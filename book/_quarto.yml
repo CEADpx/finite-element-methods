@@ -1,0 +1,80 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Advanced Finite Element Methods"
+  subtitle: "Lecture Notes"
+  author: "Prashant K. Jha"
+  site-url: "https://ceadpx.github.io/finite-element-methods/"
+  repo-url: "https://github.com/CEADpx/finite-element-methods"
+  repo-actions: [edit, issue]
+  downloads: [pdf]
+  chapters:
+    - index.qmd
+    - notation.qmd
+    - part: "Review and Foundations"
+      chapters:
+        - chapters/01-introduction.qmd
+        - chapters/02-mathematical-foundations.qmd
+        - chapters/03-variational-formulations.qmd
+        - chapters/04-model-problems.qmd
+        - chapters/05-finite-element-review.qmd
+    - part: "Error Analysis and Adaptivity"
+      chapters:
+        - chapters/06-apriori-error.qmd
+        - chapters/07-aposteriori-adaptivity.qmd
+    - part: "Advanced Finite Element Formulations"
+      chapters:
+        - chapters/08-constraints.qmd
+        - chapters/09-mixed-fem.qmd
+        - chapters/10-nonlinear-fem.qmd
+        - chapters/11-transient-fem.qmd
+    - part: "PDE-Constrained Optimization"
+      chapters:
+        - chapters/12-pde-constrained-optimization.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+execute:
+  freeze: auto
+  echo: true
+  warning: false
+  error: false
+
+crossref:
+  chapters: true
+  fig-title: "Figure"
+  tbl-title: "Table"
+  eq-title: "Equation"
+  thm-title: "Theorem"
+  def-title: "Definition"
+  exm-title: "Example"
+
+format:
+  html:
+    theme: [cosmo, styles.scss]
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-copy: true
+    code-tools: true
+    html-math-method: mathjax
+    include-in-header:
+      - latex/mathjax.html
+  pdf:
+    documentclass: scrreprt
+    pdf-engine: lualatex
+    keep-tex: true
+    toc: true
+    toc-depth: 2
+    number-depth: 3
+    geometry:
+      - margin=1in
+    colorlinks: true
+    include-in-header:
+      - latex/preamble.tex
+      - latex/macros.tex
+
+editor: source

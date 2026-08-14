@@ -1,0 +1,76 @@
+name: Publish book
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -el {0}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create Conda environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: finite-elements
+          environment-file: environment/environment.yml
+          use-mamba: true
+          auto-activate-base: false
+
+      - name: Verify build tools
+        run: |
+          which python
+          which quarto
+          python --version
+          quarto --version
+
+      - name: Install TinyTeX and render HTML and PDF
+        run: |
+          quarto install tinytex --no-prompt
+          quarto render book
+
+      - name: Confirm generated outputs
+        run: |
+          test -f book/_book/index.html
+          test -f book/_book/Advanced-Finite-Element-Methods.pdf
+          ls -lh book/_book/index.html
+          ls -lh book/_book/Advanced-Finite-Element-Methods.pdf
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload rendered book
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: book/_book
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

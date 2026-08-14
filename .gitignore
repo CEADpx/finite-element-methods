@@ -1,0 +1,16 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+book/.quarto/
+book/_book/
+book/Advanced-Finite-Element-Methods.tex
+
+# Local source PDFs used while authoring; not published with the repository.
+/references/
