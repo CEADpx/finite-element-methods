@@ -1,6 +1,6 @@
 # Notation and Conventions {#sec-notation .unnumbered}
 
-This page records notation used throughout the book. 
+This section records notation used throughout the book. 
 
 ## Typography and indices
 
@@ -124,3 +124,4 @@ The book uses *cell* for a geometric member of a mesh.
 | $\bu$ | Displacement vector | $\beps$ | Infinitesimal strain tensor |
 | $\bsig$ | Cauchy stress tensor | $\bF$ | Deformation gradient |
 | $\bC=\bF^T\bF$ | Right Cauchy--Green tensor | $\bP$ | First Piola--Kirchhoff stress tensor |
+| $J = \mathrm{det}(\bF)$ | Jacobian (determinant of $\bF$) | $I_1 = \mathrm{tr}(\bC)$ | First invariant of $\bC$ (trace) |

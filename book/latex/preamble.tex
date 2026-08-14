@@ -12,6 +12,12 @@
 \usepackage{enumitem}
 \usepackage{scrlayer-scrpage}
 
+% Place "Chapter <number>" above each numbered chapter title.
+\KOMAoptions{chapterprefix=true}
+\renewcommand*{\chapterformat}{%
+  \mbox{\chapapp\nobreakspace\thechapter\autodot}%
+}
+
 % Paragraph and list behavior
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.45em}

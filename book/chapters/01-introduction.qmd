@@ -4,7 +4,7 @@
 \chaptershorttitle{Introduction}
 ```
 
-Engineering predictions often begin with a continuum model. Temperature,
+Engineering analysis of a continuum often begins with a mathematical model. Temperature,
 displacement, velocity, concentration, and electromagnetic potential are treated
 as fields defined over a body or region of space. Balance laws constrain how
 these fields can vary, constitutive equations describe the response of a
@@ -12,7 +12,7 @@ particular material, and boundary and initial conditions connect the model to it
 surroundings. Together, these ingredients produce partial differential equations
 (PDEs) whose solutions represent the idealized response of the continuum.
 
-Closed-form solutions are exceptional once geometry, material properties, or
+Closed-form solutions are uncommon once geometry, material properties, or
 loading become realistic. A numerical method is therefore needed to replace the
 continuum problem by a finite calculation. The finite element method (FEM) makes
 this replacement through a sequence of mathematically distinct steps: it recasts
@@ -20,28 +20,31 @@ the governing equations in variational form, restricts the admissible fields to
 a finite-dimensional space constructed over a mesh, assembles the resulting
 algebraic equations, and solves those equations on a computer.
 
-The method is valuable not merely because it produces a field that can be
-plotted. Its variational structure connects physical principles, approximation
-theory, and numerical linear algebra. That connection makes it possible to ask
-whether a formulation is well posed, whether a discretization is stable, how an
-approximation improves as the mesh changes, and whether a computed result is
-credible. These questions are as important as the numerical solution itself.
+The variational structure of FEM connects physical principles, approximation
+theory, and numerical linear algebra. It allows us to ask whether a formulation
+is well posed, whether a discretization is stable, how the approximation changes
+under mesh refinement, and what evidence supports a computed result. These
+questions are part of the analysis, alongside the calculation of the numerical
+solution.
 
-This chapter introduces that intellectual structure. It distinguishes the
-physical model, the PDE, the variational problem, the finite element
-approximation, and the algebraic system without yet developing any one of them
-in detail. The notation used throughout the book is collected in the
+This chapter introduces these stages without relying on the technical details
+developed later. It distinguishes the physical model, the PDE, the variational
+problem, the finite element approximation, and the algebraic system. The
+following chapters examine each stage in greater detail. The notation used
+throughout the book is collected in the
 [Notation and Conventions](../notation.qmd) reference and defined in context as
 it enters the analysis.
 
 ## PDE-governed engineering problems {#sec-intro-pde-problems}
 
 A continuum model begins by choosing the fields and mechanisms needed to answer
-a particular question. Consider heat transfer in a solid body occupying a
+a particular question about a physical system. Consider heat transfer in a
+solid body occupying a
 domain $\Om\subset\R^d$. The primary unknown is the temperature $T(\bx,t)$.
 Conservation of energy relates its rate of change to heat flux and internal heat
-generation. Fourier's law relates the heat flux $\bq$ to the temperature
-gradient. For an isotropic material, the resulting equation has the form
+generation. Fourier's law, the constitutive relation in this model, relates the
+heat flux $\bq$ to the temperature gradient. For an isotropic material, the
+resulting equation has the form
 
 $$
 \rho c\,\dot T-\divg(k\grad T)=r
@@ -50,12 +53,12 @@ $$ {#eq-intro-heat}
 
 where $\rho$ is density, $c$ is specific heat, $k$ is thermal conductivity, and
 $r$ is a volumetric heat source. A complete problem must also prescribe suitable
-temperature or heat-flux conditions on the boundary and an initial temperature
-when time dependence is retained.
+temperature or heat-flux conditions on the boundary and an initial temperature.
 
 Now consider a deformable solid. The primary unknown is the displacement field
-$\bu(\bx)$. For small quasistatic deformation, balance of linear momentum may be
-written schematically as
+$\bu(\bx)$, which describes how a material point moves from its original
+position. For small quasistatic deformations, the balance of linear momentum may
+be written schematically as
 
 $$
 -\divg\bsig=\bb
@@ -63,21 +66,22 @@ $$
 $$ {#eq-intro-elasticity}
 
 where $\bsig$ is the Cauchy stress tensor and $\bb$ is the body force per unit
-volume. Kinematics relate displacement gradients to strain, while a constitutive
-law relates strain to stress. Displacements may be prescribed on one portion of
-the boundary and tractions on another.
+volume. Kinematics relate the displacement gradient to strain. For example,
+small-deformation theory uses $\beps = (\nabla \bu + \nabla \bu^T)/2$. A
+constitutive law then relates strain to stress; linear elasticity, for example,
+uses the linear relation $\bsig = \mathbb{C} \beps$. Displacements may be
+prescribed on one portion of the boundary and tractions on another.
 
-Equations @eq-intro-heat and @eq-intro-elasticity describe different physics and
-have unknowns of different types: temperature is scalar, while displacement is
-vector valued and stress is tensor valued. Nevertheless, the two problems share
+@eq-intro-heat and @eq-intro-elasticity describe different physics and
+have unknowns of different types: temperature is a scalar field, whereas
+displacement is a vector-valued field. Nevertheless, the two problems share
 an important structure:
 
 - a field is sought over a domain;
 - a balance law governs the field in the interior;
-- a constitutive law supplies material behavior;
+- a constitutive law models material behavior;
 - boundary and possibly initial data complete the problem;
-- quantities such as heat flux, stress, or reaction force are derived from the
-  solution.
+- quantities such as heat flux, stress, or reaction force are derived from the solution.
 
 This common structure allows one mathematical framework to treat a broad class
 of continuum problems. It does not make the models interchangeable. Choosing a
@@ -89,15 +93,19 @@ modeling decision, and no discretization can correct an inappropriate model.
 A physical system admits many mathematical models. A thermal analysis may
 neglect radiation, treat conductivity as constant, or assume a steady state. A
 structural analysis may assume infinitesimal strain, quasistatic loading, and a
-linearly elastic material. Each assumption limits the conclusions that can be
-drawn from the solution.
+linearly elastic material. Each assumption limits the conditions under which the
+model is appropriate. For example, a model based on linearized strain and small
+deformations is generally unsuitable for rubbers and other soft materials
+undergoing large deformations.
 
-Suppose, for example, that a metal support is heated along one surface and fixed
-mechanically along another. A thermal model may predict the temperature and heat
-flux accurately while saying nothing about thermal stress. A linear elastic
-model may predict small displacements under moderate loading but cease to be
-appropriate after large rotations or plastic deformation. Refining the finite
-element mesh cannot recover a mechanism that the governing model omitted.
+Suppose that a metal support is heated along one surface and fixed mechanically
+along another. A thermal model may predict temperature and heat flux while
+saying nothing about thermal stress. A linear elastic model may predict small
+displacements under moderate loading but become inappropriate after large
+rotations or plastic deformation. These are limitations of the model, and mesh
+refinement cannot remove them. If observations include stresses at several
+points, a mechanical model that omits thermal effects may fail to represent the
+data even when its finite element discretization is highly accurate.
 
 For this reason, a finite element calculation should begin with an explicit
 statement of:
@@ -107,43 +115,48 @@ statement of:
 3. the balance laws and constitutive assumptions;
 4. boundary and initial conditions;
 5. parameters and source terms;
-6. the output quantities needed from the solution.
+6. the output quantities, or quantities of interest (QoIs), needed from the
+   solution.
 
 This statement separates model construction from numerical solution and gives a
 basis for interpreting the result later.
 
 ## From a physical model to a numerical solution {#sec-intro-model-to-solution}
 
-The central organizational principle of this book is the chain
+The book organizes each model problem through the following sequence:
 
 $$
-\boxed{\text{physical model}}
-\longrightarrow
-\boxed{\text{balance laws and PDEs}}
-\longrightarrow
-\boxed{\text{boundary and initial data}}
-\longrightarrow
-\boxed{\text{variational problem}}
-\longrightarrow
-\boxed{\text{finite element problem}}
-\longrightarrow
-\boxed{\text{algebraic system}}
-\longrightarrow
-\boxed{\text{numerical solution}}
-\longrightarrow
-\boxed{\text{verification and interpretation}}.
+\begin{array}{ccccccc}
+\boxed{\substack{\text{physical}\\\text{model}}}
+&\longrightarrow&
+\boxed{\substack{\text{balance laws}\\\text{and PDEs}}}
+&\longrightarrow&
+\boxed{\substack{\text{boundary and}\\\text{initial data}}}
+&\longrightarrow&
+\boxed{\substack{\text{variational}\\\text{problem}}}
+\\
+&&&&&&\Big\downarrow
+\\
+\boxed{\substack{\text{verification and}\\\text{interpretation}}}
+&\longleftarrow&
+\boxed{\substack{\text{numerical}\\\text{solution}}}
+&\longleftarrow&
+\boxed{\substack{\text{algebraic}\\\text{system}}}
+&\longleftarrow&
+\boxed{\substack{\text{finite element}\\\text{problem}}}.
+\end{array}
 $$ {#eq-intro-workflow}
 
-The boxes in @eq-intro-workflow are related, but they are not different names
-for the same object.
+Each box in @eq-intro-workflow denotes a distinct stage of modeling or
+computation.
 
 ### Physical model
 
 The physical model identifies the idealized system, its state variables, and the
-mechanisms retained in the analysis. Material response, dimensional reduction,
-symmetry, source terms, and loading assumptions enter at this level. The output
-is not yet a differential equation; it is a precise description of what is being
-modeled and under what assumptions.
+mechanisms retained in the analysis. Material response, source terms, and loading
+assumptions enter at this level. At this stage, the analyst specifies what is
+being modeled and the assumptions under which the model will be used. The
+governing differential equations follow from those choices.
 
 ### Balance laws, constitutive equations, and PDEs
 
@@ -156,7 +169,7 @@ derivatives are interpreted classically.
 
 ### Boundary and initial data
 
-A differential equation alone rarely determines a unique solution. Boundary
+A differential equation alone is not enough to obtain a unique solution. Boundary
 conditions describe interaction with the environment: a temperature may be
 prescribed, a heat flux imposed, a displacement constrained, or a traction
 applied. Time-dependent problems also require initial data. These conditions are
@@ -169,7 +182,11 @@ The variational problem asks that the governing equations hold through their
 action on an admissible class of test functions. Derivatives are redistributed
 using integration by parts, and boundary terms become part of the formulation.
 The unknown is still a function drawn from an infinite-dimensional space. No
-mesh has yet been chosen.
+finite-dimensional approximation has been introduced at this stage. Under
+appropriate assumptions, the variational problem is equivalent to the strong
+form, but it admits solutions with weaker differentiability. Such a solution is
+called a *weak solution* to distinguish it from a classical, or strong,
+solution of the strong form.
 
 ### Finite element problem
 
@@ -180,8 +197,9 @@ of essential boundary data determine the discrete spaces.
 
 ### Algebraic system
 
-Once bases are chosen for the finite-dimensional spaces, the discrete problem
-becomes a system of algebraic equations. A linear scalar problem may produce
+After finite element discretization, the variational problem becomes a system of
+algebraic equations for the coefficients associated with the finite element
+degrees of freedom. A linear scalar PDE may produce
 
 $$
 \mathbf K\mathbf U=\mathbf F,
@@ -197,17 +215,14 @@ it is not the continuum solution itself.
 An algebraic solver computes an approximation to the coefficient vector. Direct
 and iterative solvers, preconditioners, stopping tolerances, and floating-point
 arithmetic enter at this stage. Solving the algebraic equations inaccurately can
-obscure the behavior of an otherwise sound discretization.
+obscure the behavior of an otherwise stable discretization.
 
 ### Verification and interpretation
 
-The computed field must finally be checked and interpreted. Verification asks
+The computed field must be checked and interpreted. Verification asks
 whether the equations were discretized and solved correctly. Interpretation asks
-whether derived quantities are meaningful for the original question. A smooth
-color plot is neither a verification test nor evidence that the physical model
-is adequate.
-
-Keeping these levels separate prevents common reasoning errors. A solver failure
+whether derived quantities are meaningful for the original question. Keeping
+these levels separate prevents common reasoning errors. A solver failure
 is not automatically a defect in the PDE, a mesh-refinement trend does not
 validate a constitutive model, and agreement with the assembled equations does
 not prove agreement with the continuum problem.
@@ -252,33 +267,34 @@ Several important consequences are already visible.
 
 The variational problem can admit fields whose derivatives exist only in the
 weak sense. Weak derivatives and Sobolev spaces provide the precise language for
-this enlargement of the admissible class. Chapter 2 develops that language. The
-change is not merely technical: piecewise polynomial finite element functions
-are generally not globally smooth enough to satisfy a second-order PDE
+this enlargement of the admissible class. Chapter 2 develops that language. This
+broader solution space is important because piecewise polynomial finite element
+functions are generally not globally smooth enough to satisfy a second-order PDE
 pointwise, but they can satisfy the corresponding variational equation.
 
 ### Boundary conditions enter in different ways
 
 Prescribed values are built into the admissible trial space and are called
-*essential* boundary conditions. Fluxes and tractions arise in boundary
+*essential* boundary conditions. Fluxes and tractions naturally arise in boundary
 integrals and are called *natural* boundary conditions. This distinction follows
-from the variational structure; it is not an arbitrary software convention.
+from the variational structure.
 
 ### Physical principles appear naturally
 
 In mechanics, the test function can be interpreted as a virtual displacement,
 and the variational equation expresses virtual work. In symmetric conservative
 problems, the same solution may make an energy functional stationary or minimize
-it over an admissible set. A weak equation and an energy principle are closely
-related in those cases, but they are not synonymous: many useful variational
-problems do not arise from minimization.
+it over an admissible set. A variational formulation and an energy principle are
+closely related in those cases, but they are not synonymous: many useful
+variational problems do not arise from minimization.
 
-### The statement separates structure from coordinates
+### Properties of the variational problem
 
-The form $a(u,v)=\ell(v)$ exposes properties such as symmetry, continuity, and
-coercivity without tying the analysis to a particular mesh or basis. These
-properties govern existence, uniqueness, stability, and later the quality of the
-finite element approximation.
+The form $a(u,v)=\ell(v)$ can be examined for properties such as symmetry,
+continuity, and coercivity. For a conforming Galerkin method, appropriate
+continuous properties are inherited by the finite element problem. These
+properties govern existence, uniqueness, and stability and later help determine
+the quality of the finite element approximation.
 
 ## Approximation and discretization {#sec-intro-approximation}
 
@@ -289,17 +305,20 @@ a mesh and local approximation rules.
 
 ### Meshes and local approximation
 
-A mesh $\Th$ partitions the domain into nonoverlapping cells $K$. Typical cells
-include intervals, triangles, quadrilaterals, tetrahedra, and hexahedra. On each
-cell, the unknown is represented by a simple local function, usually a
-polynomial. Neighboring representations are connected in a prescribed way so
-that the assembled field has the continuity required by the variational problem.
+A mesh $\Th$ partitions the domain into nonoverlapping elements $K$. Typical
+elements include intervals in one dimension, triangles and quadrilaterals in two
+dimensions, and tetrahedra and hexahedra in three dimensions. On each element,
+the unknown is represented by a simple local function, usually a polynomial.
+Neighboring representations are connected so that the assembled field has the
+interelement continuity required by the variational problem. Discontinuous
+Galerkin methods relax this continuity requirement and instead couple neighboring
+elements through interface terms [@arnold-brezzi-cockburn-marini2002]. This book
+focuses on conforming finite element methods; discontinuous Galerkin methods are
+outside its present scope.
 
-The geometric member of the mesh is called a *cell* in this book. A finite
-element is more precisely the combination of a cell, a local function space, and
-a set of degrees of freedom. Conventional expressions such as *element matrix*
-and *finite element mesh* remain useful, but the distinction prevents geometry
-from being confused with approximation data.
+Each geometric member of the mesh is called a *cell* or *element*. A finite
+element is more precisely the combination of an element, a local function space,
+and a set of degrees of freedom.
 
 ### Finite-dimensional spaces
 
@@ -323,41 +342,44 @@ entire function space.
 ### Local-to-global construction
 
 Finite element basis functions have local support: each is nonzero only on a
-small neighborhood of cells. Integrals can therefore be evaluated cell by cell
-and accumulated into global matrices and vectors. Two basis functions that do
-not overlap make no joint contribution, which produces sparse algebraic systems.
+small neighborhood of elements. Integrals can therefore be evaluated element by
+element and accumulated into global matrices and vectors. Two basis functions
+that do not overlap make no joint contribution, which produces sparse algebraic
+systems.
 
 This local-to-global construction is one of the defining computational features
-of FEM. It permits complex domains to be assembled from standard cell types,
+of FEM. It permits complex domains to be assembled from standard element types,
 allows material data to vary by region, and makes refinement possible in
-selected parts of the mesh.
+selected parts of the mesh. It also permits distributed computing, in which
+different processors assemble contributions from the portions of the mesh they
+own.
 
-### Reference cells and geometric flexibility
+### Reference elements and geometric flexibility
 
-Calculations on many physical cells are organized by mapping them from a small
-collection of reference cells. Shape functions, quadrature rules, and
-derivatives can be defined once on a reference cell and transformed to each
-physical cell. When the geometry is represented using the same type of basis as
-the unknown field, the construction is called *isoparametric*.
+Calculations on many physical elements are organized by mapping them from a small
+collection of reference elements. Shape functions, quadrature rules, and
+derivatives can be defined once on a reference element and transformed to each
+physical element. When the geometry and the unknown field are represented using
+the same type of basis, the construction is called *isoparametric*.
 
 These ideas explain how FEM accommodates curved boundaries and complicated
 geometries while retaining a systematic implementation. Chapter 5 develops the
-finite-element triple, Lagrange spaces, cell mappings, quadrature, assembly, and
+finite-element triple, Lagrange spaces, element mappings, quadrature, assembly, and
 discrete boundary conditions in detail.
 
-## Computation is not automatically reliability {#sec-intro-reliability}
+## Assessing the reliability of a computed result {#sec-intro-reliability}
 
-A completed solve establishes only that an algebraic procedure returned a
-result. It does not establish that the result approximates the intended physical
-system with acceptable accuracy. Several sources of discrepancy must be kept
-separate.
+A completed solve establishes that an algebraic procedure returned a result.
+Further checks are needed to determine whether that result approximates the
+intended physical system with acceptable accuracy. The following sources of
+discrepancy should be considered separately.
 
 | Source | Question |
 |---|---|
 | Modeling error | Do the physical assumptions represent the system of interest? |
 | Data uncertainty | Are geometry, material parameters, loads, and boundary data known adequately? |
 | Discretization error | Does the finite-dimensional space approximate the continuum solution sufficiently well? |
-| Quadrature error | Were cell and boundary integrals evaluated accurately enough? |
+| Quadrature error | Were element and boundary integrals evaluated accurately enough? |
 | Algebraic error | Were the discrete equations solved to an adequate tolerance? |
 | Implementation error | Does the code represent the intended formulation? |
 | Interpretation error | Are reported outputs consistent with the model and discretization? |
@@ -369,22 +391,20 @@ intended use. Mesh refinement, exact solutions, manufactured solutions,
 conservation checks, and independent implementations support verification.
 Comparison with experimental or trusted observational data supports validation.
 
-### Refinement is evidence, not a ritual
+### Interpreting refinement studies
 
-If the mesh is refined or the polynomial order increased, a consistent and
-stable method should generally approach the continuum solution under suitable
-assumptions. Observing that a quantity changes little under refinement is useful,
-but it must be interpreted carefully. A poor model can converge, an incorrectly
-implemented method can show an accidental plateau, and some quantities converge
-more slowly than the primary field.
+Under the assumptions required for convergence, refining the mesh or increasing
+the polynomial order should bring a consistent and stable discretization closer
+to the continuum solution. A refinement study provides useful numerical
+evidence, but its results require careful interpretation. A poor model can
+converge, an incorrectly implemented method can show an accidental plateau, and
+some quantities converge more slowly than the primary field.
 
 Later chapters make refinement studies quantitative. A priori analysis relates
 the approximation error to mesh size, polynomial order, solution regularity, and
 stability. A posteriori analysis uses the computed solution and problem data to
 estimate where the discretization error is concentrated. Adaptive algorithms
-then use this information to distribute computational effort. None of those
-results is derived here; their purpose is to turn numerical evidence into a
-controlled assessment.
+then use this information to distribute computational effort.
 
 ### Derived quantities require separate attention
 
@@ -395,20 +415,10 @@ integrals and need not inherit the same accuracy as the primary field. A credibl
 analysis identifies the quantity of interest before choosing the mesh and
 verification strategy.
 
-### Software automation has a boundary
-
-Modern FEM software can generate element kernels, assemble sparse tensors, apply
-boundary conditions, and call scalable solvers. It cannot determine whether a
-traction has the correct sign, whether a constitutive assumption is defensible,
-whether a nearly incompressible formulation is stable, or whether a reported
-stress is sufficiently resolved. Automation reduces mechanical implementation
-work and makes precise mathematical judgment more important, not less.
-
 ## Computational framework used in this book {#sec-intro-computational-framework}
 
 The computational material follows the same order as the mathematics: model,
 variational form, discrete spaces, algebraic problem, solver, and verification.
-Code supports this progression rather than replacing it.
 
 ### Python and Jupyter
 
@@ -423,31 +433,14 @@ implementations belong in source modules or examples.
 FEniCSx represents meshes, finite element spaces, functions, boundary conditions,
 and variational forms as computational objects. The Unified Form Language (UFL)
 expresses integrals using notation close to their mathematical form. From those
-forms, the software generates cell-level computations and assembles global
+forms, the software generates element-level computations and assembles global
 algebraic objects.
-
-This automation does not remove the derivation. Before a UFL expression appears,
-the text will identify the trial and test spaces, derive the variational problem,
-and state the boundary conditions. The software object should always have an
-explicit mathematical counterpart.
 
 ### PETSc and scalable algebra
 
 The assembled matrices and vectors are managed through PETSc. PETSc supplies
 linear and nonlinear solvers, preconditioners, distributed data structures, and
-parallel algorithms. Solver choice is part of the numerical method: large mixed,
-constrained, or nonlinear systems cannot be treated as generic dense linear
-algebra.
-
-### Quarto and reproducible exposition
-
-Quarto combines the mathematical narrative, citations, cross-references,
-figures, and executable code into HTML and PDF versions of the book. A computed
-figure should be reproducible from its stated data and code. A mathematical
-claim, however, must remain understandable without executing a notebook.
-
-Together, these tools support a workflow in which the mathematical formulation
-and its computational realization can be inspected side by side.
+parallel algorithms.
 
 ## Scope and organization of the book {#sec-intro-organization}
 
@@ -504,8 +497,8 @@ Across all these topics, the same questions recur:
 6. How should the algebraic equations be solved?
 7. What evidence supports the reported result?
 
-These questions provide a more durable understanding of FEM than any particular
-software interface.
+The chapters return to these questions when introducing each formulation and its
+computational implementation.
 
 ## Key ideas {#sec-intro-key-ideas}
 
@@ -516,9 +509,9 @@ software interface.
   software details.
 - Variational formulations reduce differentiability requirements, expose natural
   boundary terms, and provide the structure used by FEM.
-- Finite element spaces combine local approximation on mesh cells with a global
+- Finite element spaces combine local approximation on mesh elements with a global
   continuity structure.
-- Local support leads to cellwise computation and sparse global systems.
+- Local support leads to elementwise computation and sparse global systems.
 - A computed solution is credible only when modeling, discretization, algebra,
   implementation, and interpretation errors are considered separately.
 - Computation should follow the mathematical formulation and include explicit
@@ -526,38 +519,72 @@ software interface.
 
 ## Exercises {#sec-intro-exercises}
 
-1. For a steady heat-conduction problem, list the physical model, primary
-   unknown, constitutive law, governing PDE, possible boundary conditions, and
-   three quantities that might be reported from the solution.
+1. A rectangular plate $\Om=(0,L)\times(0,H)$ has constant thermal conductivity
+   $k$ and a volumetric heat source $r$. The temperature is prescribed as $T_0$
+   on the left edge, the normal heat flux is prescribed as $\bar q$ on the right
+   edge, and the top and bottom edges are insulated. Without solving the problem,
+   state:
 
-2. A cantilever is modeled using small-strain linear elasticity. Identify two
-   modeling assumptions, two discretization choices, and two verification checks.
-   Explain which of these can be improved by refining the mesh.
+   a. the primary unknown and its type (scalar, vector, or tensor);
+   b. Fourier's constitutive law for $\bq$;
+   c. the steady governing PDE;
+   d. the boundary condition on each edge, classified as essential or natural;
+   e. three distinct QoIs that could be computed from the solution.
 
-3. Classify each of the following as part of the physical model, variational
-   problem, finite element approximation, algebraic system, or numerical solver:
-   a prescribed traction, a test function, a quadratic triangle, a Krylov
-   tolerance, a coefficient vector, and a constitutive tensor.
+2. A two-dimensional cantilever of length $L$ and height $H$ is clamped at
+   $x=0$ and carries a prescribed downward traction at $x=L$. It is modeled using
+   small-strain linear elasticity. Prepare a table containing two modeling
+   assumptions, two discretization choices, and two verification checks. For
+   each entry, state whether mesh refinement can address it and justify the
+   answer in one sentence.
 
-4. Explain why a piecewise polynomial function can be appropriate for a
-   variational formulation even when it does not satisfy a second-order PDE
-   pointwise across cell boundaries.
+3. Classify each item below as belonging primarily to the physical model,
+   variational problem, finite element approximation, algebraic system, or
+   numerical solver. Give a one-sentence justification for each classification:
 
-5. Give an example in which the primary finite element field appears visually
-   smooth while a derived quantity remains inaccurate. State a verification
-   procedure appropriate for the derived quantity.
+   a. a prescribed traction;
+   b. a test function;
+   c. a quadratic triangular element;
+   d. a Krylov-method stopping tolerance;
+   e. a coefficient vector $\mathbf U$;
+   f. a constitutive tensor $\mathbb C$.
 
-6. Distinguish verification from validation for a structural finite element
-   model of a laboratory specimen. Give two activities that support each.
+4. Let $u_h$ be continuous and piecewise linear on a conforming triangular mesh.
+   State where its classical second derivatives exist and explain why $u_h$
+   generally cannot satisfy @eq-intro-diffusion-preview pointwise across element
+   boundaries. Then explain, using the integration-by-parts argument from this
+   chapter, why $u_h$ can still be admissible in the corresponding variational
+   problem.
 
-7. Starting from @eq-intro-workflow, describe where each of the following enters:
-   material calibration, numerical quadrature, mesh refinement, a linear solver,
-   and comparison with experimental data.
+5. A finite element analysis of the cantilever in Exercise 2 produces a smooth
+   displacement plot, but the reported QoI is the average normal stress over a
+   specified region near the clamp. Design a mesh-refinement study for this QoI.
+   State the sequence of meshes to be compared, the value to record on each mesh,
+   and a numerical criterion for deciding that the QoI is sufficiently resolved.
+   Explain why visual smoothness of the displacement field is not that criterion.
+
+6. A tensile coupon is tested in a laboratory, and the same test is represented
+   by a structural finite element model. Give two verification activities and
+   two validation activities for this study. For each activity, identify the
+   reference result or data needed and the discrepancy that would be measured.
+
+7. For each item below, identify the box in @eq-intro-workflow where it first
+   enters and state one error or uncertainty it may introduce:
+
+   a. calibration of a material parameter from test data;
+   b. selection of a numerical quadrature rule;
+   c. local mesh refinement;
+   d. selection of a linear solver and stopping tolerance;
+   e. comparison of a computed QoI with experimental measurements.
 
 ## Further reading {#sec-intro-further-reading}
 
 Broad treatments of the mathematical and variational foundations of FEM are
-available in [@oden-demkowicz; @oden-reddy-fem; @suli2012]. Mechanics-oriented
-developments and computational constructions can be found in [@jog;
-@becker-carey-oden1981], while [@larson-bengzon2010; @arnold2018] provide further
-perspectives on approximation, implementation, stability, and error assessment.
+available in [@oden-reddy-fem; @suli2012]. Mechanics-oriented developments and
+computational constructions can be found in [@jog; @becker-carey-oden1981],
+while [@larson-bengzon2010; @arnold2018] provide further perspectives on
+approximation, implementation, stability, and error assessment. Oden and
+Demkowicz provide the functional-analysis background used in this book
+[@oden-demkowicz]. Discontinuous Galerkin methods are outside the present scope;
+Arnold et al. provide a unified analysis of these methods for elliptic problems
+[@arnold-brezzi-cockburn-marini2002].
