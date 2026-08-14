@@ -1,0 +1,102 @@
+# Mathematical Foundations {#sec-math-foundations}
+
+This chapter establishes only the functional-analytic language required later. The treatment is intentionally selective. Süli's notes provide a concise path from function spaces to weak derivatives and Sobolev spaces, while Oden and Demkowicz provide the broader functional-analysis framework [@suli2012; @oden-demkowicz].
+
+## Vector spaces, norms, and inner products
+
+::: {#def-norm}
+## Norm
+Let $V$ be a vector space over $\R$. A mapping $\norm{\cdot}_V:V\to\R$ is a **norm** if it is positive definite, absolutely homogeneous, and satisfies the triangle inequality.
+:::
+
+The associated notion of convergence is
+
+$$
+ v_n \to v \text{ in } V
+ \quad\Longleftrightarrow\quad
+ \norm{v_n-v}_V\to0.
+$$
+
+## Function spaces
+
+For finite element analysis the most important examples are
+
+$$
+L^2(\Om), \qquad H^1(\Om), \qquad H_0^1(\Om).
+$$
+
+The $L^2$ inner product is
+
+$$
+\inner{u}{v}_{L^2(\Om)}
+=
+\int_{\Om}uv\dx,
+$$
+
+with induced norm
+
+$$
+\norm{u}_{L^2(\Om)}
+=
+\left(\int_{\Om}|u|^2\dx\right)^{1/2}.
+$$
+
+## Weak derivatives
+
+The weak derivative is motivated directly by integration by parts. For a sufficiently smooth $u$ and a compactly supported smooth test function $v$,
+
+$$
+\int_{\Om} \frac{\partial u}{\partial x_i} v\dx
+=
+-\int_{\Om}u\frac{\partial v}{\partial x_i}\dx.
+$$
+
+This identity can be used as the definition of the derivative even when the classical derivative does not exist pointwise, which is the key step toward Sobolev spaces [@suli2012].
+
+## Sobolev spaces
+
+For the second-order problems used repeatedly in this course,
+
+$$
+H^1(\Om)
+=
+\left\{
+ v\in L^2(\Om):
+ \frac{\partial v}{\partial x_i}\in L^2(\Om),\ i=1,\ldots,d
+\right\}.
+$$
+
+The associated norm is
+
+$$
+\norm{v}_{H^1(\Om)}^2
+=
+\norm{v}_{L^2(\Om)}^2
++
+\norm{\grad v}_{L^2(\Om)}^2.
+$$ {#eq-h1-norm}
+
+Equation @eq-h1-norm will be used repeatedly when discussing well-posedness and finite element error.
+
+## Linear and bilinear forms
+
+A large class of variational problems can be written as
+
+$$
+a(u,v)=\ell(v)
+\qquad \forall v\in V,
+$$
+
+where $a:V\times V\to\R$ is a bilinear form and $\ell:V\to\R$ is a linear functional.
+
+::: {#thm-lax-milgram}
+## Lax--Milgram theorem
+If $V$ is a Hilbert space, $a(\cdot,\cdot)$ is continuous and coercive on $V\times V$, and $\ell$ is a continuous linear functional on $V$, then the variational problem has a unique solution $u\in V$.
+:::
+
+The theorem is stated here for later use. Its proof is not needed for the review portion of the course.
+
+::: {.callout-important}
+## What students should retain
+The purpose of this chapter is not abstract functional analysis for its own sake. The spaces specify what regularity we require from trial and test functions, while continuity and coercivity are the properties that later control well-posedness and finite element error.
+:::

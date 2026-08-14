@@ -1,0 +1,126 @@
+# Notation and Conventions {#sec-notation .unnumbered}
+
+This page records notation used throughout the book. 
+
+## Typography and indices
+
+| Object | Convention | Typical examples |
+|---|---|---|
+| Scalar | italic lowercase or Greek letter | $u$, $T$, $k$, $\rho$ |
+| Vector | bold lowercase letter | $\bx$, $\bu$, $\bq$ |
+| Second-order tensor | bold uppercase or bold Greek letter | $\bF$, $\bC$, $\bsig$ |
+| Fourth-order tensor | blackboard-bold uppercase letter | $\mathbb{C}$ |
+| Set or function space | calligraphic or standard space symbol | $\Th$, $\V$, $H^1(\Om)$ |
+| Matrix and coefficient vector | bold uppercase letter | $\mathbf{K}$, $\mathbf{U}$ |
+
+When components are useful, Latin indices range over the spatial dimensions and
+repeated indices are summed unless stated otherwise. Thus
+
+$$
+\boldsymbol{a}\cdot\boldsymbol{b}=a_i b_i,
+\qquad
+(\boldsymbol{A}\boldsymbol{a})_i=A_{ij}a_j,
+\qquad
+\boldsymbol{A}:\boldsymbol{B}=A_{ij}B_{ij}.
+$$
+
+
+## Geometry and integration
+
+| Symbol | Meaning | Symbol | Meaning |
+|---|---|---|---|
+| $d$ | Spatial dimension | $\Om\subset\R^d$ | Open physical domain |
+| $\partial\Om$ | Boundary of $\Om$ | $\Gam_D$, $\Gam_N$ | Dirichlet and Neumann portions of the boundary |
+| $\bx$ | Point in the spatial or current configuration | $\bX$ | Point in a reference configuration |
+| $\bn$ | Outward unit normal | $\dx$, $\ds$ | Volume and boundary integration measures |
+
+Unless a different decomposition is stated,
+
+$$
+\partial\Om=\overline{\Gam_D\cup\Gam_N},
+\qquad
+\Gam_D\cap\Gam_N=\varnothing.
+$$
+
+
+## Differential operators
+
+| Symbol | Meaning |
+|---|---|
+| $\grad u = \nabla_{\bx} u$ | Spatial gradient of a scalar field |
+| $\grad\bu = \nabla_{\bx} \bu$ | Spatial gradient of a vector field |
+| $\divg\bq = \nabla_{\bx}\cdot \bq$ | Spatial divergence of a vector field |
+| $\divg\bsig = \nabla_{\bx} \bsig$ | Spatial divergence of a second-order tensor field |
+| $\Grad\bu = \nabla_{\bX} \bu$ | Gradient with respect to reference coordinates |
+| $\Div\bP = \nabla_{\bX} \cdot \bP$ | Divergence with respect to reference coordinates |
+
+The gradient of a vector field follows the convention
+
+$$
+(\grad\bu)_{ij}=\frac{\partial u_i}{\partial x_j},
+$$
+
+and the divergence of a second-order tensor follows
+
+$$
+(\divg\boldsymbol{A})_i
+=
+\frac{\partial A_{ij}}{\partial x_j}.
+$$
+
+Uppercase operators distinguish differentiation with respect to reference coordinates from differentiation with respect to spatial coordinates.
+
+## Function spaces and variational objects
+
+| Symbol | Meaning |
+|---|---|
+| $L^2(\Om)$ | Square-integrable scalar functions on $\Om$ |
+| $H^m(\Om)$ | Functions with square-integrable weak derivatives through order $m$ |
+| $H_0^1(\Om)$ | $H^1$ functions with zero trace on the prescribed boundary |
+| $\U$ | Generic trial space |
+| $\V$ | Generic test or variational space |
+| $\Ug$ | Trial space satisfying prescribed Dirichlet data $g$ |
+| $\Vzero$ | Test space satisfying the corresponding homogeneous data |
+| $a(u,v)$ | Bilinear form |
+| $a(u;v)$ | Semilinear form (nonlinear in $u$ and linear in $v$) |
+| $\ell(v)$ | Linear functional |
+| $R(u;v)$ | Residual evaluated in direction $v$ |
+| $\Pi(u)$ | Energy or potential functional |
+| $\delta\Pi(u;v)$ | First variation of $\Pi$ at $u$ in direction $v$ |
+
+The norm, seminorm, inner product, and duality pairing are written as
+
+$$
+\norm{v}_V,
+\qquad
+\seminorm{v}_{H^m(\Om)},
+\qquad
+\inner{u}{v}_V,
+\qquad
+\dual{f}{v}.
+$$
+
+## Finite element notation
+
+| Symbol | Meaning |
+|---|---|
+| $\Th$ | Mesh of the domain |
+| $K\in\Th$ | A mesh cell |
+| $h_K$ | Diameter or characteristic size of cell $K$ |
+| $h=\max_{K\in\Th}h_K$ | Global mesh-size parameter |
+| $(K,\mathcal P,\mathcal N)$ | Cell, local function space, and degrees of freedom defining a finite element |
+| $\Uh$, $\Vh$ | Discrete trial and test spaces |
+| $\uh$, $\vh$ | Discrete trial and test functions |
+| $\phi_i$ | Finite element basis function |
+| $\mathbf K\mathbf U=\mathbf F$ | Representative assembled algebraic system |
+
+The book uses *cell* for a geometric member of a mesh. 
+
+## Recurring physical fields
+
+| Symbol | Meaning | Symbol | Meaning |
+|---|---|---|---|
+| $T$ | Temperature | $\bq$ | Heat-flux vector |
+| $\bu$ | Displacement vector | $\beps$ | Infinitesimal strain tensor |
+| $\bsig$ | Cauchy stress tensor | $\bF$ | Deformation gradient |
+| $\bC=\bF^T\bF$ | Right Cauchy--Green tensor | $\bP$ | First Piola--Kirchhoff stress tensor |

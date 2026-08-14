@@ -1,0 +1,44 @@
+# Partial Differential Equations and Variational Formulations {#sec-variational}
+
+The finite element method is built from a variational problem rather than directly from the strong differential equation. Jog develops this transition from an engineering mechanics viewpoint, while Süli and Arnold formulate it in the language of weak solutions and Hilbert spaces [@jog; @suli2012; @arnold2018].
+
+## Strong and weak forms
+
+Consider the scalar diffusion problem
+
+$$
+-\divg(k\grad u)=f \quad \text{in }\Om,
+$$
+
+with suitable boundary conditions. Multiplication by a test function $v$ and integration by parts give the weak form
+
+$$
+\int_{\Om}k\grad u\cdot\grad v\dx
+=
+\int_{\Om}fv\dx
++
+\text{boundary terms}.
+$$
+
+The boundary terms distinguish essential and natural boundary conditions.
+
+## Abstract form
+
+After defining the admissible trial and test spaces, the problem is written as
+
+$$
+\text{find }u\in V
+\quad\text{such that}\quad
+a(u,v)=\ell(v)
+\quad\forall v\in V.
+$$
+
+## Energy minimization
+
+For a symmetric coercive bilinear form, the same solution minimizes
+
+$$
+\Pi(v)=\frac12 a(v,v)-\ell(v).
+$$
+
+The distinction between a general variational equation and an energy minimization problem will matter later for nonlinear and constrained problems.

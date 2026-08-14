@@ -1,0 +1,3 @@
+# A Priori Error Estimation and Convergence {#sec-apriori-error}
+
+*Chapter placeholder. Content will be developed from the finalized course notes and references.*

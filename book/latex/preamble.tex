@@ -1,0 +1,37 @@
+% ============================================================
+% ME/BME 736 book preamble
+% Presentation-level LaTeX configuration belongs here.
+% Mathematical notation belongs in macros.tex.
+% ============================================================
+
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{scrlayer-scrpage}
+
+% Paragraph and list behavior
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\setlist{nosep,leftmargin=*}
+\allowdisplaybreaks[1]
+
+% KOMA-Script running headers
+\clearpairofpagestyles
+\ihead{ME/BME 736: Advanced Finite Element Methods}
+\ohead{\headmark}
+\cfoot{\pagemark}
+\automark[section]{chapter}
+\pagestyle{scrheadings}
+
+% Matrix and equation spacing
+\setlength{\jot}{6pt}
+\renewcommand{\arraystretch}{1.08}
+
+% Better behavior for long equations and URLs
+\emergencystretch=2em
+
+% SI units
+\sisetup{detect-all}

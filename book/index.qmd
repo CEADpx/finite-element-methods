@@ -1,0 +1,20 @@
+# Preface {.unnumbered}
+
+These notes accompany **ME/BME 736: Advanced Finite Element Methods**. The course develops a rigorous and computationally useful understanding of finite element methods, with heat conduction and solid mechanics used as recurring model problems and FEniCSx used throughout for implementation and numerical investigation.
+
+The first part reviews the mathematical, variational, mechanics, and finite element foundations needed for the advanced topics. The later chapters will develop error estimation and adaptivity, constrained and mixed formulations, nonlinear finite element methods, transient problems, and PDE-constrained optimization.
+
+::: {.callout-note}
+## Authoring principle
+The mathematical formulation should be complete in the text. Executable code is used to make the numerical realization reproducible, not to replace the derivation.
+:::
+
+## How to use these notes
+
+Each computational example follows the same sequence:
+
+1. mathematical model;
+2. variational formulation;
+3. finite element discretization;
+4. FEniCSx realization;
+5. verification and interpretation.

@@ -1,0 +1,37 @@
+name: finite-elements
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - quarto
+
+  - python=3.12
+
+  - fenics-dolfinx
+  - mpich
+  - mpi4py
+  - petsc4py
+
+  - numpy
+  - scipy
+  - sympy
+
+  - matplotlib
+  - pyvista
+  - trame
+  - ipywidgets
+
+  - gmsh
+  - python-gmsh
+  - meshio
+
+  - jupyter
+  - jupyterlab
+  - ipykernel
+
+  - pandas
+
+  - pytest
+  - ruff

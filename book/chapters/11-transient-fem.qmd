@@ -1,0 +1,3 @@
+# Transient Finite Element Methods {#sec-transient-fem}
+
+*Chapter placeholder. Content will be developed from the finalized course notes and references.*

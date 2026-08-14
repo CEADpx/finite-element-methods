@@ -1,0 +1,3 @@
+# A Posteriori Error Estimation and Adaptive Finite Elements {#sec-aposteriori-adaptivity}
+
+*Chapter placeholder. Content will be developed from the finalized course notes and references.*

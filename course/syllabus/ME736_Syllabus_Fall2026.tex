@@ -1,0 +1,343 @@
+\documentclass[12pt]{article}
+
+% Standalone Fall 2026 syllabus for ME/BME 736.
+% Compile with:
+%   pdflatex ME736_Syllabus_Fall2026_updated.tex
+%   pdflatex ME736_Syllabus_Fall2026_updated.tex
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage[
+  top=1in,
+  bottom=1in,
+  left=1in,
+  right=1in
+]{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\usepackage{titlesec}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\setlength{\footskip}{24pt}
+
+\fancypagestyle{syllabus}{
+  \fancyhf{}
+  \fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+\pagestyle{syllabus}
+
+
+\definecolor{SDBlue}{HTML}{DDEBF7}
+\definecolor{SectionNavy}{HTML}{17365D}
+\definecolor{LinkBlue}{HTML}{0563C1}
+
+\titleformat{\section}
+  {\fontsize{14}{16}\selectfont\bfseries\color{SectionNavy}}
+  {\thesection.}
+  {0.6em}
+  {}
+
+\titlespacing*{\section}
+  {0pt}
+  {1.2em}
+  {0.1em}
+
+\hypersetup{
+  pdftitle={ME 736 Advanced Finite Element Methods Syllabus, Fall 2026},
+  pdfauthor={Prashant K. Jha},
+  pdfsubject={Fall 2026 course syllabus and module schedule},
+  colorlinks=true,
+  linkcolor=LinkBlue,
+  urlcolor=LinkBlue,
+  citecolor=LinkBlue,
+  breaklinks=true
+}
+\urlstyle{same}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.22em}
+\setlength{\emergencystretch}{1.5em}
+\raggedbottom
+
+\setlist[itemize]{
+  leftmargin=1.45em,
+  label=\textbullet,
+  itemsep=0pt,
+  topsep=0.12em,
+  parsep=0pt,
+  partopsep=0pt
+}
+\setlist[enumerate]{
+  leftmargin=2.15em,
+  itemsep=0.08em,
+  topsep=0.15em,
+  parsep=0pt,
+  partopsep=0pt
+}
+
+\newcommand{\syllabusheading}[1]{%
+  \par\addvspace{0.52em}%
+  \noindent\textbf{#1}\par\nobreak\vspace{0.03em}%
+}
+
+\newcommand{\syllabussubheading}[1]{%
+  \par\addvspace{0.35em}%
+  \noindent\textbf{#1}\par\nobreak\vspace{0.02em}%
+}
+
+\newcommand{\coursefield}[2]{%
+  \vspace{0.2em}\noindent\textbf{#1} #2\par
+}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\begin{document}
+
+\pagestyle{syllabus}
+\thispagestyle{syllabus}
+
+\begin{center}
+  {\bfseries \Large South Dakota School of Mines \& Technology}\\[-0.2em]
+  \large
+  Advanced Finite Element Methods, Fall 2026\\[-0.2em]
+  ME/BME 736 -- M01 [3--0 Credit Hours]
+\end{center}
+
+\section{Instructor}
+Prof.\ Prashant K.\ Jha
+
+Office: Civil \& Mechanical Engineering Building, Room 317
+
+P: 605-394-1893; E:
+\href{mailto:Prashant.Jha@sdsmt.edu}{Prashant.Jha@sdsmt.edu}
+
+\coursefield{Office hours:}{Thursday, 12:00--2:00 PM, CM 317.}
+Additional meetings depending on the availability can be scheduled via emails. 
+
+\section{Course Meeting Times and Location}
+\coursefield{Course Start/End Dates:}{August 25 through December 8}
+\coursefield{Class:}{Tuesday/Thursday, 75 minutes}
+\coursefield{Time:}{09:30--10:45 AM, Tue/Thu}
+\coursefield{Location:}{Classroom building 206W}
+\coursefield{D2L Link to the course:}{\href{https://d2l.sdbor.edu/d2l/home/2192078}{ME 736 Fall 2026}}
+\coursefield{Course Repository:}{\href{https://github.com/CEADpx/finite-element-methods}{github.com/CEADpx/finite-element-methods}}
+
+\coursefield{Course Delivery Method:}{This class will primarily be conducted in person, although there may be class periods during which we need to meet via Zoom. The class will meet together at the scheduled times. You need a working knowledge of D2L with help available on the \href{https://www.sdsmt.edu/its/help/}{ITS Page}.}
+
+\section{Course Description}
+Variational and weighted residual approach to finite element equations. Emphasis on two- and three-dimensional problems in solid mechanics. Isoparametric element formulation, higher order elements, numerical integration, imposition of constraints and penalty, convergence, and other more advanced topics. Use of two- and three-dimensional computer programs. Dynamic and vibrational problems, eigenvalues, and time integration. Introduction to geometric and material nonlinearities.
+
+\coursefield{Course Prerequisites:}{Permission of instructor.}
+
+\coursefield{Expected Background:}{Students are expected to have prior exposure to the finite element method, linear algebra, multivariable calculus, differential equations, and basic continuum or solid mechanics. Familiarity with Python is helpful. The first five class meetings provide a focused review of the mathematical, variational, mechanics, and finite element foundations used throughout the course, but these topics will not be taught from first principles.}
+
+\section{Student Learning Outcomes}
+Upon completion of this course, the student should be able to:
+\begin{enumerate}
+  \item Formulate variational and finite element approximations for representative heat transfer and solid mechanics problems using appropriate trial and test spaces.
+  \item Analyze finite element accuracy and convergence using a priori and a posteriori error analysis, numerical convergence studies, and adaptive mesh refinement.
+  \item Formulate constrained and mixed finite element problems using penalty methods, Lagrange multipliers, and displacement--pressure formulations.
+  \item Formulate and solve nonlinear finite element problems using residual equations, consistent linearization, tangent operators, and Newton methods.
+  \item Formulate transient finite element problems and assess the consistency, accuracy, and stability of common time discretization methods.
+  \item Formulate and solve PDE-constrained optimization problems using direct and adjoint sensitivity methods and gradient-based optimization.
+\end{enumerate}
+
+\coursefield{Course Goals:}{The objective of this course is to develop a rigorous and computationally useful understanding of advanced finite element methods. The course begins with a focused review of the mathematical and variational foundations of FEM, then develops error estimation and adaptivity, constrained and mixed formulations, nonlinear finite element methods, transient problems, and PDE-constrained optimization. Heat conduction and solid mechanics problems are used throughout as recurring model problems. FEniCSx is used throughout the course to implement, verify, and investigate the methods.}
+
+\section{Course Topics and Tentative Schedule}
+{
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{0.6in} C{0.48in} L{5.08in}}
+\rowcolor{SDBlue}
+\textbf{Dates} & \textbf{Classes} & \textbf{Module and coverage}\\
+\endfirsthead
+\rowcolor{SDBlue}
+\textbf{Dates} & \textbf{Classes} & \textbf{Module and coverage}\\
+\endhead
+Aug.\ 25--Sept.\ 8 & 5 &
+\textbf{Module 0: Review and Foundations.}
+Mathematical preliminaries: vector spaces, norms, metrics, and Sobolev spaces; partial differential equations, integration by parts, variational formulations, and energy minimization; linear elasticity, hyperelasticity, and the transient heat equation with associated variational forms; finite element approximation for linear quasistatic problems, including trial and test functions, shape functions, isoparametric mappings, assembly, and boundary conditions. Detailed review handouts will be provided in advance. \\[0.18em]
+
+Sept.\ 10--17 & 3 &
+\textbf{Module 1: A Priori Error Estimation and Convergence.}
+Galerkin orthogonality; continuity and coercivity; interpolation error; energy-norm and $L^2$ error; $h$-convergence and the role of polynomial order; numerical verification of convergence rates.\\[0.18em]
+
+Sept.\ 22--29 & 3 &
+\textbf{Module 2: A Posteriori Error Estimation and Adaptive FEM.}
+Uniform and local mesh refinement; residual-based error estimation; element residuals and interelement local indicators and global estimators; marking strategies; solve--estimate--mark--refine workflow and FEniCSx implementation.\\[0.18em]
+
+Oct.\ 1 & 1 &
+\textbf{Module 3: Constraints in Finite Element Problems.}
+Constrained variational and algebraic problems; penalty and Lagrange multiplier methods; interpretation of multipliers and implementation in FEniCSx.\\[0.18em]
+
+Oct.\ 6--8 & 2 &
+\textbf{Module 4: Mixed Finite Element Methods.}
+Volumetric locking in nearly incompressible elasticity; mixed displacement--pressure formulation; saddle-point structure; stable choices of displacement and pressure spaces; mixed-space implementation in FEniCSx.\\[0.18em]
+
+\rowcolor{SDBlue!65}
+Oct.\ 13 & 1 &
+\textbf{Midterm Exam.} Review and foundations through mixed finite element methods.\\[0.18em]
+
+Oct.\ 15--29 & 5 &
+\textbf{Module 5: Nonlinear Finite Element Methods.}
+Sources of nonlinearity; nonlinear systems and Newton's method; residual equations; directional derivatives and consistent linearization; tangent operators and tangent matrices; convergence criteria; load stepping and basic globalization strategies; nonlinear variational formulation; finite element formulation and FEniCSx implementation for hyperelasticity.\\[0.18em]
+
+Nov.\ 3--10 & 3 &
+\textbf{Module 6: Transient Finite Element Methods.}
+Semidiscrete formulation of the transient heat equation; mass and stiffness matrices; forward Euler, backward Euler, and Crank--Nicolson methods; consistency, accuracy, and stability; FEniCSx implementation.\\[0.18em]
+
+Nov.\ 12--Dec.\ 3 & 6 &
+\textbf{Module 7: PDE-Constrained Optimization.}
+Optimization problems governed by PDEs; state and design variables and objective functions; direct sensitivity analysis; Lagrangian and adjoint formulations; continuous and discrete adjoints; gradient verification; use of gradient-based optimization solvers; FEniCSx implementations with elasticity examples.\\[0.18em]
+
+\rowcolor{SDBlue!65}
+Dec.\ 8 & 1 &
+\textbf{Final Computational Project Due and Presentation.}\\
+\end{longtable}
+}
+
+\coursefield{Schedule note:}{The schedule may be adjusted based on class progress. There is no class on Thursday, November 26, because of the Thanksgiving holiday. The South Dakota Mines Fall 2026 final examination period is December 10--11 and December 14--16.}
+
+\section{Course Materials}
+\coursefield{Required Textbook(s) and Materials:}{No required textbook. Detailed course notes and review handouts will be provided through D2L and the course repository. Students are expected to read assigned notes before class when indicated.}
+
+\syllabussubheading{Suggested References}
+\begin{itemize}
+  \item J. T. Oden and L. Demkowicz, \textit{Applied Functional Analysis}, 3rd ed., Chapman \& Hall/CRC, 2018.
+  \item J. T. Oden and J. N. Reddy, \textit{An Introduction to the Mathematical Theory of Finite Elements}, Wiley, 1976.
+  \item E. B. Becker, G. F. Carey, and J. T. Oden, \textit{Finite Elements: An Introduction}, Vol. 1, Prentice-Hall, 1981.
+  \item J. T. Oden and J. N. Reddy, \textit{Variational Methods in Theoretical Mechanics}, 2nd ed., Springer, 1983.
+  \item J. Bonet and R. D. Wood, \textit{Nonlinear Continuum Mechanics for Finite Element Analysis}, 2nd ed., Cambridge University Press, 2008.
+\end{itemize}
+
+\coursefield{Supplementary Materials:}{Course notes, FEniCSx examples, computational notebooks or scripts, assignments, supporting data, and selected readings will be provided through the \href{https://github.com/CEADpx/finite-element-methods}{course repository} and D2L. The official FEniCSx documentation will be used as a software reference.}
+
+\coursefield{Technology Equipment Needed for the Course:}{Student Laptop Program required or suitable alternative for those who have exclusion. Students must be able to run the course FEniCSx computational environment on their laptop or through an instructor-approved alternative.}
+
+\coursefield{Technology Skills Needed for the Course:}{Ability to navigate D2L; upload and download files; communicate by email; access digital course materials; write and modify Python programs; and run, inspect, and modify finite element simulations using FEniCSx. Prior familiarity with Python is helpful. Course examples will introduce the FEniCSx workflow needed for assignments.}
+
+\section{Grading and Assessment}
+Every effort is made to grade fairly and consistently. If you believe there has been a mistake in grading, you have one (1) week from the date the graded item is returned to request a re-grade.
+
+\vspace{0.2em}
+{\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.13}
+\begin{tabular}{|L{5.28in}|C{0.92in}|}
+\hline
+\textbf{Assignment Name/Description} & \textbf{Percent}\\
+\hline
+Homework problem sets & 50\\
+\hline
+Midterm Exam & 25\\
+\hline
+Final computational project & 25\\
+\hline
+\textbf{TOTAL} & \textbf{100}\\
+\hline
+\end{tabular}
+}
+
+\coursefield{Grade division:}{A: 90--100\%, B: 80--90\%, C: 70--80\% range, D: 60--70\% range, F: below 60\%.}
+
+\coursefield{Final grade calculation:}{Final grades will be calculated based on the weighted average of the above components. The final grade will be rounded to the nearest whole number. The final computational project and presentation will be due on December 8, 2026.}
+
+\coursefield{Special Note Regarding Final Exams:}{Per South Dakota Mines Policy \href{https://www.sdsmt.edu/About/Office-of-the-President/Docs/Policy-Manual/Academics/Final-Examinations/}{(II-6-2)}, if you are scheduled to take three or more final/last exams on the same day during finals week, you may request that the middle exam(s) of the day be rescheduled. \textbf{\textit{You are required to make this request of your Instructor(s) at least 30 days prior to the last day of regular classes.}}
+}
+
+\section{Course Policies}
+
+\coursefield{Communication Protocol:}
+{Professional and courteous communication is expected when emailing the professor. At a minimum, students should address the professor as Dr.\ [Instructor last name] or Prof.~[Instructor last name], frame the message as a request rather than a demand, and close courteously, for example, ``Best regards, [first name],'' ``Regards, [first name],'' or ``Thank you, [first name].'' Emails that do not follow these basic expectations may not receive a response.}
+
+\coursefield{Coursework:}{Coursework will consist of homework problem sets, one midterm exam, and a final computational project. Homework problem sets will include both analytical problems and FEniCSx computational exercises. Two short review homework sets will cover the review module; later homework will generally span one or more advanced modules and will combine mathematical analysis, finite element implementation, verification, and interpretation of numerical results. Detailed instructions and due dates will be provided through D2L and in class.}
+
+\coursefield{Attendance Policy:}{
+Attendance is highly recommended to learn the course material. Students should expect substantial work outside class reading the assigned notes, completing analytical derivations, and developing and verifying FEniCSx implementations. Surprise in-class quizzes may be given to encourage attendance and preparation.
+}
+
+\coursefield{Late Work and Make-up Examination Policy:}{
+Homework and computational assignments will be collected on the due date at the start of class unless submitted through D2L. Late work will incur a penalty of 20\% of the total possible points for each calendar day or portion thereof after the deadline. Work submitted five calendar days after the deadline will not be accepted. The midterm exam will be held during a scheduled 75-minute class period. A make-up exam will be given only under extreme circumstances determined at the Instructor's discretion or for an excused absence. Students are expected to contact the Instructor sufficiently in advance of the exam whenever possible.
+}
+
+\coursefield{Collaboration and Generative AI Policy:}{
+Collaboration with other students and the use of ChatGPT or other generative AI tools are not permitted unless explicitly allowed in the instructions for a specific task or assignment. Each student must submit an individual assignment unless a team submission is explicitly permitted. The instructor and graders reserve the right to ask students to explain their submitted work. Points may be deducted if the submitted work or the student's explanation indicates unauthorized collaboration or use of generative AI tools.
+}
+
+\coursefield{Academic Integrity:}{
+South Dakota Mines is committed to academic honesty and scholarly integrity. The \href{https://www.sdbor.edu/policy/Documents/2-33.pdf}{South Dakota Board of Regents Policy 2:33} provides a comprehensive definition of ``Academic Dishonesty'', which include cheating and plagiarism. All Instructors at South Dakota Mines are required to report allegations of academic misconduct to the Student Conduct Officer. The \href{https://www.sdbor.edu/policy/documents/3-4.pdf}
+{South Dakota Board of Regents Policy 3:4} provides detailed information regarding key definitions, policy information, prohibited conduct, and the Student Conduct process adhered to at South Dakota Mines. Any student suspected of violating academic integrity standards will be reported in accordance with the process outlined on the \href{https://www.sdsmt.edu/Campus-Life/Community-Standards/Academic-Integrity/}{South Dakota Mines website}.
+}
+
+\coursefield{Electronic Device Policy:}{
+During in-person sessions, students should refrain from using electronic devices for purposes unrelated to the course. The instructor may ask a student to put away a device or stop behavior that distracts others. If the behavior continues after a warning, the student may be asked to leave for the remainder of the class, and the student's academic mentor or adviser may be notified. During synchronous Zoom sessions, students are expected to log in, remain attentive, and participate. Students should refrain from using other devices for activities unrelated to the course.
+}
+
+\coursefield{Classroom Conduct and Resolution of Concerns:}{Students must not engage in disruptive arguments with the instructor or other students during class. Questions and disagreements should be expressed respectfully. If a concern cannot be resolved briefly without disrupting instruction, the student should contact the instructor after class or during office hours. If the concern remains unresolved, the student may contact their academic mentor or adviser.
+}
+
+\section{Some additional statements and policies}
+
+\coursefield{Academic Freedom Statement:}{ Academic Freedom is the cornerstone upon which higher education is built. Academic freedom, as defined by \href{https://www.sdbor.edu/policy/documents/1-11.pdf}{BOR policy 1:11}, is fundamental to the advancement of truth, development of critical thinking, promotion of civil discourse, and contribution to the public good. Each course includes the freedom to discuss relevant matters and present various scholarly views in the classroom, as determined by the subject-matter expertise of the Instructor. Students are encouraged to develop the capacity for critical thinking and to pursue the truth, debate ideas, express and evaluate their opinions, and draw conclusions. Students are free to take reasoned exception to the views offered in any course of study and to reserve judgment about matters of opinion, but they are responsible for learning the content of any course of study for which they are enrolled.\footnote{Language adapted from the American Association of University Professors ``Joint Statement on Rights and Freedoms of Students''.}
+}
+
+\coursefield{Complaint Process:}{While we hope that every student has a meaningful and positive experience at South Dakota Mines, should a concern arise, students are encouraged to first attempt to resolve their concern directly with the person or office directly involved. Following that attempt, should the concern remain unresolved, students are encouraged to reach out to the Dean of Students office at \href{mailto:DeanOfStudents@sdsmt.edu}{DeanOfStudents@sdsmt.edu} or 605.394.2416. Additionally, students may access the \href{https://sdsmt-advocate.symplicity.com/public_report/index.php/pid390522?}{online form} to submit their complaint, appeal, or grievance.
+}
+
+\coursefield{Grade Appeal Policy:}{In alignment with \href{https://www.sdbor.edu/policy/documents/2-9.pdf}{BOR Policy 2:9}, students who wish to appeal their final course grade shall first discuss the matter with the course instructor. If the concerns are unresolved following that discussion, students may utilize the \href{https://sdsmt-advocate.symplicity.com/public_report/index.php/pid844003?}{online form} to submit ``Appeal -- Academic'' for a ``Grade Dispute''.
+}
+
+\coursefield{Opportunity for All - Student Success Services and Support:}{Students are provided a one-stop source for information regarding all the services and supports to ensure success. Visit the \href{https://www.sdsmt.edu/Opportunity-For-All/}{Opportunity for All} page to access service and department information including ADA accommodations, Career Services, Counseling, Office for Inclusion, Slide Rule (math support), Student Success, Title IX, Tutoring, and Veterans Services, to name a few.
+}
+
+\coursefield{South Dakota Board of Regents Required Syllabus Statements:}{The following statements may be found online in South Dakota Board of Regents Academic Affairs Council Guideline \href{https://www.sdbor.edu/administrative-offices/academics/academic-affairs-guidelines/Documents/5_Guidelines/5_3A_Guideline.pdf}{5.3.A}:
+\begin{itemize}
+  \item Freedom in Learning
+  \item Americans with Disabilities Act
+  \item Academic Dishonesty and Misconduct
+  \item Acceptable Use of Technology
+  \item Emergency Alert Communications
+\end{itemize}
+}
+
+\coursefield{Inclusion:}{South Dakota Mines is committed to cultivating an inclusive learning environment where faculty, staff, and students can grow and succeed. We value the diversity of unique backgrounds, experiences, perspectives, and talents within our community. It is our goal to promote a culture of respect, honor, understanding, integrity, and collaboration. It is through this diversity and inclusion that we find our strength.
+}
+
+\coursefield{Email Communication:}{Each student has been issued a South Dakota Mines email address. This is the official method of communication from the institution to the student. Students are expected to utilize their South Dakota Mines email address for all electronic communication related to this course and their education record at South Dakota Mines.}
+
+\coursefield{Copyright and Terms of Use of Course Materials:}{Lectures, presentations, and other course materials are protected intellectual property under South Dakota Board of Regents Policy. Accordingly, recording and disseminating lectures, presentations or course materials is strictly prohibited without the express permission of the faculty member. Violation of this prohibition may result in the student being subject to Student Conduct proceedings under SDBOR Policy 3:4.
+}
+
+\coursefield{South Dakota Mines Adheres to Title IX; What is Title IX?}{South Dakota Mines is committed to providing a safe and positive learning experience.
+
+To report a violation of sexual misconduct or gender discrimination, please contact the Title IX Coordinator, Amanda Lopez, at 605-394-2533 or submit an online report through the \href{https://www.sdsmt.edu/TitleIX/}{South Dakota Mines Title IX website}. \textit{Please note that as your professor, I am required to report any incidences to the Title IX Coordinator.} Confidential support for students is available by contacting the Student Counseling Center at 605-394-1924 or \href{mailto:counseling@sdsmt.edu}{counseling@sdsmt.edu}.
+}
+
+\coursefield{Classroom Community and Mutual Respect:}{
+This classroom is a safe space for learning and is an academic environment; you should expect to have your ideas, work, and arguments respectfully challenged. Our population is a variety of students with a great diversity of beliefs, and the class must be respectful of all members.
+}
+
+\vfill
+\textbf{Prepared by:}
+
+Prashant K.\ Jha, August 13, 2026
+
+\end{document}

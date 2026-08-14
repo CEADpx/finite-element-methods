@@ -1,0 +1,19 @@
+/*-- scss:defaults --*/
+$body-font-size: 1.02rem;
+$line-height-base: 1.55;
+
+/*-- scss:rules --*/
+.quarto-title-block .quarto-title-banner {
+  padding-top: 1.6rem;
+  padding-bottom: 1.6rem;
+}
+
+.theorem, .definition, .example {
+  margin-top: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.cell-output-display {
+  margin-top: 0.8rem;
+  margin-bottom: 1.2rem;
+}

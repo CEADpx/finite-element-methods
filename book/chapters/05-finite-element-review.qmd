@@ -1,0 +1,99 @@
+---
+jupyter: python3
+---
+
+# Review of Finite Element Approximation {#sec-fem-review}
+
+Jog's abstract formulation emphasizes the sequence from a finite-dimensional subspace to assembly, boundary conditions, solution, and postprocessing. Larson and Bengzon provide a complementary approximation and implementation viewpoint [@jog; @larson-bengzon2010].
+
+## Galerkin approximation
+
+Given a variational problem on $V$, choose a finite-dimensional subspace
+
+$$
+\Vh\subset V.
+$$
+
+The conforming Galerkin approximation is
+
+$$
+\text{find }\uh\in\Vh
+\quad\text{such that}\quad
+a(\uh,\vh)=\ell(\vh)
+\quad\forall\vh\in\Vh.
+$$ {#eq-discrete-galerkin}
+
+## Basis functions and assembly
+
+Let $\{\phi_i\}_{i=1}^N$ be a basis for $\Vh$ and write
+
+$$
+\uh=\sum_{j=1}^N U_j\phi_j.
+$$
+
+Substitution into @eq-discrete-galerkin yields
+
+$$
+\mathbf{K}\mathbf{U}=\mathbf{F},
+$$
+
+where
+
+$$
+K_{ij}=a(\phi_j,\phi_i),
+\qquad
+F_i=\ell(\phi_i).
+$$
+
+## Reference elements and quadrature
+
+The same implementation is reused over many physical elements by mapping from a reference element. Numerical quadrature is then used to evaluate element integrals.
+
+## A computed figure inside the chapter
+
+The following cell is intentionally simple. Its purpose is to show how a computed result appears directly in the source and receives a cross-reference.
+
+```{python}
+#| label: fig-demo-convergence
+#| fig-cap: "Illustrative first-order convergence curve generated during the book build."
+#| echo: true
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+h = np.array([0.5, 0.25, 0.125, 0.0625])
+error = 0.8 * h
+
+plt.figure()
+plt.loglog(h, error, "o-")
+plt.xlabel(r"mesh size $h$")
+plt.ylabel("error")
+plt.grid(True, which="both")
+plt.tight_layout()
+plt.show()
+```
+
+The figure can then be referenced normally as @fig-demo-convergence. In the actual error-analysis chapter, the values will come from FEniCSx computations rather than from an illustrative array.
+
+## FEniCSx code in the same source
+
+A FEniCSx cell can be executable once the course environment is installed. It is marked `eval: false` here so that this template remains portable.
+
+```{python}
+#| eval: false
+#| code-line-numbers: true
+
+from mpi4py import MPI
+from dolfinx import fem, mesh
+
+# Mesh and scalar Lagrange space
+domain = mesh.create_unit_square(MPI.COMM_WORLD, 32, 32)
+V = fem.functionspace(domain, ("Lagrange", 1))
+```
+
+The important design choice is that the mathematical object $V_h$ is introduced first, and the FEniCSx object is then presented as its computational realization.
+
+::: {#exm-fenicsx-map}
+## Mathematical objects and FEniCSx objects
+A typical chapter will explicitly connect the mesh $\Th$, finite element space $V_h$, trial and test functions, variational forms, boundary conditions, and solver objects to their FEniCSx counterparts.
+:::
