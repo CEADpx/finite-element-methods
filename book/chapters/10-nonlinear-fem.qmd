@@ -1,3 +1,7 @@
 # Nonlinear Finite Element Methods {#sec-nonlinear-fem}
 
+```{=latex}
+\chaptershorttitle{Nonlinear FEM}
+```
+
 *Chapter placeholder. Content will be developed from the finalized course notes and references.*

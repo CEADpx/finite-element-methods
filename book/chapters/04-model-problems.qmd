@@ -1,5 +1,9 @@
 # Model Problems in Heat Transfer and Solid Mechanics {#sec-model-problems}
 
+```{=latex}
+\chaptershorttitle{Heat and Solid Mechanics}
+```
+
 Heat conduction and solid mechanics are used throughout the course because they expose the same finite element machinery through different physics. Larson and Bengzon treat both within a common finite element framework, while Arnold derives the heat equation directly from balance and Fourier conduction [@larson-bengzon2010; @arnold2018].
 
 ## Heat conduction

@@ -1,5 +1,9 @@
 # Partial Differential Equations and Variational Formulations {#sec-variational}
 
+```{=latex}
+\chaptershorttitle{Variational Formulations}
+```
+
 The finite element method is built from a variational problem rather than directly from the strong differential equation. Jog develops this transition from an engineering mechanics viewpoint, while Süli and Arnold formulate it in the language of weak solutions and Hilbert spaces [@jog; @suli2012; @arnold2018].
 
 ## Strong and weak forms

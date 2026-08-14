@@ -8,6 +8,13 @@ $line-height-base: 1.55;
   padding-bottom: 1.6rem;
 }
 
+.book-author-contact {
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.95rem;
+}
+
 .theorem, .definition, .example {
   margin-top: 1.2rem;
   margin-bottom: 1.2rem;

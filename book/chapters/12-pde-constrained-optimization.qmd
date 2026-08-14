@@ -1,3 +1,7 @@
 # PDE-Constrained Optimization {#sec-pde-optimization}
 
+```{=latex}
+\chaptershorttitle{PDE-Constrained Optimization}
+```
+
 *Chapter placeholder. Content will be developed from the finalized course notes and references.*

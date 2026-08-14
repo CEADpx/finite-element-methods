@@ -4,6 +4,10 @@ jupyter: python3
 
 # Review of Finite Element Approximation {#sec-fem-review}
 
+```{=latex}
+\chaptershorttitle{Finite Element Approximation}
+```
+
 Jog's abstract formulation emphasizes the sequence from a finite-dimensional subspace to assembly, boundary conditions, solution, and postprocessing. Larson and Bengzon provide a complementary approximation and implementation viewpoint [@jog; @larson-bengzon2010].
 
 ## Galerkin approximation

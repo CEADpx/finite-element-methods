@@ -1,3 +1,7 @@
 # Mixed Finite Element Methods {#sec-mixed-fem}
 
+```{=latex}
+\chaptershorttitle{Mixed FEM}
+```
+
 *Chapter placeholder. Content will be developed from the finalized course notes and references.*

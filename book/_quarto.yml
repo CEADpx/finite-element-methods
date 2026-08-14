@@ -5,7 +5,11 @@ project:
 book:
   title: "Advanced Finite Element Methods"
   subtitle: "Lecture Notes"
-  author: "Prashant K. Jha"
+  author:
+    - name: "Prashant K. Jha"
+      email: "prashant.jha@sdsmt.edu"
+      affiliations:
+        - name: "Leslie A. Rose Department of Mechanical Engineering, South Dakota School of Mines & Technology"
   site-url: "https://ceadpx.github.io/finite-element-methods/"
   repo-url: "https://github.com/CEADpx/finite-element-methods"
   repo-actions: [edit, issue]

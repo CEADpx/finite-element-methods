@@ -1,5 +1,5 @@
 % ============================================================
-% ME/BME 736 book preamble
+% Advanced Finite Element Methods book preamble
 % Presentation-level LaTeX configuration belongs here.
 % Mathematical notation belongs in macros.tex.
 % ============================================================
@@ -18,13 +18,31 @@
 \setlist{nosep,leftmargin=*}
 \allowdisplaybreaks[1]
 
-% KOMA-Script running headers
+% Author details for the PDF title page. This hook runs after Pandoc's
+% generated author command and before the title page is made.
+\AtBeginDocument{%
+  \author{%
+    Prashant K. Jha\\[0.55em]
+    \normalsize Leslie A. Rose Department of Mechanical Engineering\\
+    \normalsize South Dakota School of Mines \& Technology\\[0.4em]
+    \small \href{mailto:prashant.jha@sdsmt.edu}{prashant.jha@sdsmt.edu}
+    \enspace\textbar\enspace
+    \href{mailto:pjha.sci@gmail.com}{pjha.sci@gmail.com}%
+  }%
+}
+
+% KOMA-Script running headers. Chapters provide deliberately short marks so
+% long chapter titles do not collide with the book title.
 \clearpairofpagestyles
-\ihead{ME/BME 736: Advanced Finite Element Methods}
-\ohead{\headmark}
+\ihead{Advanced FEM}
+\ohead{\leftmark}
 \cfoot{\pagemark}
-\automark[section]{chapter}
+\automark{chapter}
 \pagestyle{scrheadings}
+
+\newcommand{\chaptershorttitle}[1]{%
+  \markboth{Ch.~\thechapter: #1}{}%
+}
 
 % Matrix and equation spacing
 \setlength{\jot}{6pt}

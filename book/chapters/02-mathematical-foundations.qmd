@@ -1,5 +1,9 @@
 # Mathematical Foundations {#sec-math-foundations}
 
+```{=latex}
+\chaptershorttitle{Foundations}
+```
+
 This chapter establishes only the functional-analytic language required later. The treatment is intentionally selective. Süli's notes provide a concise path from function spaces to weak derivatives and Sobolev spaces, while Oden and Demkowicz provide the broader functional-analysis framework [@suli2012; @oden-demkowicz].
 
 ## Vector spaces, norms, and inner products
