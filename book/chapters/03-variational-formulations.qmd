@@ -4,45 +4,371 @@
 \chaptershorttitle{Variational Formulations}
 ```
 
-The finite element method is built from a variational problem rather than directly from the strong differential equation. Jog develops this transition from an engineering mechanics viewpoint, while Süli and Arnold formulate it in the language of weak solutions and Hilbert spaces [@jog; @suli2012; @arnold2018].
+The finite element method begins with a variational problem rather than a
+pointwise differential equation. Moving from one statement to the other requires
+more than multiplying by a test function: the boundary conditions must be
+partitioned, admissible trial and test spaces must be identified, and the
+regularity required of the solution must be stated. This chapter carries out
+those steps for a scalar diffusion problem and then shows the corresponding
+structure for linear elasticity. The presentation follows the engineering
+development in [@jog] and the functional setting in
+[@suli2012; @larson-bengzon2010; @arnold2018].
 
-## Strong and weak forms
+## A model boundary-value problem {#sec-variational-model-problem}
 
-Consider the scalar diffusion problem
-
-$$
--\divg(k\grad u)=f \quad \text{in }\Om,
-$$
-
-with suitable boundary conditions. Multiplication by a test function $v$ and integration by parts give the weak form
-
-$$
-\int_{\Om}k\grad u\cdot\grad v\dx
-=
-\int_{\Om}fv\dx
-+
-\text{boundary terms}.
-$$
-
-The boundary terms distinguish essential and natural boundary conditions.
-
-## Abstract form
-
-After defining the admissible trial and test spaces, the problem is written as
+Let $\Om\subset\R^d$ be a bounded domain with sufficiently regular boundary.
+Assume
 
 $$
-\text{find }u\in V
-\quad\text{such that}\quad
+\partial\Om=\overline{\Gam_D\cup\Gam_N},
+\qquad
+\Gam_D\cap\Gam_N=\varnothing,
+$$
+
+and that $\Gam_D$ has positive boundary measure. Consider
+
+$$
+-\divg(k\grad u)=f
+\qquad\text{in }\Om,
+$$ {#eq-variational-strong-pde}
+
+with boundary conditions
+
+$$
+u=g\quad\text{on }\Gam_D,
+\qquad
+k\grad u\cdot\bn=h\quad\text{on }\Gam_N.
+$$ {#eq-variational-boundary-data}
+
+The coefficient is assumed bounded and uniformly positive:
+
+$$
+0<k_0\leq k(\bx)\leq k_1<\infty
+\qquad\text{for almost every }\bx\in\Om.
+$$ {#eq-variational-coefficient-bounds}
+
+Here $u$ is the primary field, $f$ is a volume source, $g$ is prescribed
+Dirichlet data, and $h$ is the prescribed conormal derivative. For heat
+conduction, the physical outward heat flux has the opposite sign because
+$\bq=-k\grad u$.
+
+The differential equation in @eq-variational-strong-pde together with the
+boundary conditions in @eq-variational-boundary-data forms the strong problem.
+A classical interpretation would require enough differentiability for the PDE
+and boundary conditions to hold pointwise. The variational
+formulation will require only first weak derivatives of $u$.
+
+## Trial and test spaces {#sec-variational-spaces}
+
+The Dirichlet data are built into the trial space
+
+$$
+\Ug
+=\{w\in H^1(\Om):w=g\text{ on }\Gam_D\},
+$$ {#eq-variational-trial-space}
+
+where the boundary equality is understood in the trace sense. Admissible test
+functions vanish on $\Gam_D$:
+
+$$
+\Vzero
+=\{v\in H^1(\Om):v=0\text{ on }\Gam_D\}
+=H^1_{0,\Gam_D}(\Om).
+$$ {#eq-variational-test-space}
+
+The space $\Vzero$ is linear. If $g\ne0$, the trial space $\Ug$ is affine and
+does not contain the zero function. This is why writing a nonhomogeneous problem
+with one space $V$ for both trial and test functions hides an important part of
+the formulation.
+
+To convert the problem to one posed on a linear space, choose a lifting
+$u_g\in H^1(\Om)$ whose trace equals $g$ on $\Gam_D$ and write
+
+$$
+u=u_g+w,
+\qquad w\in\Vzero.
+$$ {#eq-variational-lifting}
+
+Different liftings lead to the same physical solution $u$.
+
+## Derivation of the weak form {#sec-variational-derivation}
+
+Let $v\in\Vzero$. Multiply @eq-variational-strong-pde by $v$ and integrate:
+
+$$
+-\int_{\Om}v\,\divg(k\grad u)\,\dx
+=\int_{\Om}fv\,\dx.
+$$
+
+Applying Green's formula from @sec-foundations-differential-operators gives
+
+$$
+\int_{\Om}k\grad u\cdot\grad v\,\dx
+-\int_{\partial\Om}v\,k\grad u\cdot\bn\,\ds
+=\int_{\Om}fv\,\dx.
+$$ {#eq-variational-after-parts}
+
+The boundary integral splits over $\Gam_D$ and $\Gam_N$. The contribution on
+$\Gam_D$ vanishes because $v=0$ there. Substituting the Neumann condition on
+$\Gam_N$ yields
+
+$$
+\int_{\Om}k\grad u\cdot\grad v\,\dx
+=\int_{\Om}fv\,\dx+\int_{\Gam_N}hv\,\ds.
+$$ {#eq-variational-diffusion-weak}
+
+::: {#def-weak-diffusion-problem}
+## Weak diffusion problem
+Find $u\in\Ug$ such that
+
+$$
 a(u,v)=\ell(v)
-\quad\forall v\in V.
+\qquad\forall v\in\Vzero,
 $$
 
-## Energy minimization
-
-For a symmetric coercive bilinear form, the same solution minimizes
+where
 
 $$
-\Pi(v)=\frac12 a(v,v)-\ell(v).
+a(u,v)=\int_{\Om}k\grad u\cdot\grad v\,\dx,
+\qquad
+\ell(v)=\int_{\Om}fv\,\dx+\int_{\Gam_N}hv\,\ds.
+$$ {#eq-variational-forms}
+:::
+
+No mesh has been introduced. The weak problem is still an
+infinite-dimensional statement.
+
+## Essential and natural boundary conditions {#sec-variational-boundary-conditions}
+
+The Dirichlet condition is called **essential** because it is imposed through
+membership in $\Ug$ and $\Vzero$. A candidate that does not satisfy the
+Dirichlet trace is not admissible.
+
+The Neumann condition is called **natural** because it enters through the
+boundary term produced by integration by parts. It contributes to $\ell(v)$ and
+does not restrict the test space. These names describe the role of the boundary
+conditions in the variational problem, not their physical importance.
+
+If $\Gam_D$ is empty, constants lie in the null space of the diffusion operator.
+The pure Neumann problem then requires a compatibility condition and an
+additional normalization, such as zero mean, to obtain uniqueness. The positive
+measure assumption on $\Gam_D$ avoids this complication here.
+
+## Strong and weak solutions {#sec-variational-strong-weak}
+
+The derivation shows that a sufficiently smooth solution of the strong problem
+also satisfies the weak problem. The converse needs additional regularity. If a
+weak solution is smooth enough, testing first with compactly supported functions
+recovers @eq-variational-strong-pde in the interior. Allowing test functions with
+nonzero traces on $\Gam_N$ then recovers the natural boundary condition. Thus the
+two statements are equivalent when the solution and data are sufficiently
+regular [@suli2012; @larson-bengzon2010].
+
+Without that regularity, the weak statement remains meaningful and defines the
+weak solution. For example, $u\in H^1(\Om)$ has a square-integrable weak
+gradient, so every volume integral in @eq-variational-diffusion-weak is defined,
+even though second classical derivatives may not exist.
+
+## Homogeneous reformulation {#sec-variational-homogeneous-form}
+
+Substituting @eq-variational-lifting into the weak problem gives: find
+$w\in\Vzero$ such that
+
+$$
+a(w,v)=\ell(v)-a(u_g,v)
+\qquad\forall v\in\Vzero.
+$$ {#eq-variational-homogeneous-problem}
+
+This form places both arguments of $a$ in the Hilbert space $\Vzero$ and is the
+form used to apply Lax--Milgram. It is also the continuous counterpart of the
+algebraic modification used to impose nonhomogeneous essential data.
+
+## Well-posedness of the diffusion problem {#sec-variational-well-posedness}
+
+Equip $\Vzero$ with the $H^1$ norm. From
+@eq-variational-coefficient-bounds and Cauchy--Schwarz,
+
+$$
+|a(w,v)|
+\leq k_1\norm{\grad w}_{L^2(\Om)}
+          \norm{\grad v}_{L^2(\Om)}
+\leq k_1\norm{w}_{H^1(\Om)}\norm{v}_{H^1(\Om)}.
+$$ {#eq-variational-continuity}
+
+The form is therefore continuous. Uniform positivity and the Poincare inequality
+give
+
+$$
+a(v,v)
+\geq k_0\norm{\grad v}_{L^2(\Om)}^2
+\geq \frac{k_0}{1+C_P^2}\norm{v}_{H^1(\Om)}^2.
+$$ {#eq-variational-coercivity}
+
+Thus $a$ is coercive on $\Vzero$. If the source and boundary data define a
+continuous functional $\ell$, Lax--Milgram gives a unique $w\in\Vzero$ and hence
+a unique $u=u_g+w\in\Ug$. It also gives a stability estimate: a small change in
+the data, measured in the dual norm, produces a proportionally bounded change
+in the solution.
+
+The choice of space matters. The same form is not coercive on all of
+$H^1(\Om)$ when only gradient terms are present, because constants have zero
+gradient.
+
+## Energy minimization {#sec-variational-energy}
+
+For the symmetric bilinear form in @eq-variational-forms, define
+
+$$
+\Pi(z)=\frac12a(z,z)-\ell(z),
+\qquad z\in\Ug.
+$$ {#eq-variational-energy}
+
+Let $u\in\Ug$ and $v\in\Vzero$. Since $u+\epsilon v\in\Ug$, the first
+variation is
+
+$$
+\delta\Pi(u;v)
+=\left.\frac{\dd}{\dd\epsilon}\Pi(u+\epsilon v)\right|_{\epsilon=0}
+=a(u,v)-\ell(v).
+$$ {#eq-variational-first-variation}
+
+Therefore, stationarity for every admissible direction is equivalent to the weak
+problem. Coercivity gives the stronger identity
+
+$$
+\Pi(u+v)-\Pi(u)=\frac12a(v,v)>0
+\qquad\forall v\in\Vzero\setminus\{0\},
 $$
 
-The distinction between a general variational equation and an energy minimization problem will matter later for nonlinear and constrained problems.
+so $u$ is the unique minimizer of $\Pi$ over $\Ug$.
+
+This equivalence depends on symmetry and an appropriate potential. A general
+variational equation need not arise from minimization. Nonlinear constitutive
+models, nonconservative loading, and mixed formulations require this distinction
+to be made explicitly [@jog].
+
+## Virtual work in linear elasticity {#sec-variational-elasticity}
+
+The same steps extend to vector-valued fields. For small-strain quasistatic
+elasticity, let
+
+$$
+-\divg\bsig=\bb\quad\text{in }\Om,
+\qquad
+\bu=\bm{g}\quad\text{on }\Gam_D,
+\qquad
+\bsig\bn=\bt\quad\text{on }\Gam_N.
+$$ {#eq-variational-elasticity-strong}
+
+The trial and test spaces are
+
+$$
+\Ug=\{\bm{w}\in[H^1(\Om)]^d:\bm{w}=\bm{g}\text{ on }\Gam_D\},
+\qquad
+\Vzero=\{\bv\in[H^1(\Om)]^d:\bv=\bm{0}\text{ on }\Gam_D\}.
+$$
+
+Multiplication by $\bv$, integration over $\Om$, and use of
+@eq-foundations-green-tensor give
+
+$$
+\int_{\Om}\grad\bv:\bsig\,\dx
+=\int_{\Om}\bv\cdot\bb\,\dx
++\int_{\Gam_N}\bv\cdot\bt\,\ds.
+$$
+
+Because the Cauchy stress is symmetric,
+$\grad\bv:\bsig=\beps(\bv):\bsig$, where
+
+$$
+\beps(\bv)=\frac12\left(\grad\bv+(\grad\bv)^T\right).
+$$
+
+The principle of virtual work is therefore: find $\bu\in\Ug$ such that
+
+$$
+\int_{\Om}\beps(\bv):\bsig(\bu)\,\dx
+=\int_{\Om}\bv\cdot\bb\,\dx
++\int_{\Gam_N}\bv\cdot\bt\,\ds
+\qquad\forall\bv\in\Vzero.
+$$ {#eq-variational-virtual-work}
+
+For linear elasticity, $\bsig(\bu)=\mathbb{C}:\beps(\bu)$, so the left-hand
+side is bilinear. Chapter 4 develops the constitutive and kinematic content;
+the present derivation shows that the scalar and mechanical problems have the
+same variational structure [@jog].
+
+## From the variational problem to FEM {#sec-variational-to-fem}
+
+The finite element step chooses finite-dimensional spaces
+$\Uh\subset\Ug$ and $\Vh\subset\Vzero$ and asks for $\uh\in\Uh$ such that
+
+$$
+a(\uh,\vh)=\ell(\vh)
+\qquad\forall\vh\in\Vh.
+$$ {#eq-variational-galerkin-preview}
+
+This restriction is the approximation. The integrations by parts, boundary
+classification, and choice of continuous spaces belong to the formulation and
+must be settled before a mesh or basis is selected. Chapter 5 develops this
+Galerkin discretization.
+
+## Key ideas {#sec-variational-key-ideas}
+
+- The strong problem includes the PDE and all boundary conditions.
+- Essential data define the trial and test spaces; natural data enter the linear
+  functional after integration by parts.
+- The weak formulation lowers the required derivative order and remains
+  infinite dimensional.
+- A lifting converts nonhomogeneous essential data into a problem on a linear
+  homogeneous space.
+- Continuity, coercivity, and continuity of the load functional establish
+  well-posedness through Lax--Milgram.
+- Energy minimization is equivalent to a symmetric coercive variational problem,
+  but not every variational problem has an energy functional.
+- Virtual work is the vector-valued mechanical counterpart of the scalar weak
+  form.
+
+## Exercises {#sec-variational-exercises}
+
+1. Repeat the derivation of @eq-variational-diffusion-weak when
+   $\Gam_D=\partial\Om$. State the trial space, test space, bilinear form, and
+   linear functional.
+
+2. Let $\Om=(0,1)$, $k=1$, $f=1$, $u(0)=0$, and $u'(1)=0$. Derive the weak
+   problem and verify by direct substitution that
+   $u(x)=x-\tfrac12x^2$ satisfies it.
+
+3. For the model problem in this chapter, replace the Neumann condition by the
+   Robin condition $k\grad u\cdot\bn+\beta u=r$ on $\Gam_N$, with
+   $\beta\geq0$. Derive the new bilinear form and linear functional. Identify
+   which terms contain prescribed data and which contain the unknown.
+
+4. Starting from @eq-variational-diffusion-weak, assume that $u$ is sufficiently
+   smooth and recover the interior PDE and Neumann boundary condition. State
+   where the argument uses arbitrary test functions.
+
+5. Prove @eq-variational-coercivity from the coefficient bound and
+   @eq-foundations-poincare. Explain why the same proof fails for a pure Neumann
+   problem.
+
+6. Compute the first variation of @eq-variational-energy step by step. Then show
+   that if $u$ satisfies the weak problem,
+   $\Pi(u+v)-\Pi(u)=\tfrac12a(v,v)$ for every $v\in\Vzero$.
+
+7. Derive @eq-variational-virtual-work directly in component notation. Use the
+   symmetry of $\bsig$ to show that
+   $v_{i,j}\sigma_{ij}=\varepsilon_{ij}(\bv)\sigma_{ij}$.
+
+8. Prepare a formulation table for scalar diffusion and linear elasticity with
+   columns for the primary unknown, strong operator, essential data, natural
+   data, trial space, test space, bilinear or semilinear form, and load
+   functional.
+
+## Further reading {#sec-variational-further-reading}
+
+Jog derives virtual work and heat-conduction formulations from an engineering
+mechanics viewpoint [@jog]. Larson and Bengzon give detailed scalar examples of
+Green's formula, weak formulations, and Galerkin approximation
+[@larson-bengzon2010]. Süli and Arnold develop weak solutions and well-posedness
+in Sobolev spaces [@suli2012; @arnold2018].

@@ -4,103 +4,1432 @@
 \chaptershorttitle{Foundations}
 ```
 
-This chapter establishes only the functional-analytic language required later. The treatment is intentionally selective. Süli's notes provide a concise path from function spaces to weak derivatives and Sobolev spaces, while Oden and Demkowicz provide the broader functional-analysis framework [@suli2012; @oden-demkowicz].
+Finite element analysis uses ideas from linear algebra, tensor calculus, and
+functional analysis. Students often encounter these subjects separately. This
+chapter collects the concepts needed to formulate boundary-value problems and
+their finite element approximations in a consistent notation. The treatment is
+selective and assumes only multivariable calculus and elementary linear
+algebra.
 
-## Vector spaces, norms, and inner products
+## Scalars, vectors, and tensors {#sec-foundations-tensors}
+
+A scalar has one value at each point. Temperature, density, and thermal
+conductivity are scalar fields in the isotropic models used in this book. A
+vector has a magnitude and direction; displacement, traction, and heat flux are
+examples. A second-order tensor maps vectors to vectors. Stress, strain, and the
+deformation gradient are second-order tensors.
+
+Let $\{\bm{e}_i\}_{i=1}^d$ be a fixed orthonormal Cartesian basis. A
+vector and a second-order tensor may be written as
+
+$$
+\bm{a}=a_i\bm{e}_i,
+\qquad
+\bm{A}=A_{ij}\bm{e}_i\otimes\bm{e}_j.
+$$ {#eq-foundations-component-expansion}
+
+Repeated indices are summed from $1$ to $d$ unless stated otherwise. An index
+that appears once in a term is a free index and must appear in every term of the
+equation. An index that appears twice is a dummy index and may be renamed. Thus
+
+$$
+c_i=A_{ij}a_j
+$$
+
+defines a vector $\bm{c}=\bm{A}\bm{a}$. The index $i$
+is free, whereas $j$ is summed.
+
+### Kronecker delta and identity tensor
+
+The Kronecker delta is
+
+$$
+\delta_{ij}=
+\begin{cases}
+1, & i=j,\\
+0, & i\ne j.
+\end{cases}
+$$
+
+It represents the components of the identity tensor
+$\bI=\delta_{ij}\bm{e}_i\otimes\bm{e}_j$ and satisfies
+$\delta_{ij}a_j=a_i$.
+
+::: {#exr-foundations-tensor-vector-components}
+## Tensor-vector multiplication
+Let $\bm{c}=\bm{A}\bm{b}$. Starting from the basis expansions
+
+$$
+\bm{A}=A_{ij}\bm{e}_i\otimes\bm{e}_j,
+\qquad
+\bm{b}=b_k\bm{e}_k,
+$$
+
+use $\bm{e}_j\cdot\bm{e}_k=\delta_{jk}$ and property of the Kronecker delta to show that
+$c_i=A_{ij}b_j$.
+:::
+
+### Vector products
+
+The Euclidean inner product and norm are
+
+$$
+\bm{a}\cdot\bm{b}=a_i b_i,
+\qquad
+\lVert\bm{a}\rVert
+=\sqrt{\bm{a}\cdot\bm{a}}.
+$$
+
+The tensor product $\bm{a}\otimes\bm{b}$ is the second-order
+tensor with components
+
+$$
+(\bm{a}\otimes\bm{b})_{ij}=a_i b_j.
+$$
+
+It acts on a vector according to
+$(\bm{a}\otimes\bm{b})\bm{c}
+=\bm{a}(\bm{b}\cdot\bm{c})$.
+
+### Operations on second-order tensors
+
+For second-order tensors $\bm{A}$ and $\bm{B}$,
+
+$$
+(\bm{A}\bm{B})_{ij}=A_{ik}B_{kj},
+\qquad
+(\bm{A}^{T})_{ij}=A_{ji},
+\qquad
+\tr(\bm{A})=A_{ii}.
+$$
+
+The double contraction and Frobenius norm are
+
+$$
+\bm{A}:\bm{B}=A_{ij}B_{ij},
+\qquad
+\lVert\bm{A}\rVert_F
+=\sqrt{\bm{A}:\bm{A}}.
+$$ {#eq-foundations-double-contraction}
+
+Every second-order tensor has the decomposition
+
+$$
+\bm{A}
+=\operatorname{sym}\bm{A}+\operatorname{skw}\bm{A},
+\qquad
+\operatorname{sym}\bm{A}=\frac12(\bm{A}+\bm{A}^{T}),
+\qquad
+\operatorname{skw}\bm{A}=\frac12(\bm{A}-\bm{A}^{T}).
+$$ {#eq-foundations-sym-skew}
+
+The symmetric and skew-symmetric parts are orthogonal under the double
+contraction. In particular, if $\bm{S}$ is symmetric, then
+$\bm{S}:\operatorname{skw}\bm{A}=0$.
+
+::: {#exr-foundations-symmetric-skew-orthogonality}
+## Orthogonality of the symmetric and skew-symmetric parts
+Use @eq-foundations-sym-skew and the identity
+$\bm{B}:\bm{C}=\bm{B}^{T}:\bm{C}^{T}$ to prove that
+
+$$
+\operatorname{skw}\bm{A}:\operatorname{sym}\bm{A}=0.
+$$
+:::
+
+### Fourth-order tensors
+
+A fourth-order tensor maps second-order tensors to second-order tensors. For the
+elasticity tensor $\mathbb{C}$,
+
+$$
+\bsig=\mathbb{C}:\beps,
+\qquad
+\sigma_{ij}=C_{ijkl}\varepsilon_{kl}.
+$$
+
+## Vector spaces {#sec-foundations-vector-spaces}
+
+Vector spaces are special sets with algebraic operations that support linear
+combinations. They form the setting for much of mathematical modeling. Common
+examples include $\R^n$, spaces of matrices, spaces of continuous functions,
+and spaces of linear functionals. Their elements need not be geometric vectors;
+they are called vectors because they satisfy the same algebraic axioms.
+
+::: {#def-vector-space}
+## Real vector space
+A **real vector space** is a nonempty set $V$ equipped with vector addition
+$V\times V\to V$ and scalar multiplication $\R\times V\to V$ such that, for
+all $u,v,w\in V$ and $\alpha,\beta\in\R$,
+
+1. $u+v=v+u$ and $(u+v)+w=u+(v+w)$;
+2. there is a zero element $0\in V$ satisfying $v+0=v$;
+3. for each $v\in V$, there is an element $-v\in V$ satisfying
+   $v+(-v)=0$;
+4. $1v=v$ and $\alpha(\beta v)=(\alpha\beta)v$;
+5. $\alpha(u+v)=\alpha u+\alpha v$ and
+   $(\alpha+\beta)v=\alpha v+\beta v$.
+:::
+
+The two operations are required to map back into $V$; this is the closure
+property. A nonempty subset $W\subset V$ is a linear subspace if
+$\alpha u+\beta v\in W$ for every $u,v\in W$ and
+$\alpha,\beta\in\R$.
+
+### Basis and dimension
+
+A set $B\subset V$ is **linearly independent** if every finite selection of
+distinct vectors $v_1,\ldots,v_n\in B$ satisfies
+
+$$
+\alpha_1v_1+\cdots+\alpha_nv_n=0
+\quad\Longrightarrow\quad
+\alpha_1=\cdots=\alpha_n=0.
+$$
+
+The set $B$ **spans** $V$ if every $v\in V$ is a finite linear combination of
+members of $B$. A linearly independent spanning set is a **basis**. If $V$ has
+a basis containing $n$ elements, then $\dim V=n$; otherwise $V$ is
+infinite-dimensional.
+
+::: {#exm-foundations-dimension}
+## Examples of dimension
+
+- The standard vectors $\{\bm{e}_1,\ldots,\bm{e}_n\}$ form a basis of
+  $\R^n$, so $\dim\R^n=n$.
+- The monomials $\{1,x,\ldots,x^p\}$ form a basis of
+  $\mathcal{P}_p$, so $\dim\mathcal{P}_p=p+1$.
+- The vector space of linear functionals $\ell:\R^n\to\R$ has dimension $n$.
+  Each functional has the form $\ell(\bm{x})=a_i x_i$ for a unique coefficient
+  vector $\bm{a}\in\R^n$.
+- The vector space of continuous functions on $[0,1]$, denoted $C([0,1])$, is
+  infinite-dimensional because
+  $\{1,x,x^2,\ldots\}$ contains arbitrarily large finite linearly independent
+  subsets.
+:::
+
+::: {#rem-foundations-fem-dimension}
+## Finite-dimensional approximation
+Chapter 5 constructs a finite element function space with finitely many basis
+functions. The finite element method replaces an infinite-dimensional
+variational problem by a problem in this finite-dimensional subspace. The
+coefficients in the basis expansion become the unknowns of the assembled
+linear or nonlinear algebraic system.
+:::
+
+::: {#exm-foundations-vector-spaces}
+## Polynomial and affine spaces
+The set $\mathcal{P}_p$ of polynomials of degree at most $p$ is a vector space:
+a linear combination of two such polynomials still has degree at most $p$.
+For an example of a set that is not a vector space, let $V_0$ be a linear
+subspace of a vector space $V$, and choose $u_g\in V$. The translated set
+
+$$
+V_g=u_g+V_0=\{u_g+w:w\in V_0\}.
+$$ {#eq-foundations-affine-space}
+
+is an **affine space**. If $u_g\notin V_0$, then $V_g$ does not contain the zero
+vector and is not a vector space. For example, the line
+$\{(x_1,x_2)\in\R^2:x_2=1\}$ is a translation of the one-dimensional subspace
+$\{(x_1,0):x_1\in\R\}$.
+:::
+
+## Metrics, norms, and completeness {#sec-foundations-norms}
+
+A vector space specifies which algebraic operations are allowed. A metric or a
+norm adds a notion of distance and therefore makes convergence meaningful.
+
+::: {#def-metric}
+## Metric
+Let $X$ be a set. A mapping $d:X\times X\to[0,\infty)$ is a **metric** if,
+for all $u,v,w\in X$,
+
+1. $d(u,v)=0$ if and only if $u=v$;
+2. $d(u,v)=d(v,u)$;
+3. $d(u,w)\leq d(u,v)+d(v,w)$.
+
+The pair $(X,d)$ is called a metric space.
+:::
+
+::: {#rem-foundations-metric-linear-structure}
+## Metrics and linear structure
+A metric requires only a set. For example, the discrete metric
+
+$$
+d(u,v)=
+\begin{cases}
+0, & u=v,\\
+1, & u\ne v,
+\end{cases}
+$$
+
+is defined on any set, even when addition and scalar multiplication have no
+meaning. A norm, by contrast, is defined on a vector space. The metric induced
+by a norm is translation invariant and homogeneous:
+
+$$
+d(u+w,v+w)=d(u,v),
+\qquad
+d(\alpha u,\alpha v)=|\alpha|d(u,v).
+$$
+
+These properties connect distance to the linear operations.
+:::
 
 ::: {#def-norm}
 ## Norm
-Let $V$ be a vector space over $\R$. A mapping $\norm{\cdot}_V:V\to\R$ is a **norm** if it is positive definite, absolutely homogeneous, and satisfies the triangle inequality.
+Let $V$ be a vector space over $\R$. A mapping
+$\norm{\cdot}_V:V\to[0,\infty)$ is a **norm** if, for all $u,v\in V$ and
+$\alpha\in\R$,
+
+1. $\norm{v}_V=0$ if and only if $v=0$;
+2. $\norm{\alpha v}_V=|\alpha|\norm{v}_V$;
+3. $\norm{u+v}_V\leq\norm{u}_V+\norm{v}_V$.
 :::
 
-The associated notion of convergence is
+::: {#def-euclidean-p-norm}
+## Euclidean $p$-norms
+For $\bm{x}=(x_1,\ldots,x_n)\in\R^n$ and $1\leq p<\infty$, the
+**$p$-norm** of $\bm{x}$ is
 
 $$
- v_n \to v \text{ in } V
- \quad\Longleftrightarrow\quad
- \norm{v_n-v}_V\to0.
-$$
+\norm{\bm{x}}_p
+=\left(\sum_{i=1}^{n}|x_i|^p\right)^{1/p}.
+$$ {#eq-foundations-euclidean-p-norm}
 
-## Function spaces
-
-For finite element analysis the most important examples are
+The limiting case $p=\infty$ is defined by
 
 $$
-L^2(\Om), \qquad H^1(\Om), \qquad H_0^1(\Om).
+\norm{\bm{x}}_\infty=\max_{1\leq i\leq n}|x_i|.
+$$ {#eq-foundations-euclidean-infinity-norm}
+
+In particular, $\norm{\bm{x}}_1=\sum_i|x_i|$, and
+$\norm{\bm{x}}_2=(\sum_i x_i^2)^{1/2}$ is the Euclidean norm.
+:::
+
+Every norm induces the metric
+
+$$
+d(u,v)=\norm{u-v}_V.
+$$ {#eq-foundations-norm-metric}
+
+::: {#rem-foundations-specifying-norm}
+## A vector space and its norm
+The vector-space axioms determine the algebraic object $V$. To discuss
+distance, convergence, or completeness, we must additionally specify a norm;
+the resulting normed vector space is the pair $(V,\norm{\cdot}_V)$. The same
+vector space can carry different norms. For example, if
+$\bm{x}=(1,-2)\in\R^2$, then
+
+$$
+\norm{\bm{x}}_1=3,
+\qquad
+\norm{\bm{x}}_2=\sqrt{5},
+\qquad
+\norm{\bm{x}}_\infty=2.
 $$
 
-The $L^2$ inner product is
+These norms assign different distances. In finite-dimensional spaces they
+produce the same convergent sequences, but this equivalence does not extend to
+arbitrary pairs of norms on infinite-dimensional spaces.
+:::
+
+::: {#exr-foundations-bounded-metric}
+## A metric not induced by a norm
+Let $V$ be a normed vector space. Show that
 
 $$
-\inner{u}{v}_{L^2(\Om)}
-=
-\int_{\Om}uv\dx,
+d(u,v)=\min\{1,\norm{u-v}_V\}
 $$
 
-with induced norm
+is a metric. Explain why this metric cannot be induced by a norm when
+$V\ne\{0\}$.
+:::
+
+::: {#def-convergence-normed-space}
+## Convergence in a normed vector space
+Let $(v_n)_{n=1}^{\infty}$ be a sequence in a normed vector space
+$(V,\norm{\cdot}_V)$. The sequence **converges** to $v\in V$ if, for every
+$\varepsilon>0$, there is an integer $N$ such that
+
+$$
+\norm{v_n-v}_V<\varepsilon
+\qquad\text{for every }n\geq N.
+$$ {#eq-foundations-norm-convergence-epsilon}
+
+We then write
+
+$$
+v_n\to v\text{ in }V
+\quad\Longleftrightarrow\quad
+\norm{v_n-v}_V\to0.
+$$ {#eq-foundations-norm-convergence}
+
+Here the statement $\norm{v_n-v}_V\to0$ concerns a sequence of nonnegative
+real numbers: it means that, for every $\varepsilon>0$,
+$\norm{v_n-v}_V<\varepsilon$ for all sufficiently large $n$. It is therefore
+a compact restatement of @eq-foundations-norm-convergence-epsilon, not an
+additional assumption.
+
+The vector $v$ is called the **limit** of the sequence. The definition says
+that, for any prescribed tolerance $\varepsilon$, all terms after some index
+$N$ lie within distance $\varepsilon$ of $v$.
+:::
+
+::: {#exm-foundations-convergence-r2}
+## A convergent sequence in $\R^2$
+Consider
+
+$$
+\bm{x}_n=\left(\frac1n,1+\frac{(-1)^n}{n}\right),
+\qquad
+\bm{x}=(0,1).
+$$
+
+The error is
+$\bm{x}_n-\bm{x}=(1/n,(-1)^n/n)$. Therefore,
+
+$$
+\norm{\bm{x}_n-\bm{x}}_p=\frac{2^{1/p}}{n}
+\quad (1\leq p<\infty),
+\qquad
+\norm{\bm{x}_n-\bm{x}}_\infty=\frac1n.
+$$
+
+Both expressions tend to zero. Hence $\bm{x}_n\to\bm{x}$ in each of the
+$p$-norms defined above. Given $\varepsilon>0$, for example, the
+$\infty$-norm criterion holds whenever $n>1/\varepsilon$.
+:::
+
+::: {#def-inner-product}
+## Inner product
+An **inner product** on a real vector space $V$ is a mapping
+$\inner{\cdot}{\cdot}_V:V\times V\to\R$ such that, for all
+$u,v,w\in V$ and $\alpha,\beta\in\R$,
+
+1. $\inner{\alpha u+\beta v}{w}_V
+   =\alpha\inner{u}{w}_V+\beta\inner{v}{w}_V$;
+2. $\inner{u}{v}_V=\inner{v}{u}_V$;
+3. $\inner{v}{v}_V\geq0$, with equality if and only if $v=0$.
+
+These properties imply linearity in the second argument as well. The inner
+product induces the norm
+
+$$
+\norm{v}_V=\sqrt{\inner{v}{v}_V}
+$$
+
+and satisfies the Cauchy--Schwarz inequality
+
+$$
+|\inner{u}{v}_V|\leq\norm{u}_V\norm{v}_V.
+$$
+:::
+
+An inner product supplies a notion of angle in addition to a norm. In
+particular, two vectors $u,v\in V$ are **orthogonal** if
+$\inner{u}{v}_V=0$. A general norm determines lengths and distances but does
+not, by itself, define orthogonality.
+
+::: {#def-cauchy-sequence}
+## Cauchy sequence
+A sequence $(v_n)$ in a metric space $(X,d)$ is a **Cauchy sequence** if, for
+every $\varepsilon>0$, there is an index $N$ such that
+
+$$
+d(v_n,v_m)<\varepsilon
+\qquad\text{whenever }m,n\geq N.
+$$
+
+In a normed vector space this condition is
+$\norm{v_n-v_m}_V<\varepsilon$. A Cauchy sequence has members that eventually
+become arbitrarily close to one another, without presupposing a candidate
+limit.
+:::
+
+::: {#def-complete-metric-space}
+## Complete metric space
+A metric space is **complete** if every Cauchy sequence converges to an element
+of that space.
+:::
+
+::: {#def-banach-space}
+## Banach space
+A **Banach space** is a normed vector space that is complete: every Cauchy
+sequence converges in the norm to an element of the space.
+:::
+
+::: {#def-hilbert-space}
+## Hilbert space
+A **Hilbert space** is an inner-product space that is complete in the norm
+induced by its inner product.
+:::
+
+Every Hilbert space is therefore a Banach space under its induced norm, but a
+Banach space need not have a norm induced by an inner product. Completeness
+ensures that every Cauchy sequence has a limit in the chosen space.
+
+::: {#exm-foundations-l2-sequences}
+## The sequence space $\ell^2$
+The set
+
+$$
+\ell^2
+=\left\{(a_1,a_2,\ldots):\sum_{k=1}^{\infty}|a_k|^2<\infty\right\}
+$$
+
+is a vector space under componentwise operations. With
+
+$$
+\inner{a}{b}_{\ell^2}=\sum_{k=1}^{\infty}a_kb_k,
+\qquad
+\norm{a}_{\ell^2}=\left(\sum_{k=1}^{\infty}|a_k|^2\right)^{1/2},
+$$
+
+it is complete and therefore a Hilbert space. The standard coordinate
+sequences $\bm{e}_1,\bm{e}_2,\ldots$ form a countable orthonormal basis. The
+relation between this basis and an algebraic basis is explained next.
+:::
+
+::: {#rem-foundations-infinite-dimensional-bases}
+## Algebraic and topological bases
+The dimension defined above uses a Hamel basis, in which every vector is a
+**finite** linear combination of basis vectors. The space of all polynomials
+has the countable Hamel basis $\{1,x,x^2,\ldots\}$. In contrast, an
+infinite-dimensional Banach space cannot have a countable Hamel basis; its
+algebraic dimension is uncountable.
+
+A normed space is **separable** if it contains a countable subset whose
+elements can approximate every element of the space arbitrarily closely. A
+separable Hilbert space such as $\ell^2$ can have a countable orthonormal
+basis. In that setting, vectors are limits of infinite series of basis
+vectors. A countable orthonormal basis is therefore not a countable Hamel
+basis.
+:::
+
+::: {#rem-foundations-finite-dimensional-completeness}
+## Why finite-dimensional normed spaces are complete
+Let $V$ have a finite basis $\{v_1,\ldots,v_n\}$. The coordinate map
+
+$$
+(\alpha_1,\ldots,\alpha_n)\longmapsto
+\alpha_1v_1+\cdots+\alpha_nv_n
+$$
+
+identifies $V$ with $\R^n$. Any norm on $V$ is equivalent to the Euclidean
+norm on its coordinate vectors: there are constants $c,C>0$ such that
+
+$$
+c\norm{\bm{\alpha}}_2
+\leq\norm{\alpha_i v_i}_V
+\leq C\norm{\bm{\alpha}}_2.
+$$
+
+Consequently, a Cauchy sequence in $V$ has Cauchy coordinate sequences. Each
+coordinate converges in $\R$, and the resulting coordinate vector defines a
+limit in $V$. Hence every finite-dimensional normed vector space is complete.
+:::
+
+::: {#exm-foundations-finite-dimensional-space}
+## A polynomial Hilbert space
+On $\mathcal{P}_p$, define
+
+$$
+\inner{u}{v}=\int_0^1u(x)v(x)\,\dd x.
+$$
+
+If $\inner{v}{v}=0$, then the continuous, nonnegative function $v^2$ has zero
+integral and hence $v=0$ on $[0,1]$. Thus this is an inner product. Because
+$\mathcal{P}_p$ is finite-dimensional, it is complete in the induced norm and
+is a Hilbert space, as explained in
+@rem-foundations-finite-dimensional-completeness. The algebraic vector space
+$\mathcal{P}_p$ may be paired with other norms, but any statement about
+convergence or completeness must name the chosen norm.
+:::
+
+## Continuous and integrable function spaces {#sec-foundations-function-spaces}
+
+For a nonnegative integer $k$, $C^k(\Om)$ denotes the real-valued functions on
+$\Om$ whose partial derivatives through total order $k$ exist and are
+continuous in $\Om$. The space $C^k(\overline{\Om})$ consists of functions in
+$C^k(\Om)$ for which the function and all such derivatives extend continuously
+to $\overline{\Om}$. In particular,
+
+$$
+C(\Om)=C^0(\Om),
+\qquad
+C(\overline{\Om})=C^0(\overline{\Om}).
+$$
+
+Assume now that $\Om$ is bounded. Pointwise addition and scalar multiplication
+make $C(\overline{\Om})$ a vector space. Its supremum norm is
+
+$$
+\norm{u}_{\infty}
+=\sup_{\bx\in\overline{\Om}}|u(\bx)|.
+$$ {#eq-foundations-supremum-norm}
+
+Convergence in this norm is uniform convergence: every value of the error
+$|u_n(\bx)-u(\bx)|$ is bounded by a quantity that tends to zero. The space
+$C(\overline{\Om})$ is complete in the supremum norm and is therefore a
+Banach space.
+
+::: {#exm-foundations-supremum-not-hilbert}
+## The supremum norm is not an inner-product norm
+Every norm induced by an inner product satisfies the parallelogram identity
+
+$$
+\norm{u+v}^2+\norm{u-v}^2
+=2\norm{u}^2+2\norm{v}^2.
+$$
+
+On $[0,1]$, take $u(x)=1$ and $v(x)=x$. Then
+
+$$
+\norm{u+v}_{\infty}^2+\norm{u-v}_{\infty}^2=5,
+\qquad
+2\norm{u}_{\infty}^2+2\norm{v}_{\infty}^2=4.
+$$
+
+The failure of the parallelogram identity shows that no inner product can
+induce this norm. Thus $C([0,1])$ with the supremum norm is a Banach space but
+not a Hilbert space.
+:::
+
+### The spaces $L^p(\Om)$
+
+The definition of $L^p(\Om)$ uses two basic ideas from integration theory. A
+measurable subset of $\R^d$ has a **measure**, which represents length in one
+dimension, area in two dimensions, and volume in three dimensions. A statement
+holds **almost everywhere** in $\Om$ if it can fail only on a set of measure
+zero. Changing a function on such a set does not change its integral. This
+brief description is sufficient for the spaces used here; a systematic
+treatment of measure and integration is available in [@oden-demkowicz].
+
+Let $\Om\subset\R^d$ be measurable. For $1\leq p<\infty$, define
+
+$$
+L^p(\Om)
+=\left\{u:\Om\to\R:
+u\text{ is measurable and }
+\int_{\Om}|u|^p\,\dx<\infty\right\},
+$$ {#eq-foundations-lp-definition}
+
+with norm
+
+$$
+\norm{u}_{L^p(\Om)}
+=\left(\int_{\Om}|u|^p\,\dx\right)^{1/p}.
+$$ {#eq-foundations-lp-norm}
+
+Two functions that are equal almost everywhere represent the same element of
+$L^p(\Om)$. This identification is necessary for
+@eq-foundations-lp-norm to be a norm: a function supported only on a set of
+measure zero has zero integral and therefore represents the zero element.
+Addition and scalar multiplication are defined using representatives and are
+independent of the representatives chosen. For example, on $(0,1)$, the zero
+function and the function that equals $1$ at $x=1/2$ and zero elsewhere
+represent the same element of every $L^p(0,1)$.
+
+The space $L^\infty(\Om)$ consists of measurable functions that are bounded
+apart from a possible set of measure zero. Its norm is the essential supremum,
+
+$$
+\norm{u}_{L^\infty(\Om)}
+=\mathop{\mathrm{ess\,sup}}_{\bx\in\Om}|u(\bx)|,
+$$
+
+which is the smallest bound that holds almost everywhere. Each
+$L^p(\Om)$, $1\leq p\leq\infty$, is complete and therefore is a Banach
+space.
+
+::: {#exm-foundations-lp-singularity}
+## An unbounded function in $L^p(0,1)$
+Let $u(x)=x^{-\alpha}$ on $(0,1)$, where $\alpha>0$. For
+$1\leq p<\infty$,
+
+$$
+\int_0^1|u(x)|^p\,\dd x
+=\int_0^1x^{-\alpha p}\,\dd x
+$$
+
+is finite exactly when $\alpha p<1$. Thus an unbounded function can belong to
+$L^p(0,1)$; membership depends on whether its $p$th power is integrable, not
+on pointwise boundedness.
+:::
+
+The case $p=2$ is especially important because its norm is induced by the
+inner product
+
+$$
+\inner{u}{v}_{L^2(\Om)}=\int_{\Om}uv\,\dx,
+\qquad
+\norm{u}_{L^2(\Om)}
+=\left(\int_{\Om}|u|^2\,\dx\right)^{1/2}.
+$$ {#eq-foundations-l2}
+
+Thus $L^2(\Om)$ is a Hilbert space. Two functions $u,v\in L^2(\Om)$ are
+orthogonal precisely when $\int_{\Om}uv\,\dx=0$.
+
+::: {#exr-foundations-continuous-l2-spaces}
+## Comparing $C(\overline{\Om})$ and $L^2(\Om)$
+
+1. Verify that $C(\overline{\Om})$ and $L^2(\Om)$ satisfy the vector-space
+   axioms under their usual operations, with $L^2$ functions identified up to
+   equality almost everywhere.
+2. Verify the norm axioms for $\norm{\cdot}_\infty$.
+3. Verify the inner-product axioms for
+   $\inner{\cdot}{\cdot}_{L^2(\Om)}$.
+4. Use the stated completeness results to classify each space as Banach or
+   Hilbert under the norm given here.
+:::
+
+Let $|\Om|$ denote the measure, or volume, of $\Om$:
+
+$$
+|\Om|=\int_{\Om}1\,\dx.
+$$
+
+On a bounded domain, every function in $C(\overline{\Om})$ belongs to
+$L^2(\Om)$, and
 
 $$
 \norm{u}_{L^2(\Om)}
-=
-\left(\int_{\Om}|u|^2\dx\right)^{1/2}.
-$$
+\leq |\Om|^{1/2}\norm{u}_{\infty}.
+$$ {#eq-foundations-continuous-l2-bound}
 
-## Weak derivatives
+::: {#exr-foundations-continuous-l2-bound}
+## Bounding the $L^2$ norm by the supremum norm
+Prove @eq-foundations-continuous-l2-bound. Start with
+$\norm{u}_{L^2(\Om)}^2$ and use the definition of
+$\norm{u}_\infty$ in @eq-foundations-supremum-norm to bound
+$|u(\bx)|^2$ at every $\bx\in\overline{\Om}$.
+:::
 
-The weak derivative is motivated directly by integration by parts. For a sufficiently smooth $u$ and a compactly supported smooth test function $v$,
+The two norms describe different kinds of convergence.
 
-$$
-\int_{\Om} \frac{\partial u}{\partial x_i} v\dx
-=
--\int_{\Om}u\frac{\partial v}{\partial x_i}\dx.
-$$
-
-This identity can be used as the definition of the derivative even when the classical derivative does not exist pointwise, which is the key step toward Sobolev spaces [@suli2012].
-
-## Sobolev spaces
-
-For the second-order problems used repeatedly in this course,
+::: {#exm-foundations-uniform-l2-convergence}
+## Uniform and $L^2$ convergence differ
+Let $u_n(x)=x^n$ on $[0,1]$. Each $u_n$ is continuous. Moreover,
 
 $$
-H^1(\Om)
-=
-\left\{
- v\in L^2(\Om):
- \frac{\partial v}{\partial x_i}\in L^2(\Om),\ i=1,\ldots,d
+\norm{u_n}_{\infty}=1,
+\qquad
+\norm{u_n}_{L^2(0,1)}
+=\left(\int_0^1x^{2n}\,\dd x\right)^{1/2}
+=\frac{1}{\sqrt{2n+1}}.
+$$
+
+Thus $u_n\to0$ in $L^2(0,1)$ but not in the supremum norm. An $L^2$ norm can
+be small even when the error remains large on a set whose measure is small.
+:::
+
+Vector- and tensor-valued $L^2$ spaces are defined componentwise. For example,
+
+$$
+\norm{\bu}_{[L^2(\Om)]^d}^2
+=\int_{\Om}\bu\cdot\bu\,\dx.
+$$
+
+## Differential operators {#sec-foundations-differential-operators}
+
+Let $u$ be a differentiable scalar field, $\bu$ a differentiable vector field,
+and $\bm{A}$ a differentiable second-order tensor field.
+
+### Gradient and divergence {#sec-foundations-gradient-divergence}
+
+The **gradient** of a scalar field is the vector whose components are the rates
+of change along the coordinate axes:
+
+$$
+\grad u
+=\frac{\partial u}{\partial x_i}\bm{e}_i,
+\qquad
+(\grad u)_i=\frac{\partial u}{\partial x_i}.
+$$ {#eq-foundations-scalar-gradient}
+
+Thus $\grad u$ points in the direction of steepest increase of $u$, and its
+magnitude gives the rate of increase in that direction.
+
+The gradient of a vector field $\bu=u_i\bm{e}_i$ is a second-order tensor. Its
+$(i,j)$ component measures the change of component $u_i$ in the $x_j$
+direction:
+
+$$
+\grad\bu
+=\frac{\partial u_i}{\partial x_j}\bm{e}_i\otimes\bm{e}_j,
+\qquad
+(\grad\bu)_{ij}=\frac{\partial u_i}{\partial x_j}.
+$$ {#eq-foundations-vector-gradient}
+
+The **divergence** of a vector field is the scalar obtained by summing the
+coordinate derivatives of the corresponding components:
+
+$$
+\divg\bu=\frac{\partial u_i}{\partial x_i}.
+$$ {#eq-foundations-vector-divergence}
+
+Positive divergence indicates local net outflow, while negative divergence
+indicates local net inflow. The divergence of a second-order tensor is the
+vector defined row by row:
+
+$$
+(\divg\bm{A})_i=\frac{\partial A_{ij}}{\partial x_j}.
+$$ {#eq-foundations-tensor-divergence}
+
+::: {#exm-foundations-gradient-divergence}
+## Computing a gradient and a divergence
+In two dimensions, let
+
+$$
+u(x_1,x_2)=x_1^2x_2+\sin x_2,
+\qquad
+\bm{a}(x_1,x_2)=
+\begin{bmatrix}
+x_1x_2\\ x_2^2
+\end{bmatrix}.
+$$
+
+Then
+
+$$
+\grad u=
+\begin{bmatrix}
+2x_1x_2\\ x_1^2+\cos x_2
+\end{bmatrix},
+\qquad
+\divg\bm{a}
+=\frac{\partial(x_1x_2)}{\partial x_1}
+ +\frac{\partial x_2^2}{\partial x_2}
+=3x_2.
+$$
+
+The gradient retains the direction of change of the scalar field, whereas the
+divergence combines the component derivatives into one scalar.
+:::
+
+### Gauss gradient and divergence theorems {#sec-foundations-gauss-theorems}
+
+Let $\Om\subset\R^d$ be a bounded Lipschitz domain, and let $\bn$ denote its
+outward unit normal, defined almost everywhere on $\partial\Om$.
+
+::: {#thm-foundations-gradient}
+## Gradient theorem for a scalar field
+If $u:\overline{\Om}\to\R$ is continuously differentiable, then
+
+$$
+\int_{\Om}\grad u\,\dx
+=\int_{\partial\Om}u\bn\,\ds,
+$$ {#eq-foundations-scalar-divergence-theorem}
+
+or, in indicial notation, for each $i=1,\ldots,d$,
+
+$$
+\int_{\Om}\frac{\partial u}{\partial x_i}\,\dx
+=\int_{\partial\Om}u n_i\,\ds.
+$$ {#eq-foundations-scalar-divergence-theorem-indicial}
+:::
+
+The theorem converts the volume integral of the gradient into a boundary
+integral involving the scalar field and the outward normal.
+
+::: {#cor-foundations-divergence}
+## Gauss divergence theorem
+If $\bm{a}:\overline{\Om}\to\R^d$ is continuously differentiable, then
+
+$$
+\int_{\Om}\divg\bm{a}\,\dx
+=\int_{\partial\Om}\bm{a}\cdot\bn\,\ds.
+$$ {#eq-foundations-divergence-theorem}
+
+Equivalently,
+
+$$
+\int_{\Om}\frac{\partial a_i}{\partial x_i}\,\dx
+=\int_{\partial\Om}a_i n_i\,\ds.
+$$ {#eq-foundations-gauss-divergence-indicial}
+:::
+
+**Proof.** For each component index $i$ and coordinate direction $j$, the
+scalar gradient theorem applied to $a_i$ gives
+
+$$
+\int_{\Om}\frac{\partial a_i}{\partial x_j}\,\dx
+=\int_{\partial\Om}a_i n_j\,\ds.
+$$
+
+Set $j=i$ and sum over $i=1,\ldots,d$. The left-hand side becomes
+$\int_{\Om}\partial a_i/\partial x_i\,\dx$, and the right-hand side becomes
+$\int_{\partial\Om}a_i n_i\,\ds$. These are the two sides of @eq-foundations-gauss-divergence-indicial.
+$\square$
+
+The volume integral in @eq-foundations-divergence-theorem measures the total
+local expansion of the vector field, while the boundary integral measures its
+net outward flux.
+
+::: {#rem-foundations-gauss-vector-tensor}
+## Extensions to vector and tensor fields
+Applying the scalar gradient theorem to each component $v_i$ of a vector field
+$\bv$ gives the vector-gradient identity
+
+$$
+\int_{\Om}\grad\bv\,\dx
+=\int_{\partial\Om}\bv\otimes\bn\,\ds,
+$$ {#eq-foundations-vector-gradient-theorem}
+
+whose indicial form is
+
+$$
+\int_{\Om}\frac{\partial v_i}{\partial x_j}\,\dx
+=\int_{\partial\Om}v_i n_j\,\ds.
+$$ {#eq-foundations-vector-gradient-theorem-indicial}
+
+Taking the trace of this identity, that is, setting $j=i$ and summing, gives
+the vector-divergence formula in @eq-foundations-gauss-divergence-indicial.
+
+For a second-order tensor field $\bm{A}$, apply the vector-divergence theorem
+to each row of $\bm{A}$. The result is
+
+$$
+\int_{\Om}\divg\bm{A}\,\dx
+=\int_{\partial\Om}\bm{A}\bn\,\ds,
+$$ {#eq-foundations-tensor-divergence-theorem}
+
+or, componentwise,
+
+$$
+\int_{\Om}\frac{\partial A_{ij}}{\partial x_j}\,\dx
+=\int_{\partial\Om}A_{ij}n_j\,\ds.
+$$ {#eq-foundations-tensor-divergence-theorem-indicial}
+
+Thus the scalar-gradient theorem, vector-divergence theorem, vector-gradient
+identity, and tensor-divergence identity are componentwise forms of the same
+boundary-integration principle.
+:::
+
+::: {#exr-foundations-gauss-scalar-vector}
+## Applying the scalar gradient theorem
+Let $\bv$ and $\bm{a}$ be continuously differentiable vector fields, and let
+$\bm{A}$ be a continuously differentiable second-order tensor field. Using
+the scalar gradient theorem, prove each identity independently:
+
+$$
+\begin{aligned}
+\int_{\Om}\frac{\partial v_i}{\partial x_j}\,\dx
+&=\int_{\partial\Om}v_i n_j\,\ds
+&& (i,j=1,\ldots,d),\\
+\int_{\Om}\frac{\partial a_i}{\partial x_i}\,\dx
+&=\int_{\partial\Om}a_i n_i\,\ds,\\
+\int_{\Om}\frac{\partial A_{ij}}{\partial x_j}\,\dx
+&=\int_{\partial\Om}A_{ij}n_j\,\ds
+&& (i=1,\ldots,d).
+\end{aligned}
+$$
+:::
+
+::: {#exm-foundations-divergence-theorem}
+## Flux through the boundary of a square
+Let $\Om=(0,1)^2$ and $\bm{a}(x_1,x_2)=(x_1^2,x_1x_2)$. Since
+
+$$
+\divg\bm{a}
+=\frac{\partial x_1^2}{\partial x_1}
+ +\frac{\partial(x_1x_2)}{\partial x_2}
+=3x_1,
+$$
+
+the volume integral is
+
+$$
+\int_{\Om}\divg\bm{a}\,\dx
+=\int_0^1\int_0^1 3x_1\,\dd x_2\dd x_1
+=\frac32.
+$$
+
+The boundary has four edges. On each edge, the outward normal and normal flux
+are as follows:
+
+- On the left edge $x_1=0$, $\bn=(-1,0)$ and
+  $\bm{a}=(0,0)$, so $\bm{a}\cdot\bn=0$.
+- On the right edge $x_1=1$, $\bn=(1,0)$ and
+  $\bm{a}=(1,x_2)$, so $\bm{a}\cdot\bn=1$.
+- On the bottom edge $x_2=0$, $\bn=(0,-1)$ and
+  $\bm{a}=(x_1^2,0)$, so $\bm{a}\cdot\bn=0$.
+- On the top edge $x_2=1$, $\bn=(0,1)$ and
+  $\bm{a}=(x_1^2,x_1)$, so $\bm{a}\cdot\bn=x_1$.
+
+Thus the left and bottom edges contribute zero. Integrating the two nonzero
+fluxes gives
+
+$$
+\int_{\partial\Om}\bm{a}\cdot\bn\,\ds
+=\int_0^1 1\,\dd x_2+\int_0^1x_1\,\dd x_1
+=\frac32,
+$$
+
+as predicted by the divergence theorem.
+:::
+
+::: {#exr-foundations-divergence-square}
+## Checking Gauss's theorem on a square
+Let $\Om=(0,1)^2$ and
+$\bm{a}=(x_1^2x_2,x_1x_2^2)$. Compute
+$\int_{\Om}\divg\bm{a}\,\dx$ directly. Then compute the outward flux on
+each side of $\partial\Om$ and verify
+@eq-foundations-divergence-theorem.
+:::
+
+### Integration by parts
+
+For a smooth scalar field $u$ and vector field $\bm{a}$, the product rule is
+
+$$
+\divg(u\bm{a})
+=\grad u\cdot\bm{a}+u\,\divg\bm{a}.
+$$ {#eq-foundations-product-rule}
+
+Applying the divergence theorem to $u\bm{a}$ and rearranging gives Green's
+formula
+
+$$
+\int_{\Om}u\,\divg\bm{a}\,\dx
+=-\int_{\Om}\grad u\cdot\bm{a}\,\dx
++\int_{\partial\Om}u\,\bm{a}\cdot\bn\,\ds.
+$$ {#eq-foundations-green-scalar}
+
+Its indicial form makes the contracted derivative explicit:
+
+$$
+\int_{\Om}u\frac{\partial a_i}{\partial x_i}\,\dx
+=-\int_{\Om}\frac{\partial u}{\partial x_i}a_i\,\dx
++\int_{\partial\Om}u a_i n_i\,\ds.
+$$ {#eq-foundations-green-scalar-indicial}
+
+For a vector field $\bv$ and a second-order tensor field $\bm{A}$, integration
+by parts gives
+
+$$
+\int_{\Om}\bv\cdot\divg\bm{A}\,\dx
+=-\int_{\Om}\grad\bv:\bm{A}\,\dx
++\int_{\partial\Om}\bv\cdot(\bm{A}\bn)\,\ds,
+$$ {#eq-foundations-green-tensor}
+
+or, in indicial notation,
+
+$$
+\int_{\Om}v_i\frac{\partial A_{ij}}{\partial x_j}\,\dx
+=-\int_{\Om}\frac{\partial v_i}{\partial x_j}A_{ij}\,\dx
++\int_{\partial\Om}v_i A_{ij}n_j\,\ds.
+$$ {#eq-foundations-green-tensor-indicial}
+
+These identities transfer one derivative from one factor to another and
+produce a boundary term. This is the principal calculus step used to derive
+the weak formulations in Chapter 3.
+
+::: {#exr-foundations-integration-by-parts-indicial}
+## Deriving integration by parts in indicial notation
+Starting from Gauss's theorem and the product rule, derive
+@eq-foundations-green-scalar-indicial. Apply the same argument to
+$v_iA_{ij}$ and obtain @eq-foundations-green-tensor-indicial.
+:::
+
+::: {#exm-foundations-integration-by-parts}
+## Integration by parts on a square
+Take $\Om=(0,1)^2$, $u=x_1+x_2$, and
+$\bm{a}=(x_1^2,x_2^2)$. The left-hand side of
+@eq-foundations-green-scalar is
+
+$$
+\int_{\Om}u\,\divg\bm{a}\,\dx
+=\int_0^1\int_0^1 2(x_1+x_2)^2\,\dd x_2\dd x_1
+=\frac73.
+$$
+
+Since $\grad u=(1,1)$,
+
+$$
+-\int_{\Om}\grad u\cdot\bm{a}\,\dx=-\frac23.
+$$
+
+Only the sides $x_1=1$ and $x_2=1$ contribute to the boundary integral. Its
+value is
+
+$$
+\begin{aligned}
+\int_{\partial\Om}u\,\bm{a}\cdot\bn\,\ds
+&=\int_0^1(1+x_2)\,\dd x_2
+  +\int_0^1(x_1+1)\,\dd x_1\\
+&=\frac32+\frac32=3.
+\end{aligned}
+$$
+
+The right-hand side of @eq-foundations-green-scalar is therefore
+$-2/3+3=7/3$, which agrees with the left-hand side.
+:::
+
+## Weak derivatives and Sobolev spaces {#sec-foundations-sobolev}
+
+In this section, $\Om\subset\R^d$ is open. The **support** of a function is
+the closure of the set on which it is nonzero. The space
+$C_0^\infty(\Om)$ consists of infinitely differentiable functions whose
+support is a compact subset of $\Om$. Such functions vanish in a neighborhood
+of $\partial\Om$ and are commonly called **test functions**.
+Suppose first that $u$ is smooth and $\varphi\in C_0^\infty(\Om)$. Integration
+by parts gives
+
+$$
+\int_{\Om}\frac{\partial u}{\partial x_i}\varphi\,\dx
+=-\int_{\Om}u\frac{\partial\varphi}{\partial x_i}\,\dx.
+$$ {#eq-foundations-weak-derivative-motivation}
+
+The boundary term vanishes because $\varphi$ has compact support in $\Om$.
+@eq-foundations-weak-derivative-motivation can therefore define a
+derivative without assuming that $u$ is classically differentiable.
+
+We write $L^p_{\mathrm{loc}}(\Om)$ for functions that belong to $L^p(K)$ on
+every compact subset $K\subset\Om$. This local condition allows a function to
+be integrable on each region strictly inside $\Om$ without requiring
+integrability up to the boundary or on an unbounded domain.
+
+::: {#def-weak-derivative}
+## Weak derivative
+A function $w_i\in L^1_{\mathrm{loc}}(\Om)$ is the **weak derivative** of
+$u\in L^1_{\mathrm{loc}}(\Om)$ with respect to $x_i$ if
+
+$$
+\int_{\Om}w_i\varphi\,\dx
+=-\int_{\Om}u\frac{\partial\varphi}{\partial x_i}\,\dx
+\qquad\forall\varphi\in C_0^\infty(\Om).
+$$
+
+We then write $w_i=\partial u/\partial x_i$.
+:::
+
+A weak derivative, when it exists, is unique up to equality almost everywhere.
+For a smooth function it agrees with the classical derivative. A function may
+have a weak derivative even when its classical derivative fails at isolated
+points. This enlarged notion of differentiation is essential for piecewise
+polynomial finite element functions [@suli2012].
+
+::: {#exm-foundations-weak-absolute-value}
+## Weak derivative of an absolute-value function
+Let $u(x)=|x|$ on $(-1,1)$. Its classical derivative exists except at $x=0$.
+Define
+
+$$
+w(x)=
+\begin{cases}
+-1, & -1<x<0,\\
+ 1, & 0<x<1.
+\end{cases}
+$$
+
+For $\varphi\in C_0^\infty(-1,1)$, split the integral at the origin:
+
+$$
+\begin{aligned}
+-\int_{-1}^{1}|x|\varphi'(x)\,\dd x
+&=\int_{-1}^{0}(-1)\varphi(x)\,\dd x
+  +\int_{0}^{1}\varphi(x)\,\dd x\\
+&=\int_{-1}^{1}w(x)\varphi(x)\,\dd x.
+\end{aligned}
+$$
+
+The boundary contributions at $x=0$ cancel because $u$ is continuous there.
+Therefore $w$ is the weak derivative of $|x|$. Its value at the single point
+$x=0$ is irrelevant because $L^2$ functions are identified up to equality
+almost everywhere.
+:::
+
+### Sobolev spaces $W^{k,p}(\Om)$
+
+Weak derivatives allow us to define function spaces that control a function
+and a specified number of its derivatives in $L^p$. A **multi-index** is a
+tuple $\alpha=(\alpha_1,\ldots,\alpha_d)$ of nonnegative integers. We write
+
+$$
+|\alpha|=\alpha_1+\cdots+\alpha_d,
+\qquad
+D^\alpha u
+=\frac{\partial^{|\alpha|}u}
+{\partial x_1^{\alpha_1}\cdots\partial x_d^{\alpha_d}},
+$$
+
+where $D^\alpha u$ is understood as a weak derivative. For the zero
+multi-index, $D^0u=u$.
+
+::: {#def-sobolev-space}
+## Sobolev space
+Let $k$ be a nonnegative integer and let $1\leq p\leq\infty$. The
+**Sobolev space** $W^{k,p}(\Om)$ is
+
+$$
+W^{k,p}(\Om)
+=\left\{u\in L^p(\Om):
+D^\alpha u\in L^p(\Om)
+\text{ for every }\alpha\text{ with }|\alpha|\leq k\right\}.
+$$ {#eq-foundations-wkp-definition}
+
+For $1\leq p<\infty$, its norm is
+
+$$
+\norm{u}_{W^{k,p}(\Om)}
+=\left(
+\sum_{|\alpha|\leq k}
+\norm{D^\alpha u}_{L^p(\Om)}^p
+\right)^{1/p}.
+$$ {#eq-foundations-wkp-norm}
+
+For $p=\infty$, the corresponding norm is
+$\max_{|\alpha|\leq k}\norm{D^\alpha u}_{L^\infty(\Om)}$.
+:::
+
+The space $W^{k,p}(\Om)$ is a Banach space. When $p=2$, its norm is induced
+by the inner product
+
+$$
+\inner{u}{v}_{H^k(\Om)}
+=\sum_{|\alpha|\leq k}
+\int_{\Om}D^\alpha u\,D^\alpha v\,\dx,
+$$
+
+and we use the notation
+
+$$
+H^k(\Om)=W^{k,2}(\Om).
+$$ {#eq-foundations-hk-wk2}
+
+Thus $H^k(\Om)$ is a Hilbert space. The case $k=1$ is used throughout this
+book.
+
+### The space $H^1(\Om)$
+
+For the second-order problems considered in this book,
+
+$$
+H^1(\Om)=
+\left\{v\in L^2(\Om):
+\frac{\partial v}{\partial x_i}\in L^2(\Om),\ i=1,\ldots,d
 \right\}.
-$$
+$$ {#eq-foundations-h1-definition}
 
-The associated norm is
+A **seminorm** satisfies the homogeneity and triangle-inequality properties of
+a norm but may be zero for a nonzero function. The norm and the standard
+$H^1$ seminorm are
 
 $$
 \norm{v}_{H^1(\Om)}^2
-=
-\norm{v}_{L^2(\Om)}^2
-+
-\norm{\grad v}_{L^2(\Om)}^2.
+=\norm{v}_{L^2(\Om)}^2+\norm{\grad v}_{[L^2(\Om)]^d}^2,
+\qquad
+\seminorm{v}_{H^1(\Om)}=\norm{\grad v}_{[L^2(\Om)]^d}.
 $$ {#eq-h1-norm}
 
-Equation @eq-h1-norm will be used repeatedly when discussing well-posedness and finite element error.
+For vector-valued fields we use $[H^1(\Om)]^d$, with the squared norm obtained
+by summing the squared $H^1$ norms of the components. From
+@eq-foundations-wkp-definition, membership in $H^2(\Om)$ requires the
+function and all of its first and second weak derivatives to belong to
+$L^2(\Om)$.
 
-## Linear and bilinear forms
+::: {#exr-foundations-weak-tent-function}
+## Weak derivative of a tent function
+Let $u(x)=1-|x|$ on $(-1,1)$. Find its weak derivative and verify the defining
+identity by splitting the integral at $x=0$. Determine whether $u$ belongs to
+$H^1(-1,1)$ and whether it belongs to $H^2(-1,1)$, justifying both answers.
+:::
 
-A large class of variational problems can be written as
+::: {#exr-foundations-h1-norm}
+## Computing an $H^1$ norm
+For $v(x)=x(1-x)$ on $(0,1)$, compute
+$\norm{v}_{L^2(0,1)}$, $\seminorm{v}_{H^1(0,1)}$, and
+$\norm{v}_{H^1(0,1)}$.
+:::
+
+### Traces and homogeneous boundary data
+
+An $H^1$ function need not have pointwise boundary values in the classical
+sense. On a sufficiently regular domain, the trace operator assigns a boundary
+value to each $H^1$ function continuously. This allows us to define
 
 $$
-a(u,v)=\ell(v)
-\qquad \forall v\in V,
+H^1_{0,\Gam_D}(\Om)
+=\{v\in H^1(\Om):v=0\text{ on }\Gam_D\},
+$$ {#eq-foundations-h1-gamma-d}
+
+where the boundary equality is understood in the trace sense. When
+$\Gam_D=\partial\Om$, this space is denoted $H_0^1(\Om)$.
+
+::: {#exm-foundations-boundary-value-spaces}
+## Homogeneous and nonhomogeneous boundary-value spaces
+The set
+
+$$
+V_0=\{v\in H^1(\Om):v=0\text{ on }\Gam_D\}
 $$
 
-where $a:V\times V\to\R$ is a bilinear form and $\ell:V\to\R$ is a linear functional.
+is a vector space because linear combinations preserve the homogeneous
+boundary value. In contrast, for nonzero boundary data $g$,
+
+$$
+V_g=\{v\in H^1(\Om):v=g\text{ on }\Gam_D\}
+$$
+
+is generally not a vector space: it does not contain the zero function, and
+adding two members gives boundary value $2g$. If $u_g\in V_g$, then
+$V_g=u_g+V_0$, so $V_g$ is the affine space introduced in
+@eq-foundations-affine-space.
+:::
+
+::: {#exr-foundations-vector-affine-spaces}
+## Vector and affine spaces
+Determine which of the following sets are vector spaces:
+
+1. polynomials of degree at most $p$;
+2. functions in $H^1(\Om)$ equal to zero on $\Gam_D$;
+3. functions in $H^1(\Om)$ equal to a nonzero function $g$ on $\Gam_D$.
+
+For any set that is not a vector space, identify its associated homogeneous
+linear space.
+:::
+
+If $\Gam_D$ has positive boundary measure, the Poincare inequality gives a
+constant $C_P>0$ such that
+
+$$
+\norm{v}_{L^2(\Om)}\leq C_P\norm{\grad v}_{[L^2(\Om)]^d}
+\qquad\forall v\in H^1_{0,\Gam_D}(\Om).
+$$ {#eq-foundations-poincare}
+
+Consequently, the $H^1$ seminorm is a norm equivalent to the full $H^1$ norm on
+this homogeneous space.
+
+## Linear functionals and dual spaces {#sec-foundations-duality}
+
+A linear functional maps a vector space to the scalar field. The dual space
+$V^*$ consists of the continuous linear functionals on $V$. Its norm is
+
+$$
+\norm{\ell}_{V^*}
+=\sup_{v\in V,\,v\ne0}\frac{|\ell(v)|}{\norm{v}_V}.
+$$
+
+The action of $\ell\in V^*$ on $v\in V$ may be written as $\ell(v)$ or as the
+duality pairing $\dual{\ell}{v}$. Continuity means that a constant $C_\ell$
+exists such that
+
+$$
+|\ell(v)|\leq C_\ell\norm{v}_V
+\qquad\forall v\in V.
+$$
+
+Loads, sources, and prescribed fluxes enter variational problems through such
+functionals.
+
+## Bilinear forms and well-posedness {#sec-foundations-bilinear}
+
+A mapping $a:V\times V\to\R$ is bilinear if it is linear in each argument.
+Two estimates are central.
+
+::: {#def-continuous-bilinear-form}
+## Continuity
+A bilinear form $a$ is **continuous** on $V\times V$ if a constant $M>0$
+exists such that
+
+$$
+|a(u,v)|\leq M\norm{u}_V\norm{v}_V
+\qquad\forall u,v\in V.
+$$
+:::
+
+::: {#def-coercive-bilinear-form}
+## Coercivity
+A bilinear form $a$ is **coercive** on $V$ if a constant $\alpha>0$ exists
+such that
+
+$$
+a(v,v)\geq\alpha\norm{v}_V^2
+\qquad\forall v\in V.
+$$
+:::
+
+Continuity prevents the form from growing too rapidly, while coercivity gives
+control of the solution in the chosen norm.
 
 ::: {#thm-lax-milgram}
 ## Lax--Milgram theorem
-If $V$ is a Hilbert space, $a(\cdot,\cdot)$ is continuous and coercive on $V\times V$, and $\ell$ is a continuous linear functional on $V$, then the variational problem has a unique solution $u\in V$.
+Let $V$ be a real Hilbert space. If $a:V\times V\to\R$ is continuous and
+coercive and $\ell\in V^*$, then there exists a unique $u\in V$ such that
+
+$$
+a(u,v)=\ell(v)\qquad\forall v\in V.
+$$
+
+Moreover,
+
+$$
+\norm{u}_V\leq\frac{1}{\alpha}\norm{\ell}_{V^*},
+$$
+
+where $\alpha$ is the coercivity constant.
 :::
 
-The theorem is stated here for later use. Its proof is not needed for the review portion of the course.
+The estimate shows continuous dependence on the data. Chapter 3 applies the
+theorem to a diffusion problem. Later chapters will require more general
+stability conditions for mixed and constrained formulations
+[@arnold2018; @oden-demkowicz].
 
-::: {.callout-important}
-## What students should retain
-The purpose of this chapter is not abstract functional analysis for its own sake. The spaces specify what regularity we require from trial and test functions, while continuity and coercivity are the properties that later control well-posedness and finite element error.
+::: {#exr-foundations-diffusion-continuity-coercivity}
+## Continuity and coercivity of a diffusion form
+Let $V=H_0^1(\Om)$ with $\norm{v}_V=\norm{v}_{H^1(\Om)}$, and let
+
+$$
+a(u,v)=\int_{\Om}k\grad u\cdot\grad v\,\dx,
+$$
+
+where $0<k_0\leq k(\bx)\leq k_1$. Use the Cauchy--Schwarz and Poincare
+inequalities to prove
+
+$$
+|a(u,v)|
+\leq k_1\norm{u}_{H^1(\Om)}\norm{v}_{H^1(\Om)}
+\qquad\forall u,v\in V,
+$$
+
+and
+
+$$
+a(v,v)
+\geq \frac{k_0}{1+C_P^2}\norm{v}_{H^1(\Om)}^2
+\qquad\forall v\in V.
+$$
+
+Hence identify the continuity constant $M$ and coercivity constant $\alpha$.
 :::
+
+## Key ideas {#sec-foundations-key-ideas}
+
+- Component notation makes contractions and differential operators explicit.
+- Gauss's divergence theorem converts a volume integral of a divergence into
+  the outward flux through the boundary; integration by parts follows from
+  this theorem and the product rule.
+- A vector space provides algebraic structure, a norm provides a notion of
+  distance, and completeness distinguishes Banach spaces.
+- A complete inner-product space is a Hilbert space. In particular,
+  $C(\overline{\Om})$ with the supremum norm is Banach, while $L^2(\Om)$ with
+  its standard inner product is Hilbert.
+- Trial spaces with nonhomogeneous boundary data are affine spaces; their
+  associated test spaces are linear and satisfy homogeneous data.
+- Weak derivatives allow functions with limited classical smoothness to be used
+  in variational problems.
+- $H^1(\Om)$ is the natural space for many second-order PDEs after one
+  integration by parts.
+- Traces give a precise meaning to boundary values of Sobolev functions.
+- Continuity and coercivity provide the estimates required by Lax--Milgram.
+
+## Further reading {#sec-foundations-further-reading}
+
+Süli gives a concise introduction to weak derivatives, Sobolev spaces, and the
+Lax--Milgram theorem [@suli2012]. Oden and Demkowicz provide a more extensive
+treatment of vector spaces, duality, distributions, Sobolev spaces, and operator
+theory [@oden-demkowicz]. The notation linking tensors, components, and matrices
+in finite element mechanics is discussed by Belytschko, Liu, and Moran
+[@belytschko2000].
