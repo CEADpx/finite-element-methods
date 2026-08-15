@@ -11,6 +11,61 @@ their finite element approximations in a consistent notation. The treatment is
 selective and assumes only multivariable calculus and elementary linear
 algebra.
 
+## Domains and boundary regularity {#sec-foundations-domains}
+
+Throughout the book, $\Om\subset\R^d$ denotes a nonempty, connected, open
+set. Unless stated otherwise, $\Om$ is also bounded. Its closure and boundary
+are denoted by $\overline{\Om}$ and $\partial\Om$, respectively. Additional
+regularity of the boundary will be stated when it is needed.
+
+::: {#def-lipschitz-domain}
+## Lipschitz domain
+A bounded domain $\Om\subset\R^d$ is a **Lipschitz domain** if, near every
+point of $\partial\Om$, its boundary can be represented as the graph of a
+Lipschitz-continuous function after a translation and rotation of coordinates.
+More precisely, for every $\bx_0\in\partial\Om$, there are a neighborhood
+$U$ of $\bx_0$, local coordinates $(\bx',x_d)\in\R^{d-1}\times\R$, and a
+function $\varphi:\R^{d-1}\to\R$ such that
+
+$$
+\Om\cap U
+=\{(\bx',x_d)\in U:x_d>\varphi(\bx')\},
+$$
+
+with the opposite inequality allowed after reversing the $x_d$-axis. The
+function $\varphi$ is Lipschitz continuous: there is a constant $L>0$ such
+that, with $\norm{\cdot}_2$ denoting the Euclidean norm,
+
+$$
+|\varphi(\bx')-\varphi(\bm{y}')|
+\leq L\norm{\bx'-\bm{y}'}_2
+\qquad
+\forall\bx',\bm{y}'\in\R^{d-1}.
+$$
+:::
+
+::: {#exm-foundations-domains}
+## Common domains
+
+1. An open interval $(a,b)\subset\R$ is a bounded Lipschitz domain.
+2. Open rectangles, polygons, boxes, and polyhedra with non-self-intersecting
+   boundaries are Lipschitz domains. Corners and reentrant corners are
+   permitted; the L-shaped domain
+   $(-1,1)^2\setminus([0,1)\times(-1,0])$ is a standard example.
+3. The open ball $\{\bx\in\R^d:\norm{\bx}_2<R\}$ has a smooth boundary and
+   is therefore a Lipschitz domain.
+:::
+
+::: {#rem-foundations-domain-regularity}
+## Use of domain assumptions
+The fine distinctions among boundary regularity classes are not a main topic
+of this book. When a result requires a Lipschitz boundary, a positive-measure
+Dirichlet boundary, or another geometric property, that condition will be
+assumed at the outset. These assumptions allow us to use traces, outward unit
+normals, integration by parts, and Poincare-type inequalities without
+interrupting the finite element development with additional technical proofs.
+:::
+
 ## Scalars, vectors, and tensors {#sec-foundations-tensors}
 
 A scalar has one value at each point. Temperature, density, and thermal
@@ -1835,13 +1890,12 @@ Hence identify the continuity constant $M$ and coercivity constant $\alpha$.
 
 ## Reference inequalities {#sec-foundations-reference-inequalities}
 
-The estimates below are collected here for later use. Their assumptions are
-part of each statement; in particular, norm equivalence requires finite
-dimension, whereas the norm and inner-product inequalities do not.
+The inequalities used repeatedly in later chapters are stated below as named
+results. Each statement includes the assumptions under which it applies.
 
-### Normed and inner-product spaces
-
-For any normed vector space $(V,\norm{\cdot}_V)$ and any $u,v\in V$,
+::: {#thm-foundations-triangle-inequalities}
+## Triangle and reverse triangle inequalities
+Let $(V,\norm{\cdot}_V)$ be a normed vector space. For every $u,v\in V$,
 
 $$
 \norm{u+v}_V\leq\norm{u}_V+\norm{v}_V,
@@ -1849,21 +1903,24 @@ $$
 \left|\norm{u}_V-\norm{v}_V\right|\leq\norm{u-v}_V.
 $$ {#eq-foundations-reference-norm-inequalities}
 
-The first estimate is the triangle inequality; the second is the reverse
-triangle inequality. Both hold in every normed vector space, whether finite-
-or infinite-dimensional.
+Both inequalities hold in finite- and infinite-dimensional normed spaces.
+:::
 
-If the norm is induced by an inner product, the Cauchy--Schwarz inequality is
+::: {#thm-foundations-cauchy-schwarz}
+## Cauchy--Schwarz inequality
+Let $V$ be a real inner-product space with the induced norm
+$\norm{v}_V=\sqrt{\inner{v}{v}_V}$. Then
 
 $$
-|\inner{u}{v}_V|\leq\norm{u}_V\norm{v}_V.
+|\inner{u}{v}_V|\leq\norm{u}_V\norm{v}_V
+\qquad\forall u,v\in V.
 $$ {#eq-foundations-reference-cauchy-schwarz}
 
-This statement applies to every inner-product space. Completeness is not
-required.
+Completeness of $V$ is not required.
+:::
 
-### Finite-dimensional norm equivalence
-
+::: {#thm-foundations-finite-dimensional-norm-equivalence}
+## Equivalence of norms in finite dimensions
 Let $V$ be finite-dimensional, and let $\norm{\cdot}_a$ and
 $\norm{\cdot}_b$ be any two norms on $V$. There are constants $c,C>0$ such
 that
@@ -1875,11 +1932,13 @@ $$ {#eq-foundations-finite-dimensional-norm-equivalence}
 
 The constants depend on the two norms and on the space. Arbitrary norms on an
 infinite-dimensional vector space need not be equivalent.
+:::
 
-### Function-space inequalities
-
-Let $1\leq p,q\leq\infty$ satisfy $1/p+1/q=1$, with $1/\infty=0$. If
-$u\in L^p(\Om)$ and $v\in L^q(\Om)$, Hölder's inequality gives
+::: {#thm-foundations-holder-inequality}
+## Hölder inequality
+Let $\Om\subset\R^d$ be measurable. Let $1\leq p,q\leq\infty$ satisfy
+$1/p+1/q=1$, with $1/\infty=0$. If $u\in L^p(\Om)$ and
+$v\in L^q(\Om)$, then
 
 $$
 \int_{\Om}|uv|\,\dx
@@ -1887,28 +1946,53 @@ $$
 $$ {#eq-foundations-holder}
 
 The case $p=q=2$ is the Cauchy--Schwarz inequality in $L^2(\Om)$.
+:::
 
-If $\Om$ is bounded and $u\in C(\overline{\Om})$, then
-@eq-foundations-continuous-l2-bound gives
+::: {#thm-foundations-supremum-l2-inequality}
+## Finite-measure $L^\infty$-to-$L^2$ inequality
+Let $\Om$ have finite measure and let $u\in L^\infty(\Om)$. Then
 
 $$
 \norm{u}_{L^2(\Om)}
-\leq |\Om|^{1/2}\norm{u}_{\infty}.
+\leq |\Om|^{1/2}\norm{u}_{L^\infty(\Om)}.
 $$
 
-If $\Om$ is a bounded Lipschitz domain and
-$\Gamma\subset\partial\Om$ is measurable, the trace inequality has the form
+For $u\in C(\overline{\Om})$, the $L^\infty$ norm equals the supremum norm,
+and this result reduces to @eq-foundations-continuous-l2-bound.
+:::
+
+::: {#thm-foundations-trace-inequality}
+## Trace inequality
+Let $\Om$ be a bounded Lipschitz domain and let
+$\Gamma\subset\partial\Om$ be measurable. There is a constant
+$C_{\mathrm{tr}}>0$, depending on $\Om$ and $\Gamma$, such that
 
 $$
 \norm{v}_{L^2(\Gamma)}
 \leq C_{\mathrm{tr}}\norm{v}_{H^1(\Om)}
 \qquad\forall v\in H^1(\Om).
 $$ {#eq-foundations-trace-inequality}
+:::
 
-Finally, if $\Om$ is a bounded Lipschitz domain and
-$\Gam_D\subset\partial\Om$ has positive boundary measure, the Poincare
-inequality in @eq-foundations-poincare holds on
-$H^1_{0,\Gam_D}(\Om)$. Together with @eq-h1-norm, it gives
+::: {#thm-foundations-poincare-inequality}
+## Poincare inequality
+Let $\Om$ be a bounded Lipschitz domain, and let
+$\Gam_D\subset\partial\Om$ have positive boundary measure. There is a
+constant $C_P>0$, depending on $\Om$ and $\Gam_D$, such that
+
+$$
+\norm{v}_{L^2(\Om)}
+\leq C_P\norm{\grad v}_{[L^2(\Om)]^d}
+\qquad\forall v\in H^1_{0,\Gam_D}(\Om).
+$$
+
+This is the inequality stated earlier in @eq-foundations-poincare.
+:::
+
+::: {#cor-foundations-h1-seminorm-equivalence}
+## Equivalence of the $H^1$ norm and seminorm
+Under the assumptions of @thm-foundations-poincare-inequality,
+@eq-h1-norm and the Poincare inequality give
 
 $$
 \norm{\grad v}_{[L^2(\Om)]^d}
@@ -1920,6 +2004,7 @@ $$ {#eq-foundations-h1-seminorm-equivalence}
 
 Thus the $H^1$ seminorm is a norm equivalent to the full $H^1$ norm on this
 homogeneous boundary-value space, but not on all of $H^1(\Om)$.
+:::
 
 ## Chapter summary {#sec-foundations-key-ideas}
 

@@ -14,6 +14,19 @@
 \usepackage[most]{tcolorbox}
 \usepackage{needspace}
 
+% Match the HTML theorem headings by bolding parenthetical theorem titles.
+% Pandoc/Quarto assigns theorem-like environments to the three amsthm styles
+% below; append the note-font override after those styles are selected.  The
+% standard amsthm remark style also uses an italic heading, so override its
+% heading font to keep "Remark" bold like the other environment labels.
+\makeatletter
+\AtBeginDocument{%
+  \g@addto@macro\th@plain{\thm@notefont{\bfseries}}%
+  \g@addto@macro\th@definition{\thm@notefont{\bfseries}}%
+  \g@addto@macro\th@remark{\thm@headfont{\bfseries}\thm@notefont{\bfseries}}%
+}
+\makeatother
+
 % Distinguish worked examples and exercises without changing theorem styles.
 \definecolor{femexampleback}{HTML}{F5F9FD}
 \definecolor{femexampleframe}{HTML}{8EB6D8}

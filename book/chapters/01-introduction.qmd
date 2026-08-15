@@ -227,6 +227,23 @@ is not automatically a defect in the PDE, a mesh-refinement trend does not
 validate a constitutive model, and agreement with the assembled equations does
 not prove agreement with the continuum problem.
 
+```{=latex}
+\Needspace{15\baselineskip}
+```
+
+::: {#exr-intro-workflow-classification}
+## Classifying parts of an analysis
+For each item below, identify the stage in @eq-intro-workflow where it first
+enters and justify the classification in one sentence:
+
+1. a prescribed traction;
+2. a test function;
+3. a quadratic triangular element;
+4. a coefficient vector $\mathbf U$;
+5. a Krylov-method stopping tolerance;
+6. a constitutive tensor $\mathbb C$.
+:::
+
 ## Why the variational formulation matters {#sec-intro-why-variational}
 
 The finite element method is naturally built from a variational formulation
@@ -259,7 +276,9 @@ Here $\Ug$ is a trial space containing fields that satisfy prescribed values on
 the Dirichlet boundary, and $\Vzero$ is the associated test space with
 homogeneous boundary values. The form $a(u,v)$ contains the differential
 operator after integration by parts, while $\ell(v)$ contains sources and
-prescribed fluxes or tractions. Chapter 3 constructs this statement carefully.
+prescribed fluxes or tractions. Chapter 2 defines the vector, affine, and
+function spaces used here, as well as linear functionals and bilinear or
+semilinear forms. Chapter 3 then constructs this statement carefully.
 
 Several important consequences are already visible.
 
@@ -272,12 +291,44 @@ broader solution space is important because piecewise polynomial finite element
 functions are generally not globally smooth enough to satisfy a second-order PDE
 pointwise, but they can satisfy the corresponding variational equation.
 
+```{=latex}
+\Needspace{12\baselineskip}
+```
+
+::: {#exr-intro-piecewise-linear-weak-form}
+## A piecewise-linear field and a second-order PDE
+Let $u_h$ be continuous and piecewise linear on a conforming triangular mesh.
+
+1. State where its classical second derivatives exist.
+2. Explain why $u_h$ generally cannot satisfy
+   @eq-intro-diffusion-preview pointwise across element boundaries.
+3. Use the integration-by-parts argument in this section to explain why
+   $u_h$ can nevertheless belong to the trial space of the corresponding
+   variational problem.
+:::
+
 ### Boundary conditions enter in different ways
 
 Prescribed values are built into the admissible trial space and are called
 *essential* boundary conditions. Fluxes and tractions naturally arise in boundary
 integrals and are called *natural* boundary conditions. This distinction follows
 from the variational structure.
+
+::: {#exr-intro-thermal-model}
+## A steady heat-conduction model
+A rectangular plate $\Om=(0,L)\times(0,H)$ has constant thermal conductivity
+$k$ and a volumetric heat source $r$. The temperature is $T_0$ on the left
+edge, the normal heat flux is $\bar q$ on the right edge, and the top and bottom
+edges are insulated. Without solving the problem:
+
+1. identify the primary unknown and state whether it is scalar, vector, or
+   tensor valued;
+2. state Fourier's law for $\bq$ and the steady governing PDE;
+3. write the boundary condition on each of the four edges and classify it as
+   essential or natural;
+4. identify three distinct quantities of interest that could be computed from
+   the solution.
+:::
 
 ### Physical principles appear naturally
 
@@ -291,10 +342,11 @@ variational problems do not arise from minimization.
 ### Properties of the variational problem
 
 The form $a(u,v)=\ell(v)$ can be examined for properties such as symmetry,
-continuity, and coercivity. For a conforming Galerkin method, appropriate
-continuous properties are inherited by the finite element problem. These
-properties govern existence, uniqueness, and stability and later help determine
-the quality of the finite element approximation.
+continuity, and coercivity. Chapter 2 defines these properties and states the
+Lax--Milgram theorem with the assumptions needed for existence and uniqueness.
+For a conforming Galerkin method, appropriate continuous properties are
+inherited by the finite element problem and later help determine the quality of
+the finite element approximation.
 
 ## Approximation and discretization {#sec-intro-approximation}
 
@@ -391,6 +443,24 @@ intended use. Mesh refinement, exact solutions, manufactured solutions,
 conservation checks, and independent implementations support verification.
 Comparison with experimental or trusted observational data supports validation.
 
+::: {#exr-intro-cantilever-decisions}
+## Modeling, discretization, and verification
+A two-dimensional cantilever of length $L$ and height $H$ is clamped at
+$x=0$ and carries a prescribed downward traction at $x=L$. It is modeled using
+small-strain linear elasticity. Prepare a table containing two modeling
+assumptions, two discretization choices, and two verification checks. For each
+entry, state whether mesh refinement can address it and justify the answer in
+one sentence.
+:::
+
+::: {#exr-intro-verification-validation}
+## Verification and validation of a tensile test
+A tensile coupon is tested in a laboratory, and the same test is represented
+by a structural finite element model. Give two verification activities and two
+validation activities. For each activity, identify the reference result or
+data required and the discrepancy that would be measured.
+:::
+
 ### Interpreting refinement studies
 
 Under the assumptions required for convergence, refining the mesh or increasing
@@ -414,6 +484,33 @@ or compliance. Such outputs involve derivatives, boundary reactions, or
 integrals and need not inherit the same accuracy as the primary field. A credible
 analysis identifies the quantity of interest before choosing the mesh and
 verification strategy.
+
+::: {#exr-intro-qoi-refinement}
+## A refinement study for a stress quantity
+For the cantilever in @exr-intro-cantilever-decisions, suppose the reported
+quantity of interest is the average normal stress over a specified region near
+the clamp. Design a mesh-refinement study by stating:
+
+1. the sequence of meshes to be compared;
+2. the scalar value recorded on each mesh;
+3. a numerical criterion for deciding that the quantity is sufficiently
+   resolved.
+
+Explain why visual smoothness of the displacement field is not such a
+criterion.
+:::
+
+::: {#exr-intro-workflow-errors}
+## Decisions and possible errors
+For each item below, identify the stage in @eq-intro-workflow where it first
+enters and state one error or uncertainty it may introduce:
+
+1. calibration of a material parameter from test data;
+2. selection of a numerical quadrature rule;
+3. local mesh refinement;
+4. selection of a linear solver and stopping tolerance;
+5. comparison of a computed quantity of interest with experimental data.
+:::
 
 ## Computational framework used in this book {#sec-intro-computational-framework}
 
@@ -449,14 +546,16 @@ computational tools required for advanced formulations.
 
 ### Review and foundations
 
-Chapter 2 introduces vector and tensor operations, function spaces, weak
-derivatives, Sobolev spaces, norms, bilinear forms, and well-posedness. Chapter 3
-derives variational formulations from boundary-value problems and explains trial
-and test spaces, essential and natural boundary conditions, and energy
-stationarity. Chapter 4 develops heat conduction, linear elasticity, and the
-finite-deformation quantities needed for hyperelasticity. Chapter 5 constructs
-finite element spaces and connects meshes, basis functions, mappings, quadrature,
-assembly, boundary conditions, and FEniCSx.
+Chapter 2 introduces vector and tensor operations, normed and inner-product
+spaces, function spaces, weak derivatives, Sobolev spaces, functionals and
+forms, directional derivatives, and the estimates used in well-posedness
+arguments. Chapter 3 derives variational formulations from boundary-value
+problems and explains trial and test spaces, essential and natural boundary
+conditions, continuous load functionals, and energy minimization. Chapter 4
+develops heat conduction, linear elasticity, and the finite-deformation
+quantities needed for hyperelasticity. Chapter 5 constructs finite element
+spaces and connects meshes, basis functions, mappings, quadrature, assembly,
+boundary conditions, and FEniCSx.
 
 ### Error analysis and adaptivity
 
@@ -500,7 +599,7 @@ Across all these topics, the same questions recur:
 The chapters return to these questions when introducing each formulation and its
 computational implementation.
 
-## Key ideas {#sec-intro-key-ideas}
+## Chapter summary {#sec-intro-key-ideas}
 
 - A continuum model, its strong PDE, its variational formulation, its finite
   element approximation, and its algebraic system are distinct mathematical
@@ -516,66 +615,6 @@ computational implementation.
   implementation, and interpretation errors are considered separately.
 - Computation should follow the mathematical formulation and include explicit
   verification evidence.
-
-## Exercises {#sec-intro-exercises}
-
-1. A rectangular plate $\Om=(0,L)\times(0,H)$ has constant thermal conductivity
-   $k$ and a volumetric heat source $r$. The temperature is prescribed as $T_0$
-   on the left edge, the normal heat flux is prescribed as $\bar q$ on the right
-   edge, and the top and bottom edges are insulated. Without solving the problem,
-   state:
-
-   a. the primary unknown and its type (scalar, vector, or tensor);
-   b. Fourier's constitutive law for $\bq$;
-   c. the steady governing PDE;
-   d. the boundary condition on each edge, classified as essential or natural;
-   e. three distinct QoIs that could be computed from the solution.
-
-2. A two-dimensional cantilever of length $L$ and height $H$ is clamped at
-   $x=0$ and carries a prescribed downward traction at $x=L$. It is modeled using
-   small-strain linear elasticity. Prepare a table containing two modeling
-   assumptions, two discretization choices, and two verification checks. For
-   each entry, state whether mesh refinement can address it and justify the
-   answer in one sentence.
-
-3. Classify each item below as belonging primarily to the physical model,
-   variational problem, finite element approximation, algebraic system, or
-   numerical solver. Give a one-sentence justification for each classification:
-
-   a. a prescribed traction;
-   b. a test function;
-   c. a quadratic triangular element;
-   d. a Krylov-method stopping tolerance;
-   e. a coefficient vector $\mathbf U$;
-   f. a constitutive tensor $\mathbb C$.
-
-4. Let $u_h$ be continuous and piecewise linear on a conforming triangular mesh.
-   State where its classical second derivatives exist and explain why $u_h$
-   generally cannot satisfy @eq-intro-diffusion-preview pointwise across element
-   boundaries. Then explain, using the integration-by-parts argument from this
-   chapter, why $u_h$ can still be admissible in the corresponding variational
-   problem.
-
-5. A finite element analysis of the cantilever in Exercise 2 produces a smooth
-   displacement plot, but the reported QoI is the average normal stress over a
-   specified region near the clamp. Design a mesh-refinement study for this QoI.
-   State the sequence of meshes to be compared, the value to record on each mesh,
-   and a numerical criterion for deciding that the QoI is sufficiently resolved.
-   Explain why visual smoothness of the displacement field is not that criterion.
-
-6. A tensile coupon is tested in a laboratory, and the same test is represented
-   by a structural finite element model. Give two verification activities and
-   two validation activities for this study. For each activity, identify the
-   reference result or data needed and the discrepancy that would be measured.
-
-7. For each item below, identify the box in @eq-intro-workflow where it first
-   enters and state one error or uncertainty it may introduce:
-
-   a. calibration of a material parameter from test data;
-   b. selection of a numerical quadrature rule;
-   c. local mesh refinement;
-   d. selection of a linear solver and stopping tolerance;
-   e. comparison of a computed QoI with experimental measurements.
 
 ## Further reading {#sec-intro-further-reading}
 
