@@ -11,6 +11,52 @@
 \usepackage{siunitx}
 \usepackage{enumitem}
 \usepackage{scrlayer-scrpage}
+\usepackage[most]{tcolorbox}
+\usepackage{needspace}
+
+% Distinguish worked examples and exercises without changing theorem styles.
+\definecolor{femexampleback}{HTML}{F5F9FD}
+\definecolor{femexampleframe}{HTML}{8EB6D8}
+\definecolor{femexerciseback}{HTML}{FFFAF0}
+\definecolor{femexerciseframe}{HTML}{D4A72C}
+\tcbset{
+  femexamplebox/.style={
+    enhanced,
+    breakable,
+    colback=femexampleback,
+    colframe=femexampleframe,
+    boxrule=0.45pt,
+    leftrule=2.2pt,
+    arc=1.5pt,
+    left=7pt,
+    right=7pt,
+    top=6pt,
+    bottom=6pt,
+    before skip=0.9em,
+    after skip=0.9em
+  },
+  femexercisebox/.style={
+    enhanced,
+    breakable,
+    colback=femexerciseback,
+    colframe=femexerciseframe,
+    boxrule=0.45pt,
+    leftrule=2.2pt,
+    arc=1.5pt,
+    left=7pt,
+    right=7pt,
+    top=6pt,
+    bottom=6pt,
+    before skip=0.9em,
+    after skip=0.9em
+  }
+}
+
+% Quarto defines these theorem environments after processing header includes.
+\AtBeginDocument{%
+  \tcolorboxenvironment{example}{femexamplebox}%
+  \tcolorboxenvironment{exercise}{femexercisebox}%
+}
 
 % Place "Chapter <number>" above each numbered chapter title.
 \KOMAoptions{chapterprefix=true}

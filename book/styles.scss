@@ -20,6 +20,29 @@ $line-height-base: 1.55;
   margin-bottom: 1.2rem;
 }
 
+.theorem.example,
+.theorem.exercise {
+  padding: 0.8rem 1rem 0.7rem;
+  border: 1px solid;
+  border-left-width: 0.3rem;
+  border-radius: 0.25rem;
+}
+
+.theorem.example {
+  background-color: #f5f9fd;
+  border-color: #8eb6d8;
+}
+
+.theorem.exercise {
+  background-color: #fffaf0;
+  border-color: #d4a72c;
+}
+
+.theorem.example > :last-child,
+.theorem.exercise > :last-child {
+  margin-bottom: 0;
+}
+
 .cell-output-display {
   margin-top: 0.8rem;
   margin-bottom: 1.2rem;

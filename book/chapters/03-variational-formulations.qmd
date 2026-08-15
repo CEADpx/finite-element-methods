@@ -223,8 +223,9 @@ $$
 \qquad z\in\Ug.
 $$ {#eq-variational-energy}
 
-Let $u\in\Ug$ and $v\in\Vzero$. Since $u+\epsilon v\in\Ug$, the first
-variation is
+Let $u\in\Ug$ and $v\in\Vzero$. Since $u+\epsilon v\in\Ug$, $v$ is an
+admissible variation direction. Using the definition in
+@eq-foundations-first-variation, the first variation is
 
 $$
 \delta\Pi(u;v)

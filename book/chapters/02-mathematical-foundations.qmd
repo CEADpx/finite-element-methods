@@ -129,8 +129,11 @@ $\bm{S}:\operatorname{skw}\bm{A}=0$.
 
 ::: {#exr-foundations-symmetric-skew-orthogonality}
 ## Orthogonality of the symmetric and skew-symmetric parts
-Use @eq-foundations-sym-skew and the identity
-$\bm{B}:\bm{C}=\bm{B}^{T}:\bm{C}^{T}$ to prove that
+Use the definition
+$\bm{B}:\bm{C}=B_{ij}C_{ij}$ from
+@eq-foundations-double-contraction, the decomposition in
+@eq-foundations-sym-skew, and the identity
+$\bm{B}^{T}:\bm{C}^{T}=\bm{B}:\bm{C}$ to prove that
 
 $$
 \operatorname{skw}\bm{A}:\operatorname{sym}\bm{A}=0.
@@ -287,6 +290,20 @@ $\alpha\in\R$,
 3. $\norm{u+v}_V\leq\norm{u}_V+\norm{v}_V$.
 :::
 
+::: {#def-seminorm}
+## Seminorm
+Let $V$ be a vector space over $\R$. A mapping
+$\seminorm{\cdot}_V:V\to[0,\infty)$ is a **seminorm** if, for all
+$u,v\in V$ and $\alpha\in\R$,
+
+1. $\seminorm{\alpha v}_V=|\alpha|\seminorm{v}_V$;
+2. $\seminorm{u+v}_V\leq\seminorm{u}_V+\seminorm{v}_V$.
+
+Unlike a norm, a seminorm may satisfy $\seminorm{v}_V=0$ for a nonzero
+$v$. We use double bars $\norm{v}_V$ for a norm and single bars
+$\seminorm{v}_V$ for a seminorm.
+:::
+
 ::: {#def-euclidean-p-norm}
 ## Euclidean $p$-norms
 For $\bm{x}=(x_1,\ldots,x_n)\in\R^n$ and $1\leq p<\infty$, the
@@ -431,6 +448,20 @@ particular, two vectors $u,v\in V$ are **orthogonal** if
 $\inner{u}{v}_V=0$. A general norm determines lengths and distances but does
 not, by itself, define orthogonality.
 
+
+::: {#exr-inner-product-parallelogram-identity}
+## Parallelogram identity for inner product space
+
+Every norm induced by an inner product satisfies the parallelogram identity
+
+$$
+\norm{u+v}^2+\norm{u-v}^2
+=2\norm{u}^2+2\norm{v}^2.
+$$
+
+Using the fact that norm satisfies $\norm{v}_V^2=\inner{v}{v}_V$ and the properties of $\inner{\cdot}{\cdot}_V$ in @def-inner-product, show that the left hand side of the above equation reduces to the right hand side.
+:::
+
 ::: {#def-cauchy-sequence}
 ## Cauchy sequence
 A sequence $(v_n)$ in a metric space $(X,d)$ is a **Cauchy sequence** if, for
@@ -492,19 +523,36 @@ relation between this basis and an algebraic basis is explained next.
 :::
 
 ::: {#rem-foundations-infinite-dimensional-bases}
-## Algebraic and topological bases
+## Algebraic bases
 The dimension defined above uses a Hamel basis, in which every vector is a
 **finite** linear combination of basis vectors. The space of all polynomials
 has the countable Hamel basis $\{1,x,x^2,\ldots\}$. In contrast, an
 infinite-dimensional Banach space cannot have a countable Hamel basis; its
 algebraic dimension is uncountable.
+:::
 
-A normed space is **separable** if it contains a countable subset whose
-elements can approximate every element of the space arbitrarily closely. A
-separable Hilbert space such as $\ell^2$ can have a countable orthonormal
-basis. In that setting, vectors are limits of infinite series of basis
-vectors. A countable orthonormal basis is therefore not a countable Hamel
-basis.
+::: {#def-separable-space}
+## Separable space
+A normed vector space $(V,\norm{\cdot}_V)$ is **separable** if it contains a
+countable subset $D$ such that, for every $v\in V$ and every $\varepsilon>0$,
+there is a $w\in D$ satisfying
+
+$$
+\norm{v-w}_V<\varepsilon.
+$$
+
+Equivalently, $D$ is dense in $V$, meaning that its closure is $V$.
+:::
+
+::: {#rem-foundations-orthonormal-hamel-bases}
+## Orthonormal and Hamel bases
+A separable Hilbert space such as $\ell^2$ can have a countable orthonormal
+basis. Such a basis represents each vector as the norm limit of a series,
+which may contain infinitely many nonzero terms. A Hamel basis, by definition,
+must represent every vector using a finite linear combination. For example,
+the vector $(1,1/2,1/3,\ldots)\in\ell^2$ has infinitely many nonzero
+coefficients in the standard orthonormal basis. Thus the standard orthonormal
+basis of $\ell^2$ is not a Hamel basis.
 :::
 
 ::: {#rem-foundations-finite-dimensional-completeness}
@@ -521,7 +569,7 @@ norm on its coordinate vectors: there are constants $c,C>0$ such that
 
 $$
 c\norm{\bm{\alpha}}_2
-\leq\norm{\alpha_i v_i}_V
+\leq\norm{\sum_{i=1}^n\alpha_i v_i}_V
 \leq C\norm{\bm{\alpha}}_2.
 $$
 
@@ -542,9 +590,17 @@ If $\inner{v}{v}=0$, then the continuous, nonnegative function $v^2$ has zero
 integral and hence $v=0$ on $[0,1]$. Thus this is an inner product. Because
 $\mathcal{P}_p$ is finite-dimensional, it is complete in the induced norm and
 is a Hilbert space, as explained in
-@rem-foundations-finite-dimensional-completeness. The algebraic vector space
-$\mathcal{P}_p$ may be paired with other norms, but any statement about
-convergence or completeness must name the chosen norm.
+@rem-foundations-finite-dimensional-completeness.
+:::
+
+::: {#rem-foundations-polynomial-norm-choice}
+## The space and its norm
+The notation $\mathcal{P}_p$ specifies the vector space but does not specify a
+norm. For example, the same polynomial space can be equipped with the norm
+induced by the inner product in the preceding example, the supremum norm on
+$[0,1]$, or an $H^1(0,1)$ norm. A statement about distance or convergence must
+identify which norm is being used. Because $\mathcal{P}_p$ is
+finite-dimensional, it is complete under each of these norms.
 :::
 
 ## Continuous and integrable function spaces {#sec-foundations-function-spaces}
@@ -576,24 +632,18 @@ Banach space.
 
 ::: {#exm-foundations-supremum-not-hilbert}
 ## The supremum norm is not an inner-product norm
-Every norm induced by an inner product satisfies the parallelogram identity
-
-$$
-\norm{u+v}^2+\norm{u-v}^2
-=2\norm{u}^2+2\norm{v}^2.
-$$
 
 On $[0,1]$, take $u(x)=1$ and $v(x)=x$. Then
 
 $$
 \norm{u+v}_{\infty}^2+\norm{u-v}_{\infty}^2=5,
-\qquad
-2\norm{u}_{\infty}^2+2\norm{v}_{\infty}^2=4.
+\quad
+2\norm{u}_{\infty}^2+2\norm{v}_{\infty}^2=4 \quad \Rightarrow \quad \norm{u+v}_{\infty}^2+\norm{u-v}_{\infty}^2 \neq 2\norm{u}_{\infty}^2+2\norm{v}_{\infty}^2.
 $$
 
-The failure of the parallelogram identity shows that no inner product can
-induce this norm. Thus $C([0,1])$ with the supremum norm is a Banach space but
-not a Hilbert space.
+The above shows the failure of the parallelogram identity in @exr-inner-product-parallelogram-identity. Therefore, we can not construct or define a inner product $\inner{\cdot}{\cdot}_V$ such that $\norm{\cdot}_V^2 = \inner{\cdot}{\cdot}_V$. To prove this, suppose you could construct such an inner product then parallelogram identity in @exr-inner-product-parallelogram-identity must hold, which contradicts the above. 
+
+This example shows that the space of continuous functions $C([0,1])$ with the supremum norm is a Banach space but not a Hilbert space.
 :::
 
 ### The spaces $L^p(\Om)$
@@ -1213,16 +1263,19 @@ H^1(\Om)=
 \right\}.
 $$ {#eq-foundations-h1-definition}
 
-A **seminorm** satisfies the homogeneity and triangle-inequality properties of
-a norm but may be zero for a nonzero function. The norm and the standard
-$H^1$ seminorm are
+The $H^1$ norm is
 
 $$
 \norm{v}_{H^1(\Om)}^2
-=\norm{v}_{L^2(\Om)}^2+\norm{\grad v}_{[L^2(\Om)]^d}^2,
-\qquad
-\seminorm{v}_{H^1(\Om)}=\norm{\grad v}_{[L^2(\Om)]^d}.
+=\norm{v}_{L^2(\Om)}^2+\norm{\grad v}_{[L^2(\Om)]^d}^2.
 $$ {#eq-h1-norm}
+
+The corresponding $H^1$ seminorm is
+
+$$
+\seminorm{v}_{H^1(\Om)}
+=\norm{\grad v}_{[L^2(\Om)]^d}.
+$$ {#eq-h1-seminorm}
 
 For vector-valued fields we use $[H^1(\Om)]^d$, with the squared norm obtained
 by summing the squared $H^1$ norms of the components. From
@@ -1302,32 +1355,403 @@ $$ {#eq-foundations-poincare}
 Consequently, the $H^1$ seminorm is a norm equivalent to the full $H^1$ norm on
 this homogeneous space.
 
-## Linear functionals and dual spaces {#sec-foundations-duality}
+## Functionals and forms {#sec-foundations-duality}
 
-A linear functional maps a vector space to the scalar field. The dual space
-$V^*$ consists of the continuous linear functionals on $V$. Its norm is
+A functional maps an element in the vector space to a real number and in general the mapping can be nonlinear. Forms have two arguments and will be used to express the
+dependence of a variational problem on its trial and test functions.
+
+::: {#def-functional}
+## Functional
+Let $V$ be a vector space over $\R$. A **functional** on $V$ is a mapping
 
 $$
-\norm{\ell}_{V^*}
-=\sup_{v\in V,\,v\ne0}\frac{|\ell(v)|}{\norm{v}_V}.
+J:V\to\R.
 $$
 
-The action of $\ell\in V^*$ on $v\in V$ may be written as $\ell(v)$ or as the
-duality pairing $\dual{\ell}{v}$. Continuity means that a constant $C_\ell$
-exists such that
+:::
+
+
+::: {#def-continuous-functional}
+## Continuous functional
+Let $(V,\norm{\cdot}_V)$ be a normed vector space. A functional
+$J:V\to\R$ is **continuous at** $u\in V$ if, for every $\varepsilon>0$,
+there is a $\delta>0$ such that
+
+$$
+\norm{v-u}_V<\delta
+\quad\Longrightarrow\quad
+|J(v)-J(u)|<\varepsilon.
+$$
+
+The functional is **continuous on** $V$ if it is continuous at every
+$u\in V$.
+:::
+
+::: {#exr-foundations-general-functional}
+## Linear and nonlinear functionals on $\R^n$
+For a fixed $\bm{f}\in\R^n$, consider
+
+$$
+J_1(\bm{x})=\bm{f}\cdot\bm{x},
+\qquad
+J_2(\bm{x})=\frac12\norm{\bm{x}}_2^2.
+$$
+
+Verify directly that both are functionals on $\R^n$. Determine which one is
+linear, and use the Euclidean norm to show that both are continuous.
+:::
+
+### Linear functionals {#sec-foundations-linear-functionals}
+
+::: {#def-linear-functional}
+## Linear functional
+A functional $\ell:V\to\R$ is **linear** if
+
+$$
+\ell(\alpha u+\beta v)
+=\alpha\ell(u)+\beta\ell(v)
+\qquad
+\forall u,v\in V,
+\quad
+\forall\alpha,\beta\in\R.
+$$
+:::
+
+::: {#exm-foundations-linear-functional-euclidean}
+## Work of a force in $\R^n$
+For a fixed force $\bm{f}\in\R^n$, the mapping
+
+$$
+\ell(\bm{x})=\bm{f}\cdot\bm{x}
+$$
+
+is a linear functional of the displacement $\bm{x}$. Its value is the work
+done by the force through that displacement. Linearity follows from the
+distributive property of the dot product.
+:::
+
+::: {#exm-foundations-linear-functional-loads}
+## Body-force and traction functionals
+Let $\Om$ be a bounded Lipschitz domain and let
+$\bm{v}\in V=[H^1(\Om)]^d$ be a displacement field. A body force
+$\bm{b}\in[L^2(\Om)]^d$ defines the functional
+
+$$
+\ell_b(\bm{v})
+=\int_{\Om}\bm{b}\cdot\bm{v}\,\dx.
+$$
+
+Let $\Gamma_t\subset\partial\Om$ be a measurable boundary portion on which a
+traction $\bm{t}\in[L^2(\Gamma_t)]^d$ is prescribed. The trace of $\bm{v}$ is
+defined on $\Gamma_t$, and the traction defines the functional
+
+$$
+\ell_t(\bm{v})
+=\int_{\Gamma_t}\bm{t}\cdot\bm{v}\,\ds.
+$$
+
+The total external-load functional is
+$\ell(\bm{v})=\ell_b(\bm{v})+\ell_t(\bm{v})$. Both integrals are linear in
+$\bm{v}$.
+:::
+
+::: {#thm-continuous-linear-functional}
+## Characterization of a continuous linear functional
+Let $(V,\norm{\cdot}_V)$ be a normed vector space. A linear functional
+$\ell:V\to\R$ is continuous if and only if there is a constant
+$C_\ell\geq0$ such that
 
 $$
 |\ell(v)|\leq C_\ell\norm{v}_V
 \qquad\forall v\in V.
+$$ {#eq-foundations-continuous-linear-functional}
+:::
+
+::: {#def-dual-space}
+## Dual space and dual norm
+Let $(V,\norm{\cdot}_V)$ be a normed vector space. Its **dual space** is
+
+$$
+V^*=\{\ell:V\to\R:\ell\text{ is linear and continuous}\}.
 $$
 
-Loads, sources, and prescribed fluxes enter variational problems through such
-functionals.
+For $\ell\in V^*$, the **dual norm** is
 
-## Bilinear forms and well-posedness {#sec-foundations-bilinear}
+$$
+\norm{\ell}_{V^*}
+=\sup_{v\in V,\,v\ne0}\frac{|\ell(v)|}{\norm{v}_V}.
+$$ {#eq-foundations-dual-norm}
 
-A mapping $a:V\times V\to\R$ is bilinear if it is linear in each argument.
-Two estimates are central.
+This supremum is finite because $\ell$ is continuous, and it defines a norm
+on $V^*$. When $V\ne\{0\}$, the same value is
+$\sup_{\norm{v}_V=1}|\ell(v)|$.
+
+The action of $\ell\in V^*$ on $v\in V$ may be written as $\ell(v)$ or as
+the duality pairing $\dual{\ell}{v}$.
+:::
+
+::: {#exr-foundations-load-functional-continuity}
+## Continuity of the external-load functional
+For the loads in @exm-foundations-linear-functional-loads, use the
+Cauchy--Schwarz inequality and the trace estimate
+
+$$
+\norm{\bm{v}}_{[L^2(\Gamma_t)]^d}
+\leq C_{\mathrm{tr}}\norm{\bm{v}}_{[H^1(\Om)]^d}
+$$
+
+to prove
+
+$$
+|\ell(\bm{v})|
+\leq
+\left(
+\norm{\bm{b}}_{[L^2(\Om)]^d}
++C_{\mathrm{tr}}\norm{\bm{t}}_{[L^2(\Gamma_t)]^d}
+\right)
+\norm{\bm{v}}_{[H^1(\Om)]^d}.
+$$
+
+Conclude that $\ell\in V^*$ and give an upper bound for
+$\norm{\ell}_{V^*}$.
+:::
+
+### Bilinear forms {#sec-foundations-bilinear-forms}
+
+::: {#def-bilinear-form}
+## Bilinear form
+A mapping $a:U\times V\to\R$ is a **bilinear form** if it is linear in each
+argument:
+
+$$
+\begin{aligned}
+a(\alpha u_1+\beta u_2,v)
+&=\alpha a(u_1,v)+\beta a(u_2,v),\\
+a(u,\alpha v_1+\beta v_2)
+&=\alpha a(u,v_1)+\beta a(u,v_2).
+\end{aligned}
+$$
+:::
+
+::: {#exm-foundations-bilinear-form}
+## A matrix bilinear form
+For a fixed matrix $\bm{K}\in\R^{n\times n}$,
+
+$$
+a(\bm{x},\bm{y})=\bm{y}\cdot(\bm{K}\bm{x})
+$$
+
+is bilinear in $\bm{x}$ and $\bm{y}$. When $\bm{K}=\bI$, this is the
+Euclidean inner product.
+:::
+
+::: {#exm-foundations-diffusion-bilinear-form}
+## A diffusion bilinear form
+Let $V=H^1(\Om)$ and let $k\in L^\infty(\Om)$. Define
+
+$$
+a(u,v)=\int_{\Om}k\grad u\cdot\grad v\,\dx.
+$$
+
+For a fixed $v$, linearity of the gradient and integral gives
+$a(\alpha u_1+\beta u_2,v)=\alpha a(u_1,v)+\beta a(u_2,v)$. The same
+calculation in the second argument proves that $a$ is bilinear. Because $k$
+is scalar-valued, $a(u,v)=a(v,u)$.
+:::
+
+::: {#exr-foundations-bilinear-form-properties}
+## Properties of two bilinear forms
+
+1. For $a(\bm{x},\bm{y})=\bm{y}\cdot(\bm{K}\bm{x})$, verify linearity in
+   each argument and prove that $a(\bm{x},\bm{y})=a(\bm{y},\bm{x})$ for all
+   $\bm{x},\bm{y}\in\R^n$ if and only if $\bm{K}=\bm{K}^T$.
+2. For the diffusion form in @exm-foundations-diffusion-bilinear-form, verify
+   bilinearity directly and show that $a(v,v)\geq0$ when $k(\bx)\geq0$
+   almost everywhere in $\Om$.
+:::
+
+### Semilinear forms {#sec-foundations-semilinear-forms}
+
+::: {#def-semilinear-form}
+## Semilinear form
+In this book, a mapping $a:U\times V\to\R$, written $a(u;v)$, is a
+**semilinear form** if it may depend nonlinearly on $u$ but is linear in $v$.
+Thus, for each fixed $u\in U$,
+
+$$
+a(u;\alpha v_1+\beta v_2)
+=\alpha a(u;v_1)+\beta a(u;v_2).
+$$
+
+The semicolon separates the possibly nonlinear trial argument from the linear
+test argument.
+:::
+
+::: {#exm-foundations-semilinear-form}
+## A nonlinear scalar equation
+For fixed $f\in\R$, define
+
+$$
+a(x;y)=(x^3-f)y.
+$$
+
+This form is nonlinear in $x$ and linear in $y$. The condition
+$a(x;y)=0$ for every $y\in\R$ is equivalent to $x^3=f$.
+:::
+
+::: {#exm-foundations-reaction-diffusion-semilinear-form}
+## A reaction--diffusion semilinear form
+Let $U=V=C^1(\overline{\Om})$, assume that $\Om$ is bounded, and define
+
+$$
+a(u;v)=\int_{\Om}\left(k\grad u\cdot\grad v+u^3v\right)\,\dx
+$$
+
+for a prescribed $k\in C(\overline{\Om})$. For each fixed $u\in U$, the gradient
+term and the reaction term $u^3v$ are linear in $v$. The dependence on $u$ is
+not linear because of $u^3$. Hence $a$ is semilinear under the convention used
+in @def-semilinear-form.
+:::
+
+::: {#exr-foundations-semilinear-form-properties}
+## Verifying semilinearity
+For the form in @exm-foundations-reaction-diffusion-semilinear-form:
+
+1. verify the defining identity
+   $a(u;\alpha v_1+\beta v_2)=\alpha a(u;v_1)+\beta a(u;v_2)$;
+2. compare $a(2;1)$ with $a(1;1)+a(1;1)$ to show that the dependence on the
+   first argument is not linear.
+:::
+
+### Directional derivatives and first variations {#sec-foundations-functional-derivatives}
+
+::: {#def-directional-derivative}
+## Directional derivative and first variation
+Let $J:V\to\R$ be a functional. The **directional derivative** of $J$ at
+$u\in V$ in the direction $v\in V$ is
+
+$$
+DJ(u)[v]
+=\left.\frac{\dd}{\dd\epsilon}J(u+\epsilon v)\right|_{\epsilon=0} = \lim_{\epsilon\to0}
+\frac{J(u+\epsilon v)-J(u)}{\epsilon},
+$$ {#eq-foundations-directional-derivative}
+
+provided the limit exists. The same quantity is called the **first
+variation** of $J$ and is written
+
+$$
+\delta J(u;v)
+=DJ(u)[v].
+$$ {#eq-foundations-first-variation}
+
+The function $u+\epsilon v$ is a variation of $u$, and $v$ is the variation
+direction. If $DJ(u)[v]$ exists for every $v$ and depends linearly and
+continuously on $v$, then $DJ(u)\in V^*$ is the Gâteaux derivative of $J$ at
+$u$.
+:::
+
+::: {#exm-foundations-quadratic-functional}
+## Derivative of a quadratic functional on $\R^n$
+Let $\bm{K}\in\R^{n\times n}$ be symmetric and define
+
+$$
+J(\bm{x})
+=\frac12\bm{x}\cdot(\bm{K}\bm{x})-\bm{f}\cdot\bm{x}.
+$$
+
+Direct expansion gives
+
+$$
+\begin{aligned}
+J(\bm{x}+\epsilon\bm{y})-J(\bm{x})
+={}&\epsilon(\bm{K}\bm{x}-\bm{f})\cdot\bm{y}
++\frac{\epsilon^2}{2}\bm{y}\cdot(\bm{K}\bm{y}).
+\end{aligned}
+$$
+
+Dividing by $\epsilon$ and taking the limit gives
+
+$$
+DJ(\bm{x})[\bm{y}]
+=\delta J(\bm{x};\bm{y})
+=(\bm{K}\bm{x}-\bm{f})\cdot\bm{y}.
+$$ {#eq-foundations-quadratic-first-variation}
+
+For fixed $\bm{x}$, this expression is a continuous linear functional of
+$\bm{y}$. Hence the Gâteaux derivative is the member of $(\R^n)^*$ represented
+by the vector $\bm{K}\bm{x}-\bm{f}$.
+:::
+
+::: {#exm-foundations-energy-functional-derivative}
+## Derivative of an energy functional
+Let $V=H_0^1(\Om)$, let $k\in L^\infty(\Om)$, and let $f\in L^2(\Om)$.
+Consider
+
+$$
+J(u)
+=\frac12\int_{\Om}k|\grad u|^2\,\dx
+-\int_{\Om}fu\,\dx.
+$$
+
+For $u,v\in V$,
+
+$$
+\begin{aligned}
+J(u+\epsilon v)-J(u)
+={}&\epsilon\left(
+\int_{\Om}k\grad u\cdot\grad v\,\dx
+-\int_{\Om}fv\,\dx
+\right)\\
+&+\frac{\epsilon^2}{2}
+\int_{\Om}k|\grad v|^2\,\dx.
+\end{aligned}
+$$
+
+It follows that
+
+$$
+DJ(u)[v]
+=\delta J(u;v)
+=\int_{\Om}k\grad u\cdot\grad v\,\dx
+-\int_{\Om}fv\,\dx.
+$$ {#eq-foundations-energy-functional-derivative}
+
+For fixed $u$, this expression is linear in $v$. The Cauchy--Schwarz
+inequality gives
+
+$$
+|DJ(u)[v]|
+\leq
+\left(
+\norm{k}_{L^\infty(\Om)}\norm{\grad u}_{[L^2(\Om)]^d}
++\norm{f}_{L^2(\Om)}
+\right)
+\norm{v}_{H^1(\Om)},
+$$
+
+so $DJ(u)\in V^*$. This is the Gâteaux derivative of $J$ at $u$.
+:::
+
+::: {#exr-foundations-nonlinear-functional-derivative}
+## Derivative of a nonlinear energy functional
+For smooth scalar functions on a bounded domain and prescribed
+$k,f\in C(\overline{\Om})$, let
+
+$$
+J(u)=\int_{\Om}\left(
+\frac{k}{2}|\grad u|^2+\frac14u^4-fu
+\right)\,\dx.
+$$
+
+Compute $DJ(u)[v]$ from the definition in
+@eq-foundations-directional-derivative. Verify that the result is linear in
+$v$, and identify the associated semilinear form.
+:::
+
+## Continuity, coercivity, and well-posedness {#sec-foundations-bilinear}
+
+For the Lax--Milgram theorem, two estimates on a bilinear form
+$a:V\times V\to\R$ are central.
 
 ::: {#def-continuous-bilinear-form}
 ## Continuity
@@ -1377,6 +1801,10 @@ theorem to a diffusion problem. Later chapters will require more general
 stability conditions for mixed and constrained formulations
 [@arnold2018; @oden-demkowicz].
 
+```{=latex}
+\Needspace{12\baselineskip}
+```
+
 ::: {#exr-foundations-diffusion-continuity-coercivity}
 ## Continuity and coercivity of a diffusion form
 Let $V=H_0^1(\Om)$ with $\norm{v}_V=\norm{v}_{H^1(\Om)}$, and let
@@ -1405,31 +1833,113 @@ $$
 Hence identify the continuity constant $M$ and coercivity constant $\alpha$.
 :::
 
-## Key ideas {#sec-foundations-key-ideas}
+## Reference inequalities {#sec-foundations-reference-inequalities}
 
-- Component notation makes contractions and differential operators explicit.
-- Gauss's divergence theorem converts a volume integral of a divergence into
-  the outward flux through the boundary; integration by parts follows from
-  this theorem and the product rule.
-- A vector space provides algebraic structure, a norm provides a notion of
-  distance, and completeness distinguishes Banach spaces.
-- A complete inner-product space is a Hilbert space. In particular,
-  $C(\overline{\Om})$ with the supremum norm is Banach, while $L^2(\Om)$ with
-  its standard inner product is Hilbert.
-- Trial spaces with nonhomogeneous boundary data are affine spaces; their
-  associated test spaces are linear and satisfy homogeneous data.
-- Weak derivatives allow functions with limited classical smoothness to be used
-  in variational problems.
-- $H^1(\Om)$ is the natural space for many second-order PDEs after one
-  integration by parts.
-- Traces give a precise meaning to boundary values of Sobolev functions.
-- Continuity and coercivity provide the estimates required by Lax--Milgram.
+The estimates below are collected here for later use. Their assumptions are
+part of each statement; in particular, norm equivalence requires finite
+dimension, whereas the norm and inner-product inequalities do not.
 
-## Further reading {#sec-foundations-further-reading}
+### Normed and inner-product spaces
 
-Süli gives a concise introduction to weak derivatives, Sobolev spaces, and the
-Lax--Milgram theorem [@suli2012]. Oden and Demkowicz provide a more extensive
-treatment of vector spaces, duality, distributions, Sobolev spaces, and operator
-theory [@oden-demkowicz]. The notation linking tensors, components, and matrices
-in finite element mechanics is discussed by Belytschko, Liu, and Moran
-[@belytschko2000].
+For any normed vector space $(V,\norm{\cdot}_V)$ and any $u,v\in V$,
+
+$$
+\norm{u+v}_V\leq\norm{u}_V+\norm{v}_V,
+\qquad
+\left|\norm{u}_V-\norm{v}_V\right|\leq\norm{u-v}_V.
+$$ {#eq-foundations-reference-norm-inequalities}
+
+The first estimate is the triangle inequality; the second is the reverse
+triangle inequality. Both hold in every normed vector space, whether finite-
+or infinite-dimensional.
+
+If the norm is induced by an inner product, the Cauchy--Schwarz inequality is
+
+$$
+|\inner{u}{v}_V|\leq\norm{u}_V\norm{v}_V.
+$$ {#eq-foundations-reference-cauchy-schwarz}
+
+This statement applies to every inner-product space. Completeness is not
+required.
+
+### Finite-dimensional norm equivalence
+
+Let $V$ be finite-dimensional, and let $\norm{\cdot}_a$ and
+$\norm{\cdot}_b$ be any two norms on $V$. There are constants $c,C>0$ such
+that
+
+$$
+c\norm{v}_a\leq\norm{v}_b\leq C\norm{v}_a
+\qquad\forall v\in V.
+$$ {#eq-foundations-finite-dimensional-norm-equivalence}
+
+The constants depend on the two norms and on the space. Arbitrary norms on an
+infinite-dimensional vector space need not be equivalent.
+
+### Function-space inequalities
+
+Let $1\leq p,q\leq\infty$ satisfy $1/p+1/q=1$, with $1/\infty=0$. If
+$u\in L^p(\Om)$ and $v\in L^q(\Om)$, Hölder's inequality gives
+
+$$
+\int_{\Om}|uv|\,\dx
+\leq\norm{u}_{L^p(\Om)}\norm{v}_{L^q(\Om)}.
+$$ {#eq-foundations-holder}
+
+The case $p=q=2$ is the Cauchy--Schwarz inequality in $L^2(\Om)$.
+
+If $\Om$ is bounded and $u\in C(\overline{\Om})$, then
+@eq-foundations-continuous-l2-bound gives
+
+$$
+\norm{u}_{L^2(\Om)}
+\leq |\Om|^{1/2}\norm{u}_{\infty}.
+$$
+
+If $\Om$ is a bounded Lipschitz domain and
+$\Gamma\subset\partial\Om$ is measurable, the trace inequality has the form
+
+$$
+\norm{v}_{L^2(\Gamma)}
+\leq C_{\mathrm{tr}}\norm{v}_{H^1(\Om)}
+\qquad\forall v\in H^1(\Om).
+$$ {#eq-foundations-trace-inequality}
+
+Finally, if $\Om$ is a bounded Lipschitz domain and
+$\Gam_D\subset\partial\Om$ has positive boundary measure, the Poincare
+inequality in @eq-foundations-poincare holds on
+$H^1_{0,\Gam_D}(\Om)$. Together with @eq-h1-norm, it gives
+
+$$
+\norm{\grad v}_{[L^2(\Om)]^d}
+\leq\norm{v}_{H^1(\Om)}
+\leq\sqrt{1+C_P^2}\,
+\norm{\grad v}_{[L^2(\Om)]^d}
+\qquad\forall v\in H^1_{0,\Gam_D}(\Om).
+$$ {#eq-foundations-h1-seminorm-equivalence}
+
+Thus the $H^1$ seminorm is a norm equivalent to the full $H^1$ norm on this
+homogeneous boundary-value space, but not on all of $H^1(\Om)$.
+
+## Chapter summary {#sec-foundations-key-ideas}
+
+- Vector and tensor operations can be written in basis-independent or
+  component form. The component form fixes the meaning of contractions,
+  gradients, and divergences.
+- A vector space specifies linear combinations. A norm adds distance and
+  convergence. A complete normed vector space is a Banach space, and a
+  complete inner-product space is a Hilbert space.
+- The spaces $L^p(\Om)$ contain integrable functions, while Sobolev spaces
+  also require weak derivatives to be integrable. The space $H^1(\Om)$ is
+  used for the second-order problems considered in this book.
+- The divergence theorem and integration by parts move derivatives between
+  functions and introduce boundary terms.
+- A functional maps a vector space to $\R$. The continuous linear functionals
+  on a normed vector space form its dual space, while bilinear and semilinear
+  forms take two arguments.
+- The directional derivative of a functional is its first variation. When it
+  is linear and continuous in the direction, it defines an element of the
+  dual space.
+- The Lax--Milgram theorem gives existence and uniqueness when a bilinear form
+  is continuous and coercive and the right-hand side is a continuous linear
+  functional.
