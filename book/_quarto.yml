@@ -16,6 +16,7 @@ book:
   downloads: [pdf]
   chapters:
     - index.qmd
+    - status.qmd
     - notation.qmd
     - part: "Review and Foundations"
       chapters:

@@ -1,0 +1,36 @@
+# Book Development Status {.unnumbered}
+
+This book is being developed alongside the Fall 2026 offering of
+ME/BME 736: Advanced Finite Element Methods. The status below indicates how
+much of each chapter has been developed and reviewed. It will be updated as the
+book progresses.
+
+For this page, **complete** means that a chapter has a full working draft
+suitable for use in the course. Complete chapters may still receive
+copyediting, additional examples, improved exercises, and revisions needed for
+consistency with later chapters.
+
+## Complete
+
+- **Chapter 1: Introduction to the Finite Element Method**
+- **Chapter 2: Mathematical Foundations**
+
+## Actively developed
+
+- **Chapter 3: Partial Differential Equations and Variational Formulations**
+- **Chapter 4: Model Problems in Heat Transfer and Solid Mechanics** 
+- **Chapter 5: Review of Finite Element Approximation**
+
+## Yet to be started
+
+The following chapters currently contain placeholders:
+
+- **Chapter 6: A Priori Error Estimation and Convergence**
+- **Chapter 7: A Posteriori Error Estimation and Adaptive Finite Elements**
+- **Chapter 8: Constraints in Finite Element Methods**
+- **Chapter 9: Mixed Finite Element Methods**
+- **Chapter 10: Nonlinear Finite Element Methods**
+- **Chapter 11: Transient Finite Element Methods**
+- **Chapter 12: PDE-Constrained Optimization**
+
+Last updated: August 15, 2026.

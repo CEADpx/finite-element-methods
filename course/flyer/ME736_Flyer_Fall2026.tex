@@ -1,0 +1,130 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,top=0.38in,bottom=0.42in,left=0.55in,right=0.55in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[sfdefault]{sourcesanspro}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{fontawesome5}
+\usepackage[hidelinks]{hyperref}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage[absolute,overlay]{textpos}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{2em}
+
+\definecolor{MinesNavy}{RGB}{0,37,84}
+\definecolor{CEADTeal}{RGB}{20,139,144}
+\definecolor{CEADGreen}{RGB}{99,161,103}
+\definecolor{WarmGray}{RGB}{92,98,102}
+\definecolor{LightRule}{RGB}{211,215,216}
+\definecolor{SoftGray}{RGB}{245,246,246}
+
+\newcommand{\partrow}[4]{%
+  \begin{tabularx}{\textwidth}{@{}>{\raggedleft\arraybackslash}p{0.52in}@{\hspace{0.18in}}X@{}}
+  {\fontsize{23}{23}\selectfont\bfseries\textcolor{#1}{#2}} &
+  \begin{minipage}[t]{\linewidth}
+    {\fontsize{15}{17}\selectfont\bfseries\textcolor{MinesNavy}{#3}}\\[-1pt]
+    {\fontsize{10.6}{13.1}\selectfont\color{WarmGray}#4}
+  \end{minipage}
+  \end{tabularx}
+}
+
+\begin{document}
+
+% -----------------------------------------------------------------------------
+% Institutional identity
+% -----------------------------------------------------------------------------
+\noindent
+\raisebox{-0.5\height}{%
+  \includegraphics[width=2.55in]{02-SouthDakotaMinesLogo_Secondary_StackedCenterTag_Blue_RGB.png}%
+}%
+\hfill
+\raisebox{-0.5\height}{%
+  \includegraphics[width=1.05in]{logo-portrait-v3.png}%
+}
+\par
+
+\vspace{0.07in}
+{\fontsize{29}{31}\selectfont\bfseries\textcolor{MinesNavy}{Advanced Finite Element Methods}}\par
+\vspace{0.055in}
+{\fontsize{15.5}{18}\selectfont\bfseries\textcolor{CEADTeal}{ME/BME 736 \enspace | \enspace Fall 2026}}\par
+\vspace{0.16in}
+\begin{minipage}[t]{0.055in}
+\vspace{0pt}\textcolor{CEADTeal}{\rule{0.055in}{0.56in}}
+\end{minipage}\hspace{0.14in}%
+\begin{minipage}[t]{0.90\textwidth}
+\vspace{0pt}
+{\fontsize{11.3}{14.2}\selectfont
+This course develops the mathematical and computational foundations needed to formulate, analyze, and implement advanced finite element methods. Topics include variational formulations, error estimation and adaptive refinement, constrained and mixed methods, nonlinear and transient problems, and PDE-constrained optimization. Heat conduction and solid mechanics provide recurring model problems, and \textbf{FEniCSx is used to implement the methods, verify results, and examine numerical behavior}.}
+\end{minipage}
+
+\vspace{0.16in}
+{\fontsize{10}{12}\selectfont\bfseries\textcolor{WarmGray}{COURSE PATH}}\par
+\vspace{0.055in}
+\noindent\textcolor{LightRule}{\rule{\textwidth}{0.5pt}}\par
+\vspace{0.075in}
+
+\partrow{CEADTeal}{01}{Review \& Foundations}{
+Vector and function spaces, Sobolev spaces, integration by parts, variational formulations, energy minimization, heat conduction, linear elasticity, hyperelasticity, finite element approximation, isoparametric mappings, assembly, numerical integration, and boundary conditions.}
+
+\vspace{0.04in}\textcolor{LightRule}{\rule{\textwidth}{0.45pt}}\vspace{0.065in}
+
+\partrow{CEADGreen}{02}{Error Analysis \& Adaptivity}{
+A priori error estimation, Galerkin orthogonality, continuity and coercivity, interpolation error, energy and $L^2$ errors, numerical convergence studies, residual-based a posteriori estimators, local error indicators, marking strategies, and adaptive mesh refinement.}
+
+\vspace{0.04in}\textcolor{LightRule}{\rule{\textwidth}{0.45pt}}\vspace{0.065in}
+
+\partrow{MinesNavy}{03}{Advanced Finite Element Formulations}{
+Constraints using penalty and Lagrange multiplier methods; mixed displacement--pressure formulations for nearly incompressible elasticity; nonlinear residuals, consistent linearization, tangent operators, Newton methods, and hyperelasticity; transient FEM with explicit and implicit time discretization.}
+
+\vspace{0.04in}\textcolor{LightRule}{\rule{\textwidth}{0.45pt}}\vspace{0.065in}
+
+\partrow{CEADTeal}{04}{PDE-Constrained Optimization}{
+Optimization problems governed by PDEs, state and design variables, direct sensitivities, Lagrangian and adjoint formulations, continuous and discrete adjoints, gradient verification, and gradient-based optimization using heat conduction and elasticity examples.}
+
+\vspace{0.13in}
+\begin{center}
+{\fontsize{10.2}{12}\selectfont\bfseries\textcolor{MinesNavy}{ANALYSIS}}
+\hspace{0.11in}\textcolor{CEADTeal}{\large$\rightarrow$}\hspace{0.11in}
+{\fontsize{10.2}{12}\selectfont\bfseries\textcolor{MinesNavy}{FORMULATION}}
+\hspace{0.11in}\textcolor{CEADTeal}{\large$\rightarrow$}\hspace{0.11in}
+{\fontsize{10.2}{12}\selectfont\bfseries\textcolor{MinesNavy}{FEniCSx}}
+\hspace{0.11in}\textcolor{CEADTeal}{\large$\rightarrow$}\hspace{0.11in}
+{\fontsize{10.2}{12}\selectfont\bfseries\textcolor{MinesNavy}{VERIFICATION}}
+\hspace{0.11in}\textcolor{CEADTeal}{\large$\rightarrow$}\hspace{0.11in}
+{\fontsize{10.2}{12}\selectfont\bfseries\textcolor{MinesNavy}{OPTIMIZATION}}
+\end{center}
+
+% -----------------------------------------------------------------------------
+% Resources + logistics: fixed footer for a clean one-page composition
+% -----------------------------------------------------------------------------
+\begin{textblock*}{7.40in}(0.55in,9.28in)
+\textcolor{LightRule}{\rule{7.40in}{0.55pt}}\\[6pt]
+\begin{tabularx}{7.40in}{@{}X@{\hspace{0.34in}}p{2.75in}@{}}
+\begin{minipage}[t]{\linewidth}
+{\fontsize{9.3}{11}\selectfont\bfseries\textcolor{WarmGray}{OPEN COURSE RESOURCES}}\\[2pt]
+{\fontsize{9.7}{11.8}\selectfont
+\faBookOpen\ \href{https://ceadpx.github.io/finite-element-methods/}{\textcolor{CEADTeal}{ceadpx.github.io/finite-element-methods/}}\\[1pt]
+\faGithub\ \href{https://github.com/CEADpx/finite-element-methods}{\textcolor{CEADTeal}{github.com/CEADpx/finite-element-methods}}
+}\\[2pt]
+{\fontsize{8.4}{10.1}\selectfont\color{WarmGray}Open HTML/PDF book, FEniCSx examples, notebooks, assignments, and data.}
+\end{minipage}
+&
+\begin{minipage}[t]{\linewidth}
+{\fontsize{9.3}{11}\selectfont\bfseries\textcolor{WarmGray}{FALL 2026}}\\[2pt]
+{\fontsize{9.5}{11.7}\selectfont
+\textbf{Tue/Thu} \quad 9:30--10:45 AM\\
+Classroom Building 206W\\[2pt]
+\textbf{Prof. Prashant K. Jha}\\[-1pt]
+\href{mailto:Prashant.Jha@sdsmt.edu}{\textcolor{CEADTeal}{Prashant.Jha@sdsmt.edu}}
+}
+\end{minipage}
+\end{tabularx}
+\end{textblock*}
+
+\end{document}

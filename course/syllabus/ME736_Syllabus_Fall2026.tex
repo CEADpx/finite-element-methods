@@ -2,8 +2,8 @@
 
 % Standalone Fall 2026 syllabus for ME/BME 736.
 % Compile with:
-%   pdflatex ME736_Syllabus_Fall2026_updated.tex
-%   pdflatex ME736_Syllabus_Fall2026_updated.tex
+%   pdflatex ME736_Syllabus_Fall2026.tex
+%   pdflatex ME736_Syllabus_Fall2026.tex
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -21,6 +21,7 @@
 \usepackage{longtable}
 \usepackage{colortbl}
 \usepackage{enumitem}
+\usepackage{needspace}
 \usepackage{hyperref}
 
 \usepackage{titlesec}
@@ -127,18 +128,22 @@ Office: Civil \& Mechanical Engineering Building, Room 317
 P: 605-394-1893; E:
 \href{mailto:Prashant.Jha@sdsmt.edu}{Prashant.Jha@sdsmt.edu}
 
-\coursefield{Office hours:}{Thursday, 12:00--2:00 PM, CM 317.}
-Additional meetings depending on the availability can be scheduled via emails. 
+\coursefield{Office hours:}{Thursday, 12:00--2:00 PM, CM 317. Zoom link: \href{https://sdsmt.zoom.us/j/93018770360}{https://sdsmt.zoom.us/j/93018770360}.}
+Additional meetings may be scheduled by email, subject to availability.
+
+\coursefield{Preferred contact method:}{Email. I will normally respond within two business days.}
 
 \section{Course Meeting Times and Location}
-\coursefield{Course Start/End Dates:}{August 25 through December 8}
+\coursefield{Course Start/End Dates:}{August 25 through December 8, 2026}
+\coursefield{Course Final Exam Date and Time:}{No in-person final examination is scheduled. The final computational project is due and will be presented on Tuesday, December 8, during the scheduled 9:30--10:45 AM class period. Submission instructions will be provided through D2L.}
 \coursefield{Class:}{Tuesday/Thursday, 75 minutes}
 \coursefield{Time:}{09:30--10:45 AM, Tue/Thu}
-\coursefield{Location:}{Classroom building 206W}
-\coursefield{D2L Link to the course:}{\href{https://d2l.sdbor.edu/d2l/home/2192078}{ME 736 Fall 2026}}
-\coursefield{Course Repository:}{\href{https://github.com/CEADpx/finite-element-methods}{github.com/CEADpx/finite-element-methods}}
+\coursefield{Location:}{Classroom Building, Room 206W}
+\coursefield{D2L Link to the course:}{\href{https://d2l.sdbor.edu/d2l/home/2208049}{ME 736 Fall 2026}}
+\coursefield{Course Repository:}{\href{https://github.com/CEADpx/finite-element-methods}{https://github.com/CEADpx/finite-element-methods}}
+\coursefield{Course Lecture Notes:}{\href{https://ceadpx.github.io/finite-element-methods/}{https://ceadpx.github.io/finite-element-methods/}}
 
-\coursefield{Course Delivery Method:}{This class will primarily be conducted in person, although there may be class periods during which we need to meet via Zoom. The class will meet together at the scheduled times. You need a working knowledge of D2L with help available on the \href{https://www.sdsmt.edu/its/help/}{ITS Page}.}
+\coursefield{Course Delivery Method:}{This class will primarily be conducted in person, although there may be class periods during which we need to meet via Zoom. The class will meet together at the scheduled times. You need a working knowledge of D2L; assistance is available from \href{https://www.sdsmt.edu/about/offices-and-administration/information-technology-services.html}{Information Technology Services}.}
 
 \section{Course Description}
 Variational and weighted residual approach to finite element equations. Emphasis on two- and three-dimensional problems in solid mechanics. Isoparametric element formulation, higher order elements, numerical integration, imposition of constraints and penalty, convergence, and other more advanced topics. Use of two- and three-dimensional computer programs. Dynamic and vibrational problems, eigenvalues, and time integration. Introduction to geometric and material nonlinearities.
@@ -217,7 +222,10 @@ Dec.\ 8 & 1 &
 \coursefield{Schedule note:}{The schedule may be adjusted based on class progress. There is no class on Thursday, November 26, because of the Thanksgiving holiday. The South Dakota Mines Fall 2026 final examination period is December 10--11 and December 14--16.}
 
 \section{Course Materials}
-\coursefield{Required Textbook(s) and Materials:}{No required textbook. Detailed course notes and review handouts will be provided through D2L and the course repository. Students are expected to read assigned notes before class when indicated.}
+\coursefield{Required Textbook(s) and Materials:}{No required textbook. Detailed lecture notes are provided as an online book at \href{https://ceadpx.github.io/finite-element-methods/}{https://ceadpx.github.io/finite-element-methods/}. The chapters in the book will be developed throughout the semester.
+
+Additional references will be provided either on D2L or in the GitHub course repository \href{https://github.com/CEADpx/finite-element-methods}{https://github.com/CEADpx/finite-element-methods}. Students are expected to have access to a laptop or desktop computer capable of running the FEniCSx computational environment.}
+
 
 \syllabussubheading{Suggested References}
 \begin{itemize}
@@ -225,12 +233,16 @@ Dec.\ 8 & 1 &
   \item J. T. Oden and J. N. Reddy, \textit{An Introduction to the Mathematical Theory of Finite Elements}, Wiley, 1976.
   \item E. B. Becker, G. F. Carey, and J. T. Oden, \textit{Finite Elements: An Introduction}, Vol. 1, Prentice-Hall, 1981.
   \item J. T. Oden and J. N. Reddy, \textit{Variational Methods in Theoretical Mechanics}, 2nd ed., Springer, 1983.
+  \Needspace{3\baselineskip}
   \item J. Bonet and R. D. Wood, \textit{Nonlinear Continuum Mechanics for Finite Element Analysis}, 2nd ed., Cambridge University Press, 2008.
+  \item C. S. Jog, \textit{Introduction to the Finite Element Method}, Lecture Notes, 2011. PDF available at \href{https://mecheng.iisc.ac.in/csjog/me257Notes/fem.pdf}{Jog FEM Lecture Notes}.
+  \item D. N. Arnold, \textit{Lecture notes on numerical analysis of partial differential equations}, Lecture Notes, 2011. PDF available at \href{https://www-users.cse.umn.edu/~arnold/8445.f12/notes.pdf}{Arnold FEM Lecture Notes}.
+  \item E. S{\"u}li, \textit{Lecture Notes on Finite Element Methods for Partial Differential Equations}, Lecture Notes, 2011. PDF available at \href{https://people.maths.ox.ac.uk/suli/fem.pdf}{S{\"u}li FEM Lecture Notes}.
 \end{itemize}
 
 \coursefield{Supplementary Materials:}{Course notes, FEniCSx examples, computational notebooks or scripts, assignments, supporting data, and selected readings will be provided through the \href{https://github.com/CEADpx/finite-element-methods}{course repository} and D2L. The official FEniCSx documentation will be used as a software reference.}
 
-\coursefield{Technology Equipment Needed for the Course:}{Student Laptop Program required or suitable alternative for those who have exclusion. Students must be able to run the course FEniCSx computational environment on their laptop or through an instructor-approved alternative.}
+\coursefield{Technology Equipment Needed for the Course:}{Participation in the Student Laptop Program is required unless the student has an approved exclusion and a suitable alternative. Students must be able to run the course FEniCSx computational environment on their laptop or through an instructor-approved alternative.}
 
 \coursefield{Technology Skills Needed for the Course:}{Ability to navigate D2L; upload and download files; communicate by email; access digital course materials; write and modify Python programs; and run, inspect, and modify finite element simulations using FEniCSx. Prior familiarity with Python is helpful. Course examples will introduce the FEniCSx workflow needed for assignments.}
 
@@ -245,7 +257,9 @@ Every effort is made to grade fairly and consistently. If you believe there has 
 \hline
 \textbf{Assignment Name/Description} & \textbf{Percent}\\
 \hline
-Homework problem sets & 50\\
+Homework problem sets & 40\\
+\hline
+In-class quizzes & 10\\
 \hline
 Midterm Exam & 25\\
 \hline
@@ -256,35 +270,43 @@ Final computational project & 25\\
 \end{tabular}
 }
 
-\coursefield{Grade division:}{A: 90--100\%, B: 80--90\%, C: 70--80\% range, D: 60--70\% range, F: below 60\%.}
+\coursefield{Grade division:}{A: 90--100\%, B: 80--89\%, C: 70--79\%, D: 60--69\%, F: below 60\%.}
 
 \coursefield{Final grade calculation:}{Final grades will be calculated based on the weighted average of the above components. The final grade will be rounded to the nearest whole number. The final computational project and presentation will be due on December 8, 2026.}
 
-\coursefield{Special Note Regarding Final Exams:}{Per South Dakota Mines Policy \href{https://www.sdsmt.edu/About/Office-of-the-President/Docs/Policy-Manual/Academics/Final-Examinations/}{(II-6-2)}, if you are scheduled to take three or more final/last exams on the same day during finals week, you may request that the middle exam(s) of the day be rescheduled. \textbf{\textit{You are required to make this request of your Instructor(s) at least 30 days prior to the last day of regular classes.}}
+\coursefield{Special Note Regarding Final Exams:}{Per South Dakota Mines \href{https://www.sdsmt.edu/about/assets/pdf-files/policy-manual/Policy\%202-8\%20Final\%20Examination.pdf}{Policy 2-8}, if you are scheduled to take three or more exams on the same day during Finals Week, you may request that the middle exam(s) of the day be rescheduled. \textbf{\textit{You are required to make this request directly to the instructor(s) of the middle exam(s) at least 30 days before the last day of regular classes.}}
 }
 
 \section{Course Policies}
 
 \coursefield{Communication Protocol:}
-{Professional and courteous communication is expected when emailing the professor. At a minimum, students should address the professor as Dr.\ [Instructor last name] or Prof.~[Instructor last name], frame the message as a request rather than a demand, and close courteously, for example, ``Best regards, [first name],'' ``Regards, [first name],'' or ``Thank you, [first name].'' Emails that do not follow these basic expectations may not receive a response.}
+{Professional and courteous communication is expected when emailing the professor. At a minimum, students should address the professor as Dr.~Jha or Prof.~Jha, frame the message as a request rather than a demand, and close courteously, for example, ``Best regards, [first name],'' ``Regards, [first name],'' or ``Thank you, [first name].'' Emails that do not follow these basic expectations may not receive a response.}
 
-\coursefield{Coursework:}{Coursework will consist of homework problem sets, one midterm exam, and a final computational project. Homework problem sets will include both analytical problems and FEniCSx computational exercises. Two short review homework sets will cover the review module; later homework will generally span one or more advanced modules and will combine mathematical analysis, finite element implementation, verification, and interpretation of numerical results. Detailed instructions and due dates will be provided through D2L and in class.}
+\coursefield{Coursework:}{Coursework will consist of homework problem sets, in-class quizzes, one midterm exam, and a final computational project. Homework problem sets will include both analytical problems and FEniCSx computational exercises. Two short review homework sets will cover the review module; later homework will generally span one or more advanced modules and will combine mathematical analysis, finite element implementation, verification, and interpretation of numerical results. Detailed instructions and due dates will be provided through D2L and in class.}
+
+Homework problem sets develop the course outcomes through mathematical formulation, finite element implementation, verification, and interpretation of results. In-class quizzes assess preparation and understanding of assigned readings and recently developed concepts. The midterm exam assesses students' independent application of the mathematical and computational foundations. The final project integrates formulation, implementation, verification, and interpretation in a substantial finite element investigation.
+
+\coursefield{In-Class Quizzes:}{
+Approximately eight to ten class meetings will include a brief in-class quiz, normally during the first 15 minutes. Quizzes may assess assigned readings, previously covered material, short derivations, conceptual questions, or the interpretation of computational results. Assigned readings and other preparatory material will be identified in advance, but quiz dates may not always be announced.
+
+The in-class quiz grade will be calculated from the quizzes actually administered during the semester, with each student's lowest quiz score dropped. Because these quizzes assess preparation and work completed during class, routine make-up quizzes will not be offered. For an absence excused under university policy, the missed quiz will either be excluded from the student's calculation or replaced by a reasonable alternative, as determined by the instructor.
+}
 
 \coursefield{Attendance Policy:}{
-Attendance is highly recommended to learn the course material. Students should expect substantial work outside class reading the assigned notes, completing analytical derivations, and developing and verifying FEniCSx implementations. Surprise in-class quizzes may be given to encourage attendance and preparation.
+Excused absences will be handled in accordance with \href{https://www.sdsmt.edu/about/assets/pdf-files/policy-manual/Policy\%203-1\%20Excused\%20Absences.pdf}{South Dakota Mines Policy 3-1}. Regular attendance is important because class meetings include discussion, problem solving, computational demonstrations, and in-class quizzes. Students should expect substantial work outside class reading the assigned notes, completing analytical derivations, and developing and verifying FEniCSx implementations. Students are responsible for completing assigned readings and other preparatory work before class.
 }
 
 \coursefield{Late Work and Make-up Examination Policy:}{
 Homework and computational assignments will be collected on the due date at the start of class unless submitted through D2L. Late work will incur a penalty of 20\% of the total possible points for each calendar day or portion thereof after the deadline. Work submitted five calendar days after the deadline will not be accepted. The midterm exam will be held during a scheduled 75-minute class period. A make-up exam will be given only under extreme circumstances determined at the Instructor's discretion or for an excused absence. Students are expected to contact the Instructor sufficiently in advance of the exam whenever possible.
 }
 
-\coursefield{Collaboration and Generative AI Policy:}{
-Collaboration with other students and the use of ChatGPT or other generative AI tools are not permitted unless explicitly allowed in the instructions for a specific task or assignment. Each student must submit an individual assignment unless a team submission is explicitly permitted. The instructor and graders reserve the right to ask students to explain their submitted work. Points may be deducted if the submitted work or the student's explanation indicates unauthorized collaboration or use of generative AI tools.
+\coursefield{Collaboration and Generative Artificial Intelligence Tool Utilization:}{
+Collaboration with other students and the use of ChatGPT or other generative artificial intelligence (genAI) tools are permitted only when expressly allowed in the instructions for a specific task or assignment. Unless the instructions state otherwise, students must complete and submit their work independently without the support of a genAI tool. Each student must submit an individual assignment unless a team submission is explicitly permitted. The instructor and graders reserve the right to ask students to explain their submitted work. Points may be deducted if the submitted work or the student's explanation indicates unauthorized collaboration or use of genAI tools.
 }
 
+\Needspace{7\baselineskip}
 \coursefield{Academic Integrity:}{
-South Dakota Mines is committed to academic honesty and scholarly integrity. The \href{https://www.sdbor.edu/policy/Documents/2-33.pdf}{South Dakota Board of Regents Policy 2:33} provides a comprehensive definition of ``Academic Dishonesty'', which include cheating and plagiarism. All Instructors at South Dakota Mines are required to report allegations of academic misconduct to the Student Conduct Officer. The \href{https://www.sdbor.edu/policy/documents/3-4.pdf}
-{South Dakota Board of Regents Policy 3:4} provides detailed information regarding key definitions, policy information, prohibited conduct, and the Student Conduct process adhered to at South Dakota Mines. Any student suspected of violating academic integrity standards will be reported in accordance with the process outlined on the \href{https://www.sdsmt.edu/Campus-Life/Community-Standards/Academic-Integrity/}{South Dakota Mines website}.
+South Dakota Mines is committed to academic honesty and scholarly integrity. \href{https://public.powerdms.com/SDRegents/documents/1587741}{South Dakota Board of Regents Policy 2.9.2} provides a comprehensive definition of academic dishonesty, including cheating and plagiarism. All instructors at South Dakota Mines are required to report allegations of academic misconduct to the Student Conduct Officer. \href{https://public.powerdms.com/SDRegents/documents/1680638}{South Dakota Board of Regents Policy 3.4.1} provides detailed information regarding relevant definitions, prohibited conduct, and the Student Conduct process followed at South Dakota Mines. Any student suspected of violating academic integrity standards will be reported in accordance with the process described on the \href{https://www.sdsmt.edu/i-am-a/academic-integrity.html}{South Dakota Mines Academic Integrity webpage}.
 }
 
 \coursefield{Electronic Device Policy:}{
@@ -296,19 +318,23 @@ During in-person sessions, students should refrain from using electronic devices
 
 \section{Some additional statements and policies}
 
-\coursefield{Academic Freedom Statement:}{ Academic Freedom is the cornerstone upon which higher education is built. Academic freedom, as defined by \href{https://www.sdbor.edu/policy/documents/1-11.pdf}{BOR policy 1:11}, is fundamental to the advancement of truth, development of critical thinking, promotion of civil discourse, and contribution to the public good. Each course includes the freedom to discuss relevant matters and present various scholarly views in the classroom, as determined by the subject-matter expertise of the Instructor. Students are encouraged to develop the capacity for critical thinking and to pursue the truth, debate ideas, express and evaluate their opinions, and draw conclusions. Students are free to take reasoned exception to the views offered in any course of study and to reserve judgment about matters of opinion, but they are responsible for learning the content of any course of study for which they are enrolled.\footnote{Language adapted from the American Association of University Professors ``Joint Statement on Rights and Freedoms of Students''.}
+\coursefield{Academic Freedom Statement:}{Academic freedom is the cornerstone upon which higher education is built. Academic freedom, as defined by \href{https://public.powerdms.com/SDRegents/tree/documents/1729410}{BOR Policy 1.6.1}, is fundamental to the advancement of truth, development of critical thinking, promotion of civil discourse, and contribution to the public good. Each course includes the freedom to discuss relevant matters and present various scholarly views in the classroom, as determined by the subject-matter expertise of the instructor. Students are encouraged to develop the capacity for critical thinking and to pursue the truth, debate ideas, express and evaluate their opinions, and draw conclusions. Students are free to take reasoned exception to the views offered in any course of study and to reserve judgment about matters of opinion, but they are responsible for learning the content of any course of study for which they are enrolled.\footnote{Language adapted from the American Association of University Professors ``Joint Statement on Rights and Freedoms of Students''.}
 }
 
 \coursefield{Complaint Process:}{While we hope that every student has a meaningful and positive experience at South Dakota Mines, should a concern arise, students are encouraged to first attempt to resolve their concern directly with the person or office directly involved. Following that attempt, should the concern remain unresolved, students are encouraged to reach out to the Dean of Students office at \href{mailto:DeanOfStudents@sdsmt.edu}{DeanOfStudents@sdsmt.edu} or 605.394.2416. Additionally, students may access the \href{https://sdsmt-advocate.symplicity.com/public_report/index.php/pid390522?}{online form} to submit their complaint, appeal, or grievance.
 }
 
-\coursefield{Grade Appeal Policy:}{In alignment with \href{https://www.sdbor.edu/policy/documents/2-9.pdf}{BOR Policy 2:9}, students who wish to appeal their final course grade shall first discuss the matter with the course instructor. If the concerns are unresolved following that discussion, students may utilize the \href{https://sdsmt-advocate.symplicity.com/public_report/index.php/pid844003?}{online form} to submit ``Appeal -- Academic'' for a ``Grade Dispute''.
+\coursefield{Grade Appeal Policy:}{In alignment with \href{https://public.powerdms.com/SDRegents/documents/1587739}{BOR Policy 2.9.1} and \href{https://www.sdsmt.edu/about/assets/pdf-files/policy-manual/Policy\%202-21\%20Final\%20Grade\%20Appeal.pdf}{South Dakota Mines Policy 2-21}, students who wish to appeal their final course grade shall first discuss the matter with the course instructor. If the concerns are unresolved following that discussion, students may appeal to the instructor's department head or supervisor for a decision. If the student is dissatisfied with the supervisor's decision, the student may then use the \href{https://sdsmt-advocate.symplicity.com/public_report/index.php/pid844003?}{online form} to submit ``Appeal -- Academic'' for a ``Grade Dispute''.
 }
 
-\coursefield{Opportunity for All - Student Success Services and Support:}{Students are provided a one-stop source for information regarding all the services and supports to ensure success. Visit the \href{https://www.sdsmt.edu/Opportunity-For-All/}{Opportunity for All} page to access service and department information including ADA accommodations, Career Services, Counseling, Office for Inclusion, Slide Rule (math support), Student Success, Title IX, Tutoring, and Veterans Services, to name a few.
+\Needspace{5\baselineskip}
+\coursefield{Opportunity for All - Student Success Services and Support:}{Students are provided a one-stop source for information regarding services and support for their success. Visit the \href{https://www.sdsmt.edu/student-life/opportunity-center/index.html}{Opportunity Center} page to access information about accessibility services, Career Services, Counseling Services, the Ivanhoe International Center, Slide Rule Math Tutoring, Title IX, tutoring and academic support, and Veterans Services, among other resources.
 }
 
-\coursefield{South Dakota Board of Regents Required Syllabus Statements:}{The following statements may be found online in South Dakota Board of Regents Academic Affairs Council Guideline \href{https://www.sdbor.edu/administrative-offices/academics/academic-affairs-guidelines/Documents/5_Guidelines/5_3A_Guideline.pdf}{5.3.A}:
+\coursefield{Accessibility Accommodations:}{If you have a disability for which you are or may be requesting an accommodation, you are encouraged to contact both the instructor and the Accessibility Services office at 605-394-2533 or \href{mailto:DisabilityServices@sdsmt.edu}{DisabilityServices@sdsmt.edu} as early as possible in the semester.
+}
+
+\coursefield{South Dakota Board of Regents Required Syllabus Statements:}{The following statements are available in South Dakota Board of Regents \href{https://public.powerdms.com/SDRegents/tree/documents/1677929}{Academic Affairs Council Guideline 2.7.3.A(1)}:
 \begin{itemize}
   \item Freedom in Learning
   \item Americans with Disabilities Act
@@ -323,21 +349,21 @@ During in-person sessions, students should refrain from using electronic devices
 
 \coursefield{Email Communication:}{Each student has been issued a South Dakota Mines email address. This is the official method of communication from the institution to the student. Students are expected to utilize their South Dakota Mines email address for all electronic communication related to this course and their education record at South Dakota Mines.}
 
-\coursefield{Copyright and Terms of Use of Course Materials:}{Lectures, presentations, and other course materials are protected intellectual property under South Dakota Board of Regents Policy. Accordingly, recording and disseminating lectures, presentations or course materials is strictly prohibited without the express permission of the faculty member. Violation of this prohibition may result in the student being subject to Student Conduct proceedings under SDBOR Policy 3:4.
+\coursefield{Copyright and Terms of Use of Course Materials:}{Lectures, presentations, and other course materials are protected intellectual property under South Dakota Board of Regents Policy. Accordingly, recording and disseminating lectures, presentations or course materials is strictly prohibited without the express permission of the faculty member. Violation of this prohibition may result in the student being subject to Student Conduct proceedings under \href{https://public.powerdms.com/SDRegents/tree/documents/1680638}{SDBOR Policy 3.4.1}.
 }
 
-\coursefield{South Dakota Mines Adheres to Title IX; What is Title IX?}{South Dakota Mines is committed to providing a safe and positive learning experience.
+\coursefield{Title IX:}{Title IX of the Education Amendments of 1972 is the federal law prohibiting discrimination based on sex under any education program or activity operated by an institution receiving or benefiting from federal financial assistance. Behaviors that may constitute sex discrimination include sexual assault, sexual harassment, stalking, relationship abuse, sexual misconduct, and gender discrimination. Students are encouraged to report these behaviors. The Title IX Coordinator is Amanda Lopez, \href{mailto:amanda.lopez@sdsmt.edu}{amanda.lopez@sdsmt.edu}, 605-394-2533.
 
-To report a violation of sexual misconduct or gender discrimination, please contact the Title IX Coordinator, Amanda Lopez, at 605-394-2533 or submit an online report through the \href{https://www.sdsmt.edu/TitleIX/}{South Dakota Mines Title IX website}. \textit{Please note that as your professor, I am required to report any incidences to the Title IX Coordinator.} Confidential support for students is available by contacting the Student Counseling Center at 605-394-1924 or \href{mailto:counseling@sdsmt.edu}{counseling@sdsmt.edu}.
+South Dakota Mines is committed to providing a safe and positive learning experience. To report sexual misconduct or gender discrimination, contact the Title IX Coordinator at 605-394-2533 or submit an \href{https://sdsmt-advocate.symplicity.com/public_report/index.php/pid360859?}{online report}. \textit{Please note that as your professor, I am required to report such incidents to the Title IX Coordinator.} Confidential support for students is available from the Student Counseling Center at 605-394-1924 or \href{mailto:counseling@sdsmt.edu}{counseling@sdsmt.edu}.
 }
 
 \coursefield{Classroom Community and Mutual Respect:}{
-This classroom is a safe space for learning and is an academic environment; you should expect to have your ideas, work, and arguments respectfully challenged. Our population is a variety of students with a great diversity of beliefs, and the class must be respectful of all members.
+This classroom is a safe, academic environment for learning; you should expect to have your ideas, work, and arguments respectfully challenged. The class includes students with diverse backgrounds and beliefs, and all members must treat one another respectfully.
 }
 
 \vfill
 \textbf{Prepared by:}
 
-Prashant K.\ Jha, August 13, 2026
+Prashant K.\ Jha, August 15, 2026
 
 \end{document}
