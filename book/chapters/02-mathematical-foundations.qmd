@@ -11,6 +11,120 @@ their finite element approximations in a consistent notation. The treatment is
 selective and assumes only multivariable calculus and elementary linear
 algebra.
 
+## Sets and basic notation {#sec-foundations-sets}
+
+A **set** is a collection of distinct objects. The objects in a set are its
+**elements**. Curly braces $\{\,\}$ are used to specify which elements belong
+to the set. For example,
+
+$$
+A=\{1,2,3\}
+$$
+
+defines the set whose elements are $1$, $2$, and $3$. We write $2\in A$ to
+state that $2$ belongs to $A$, and $4\notin A$ to state that $4$ does not
+belong to $A$. The order and repetition of listed elements do not matter:
+
+$$
+\{1,2,3\}=\{3,2,1\}=\{1,1,2,3\}.
+$$
+
+Two sets are equal when they have exactly the same elements. An element and a
+set containing that element are different objects. For example,
+$1\in\{1\}$, but $1\ne\{1\}$.
+
+When listing every element is inconvenient or impossible, we use
+**set-builder notation**. The general form
+
+$$
+\{x\in X:P(x)\}
+$$
+
+means “the set of all elements $x$ of $X$ for which the condition $P(x)$ is
+true.” The colon is read as “such that.” A vertical bar is sometimes used in
+place of the colon. For example,
+
+$$
+\{x\in\R:x^2<4\}=(-2,2),
+$$
+
+because the real numbers satisfying $x^2<4$ are precisely those between
+$-2$ and $2$. Similarly,
+
+$$
+\{(x,y)\in\R^2:y=x\}
+$$
+
+is the line through the origin with slope one. The expression to the left of
+the colon identifies the objects under consideration; the expression to the
+right gives the condition those objects must satisfy.
+
+A set $A$ is a **subset** of a set $B$, written $A\subset B$, if every element
+of $A$ also belongs to $B$. In this book, $A\subset B$ allows the possibility
+that $A=B$; a strict subset is written $A\subsetneq B$. The set with no
+elements is the **empty set**, denoted by $\varnothing$.
+
+For two sets $A$ and $B$,
+
+$$
+\begin{aligned}
+A\cup B &=\{x:x\in A\text{ or }x\in B\},\\
+A\cap B &=\{x:x\in A\text{ and }x\in B\},\\
+A\setminus B &=\{x\in A:x\notin B\}.
+\end{aligned}
+$$
+
+These are the **union**, **intersection**, and **set difference**,
+respectively. The Cartesian product is
+
+$$
+A\times B=\{(a,b):a\in A\text{ and }b\in B\}.
+$$
+
+Thus $\R^2=\R\times\R$, and more generally $\R^d$ is the set of ordered
+$d$-tuples of real numbers.
+
+Intervals are sets of real numbers. For $a<b$,
+
+$$
+(a,b)=\{x\in\R:a<x<b\},
+\qquad
+[a,b]=\{x\in\R:a\leq x\leq b\}.
+$$
+
+The first interval excludes its endpoints and the second includes them.
+
+The standard number sets used in this chapter are
+
+$$
+\mathbb{N}=\{0,1,2,\ldots\},
+\qquad
+\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots\},
+\qquad
+\mathbb{Q}\subset\R,
+$$
+
+where $\mathbb{N}$, $\mathbb{Z}$, $\mathbb{Q}$, and $\R$ denote the natural
+numbers, integers, rational numbers, and real numbers, respectively.
+
+A function $f:X\to Y$ assigns one element $f(x)\in Y$ to each $x\in X$.
+The set $X$ is the domain of the function and $Y$ is its codomain. The braces
+used to describe a set specify only its elements; they do not, by themselves,
+define vector addition, scalar multiplication, a metric, or a norm.
+
+::: {#exr-foundations-set-notation}
+## Reading and writing sets
+
+1. List the elements of
+   $A=\{n\in\mathbb{N}:0\leq n\leq4\}$.
+2. Write the interval $[-1,2)$ in set-builder notation.
+3. Let $B=\{x\in\R:x^2=1\}$. List the elements of $B$ and determine whether
+   $B\subset[-1,1]$.
+4. List the ordered pairs in $\{0,1\}\times\{2,3\}$.
+5. Describe $\{(x,y)\in\R^2:y=2x\}$ in words and determine whether
+   $(2,4)$ and $(2,5)$ belong to this set.
+:::
+
 ## Domains and boundary regularity {#sec-foundations-domains}
 
 Throughout the book, $\Om\subset\R^d$ denotes a nonempty, connected, open
@@ -33,8 +147,8 @@ $$
 $$
 
 with the opposite inequality allowed after reversing the $x_d$-axis. The
-function $\varphi$ is Lipschitz continuous: there is a constant $L>0$ such
-that, with $\norm{\cdot}_2$ denoting the Euclidean norm,
+function $\varphi$ is Lipschitz continuous if there is a constant $L>0$ such
+that
 
 $$
 |\varphi(\bx')-\varphi(\bm{y}')|
@@ -42,6 +156,9 @@ $$
 \qquad
 \forall\bx',\bm{y}'\in\R^{d-1}.
 $$
+
+Here $\norm{\bm{z}}_2=(\sum_{i=1}^{d-1}z_i^2)^{1/2}$ is the Euclidean norm
+of $\bm{z}\in\R^{d-1}$.
 :::
 
 ::: {#exm-foundations-domains}
@@ -68,47 +185,228 @@ interrupting the finite element development with additional technical proofs.
 
 ## Scalars, vectors, and tensors {#sec-foundations-tensors}
 
-A scalar has one value at each point. Temperature, density, and thermal
-conductivity are scalar fields in the isotropic models used in this book. A
-vector has a magnitude and direction; displacement, traction, and heat flux are
-examples. A second-order tensor maps vectors to vectors. Stress, strain, and the
-deformation gradient are second-order tensors.
+A **scalar** is a real number. Scalars describe quantities that have a value
+but no direction. Temperature, density, and isotropic thermal conductivity are
+examples. A scalar field assigns a scalar to each point of a domain; for
+example, a temperature field is a function
+$T:\Om\to\R$.
 
-Let $\{\bm{e}_i\}_{i=1}^d$ be a fixed orthonormal Cartesian basis. A
-vector and a second-order tensor may be written as
+A **vector** describes a quantity with components along spatial directions.
+Displacement, traction, velocity, and heat flux are vector fields. At each
+point $\bx\in\Om$, a vector field $\bm{a}:\Om\to\R^d$ assigns a vector
+$\bm{a}(\bx)$. Before working with vector and tensor components, we must specify
+the coordinate directions with respect to which those components are measured.
+
+### Cartesian coordinates and vector components
+
+A Cartesian coordinate system in $\R^d$ consists of an origin and an
+orthonormal basis
 
 $$
-\bm{a}=a_i\bm{e}_i,
+\{\bm{e}_1,\ldots,\bm{e}_d\}.
+$$
+
+The basis vectors have unit length and are mutually perpendicular. Their dot
+products satisfy
+
+$$
+\bm{e}_i\cdot\bm{e}_j=\delta_{ij},
 \qquad
-\bm{A}=A_{ij}\bm{e}_i\otimes\bm{e}_j.
-$$ {#eq-foundations-component-expansion}
-
-Repeated indices are summed from $1$ to $d$ unless stated otherwise. An index
-that appears once in a term is a free index and must appear in every term of the
-equation. An index that appears twice is a dummy index and may be renamed. Thus
-
-$$
-c_i=A_{ij}a_j
-$$
-
-defines a vector $\bm{c}=\bm{A}\bm{a}$. The index $i$
-is free, whereas $j$ is summed.
-
-### Kronecker delta and identity tensor
-
-The Kronecker delta is
-
-$$
 \delta_{ij}=
 \begin{cases}
 1, & i=j,\\
-0, & i\ne j.
+0, & i\ne j,
 \end{cases}
+$$ {#eq-foundations-cartesian-orthonormality}
+
+where $\delta_{ij}$ is the **Kronecker delta**. In $\R^2$, the usual
+Cartesian basis is
+$\bm{e}_1=(1,0)$ and $\bm{e}_2=(0,1)$; in $\R^3$, it is
+$\bm{e}_1=(1,0,0)$, $\bm{e}_2=(0,1,0)$, and
+$\bm{e}_3=(0,0,1)$.
+
+Every vector $\bm{a}\in\R^d$ has a unique expansion
+
+$$
+\bm{a}
+=a_1\bm{e}_1+\cdots+a_d\bm{e}_d
+=a_i\bm{e}_i.
+$$ {#eq-foundations-vector-component-expansion}
+
+The scalar $a_i$ is the component of $\bm{a}$ in the
+$\bm{e}_i$ direction. Taking the dot product of
+@eq-foundations-vector-component-expansion with $\bm{e}_j$ gives
+
+$$
+\bm{a}\cdot\bm{e}_j
+=a_i(\bm{e}_i\cdot\bm{e}_j)
+=a_i\delta_{ij}
+=a_j.
 $$
 
-It represents the components of the identity tensor
-$\bI=\delta_{ij}\bm{e}_i\otimes\bm{e}_j$ and satisfies
-$\delta_{ij}a_j=a_i$.
+Thus the components can be recovered from the vector by
+$a_i=\bm{a}\cdot\bm{e}_i$. The vector is the geometric object, whereas the
+list of components $(a_1,\ldots,a_d)$ describes that vector in the selected
+basis.
+
+![Resolution of a vector into components along an orthonormal Cartesian basis in $\R^2$.](../figures/cartesian-basis-components.png){#fig-foundations-cartesian-basis width="72%" fig-align="center"}
+
+For vectors
+$\bm{a}=a_i\bm{e}_i$ and $\bm{b}=b_i\bm{e}_i$, orthonormality gives
+
+$$
+\bm{a}\cdot\bm{b}=a_i b_i,
+\qquad
+\lVert\bm{a}\rVert
+=\sqrt{\bm{a}\cdot\bm{a}}
+=\left(\sum_{i=1}^d a_i^2\right)^{1/2}.
+$$ {#eq-foundations-vector-dot-norm}
+
+::: {#exm-foundations-vector-components}
+## Components of a vector in $\R^3$
+Let
+
+$$
+\bm{a}=2\bm{e}_1-\bm{e}_2+2\bm{e}_3.
+$$
+
+Its Cartesian components are $(a_1,a_2,a_3)=(2,-1,2)$. Therefore,
+
+$$
+\lVert\bm{a}\rVert
+=\sqrt{2^2+(-1)^2+2^2}
+=3.
+$$
+
+The component in the $\bm{e}_2$ direction is also recovered from
+$\bm{a}\cdot\bm{e}_2=-1$.
+:::
+
+::: {#exr-foundations-vector-component-calculations}
+## Elementary vector calculations
+In the Cartesian basis of $\R^3$, let
+
+$$
+\bm{a}=2\bm{e}_1-\bm{e}_2+2\bm{e}_3,
+\qquad
+\bm{b}=\bm{e}_1+3\bm{e}_2.
+$$
+
+1. List the components of $\bm{a}$ and $\bm{b}$.
+2. Compute $\bm{a}\cdot\bm{b}$,
+   $\lVert\bm{a}\rVert$, and $\lVert\bm{b}\rVert$.
+3. Use $a_i=\bm{a}\cdot\bm{e}_i$ to recover each component of
+   $\bm{a}$.
+:::
+
+### Dyadic product and second-order tensors
+
+For vectors $\bm{a},\bm{b}\in\R^d$, their **dyadic product**, also called
+the tensor product, is the second-order tensor
+$\bm{a}\otimes\bm{b}$ defined by its action on an arbitrary vector
+$\bm{c}$:
+
+$$
+(\bm{a}\otimes\bm{b})\bm{c}
+=\bm{a}(\bm{b}\cdot\bm{c}).
+$$ {#eq-foundations-dyadic-action}
+
+Using Cartesian components,
+
+$$
+\bm{a}\otimes\bm{b}
+=a_i b_j\,\bm{e}_i\otimes\bm{e}_j,
+\qquad
+(\bm{a}\otimes\bm{b})_{ij}=a_i b_j.
+$$ {#eq-foundations-dyadic-components}
+
+The order of the vectors matters:
+$\bm{a}\otimes\bm{b}$ and $\bm{b}\otimes\bm{a}$ are generally different
+tensors.
+
+::: {#exm-foundations-dyadic-product}
+## A dyadic product in $\R^2$
+Let
+
+$$
+\bm{a}=\bm{e}_1+2\bm{e}_2,
+\qquad
+\bm{b}=3\bm{e}_1-\bm{e}_2.
+$$
+
+The components of $\bm{a}\otimes\bm{b}$ form the matrix
+
+$$
+[\,\bm{a}\otimes\bm{b}\,]
+=
+\begin{bmatrix}
+1\\[2pt]2
+\end{bmatrix}
+\begin{bmatrix}
+3&-1
+\end{bmatrix}
+=
+\begin{bmatrix}
+3&-1\\
+6&-2
+\end{bmatrix}.
+$$
+
+For $\bm{c}=\bm{e}_1+\bm{e}_2$, we have
+$\bm{b}\cdot\bm{c}=2$. Hence
+
+$$
+(\bm{a}\otimes\bm{b})\bm{c}
+=2\bm{a}
+=2\bm{e}_1+4\bm{e}_2.
+$$
+
+Multiplying the displayed matrix by the component vector $(1,1)^T$ gives
+the same result.
+:::
+
+A **second-order tensor** $\bm{A}$ is a linear mapping from vectors to
+vectors. Stress, strain, and the deformation gradient are second-order tensor
+fields. Relative to a Cartesian basis, the tensor components are
+
+$$
+A_{ij}
+=\bm{e}_i\cdot(\bm{A}\bm{e}_j),
+$$
+
+and the tensor has the expansion
+
+$$
+\bm{A}=A_{ij}\bm{e}_i\otimes\bm{e}_j.
+$$ {#eq-foundations-component-expansion}
+
+The component $A_{ij}$ is the $\bm{e}_i$ component of the vector obtained
+when $\bm{A}$ acts on $\bm{e}_j$. The array $[A_{ij}]$ is the matrix
+representation of $\bm{A}$ in the chosen basis. As with a vector, the tensor
+is independent of the basis, although its components change when the basis
+changes.
+
+### Index notation and tensor-vector multiplication
+
+Repeated indices are summed from $1$ to $d$ unless stated otherwise. An index
+that appears once in a term is a **free index** and must appear in every term
+of the equation. An index that appears twice is a **dummy index** and may be
+renamed. For example,
+
+$$
+\bm{c}=\bm{A}\bm{a}
+\qquad\Longleftrightarrow\qquad
+c_i=A_{ij}a_j.
+$$ {#eq-foundations-tensor-vector-components}
+
+The index $i$ is free, whereas $j$ is summed. The Kronecker delta represents
+the components of the identity tensor,
+
+$$
+\bI=\delta_{ij}\bm{e}_i\otimes\bm{e}_j,
+$$
+
+and satisfies $\delta_{ij}a_j=a_i$.
 
 ::: {#exr-foundations-tensor-vector-components}
 ## Tensor-vector multiplication
@@ -120,31 +418,9 @@ $$
 \bm{b}=b_k\bm{e}_k,
 $$
 
-use $\bm{e}_j\cdot\bm{e}_k=\delta_{jk}$ and property of the Kronecker delta to show that
-$c_i=A_{ij}b_j$.
+use $\bm{e}_j\cdot\bm{e}_k=\delta_{jk}$ and the defining property of the
+Kronecker delta to show that $c_i=A_{ij}b_j$.
 :::
-
-### Vector products
-
-The Euclidean inner product and norm are
-
-$$
-\bm{a}\cdot\bm{b}=a_i b_i,
-\qquad
-\lVert\bm{a}\rVert
-=\sqrt{\bm{a}\cdot\bm{a}}.
-$$
-
-The tensor product $\bm{a}\otimes\bm{b}$ is the second-order
-tensor with components
-
-$$
-(\bm{a}\otimes\bm{b})_{ij}=a_i b_j.
-$$
-
-It acts on a vector according to
-$(\bm{a}\otimes\bm{b})\bm{c}
-=\bm{a}(\bm{b}\cdot\bm{c})$.
 
 ### Operations on second-order tensors
 
@@ -208,36 +484,132 @@ $$
 
 ## Vector spaces {#sec-foundations-vector-spaces}
 
-Vector spaces are special sets with algebraic operations that support linear
-combinations. They form the setting for much of mathematical modeling. Common
-examples include $\R^n$, spaces of matrices, spaces of continuous functions,
-and spaces of linear functionals. Their elements need not be geometric vectors;
-they are called vectors because they satisfy the same algebraic axioms.
+Vector spaces provide the algebraic setting for linear combinations. Their
+elements need not be arrows in physical space. A matrix, a polynomial, a
+continuous function, or a linear functional can be treated as a vector when
+addition and scalar multiplication satisfy the vector-space axioms.
+
+A set alone is not a vector space. Addition and scalar multiplication are part
+of the structure placed on the set. Once these operations have been specified,
+the set is a vector space only if all the axioms below hold.
 
 ::: {#def-vector-space}
 ## Real vector space
-A **real vector space** is a nonempty set $V$ equipped with vector addition
-$V\times V\to V$ and scalar multiplication $\R\times V\to V$ such that, for
-all $u,v,w\in V$ and $\alpha,\beta\in\R$,
+A **real vector space** is a nonempty set $V$ together with
 
-1. $u+v=v+u$ and $(u+v)+w=u+(v+w)$;
-2. there is a zero element $0\in V$ satisfying $v+0=v$;
-3. for each $v\in V$, there is an element $-v\in V$ satisfying
-   $v+(-v)=0$;
-4. $1v=v$ and $\alpha(\beta v)=(\alpha\beta)v$;
-5. $\alpha(u+v)=\alpha u+\alpha v$ and
+- an addition that assigns an element $u+v\in V$ to every
+  $u,v\in V$, and
+- a scalar multiplication that assigns an element $\alpha v\in V$ to every
+  $\alpha\in\R$ and $v\in V$,
+
+such that, for all $u,v,w\in V$ and $\alpha,\beta\in\R$:
+
+1. **Commutativity of addition:** $u+v=v+u$.
+2. **Associativity of addition:** $(u+v)+w=u+(v+w)$.
+3. **Additive identity:** there is an element $0\in V$ such that
+   $v+0=v$.
+4. **Additive inverse:** for each $v\in V$, there is an element
+   $-v\in V$ such that $v+(-v)=0$.
+5. **Identity for scalar multiplication:** $1v=v$.
+6. **Compatibility of scalar multiplication:**
+   $\alpha(\beta v)=(\alpha\beta)v$.
+7. **Distributivity over vector addition:**
+   $\alpha(u+v)=\alpha u+\alpha v$.
+8. **Distributivity over scalar addition:**
    $(\alpha+\beta)v=\alpha v+\beta v$.
 :::
 
-The two operations are required to map back into $V$; this is the closure
-property. A nonempty subset $W\subset V$ is a linear subspace if
-$\alpha u+\beta v\in W$ for every $u,v\in W$ and
-$\alpha,\beta\in\R$.
+::: {#def-linear-subspace}
+## Linear subspace
+Let $V$ be a real vector space. A nonempty subset $W\subset V$ is a
+**linear subspace** of $V$ if
+
+$$
+\alpha u+\beta v\in W
+\qquad
+\text{for every }u,v\in W
+\text{ and }\alpha,\beta\in\R.
+$$
+
+Thus a subspace uses the addition and scalar multiplication already defined on
+$V$ and is itself a vector space under those operations.
+:::
+
+The subspace condition is a convenient test because it checks both operations
+at once. Taking $\alpha=\beta=0$ shows that every nonempty subspace contains
+the zero vector. Taking $(\alpha,\beta)=(1,1)$ checks addition, and taking
+$\beta=0$ checks scalar multiplication.
+
+::: {#exm-foundations-basic-vector-spaces}
+## Vector spaces and nonexamples
+
+1. $\R^n$ is a vector space under componentwise addition and scalar
+   multiplication.
+2. The set $\R^{m\times n}$ of real $m$-by-$n$ matrices is a vector space
+   under the usual matrix addition and scalar multiplication.
+3. The set of continuous functions on $[0,1]$ is a vector space under
+   pointwise operations:
+
+   $$
+   (u+v)(x)=u(x)+v(x),
+   \qquad
+   (\alpha u)(x)=\alpha u(x).
+   $$
+
+   Sums and scalar multiples of continuous functions remain continuous.
+4. The line
+   $W=\{(x_1,x_2)\in\R^2:x_2=2x_1\}$ is a subspace of $\R^2$.
+   The parallel line
+   $\{(x_1,x_2)\in\R^2:x_2=2x_1+1\}$ is not a vector space because it
+   does not contain $(0,0)$.
+:::
+
+::: {#exr-foundations-subspace-test}
+## Identifying real vector spaces
+For each set, use the usual addition and multiplication by scalars from $\R$.
+Determine whether these operations make the set a real vector space. If they
+do not, identify at least one vector-space requirement that fails.
+
+1. $\R^n$, where $n\geq1$;
+2. $\R$;
+3. $\mathbb{Q}$, the rational numbers;
+4. $\mathbb{Z}$, the integers;
+5. $\mathbb{N}=\{0,1,2,\ldots\}$;
+6. $C(\overline{\Om})=\{u:\overline{\Om}\to\R:u\text{ is continuous}\}$,
+   with operations defined pointwise;
+7. $\{u\in C(\overline{\Om}):u(\bx_0)=1\}$, where
+   $\bx_0\in\overline{\Om}$ is fixed;
+8. $\mathcal{P}_p$, the real polynomials of degree at most $p$, where
+   $p\geq0$;
+9. $\{(x,y)\in\R^2:y=x\}$;
+10. $\{(x,y)\in\R^2:y=x+1\}$.
+:::
 
 ### Basis and dimension
 
-A set $B\subset V$ is **linearly independent** if every finite selection of
-distinct vectors $v_1,\ldots,v_n\in B$ satisfies
+Let $V$ be a real vector space, let $n$ be a positive integer, and let
+$v_1,\ldots,v_n\in V$. A **linear combination** of these vectors is a vector
+of the form
+
+$$
+\alpha_1v_1+\cdots+\alpha_nv_n,
+$$
+
+where $\alpha_1,\ldots,\alpha_n\in\R$.
+
+The **span** of $v_1,\ldots,v_n$ is the set of all their linear combinations:
+
+$$
+\operatorname{span}\{v_1,\ldots,v_n\}
+=\left\{\alpha_1v_1+\cdots+\alpha_nv_n:
+\alpha_1,\ldots,\alpha_n\in\R\right\}.
+$$
+
+The vectors $v_1,\ldots,v_n$ **span** $V$ if
+$\operatorname{span}\{v_1,\ldots,v_n\}=V$. In other words, every vector in
+$V$ can then be represented using $v_1,\ldots,v_n$.
+
+The vectors $v_1,\ldots,v_n$ are **linearly independent** if
 
 $$
 \alpha_1v_1+\cdots+\alpha_nv_n=0
@@ -245,25 +617,95 @@ $$
 \alpha_1=\cdots=\alpha_n=0.
 $$
 
-The set $B$ **spans** $V$ if every $v\in V$ is a finite linear combination of
-members of $B$. A linearly independent spanning set is a **basis**. If $V$ has
-a basis containing $n$ elements, then $\dim V=n$; otherwise $V$ is
-infinite-dimensional.
+The set $\{v_1,\ldots,v_n\}$ is a **basis** of $V$ if it spans $V$ and is
+linearly independent. The spanning property ensures that every $v\in V$ has a
+representation
 
-::: {#exm-foundations-dimension}
-## Examples of dimension
+$$
+v=\alpha_1v_1+\cdots+\alpha_nv_n,
+$$
 
-- The standard vectors $\{\bm{e}_1,\ldots,\bm{e}_n\}$ form a basis of
-  $\R^n$, so $\dim\R^n=n$.
-- The monomials $\{1,x,\ldots,x^p\}$ form a basis of
-  $\mathcal{P}_p$, so $\dim\mathcal{P}_p=p+1$.
-- The vector space of linear functionals $\ell:\R^n\to\R$ has dimension $n$.
-  Each functional has the form $\ell(\bm{x})=a_i x_i$ for a unique coefficient
-  vector $\bm{a}\in\R^n$.
-- The vector space of continuous functions on $[0,1]$, denoted $C([0,1])$, is
-  infinite-dimensional because
-  $\{1,x,x^2,\ldots\}$ contains arbitrarily large finite linearly independent
-  subsets.
+and linear independence ensures that the coefficients in this representation
+are unique.
+
+A vector space is **finite-dimensional** if it has a basis containing a finite
+number of vectors. Every basis of a finite-dimensional vector space contains
+the same number of vectors. This number is the **dimension** of the space. If
+$\{v_1,\ldots,v_n\}$ is a basis of $V$, then
+
+$$
+\dim V=n.
+$$
+
+::: {#exm-foundations-standard-basis}
+## The standard basis of $\R^2$
+The vectors
+
+$$
+\bm{e}_1=(1,0),
+\qquad
+\bm{e}_2=(0,1)
+$$
+
+span $\R^2$ because every $\bm{x}=(x_1,x_2)\in\R^2$ can be written as
+
+$$
+\bm{x}=x_1\bm{e}_1+x_2\bm{e}_2.
+$$
+
+They are linearly independent because
+$\alpha_1\bm{e}_1+\alpha_2\bm{e}_2=(0,0)$ implies
+$\alpha_1=\alpha_2=0$. Hence $\{\bm{e}_1,\bm{e}_2\}$ is a basis of $\R^2$,
+and $\dim\R^2=2$.
+:::
+
+::: {#exm-foundations-polynomial-dimension}
+## Dimension of a polynomial space
+Let $\mathcal{P}_p$ denote the polynomials of degree at most $p$. Every
+$q\in\mathcal{P}_p$ has the form
+
+$$
+q(x)=c_0+c_1x+\cdots+c_px^p
+=\sum_{i=0}^{p}c_i x^i.
+$$ {#eq-foundations-polynomial-expansion}
+
+Thus the $p+1$ monomials
+
+$$
+\{1,x,x^2,\ldots,x^p\}
+$$
+
+span $\mathcal{P}_p$. They are also linearly independent: the zero polynomial
+has all coefficients equal to zero. They therefore form a basis, and
+
+$$
+\dim\mathcal{P}_p=p+1.
+$$
+
+Once this basis is fixed, the polynomial is determined by the $p+1$ numbers
+$(c_0,\ldots,c_p)$. This is the same coordinate idea used for a vector in
+$\R^{p+1}$. Different polynomials have different coefficient vectors, while
+the basis functions remain fixed.
+:::
+
+::: {#exr-foundations-polynomial-coordinates}
+## Representing a polynomial in two bases
+Consider $\mathcal{P}_2$.
+
+1. Show that $\{1,x,x^2\}$ is a basis.
+2. Show that $\{1,x-1,(x-1)^2\}$ is also a basis.
+3. For $q(x)=2-3x+x^2$, find constants $a_0,a_1,a_2$ and
+   $b_0,b_1,b_2$ such that
+
+   $$
+   q(x)=a_0+a_1x+a_2x^2
+   $$
+
+   and
+
+   $$
+   q(x)=b_0+b_1(x-1)+b_2(x-1)^2.
+   $$
 :::
 
 ::: {#rem-foundations-fem-dimension}
@@ -276,11 +718,9 @@ linear or nonlinear algebraic system.
 :::
 
 ::: {#exm-foundations-vector-spaces}
-## Polynomial and affine spaces
-The set $\mathcal{P}_p$ of polynomials of degree at most $p$ is a vector space:
-a linear combination of two such polynomials still has degree at most $p$.
-For an example of a set that is not a vector space, let $V_0$ be a linear
-subspace of a vector space $V$, and choose $u_g\in V$. The translated set
+## Affine spaces
+Let $V_0$ be a linear subspace of a vector space $V$, and choose
+$u_g\in V$. The translated set
 
 $$
 V_g=u_g+V_0=\{u_g+w:w\in V_0\}.
@@ -294,8 +734,9 @@ $\{(x_1,0):x_1\in\R\}$.
 
 ## Metrics, norms, and completeness {#sec-foundations-norms}
 
-A vector space specifies which algebraic operations are allowed. A metric or a
-norm adds a notion of distance and therefore makes convergence meaningful.
+A metric is additional structure placed on a set, and a norm is additional
+structure placed on a vector space. In either case, the proposed formula is
+valid only if it satisfies the corresponding axioms below.
 
 ::: {#def-metric}
 ## Metric
@@ -309,31 +750,6 @@ for all $u,v,w\in X$,
 The pair $(X,d)$ is called a metric space.
 :::
 
-::: {#rem-foundations-metric-linear-structure}
-## Metrics and linear structure
-A metric requires only a set. For example, the discrete metric
-
-$$
-d(u,v)=
-\begin{cases}
-0, & u=v,\\
-1, & u\ne v,
-\end{cases}
-$$
-
-is defined on any set, even when addition and scalar multiplication have no
-meaning. A norm, by contrast, is defined on a vector space. The metric induced
-by a norm is translation invariant and homogeneous:
-
-$$
-d(u+w,v+w)=d(u,v),
-\qquad
-d(\alpha u,\alpha v)=|\alpha|d(u,v).
-$$
-
-These properties connect distance to the linear operations.
-:::
-
 ::: {#def-norm}
 ## Norm
 Let $V$ be a vector space over $\R$. A mapping
@@ -343,6 +759,26 @@ $\alpha\in\R$,
 1. $\norm{v}_V=0$ if and only if $v=0$;
 2. $\norm{\alpha v}_V=|\alpha|\norm{v}_V$;
 3. $\norm{u+v}_V\leq\norm{u}_V+\norm{v}_V$.
+:::
+
+::: {#rem-foundations-constructing-a-norm}
+## Constructing a norm from a basis
+Suppose $\{v_1,\ldots,v_n\}$ is a basis of a finite-dimensional vector space
+$V$. Every $v\in V$ has a unique representation
+
+$$
+v=\alpha_1v_1+\cdots+\alpha_nv_n.
+$$
+
+The formula
+
+$$
+\norm{v}_{1,B}=|\alpha_1|+\cdots+|\alpha_n|
+$$
+
+defines a norm on $V$. Thus every finite-dimensional real vector space can be
+equipped with a norm. The norm is not determined by the set $V$ alone; the
+formula above depends on the selected basis.
 :::
 
 ::: {#def-seminorm}
@@ -385,6 +821,39 @@ $$
 d(u,v)=\norm{u-v}_V.
 $$ {#eq-foundations-norm-metric}
 
+::: {#rem-foundations-metric-linear-structure}
+## Metrics and linear structure
+Any nonempty set $X$ can be made into a metric space by choosing a mapping
+$d:X\times X\to[0,\infty)$ that satisfies the metric axioms. For example, the
+discrete metric
+
+$$
+d(u,v)=
+\begin{cases}
+0, & u=v,\\
+1, & u\ne v,
+\end{cases}
+$$
+
+is valid on every set, even when addition and scalar multiplication have no
+meaning. The same set can carry many different metrics.
+
+A norm, by contrast, must respect the vector-space operations. The metric
+induced by a norm is translation invariant and homogeneous:
+
+$$
+d(u+w,v+w)=d(u,v),
+\qquad
+d(\alpha u,\alpha v)=|\alpha|d(u,v).
+$$
+
+These properties connect distance to the linear operations. In particular,
+the discrete metric on a nonzero vector space is not induced by a norm. If
+$v\ne0$, the proposed rule $\norm{v}=1$ would give
+$\norm{2v}=1$, whereas norm homogeneity requires
+$\norm{2v}=2\norm{v}=2$.
+:::
+
 ::: {#rem-foundations-specifying-norm}
 ## A vector space and its norm
 The vector-space axioms determine the algebraic object $V$. To discuss
@@ -404,18 +873,6 @@ $$
 These norms assign different distances. In finite-dimensional spaces they
 produce the same convergent sequences, but this equivalence does not extend to
 arbitrary pairs of norms on infinite-dimensional spaces.
-:::
-
-::: {#exr-foundations-bounded-metric}
-## A metric not induced by a norm
-Let $V$ be a normed vector space. Show that
-
-$$
-d(u,v)=\min\{1,\norm{u-v}_V\}
-$$
-
-is a metric. Explain why this metric cannot be induced by a norm when
-$V\ne\{0\}$.
 :::
 
 ::: {#def-convergence-normed-space}
@@ -473,6 +930,36 @@ $p$-norms defined above. Given $\varepsilon>0$, for example, the
 $\infty$-norm criterion holds whenever $n>1/\varepsilon$.
 :::
 
+::: {#def-cauchy-sequence}
+## Cauchy sequence
+A sequence $(v_n)$ in a metric space $(X,d)$ is a **Cauchy sequence** if, for
+every $\varepsilon>0$, there is an index $N$ such that
+
+$$
+d(v_n,v_m)<\varepsilon
+\qquad\text{whenever }m,n\geq N.
+$$
+
+In a normed vector space this condition is
+$\norm{v_n-v_m}_V<\varepsilon$. A Cauchy sequence has members that eventually
+become arbitrarily close to one another, without presupposing a candidate
+limit.
+:::
+
+::: {#def-complete-metric-space}
+## Complete metric space
+A metric space is **complete** if every Cauchy sequence converges to an element
+of that space.
+:::
+
+::: {#def-banach-space}
+## Banach space
+A **Banach space** is a normed vector space that is complete: every Cauchy
+sequence converges in the norm to an element of the space.
+:::
+
+### Inner products and Hilbert spaces
+
 ::: {#def-inner-product}
 ## Inner product
 An **inner product** on a real vector space $V$ is a mapping
@@ -503,6 +990,61 @@ particular, two vectors $u,v\in V$ are **orthogonal** if
 $\inner{u}{v}_V=0$. A general norm determines lengths and distances but does
 not, by itself, define orthogonality.
 
+Once a basis $\{v_1,\ldots,v_n\}$ of a finite-dimensional real vector space
+has been selected, an inner product can be defined by declaring the basis
+orthonormal. If
+
+$$
+u=\sum_{i=1}^n\alpha_i v_i,
+\qquad
+v=\sum_{i=1}^n\beta_i v_i,
+$$
+
+set
+
+$$
+\inner{u}{v}_B=\sum_{i=1}^n\alpha_i\beta_i.
+$$
+
+Therefore every finite-dimensional real vector space can be equipped with an
+inner product. This does not mean that every norm chosen on the space is
+induced by an inner product.
+
+::: {#def-hilbert-space}
+## Hilbert space
+A **Hilbert space** is an inner-product space that is complete in the norm
+induced by its inner product.
+:::
+
+Every Hilbert space is a Banach space under its induced norm. A Banach space,
+however, need not have a norm induced by an inner product.
+
+::: {#exm-foundations-norms-on-examples}
+## Norms and inner products on familiar vector spaces
+
+1. On $\R^n$, every $p$-norm in @def-euclidean-p-norm is a norm. The
+   Euclidean norm $\norm{\cdot}_2$ is induced by the dot product.
+2. On $\R^{m\times n}$, the Frobenius norm
+   $\norm{\bm{A}}_F=(\bm{A}:\bm{A})^{1/2}$ is induced by the inner product
+   $\inner{\bm{A}}{\bm{B}}_F=\bm{A}:\bm{B}$.
+3. On $\mathcal{P}_p$, the formula
+
+   $$
+   \norm{q}_{\mathrm{int}}
+   =\left(\int_0^1q(x)^2\,\dd x\right)^{1/2}
+   $$
+
+   is a norm induced by
+   $\inner{q}{r}_{\mathrm{int}}=\int_0^1q(x)r(x)\,\dd x$. In particular,
+   if the integral of the continuous, nonnegative function $q^2$ is zero,
+   then $q=0$ on $[0,1]$. The supremum norm
+   $\norm{q}_\infty=\max_{0\leq x\leq1}|q(x)|$ is another norm on
+   $\mathcal{P}_p$.
+4. On $C([0,1])$, the supremum norm
+   $\norm{u}_\infty=\max_{0\leq x\leq1}|u(x)|$ is a norm, but it is not
+   induced by an inner product.
+:::
+
 
 ::: {#exr-inner-product-parallelogram-identity}
 ## Parallelogram identity for inner product space
@@ -517,154 +1059,32 @@ $$
 Using the fact that norm satisfies $\norm{v}_V^2=\inner{v}{v}_V$ and the properties of $\inner{\cdot}{\cdot}_V$ in @def-inner-product, show that the left hand side of the above equation reduces to the right hand side.
 :::
 
-::: {#def-cauchy-sequence}
-## Cauchy sequence
-A sequence $(v_n)$ in a metric space $(X,d)$ is a **Cauchy sequence** if, for
-every $\varepsilon>0$, there is an index $N$ such that
-
-$$
-d(v_n,v_m)<\varepsilon
-\qquad\text{whenever }m,n\geq N.
-$$
-
-In a normed vector space this condition is
-$\norm{v_n-v_m}_V<\varepsilon$. A Cauchy sequence has members that eventually
-become arbitrarily close to one another, without presupposing a candidate
-limit.
-:::
-
-::: {#def-complete-metric-space}
-## Complete metric space
-A metric space is **complete** if every Cauchy sequence converges to an element
-of that space.
-:::
-
-::: {#def-banach-space}
-## Banach space
-A **Banach space** is a normed vector space that is complete: every Cauchy
-sequence converges in the norm to an element of the space.
-:::
-
-::: {#def-hilbert-space}
-## Hilbert space
-A **Hilbert space** is an inner-product space that is complete in the norm
-induced by its inner product.
-:::
-
-Every Hilbert space is therefore a Banach space under its induced norm, but a
-Banach space need not have a norm induced by an inner product. Completeness
-ensures that every Cauchy sequence has a limit in the chosen space.
-
-::: {#exm-foundations-l2-sequences}
-## The sequence space $\ell^2$
-The set
-
-$$
-\ell^2
-=\left\{(a_1,a_2,\ldots):\sum_{k=1}^{\infty}|a_k|^2<\infty\right\}
-$$
-
-is a vector space under componentwise operations. With
-
-$$
-\inner{a}{b}_{\ell^2}=\sum_{k=1}^{\infty}a_kb_k,
-\qquad
-\norm{a}_{\ell^2}=\left(\sum_{k=1}^{\infty}|a_k|^2\right)^{1/2},
-$$
-
-it is complete and therefore a Hilbert space. The standard coordinate
-sequences $\bm{e}_1,\bm{e}_2,\ldots$ form a countable orthonormal basis. The
-relation between this basis and an algebraic basis is explained next.
-:::
-
-::: {#rem-foundations-infinite-dimensional-bases}
-## Algebraic bases
-The dimension defined above uses a Hamel basis, in which every vector is a
-**finite** linear combination of basis vectors. The space of all polynomials
-has the countable Hamel basis $\{1,x,x^2,\ldots\}$. In contrast, an
-infinite-dimensional Banach space cannot have a countable Hamel basis; its
-algebraic dimension is uncountable.
-:::
-
-::: {#def-separable-space}
-## Separable space
-A normed vector space $(V,\norm{\cdot}_V)$ is **separable** if it contains a
-countable subset $D$ such that, for every $v\in V$ and every $\varepsilon>0$,
-there is a $w\in D$ satisfying
-
-$$
-\norm{v-w}_V<\varepsilon.
-$$
-
-Equivalently, $D$ is dense in $V$, meaning that its closure is $V$.
-:::
-
-::: {#rem-foundations-orthonormal-hamel-bases}
-## Orthonormal and Hamel bases
-A separable Hilbert space such as $\ell^2$ can have a countable orthonormal
-basis. Such a basis represents each vector as the norm limit of a series,
-which may contain infinitely many nonzero terms. A Hamel basis, by definition,
-must represent every vector using a finite linear combination. For example,
-the vector $(1,1/2,1/3,\ldots)\in\ell^2$ has infinitely many nonzero
-coefficients in the standard orthonormal basis. Thus the standard orthonormal
-basis of $\ell^2$ is not a Hamel basis.
-:::
-
 ::: {#rem-foundations-finite-dimensional-completeness}
-## Why finite-dimensional normed spaces are complete
-Let $V$ have a finite basis $\{v_1,\ldots,v_n\}$. The coordinate map
-
-$$
-(\alpha_1,\ldots,\alpha_n)\longmapsto
-\alpha_1v_1+\cdots+\alpha_nv_n
-$$
-
-identifies $V$ with $\R^n$. Any norm on $V$ is equivalent to the Euclidean
-norm on its coordinate vectors: there are constants $c,C>0$ such that
-
-$$
-c\norm{\bm{\alpha}}_2
-\leq\norm{\sum_{i=1}^n\alpha_i v_i}_V
-\leq C\norm{\bm{\alpha}}_2.
-$$
-
-Consequently, a Cauchy sequence in $V$ has Cauchy coordinate sequences. Each
-coordinate converges in $\R$, and the resulting coordinate vector defines a
-limit in $V$. Hence every finite-dimensional normed vector space is complete.
-:::
-
-::: {#exm-foundations-finite-dimensional-space}
-## A polynomial Hilbert space
-On $\mathcal{P}_p$, define
-
-$$
-\inner{u}{v}=\int_0^1u(x)v(x)\,\dd x.
-$$
-
-If $\inner{v}{v}=0$, then the continuous, nonnegative function $v^2$ has zero
-integral and hence $v=0$ on $[0,1]$. Thus this is an inner product. Because
-$\mathcal{P}_p$ is finite-dimensional, it is complete in the induced norm and
-is a Hilbert space, as explained in
-@rem-foundations-finite-dimensional-completeness.
-:::
-
-::: {#rem-foundations-polynomial-norm-choice}
-## The space and its norm
-The notation $\mathcal{P}_p$ specifies the vector space but does not specify a
-norm. For example, the same polynomial space can be equipped with the norm
-induced by the inner product in the preceding example, the supremum norm on
-$[0,1]$, or an $H^1(0,1)$ norm. A statement about distance or convergence must
-identify which norm is being used. Because $\mathcal{P}_p$ is
-finite-dimensional, it is complete under each of these norms.
+## Finite-dimensional normed spaces are complete
+Every finite-dimensional normed vector space is complete. After a basis is
+chosen, the space can be identified with $\R^n$, and every norm on it is
+equivalent to the Euclidean norm. A Cauchy sequence therefore has convergent
+coordinate sequences and a limit in the original space. In particular,
+$\mathcal{P}_p$ is complete under either norm given in
+@exm-foundations-norms-on-examples.
 :::
 
 ## Continuous and integrable function spaces {#sec-foundations-function-spaces}
 
 For a nonnegative integer $k$, $C^k(\Om)$ denotes the real-valued functions on
 $\Om$ whose partial derivatives through total order $k$ exist and are
-continuous in $\Om$. The space $C^k(\overline{\Om})$ consists of functions in
-$C^k(\Om)$ for which the function and all such derivatives extend continuously
-to $\overline{\Om}$. In particular,
+continuous at every point of $\Om$. In particular, $C(\Om)=C^0(\Om)$ is the
+space of continuous functions on the open domain.
+
+The notation $C(\overline{\Om})$ has a direct meaning: it is the space of
+continuous functions $u:\overline{\Om}\to\R$. Such a function has values on
+both the interior and the boundary. For $k\geq1$, a function belongs to
+$C^k(\overline{\Om})$ if it belongs to $C^k(\Om)$ and the function and each of
+its partial derivatives through order $k$ approach a finite, unique value as
+an interior point approaches any point of $\partial\Om$. Assigning these
+limiting values on the boundary makes the function and those derivatives
+continuous on $\overline{\Om}$. This is what is meant when we say that the
+derivatives extend continuously to the closure. Thus
 
 $$
 C(\Om)=C^0(\Om),
@@ -672,18 +1092,90 @@ C(\Om)=C^0(\Om),
 C(\overline{\Om})=C^0(\overline{\Om}).
 $$
 
-Assume now that $\Om$ is bounded. Pointwise addition and scalar multiplication
-make $C(\overline{\Om})$ a vector space. Its supremum norm is
+The closed domain is useful for two reasons. First, classical boundary
+conditions require values on $\partial\Om$. Second, because $\Om$ is bounded,
+$\overline{\Om}$ is compact. A continuous function on $\overline{\Om}$ is
+therefore bounded and attains a maximum and a minimum. Consequently,
+pointwise addition and scalar multiplication make $C(\overline{\Om})$ a vector
+space, and the supremum norm
 
 $$
 \norm{u}_{\infty}
 =\sup_{\bx\in\overline{\Om}}|u(\bx)|.
 $$ {#eq-foundations-supremum-norm}
 
-Convergence in this norm is uniform convergence: every value of the error
-$|u_n(\bx)-u(\bx)|$ is bounded by a quantity that tends to zero. The space
-$C(\overline{\Om})$ is complete in the supremum norm and is therefore a
-Banach space.
+is finite for every $u\in C(\overline{\Om})$.
+
+There are several ways in which a sequence of functions can converge. A
+sequence $(u_n)$ converges **pointwise** to $u$ if, for each fixed
+$\bx\in\overline{\Om}$ and every $\varepsilon>0$, there is an index $N$ that
+may depend on $\bx$ such that
+
+$$
+|u_n(\bx)-u(\bx)|<\varepsilon
+\qquad\text{for all }n\geq N.
+$$
+
+The convergence is **uniform** if one index $N$ works for every point: for
+each $\varepsilon>0$, there is an $N$ such that
+
+$$
+|u_n(\bx)-u(\bx)|<\varepsilon
+\qquad
+\text{for every }\bx\in\overline{\Om}
+\text{ and every }n\geq N.
+$$ {#eq-foundations-uniform-convergence}
+
+The latter condition is exactly convergence in the supremum norm,
+
+$$
+u_n\to u\text{ uniformly on }\overline{\Om}
+\quad\Longleftrightarrow\quad
+\norm{u_n-u}_{\infty}\to0.
+$$ {#eq-foundations-uniform-supremum}
+
+::: {#exm-foundations-uniform-convergence}
+## Uniform convergence on an interval
+For $u_n(x)=x/n$ on $[0,1]$,
+
+$$
+\norm{u_n}_{\infty}
+=\max_{0\leq x\leq1}\frac{x}{n}
+=\frac1n.
+$$
+
+Therefore $u_n\to0$ uniformly. Given $\varepsilon>0$, any integer
+$N>1/\varepsilon$ ensures that $|u_n(x)|<\varepsilon$ for every $x\in[0,1]$
+and every $n\geq N$.
+:::
+
+::: {#rem-foundations-continuous-banach}
+## Completeness of $C(\overline{\Om})$
+The space $C(\overline{\Om})$ is complete in the supremum norm. Hence
+$(C(\overline{\Om}),\norm{\cdot}_{\infty})$ is a Banach space. A proof is not
+needed for the finite element developments in this book, but the result is
+important: the uniform limit of continuous functions is continuous and
+therefore remains in $C(\overline{\Om})$.
+:::
+
+::: {#exr-foundations-pointwise-not-uniform}
+## Pointwise convergence need not be uniform
+Let $u_n(x)=x^n$ on $[0,1]$ and define
+
+$$
+u(x)=
+\begin{cases}
+0, & 0\leq x<1,\\
+1, & x=1.
+\end{cases}
+$$
+
+1. Show that $u_n(x)\to u(x)$ at every fixed $x\in[0,1]$.
+2. Show that $\sup_{0\leq x\leq1}|u_n(x)-u(x)|=1$ for every $n$.
+3. Conclude that $(u_n)$ converges pointwise, but not uniformly, to $u$.
+   Explain why this does not contradict the statement that a uniform limit of
+   continuous functions is continuous.
+:::
 
 ::: {#exm-foundations-supremum-not-hilbert}
 ## The supremum norm is not an inner-product norm
@@ -691,25 +1183,71 @@ Banach space.
 On $[0,1]$, take $u(x)=1$ and $v(x)=x$. Then
 
 $$
-\norm{u+v}_{\infty}^2+\norm{u-v}_{\infty}^2=5,
-\quad
-2\norm{u}_{\infty}^2+2\norm{v}_{\infty}^2=4 \quad \Rightarrow \quad \norm{u+v}_{\infty}^2+\norm{u-v}_{\infty}^2 \neq 2\norm{u}_{\infty}^2+2\norm{v}_{\infty}^2.
+\norm{u+v}_{\infty}=2,
+\qquad
+\norm{u-v}_{\infty}=1,
+\qquad
+\norm{u}_{\infty}=\norm{v}_{\infty}=1.
 $$
 
-The above shows the failure of the parallelogram identity in @exr-inner-product-parallelogram-identity. Therefore, we can not construct or define a inner product $\inner{\cdot}{\cdot}_V$ such that $\norm{\cdot}_V^2 = \inner{\cdot}{\cdot}_V$. To prove this, suppose you could construct such an inner product then parallelogram identity in @exr-inner-product-parallelogram-identity must hold, which contradicts the above. 
+It follows that
 
-This example shows that the space of continuous functions $C([0,1])$ with the supremum norm is a Banach space but not a Hilbert space.
+$$
+\norm{u+v}_{\infty}^2+\norm{u-v}_{\infty}^2=5,
+\qquad
+2\norm{u}_{\infty}^2+2\norm{v}_{\infty}^2=4.
+$$
+
+The supremum norm therefore fails the parallelogram identity in
+@exr-inner-product-parallelogram-identity. It cannot be induced by an inner
+product. Thus $C([0,1])$ with the supremum norm is a Banach space but not a
+Hilbert space under this norm.
 :::
 
 ### The spaces $L^p(\Om)$
 
-The definition of $L^p(\Om)$ uses two basic ideas from integration theory. A
-measurable subset of $\R^d$ has a **measure**, which represents length in one
-dimension, area in two dimensions, and volume in three dimensions. A statement
-holds **almost everywhere** in $\Om$ if it can fail only on a set of measure
-zero. Changing a function on such a set does not change its integral. This
-brief description is sufficient for the spaces used here; a systematic
-treatment of measure and integration is available in [@oden-demkowicz].
+The definition of $L^p(\Om)$ uses the measure of subsets of $\R^d$. In one,
+two, and three dimensions, measure corresponds to length, area, and volume,
+respectively. A systematic treatment of measure and integration is beyond the
+scope of this book; see [@oden-demkowicz]. The following definitions explain
+the points needed for finite element analysis.
+
+::: {#def-foundations-measure-zero}
+## Set of measure zero
+A measurable set $N\subset\R^d$ has **measure zero** if, for every
+$\varepsilon>0$, it can be covered by countably many boxes whose total
+$d$-dimensional volume is less than $\varepsilon$.
+:::
+
+A single point has measure zero. Every finite or countable set of points also
+has measure zero. A smooth curve in $\R^2$ has two-dimensional measure zero,
+even though it may have positive length. Similarly, a smooth surface in
+$\R^3$ has three-dimensional measure zero, even though it may have positive
+area. In contrast, a nonempty open interval, rectangle, or ball has positive
+measure.
+
+::: {#def-foundations-almost-everywhere}
+## Almost everywhere
+Let $P(\bx)$ be a statement defined for $\bx\in\Om$. The statement holds
+**almost everywhere** in $\Om$, abbreviated **a.e. in $\Om$**, if the set
+
+$$
+N_P=\{\bx\in\Om:P(\bx)\text{ is false}\}
+$$
+
+has measure zero. Two functions $u$ and $v$ are equal almost everywhere if
+
+$$
+\{\bx\in\Om:u(\bx)\ne v(\bx)\}
+$$
+
+has measure zero.
+:::
+
+For example, let $u(x)=0$ on $(0,1)$ and define $v$ by
+$v(1/2)=1$ and $v(x)=0$ for $x\ne1/2$. The functions are not equal at every
+point, but they are equal almost everywhere because they differ only on the
+one-point set $\{1/2\}$. Their integrals are equal.
 
 Let $\Om\subset\R^d$ be measurable. For $1\leq p<\infty$, define
 
@@ -727,25 +1265,97 @@ $$
 =\left(\int_{\Om}|u|^p\,\dx\right)^{1/p}.
 $$ {#eq-foundations-lp-norm}
 
-Two functions that are equal almost everywhere represent the same element of
-$L^p(\Om)$. This identification is necessary for
-@eq-foundations-lp-norm to be a norm: a function supported only on a set of
-measure zero has zero integral and therefore represents the zero element.
-Addition and scalar multiplication are defined using representatives and are
-independent of the representatives chosen. For example, on $(0,1)$, the zero
-function and the function that equals $1$ at $x=1/2$ and zero elsewhere
-represent the same element of every $L^p(0,1)$.
+Strictly speaking, an element of $L^p(\Om)$ is not one pointwise-defined
+function. It is a collection of functions that are equal almost everywhere.
+Such a collection is called an **equivalence class**. We choose one function
+from the class when writing formulas and call it a **representative**. The
+value of the integral and the norm is independent of which representative is
+chosen.
+
+This identification is necessary because
+
+$$
+\norm{u-v}_{L^p(\Om)}=0
+\quad\Longleftrightarrow\quad
+u=v\text{ a.e. in }\Om.
+$$ {#eq-foundations-lp-equality}
+
+Thus equality in $L^p(\Om)$ means equality almost everywhere, not equality at
+every point. The two functions in the preceding example represent the same
+element of every $L^p(0,1)$. Addition and scalar multiplication may be
+performed using any representatives; changing representatives does not change
+the resulting $L^p$ element.
 
 The space $L^\infty(\Om)$ consists of measurable functions that are bounded
 apart from a possible set of measure zero. Its norm is the essential supremum,
 
 $$
 \norm{u}_{L^\infty(\Om)}
-=\mathop{\mathrm{ess\,sup}}_{\bx\in\Om}|u(\bx)|,
+=\mathop{\mathrm{ess\,sup}}_{\bx\in\Om}|u(\bx)|
+=\inf\left\{M\geq0:
+|u(\bx)|\leq M\text{ for a.e. }\bx\in\Om\right\},
 $$
 
-which is the smallest bound that holds almost everywhere. Each
-$L^p(\Om)$, $1\leq p\leq\infty$, is complete and therefore is a Banach
+so values on a set of measure zero do not affect the $L^\infty$ norm.
+
+::: {#exm-foundations-essential-supremum}
+## Supremum and essential supremum
+Define $u:(0,1)\to\R$ by
+
+$$
+u(x)=
+\begin{cases}
+100, & x=1/2,\\
+1, & x\ne1/2.
+\end{cases}
+$$
+
+Then
+
+$$
+\sup_{0<x<1}|u(x)|=100,
+\qquad
+\mathop{\mathrm{ess\,sup}}_{0<x<1}|u(x)|=1.
+$$
+
+The exceptional value occurs on a set of measure zero and is ignored by the
+essential supremum.
+:::
+
+::: {#exr-foundations-ae-equality}
+## Equality almost everywhere
+Define the measurable function $w:(0,1)\to\R$ by
+
+$$
+w(x)=
+\begin{cases}
+1, & x\in\mathbb{Q},\\
+0, & x\notin\mathbb{Q}.
+\end{cases}
+$$
+
+1. Use the fact that $\mathbb{Q}\cap(0,1)$ is countable to show that
+   $w=0$ almost everywhere in $(0,1)$.
+2. Compute $\sup_{0<x<1}|w(x)|$ and
+   $\mathop{\mathrm{ess\,sup}}_{0<x<1}|w(x)|$.
+3. Show that $w$ and the zero function represent the same element of
+   $L^p(0,1)$ for every $1\leq p\leq\infty$.
+:::
+
+For a continuous function $u\in C(\overline{\Om})$, isolated spikes cannot
+occur. Continuity implies
+
+$$
+\norm{u}_{L^\infty(\Om)}
+=\max_{\bx\in\overline{\Om}}|u(\bx)|
+=\norm{u}_{\infty}.
+$$ {#eq-foundations-continuous-essential-supremum}
+
+Indeed, if $|u|$ is close to its maximum at one point, continuity keeps it
+close to that value in a neighborhood having positive measure. Therefore no
+smaller bound can hold almost everywhere.
+
+Each $L^p(\Om)$, $1\leq p\leq\infty$, is complete and therefore is a Banach
 space.
 
 ::: {#exm-foundations-lp-singularity}
@@ -787,6 +1397,47 @@ orthogonal precisely when $\int_{\Om}uv\,\dx=0$.
    $\inner{\cdot}{\cdot}_{L^2(\Om)}$.
 4. Use the stated completeness results to classify each space as Banach or
    Hilbert under the norm given here.
+:::
+
+::: {#rem-foundations-fourier-basis}
+## Fourier approximation in $L^2(-\pi,\pi)$
+In the real Hilbert space $L^2(-\pi,\pi)$, the functions
+
+$$
+\frac{1}{\sqrt{2\pi}},
+\qquad
+\frac{\cos(nx)}{\sqrt{\pi}},
+\qquad
+\frac{\sin(nx)}{\sqrt{\pi}},
+\qquad n=1,2,\ldots,
+$$
+
+are mutually orthonormal. For $u\in L^2(-\pi,\pi)$, define
+
+$$
+a_0=\frac{1}{\pi}\int_{-\pi}^{\pi}u(x)\,\dd x,
+\qquad
+a_n=\frac{1}{\pi}\int_{-\pi}^{\pi}u(x)\cos(nx)\,\dd x,
+\qquad
+b_n=\frac{1}{\pi}\int_{-\pi}^{\pi}u(x)\sin(nx)\,\dd x
+$$
+
+and
+
+$$
+S_Nu(x)
+=\frac{a_0}{2}
++\sum_{n=1}^{N}\left(a_n\cos(nx)+b_n\sin(nx)\right).
+$$
+
+Then
+
+$$
+\lim_{N\to\infty}\norm{u-S_Nu}_{L^2(-\pi,\pi)}=0.
+$$
+
+The Fourier partial sums converge to $u$ in the $L^2$ norm. This statement
+does not assert pointwise or uniform convergence.
 :::
 
 Let $|\Om|$ denote the measure, or volume, of $\Om$:
@@ -1304,15 +1955,24 @@ $$
 H^k(\Om)=W^{k,2}(\Om).
 $$ {#eq-foundations-hk-wk2}
 
-Thus $H^k(\Om)$ is a Hilbert space. The case $k=1$ is used throughout this
-book.
+Thus $H^k(\Om)$ is a Hilbert space. In particular,
+
+$$
+H^1(\Om)=W^{1,2}(\Om),
+\qquad
+H^2(\Om)=W^{2,2}(\Om).
+$$ {#eq-foundations-h1-h2-notation}
+
+The space $H^1(\Om)$ is used to formulate the second-order boundary-value
+problems in this book. The additional derivatives supplied by $H^2(\Om)$ are
+used in interpolation and error estimates.
 
 ### The space $H^1(\Om)$
 
 For the second-order problems considered in this book,
 
 $$
-H^1(\Om)=
+H^1(\Om)=W^{1,2}(\Om)=
 \left\{v\in L^2(\Om):
 \frac{\partial v}{\partial x_i}\in L^2(\Om),\ i=1,\ldots,d
 \right\}.
@@ -1333,10 +1993,51 @@ $$
 $$ {#eq-h1-seminorm}
 
 For vector-valued fields we use $[H^1(\Om)]^d$, with the squared norm obtained
-by summing the squared $H^1$ norms of the components. From
-@eq-foundations-wkp-definition, membership in $H^2(\Om)$ requires the
-function and all of its first and second weak derivatives to belong to
-$L^2(\Om)$.
+by summing the squared $H^1$ norms of the components.
+
+### The space $H^2(\Om)$
+
+The space $H^2(\Om)=W^{2,2}(\Om)$ consists of functions whose weak
+derivatives through second order are square-integrable:
+
+$$
+H^2(\Om)
+=\left\{v\in L^2(\Om):
+\frac{\partial v}{\partial x_i}\in L^2(\Om),
+\ \frac{\partial^2v}{\partial x_i\partial x_j}\in L^2(\Om),
+\ i,j=1,\ldots,d
+\right\}.
+$$ {#eq-foundations-h2-definition}
+
+Its norm and second-order seminorm are
+
+$$
+\norm{v}_{H^2(\Om)}^2
+=\sum_{|\alpha|\leq2}
+\norm{D^\alpha v}_{L^2(\Om)}^2
+$$ {#eq-foundations-h2-norm}
+
+and
+
+$$
+\seminorm{v}_{H^2(\Om)}^2
+=\sum_{|\alpha|=2}
+\norm{D^\alpha v}_{L^2(\Om)}^2.
+$$ {#eq-foundations-h2-seminorm}
+
+The second weak derivatives form the Hessian matrix
+
+$$
+(\operatorname{Hess}v)_{ij}
+=\frac{\partial^2v}{\partial x_i\partial x_j}.
+$$
+
+For vector-valued fields, $[H^2(\Om)]^d$ is defined componentwise.
+
+For first-order finite elements, the $H^2$ seminorm measures the second
+derivatives that appear in estimates of the error in the $H^1$ norm. These
+estimates are introduced after the finite element interpolation operator has
+been defined.
 
 ::: {#exr-foundations-weak-tent-function}
 ## Weak derivative of a tent function
@@ -1346,10 +2047,11 @@ $H^1(-1,1)$ and whether it belongs to $H^2(-1,1)$, justifying both answers.
 :::
 
 ::: {#exr-foundations-h1-norm}
-## Computing an $H^1$ norm
+## Computing $H^1$ and $H^2$ norms
 For $v(x)=x(1-x)$ on $(0,1)$, compute
-$\norm{v}_{L^2(0,1)}$, $\seminorm{v}_{H^1(0,1)}$, and
-$\norm{v}_{H^1(0,1)}$.
+$\norm{v}_{L^2(0,1)}$, $\seminorm{v}_{H^1(0,1)}$,
+$\norm{v}_{H^1(0,1)}$, $\seminorm{v}_{H^2(0,1)}$, and
+$\norm{v}_{H^2(0,1)}$.
 :::
 
 ### Traces and homogeneous boundary data
@@ -1412,8 +2114,10 @@ this homogeneous space.
 
 ## Functionals and forms {#sec-foundations-duality}
 
-A functional maps an element in the vector space to a real number and in general the mapping can be nonlinear. Forms have two arguments and will be used to express the
-dependence of a variational problem on its trial and test functions.
+A functional assigns a real number to each element of a vector space and need
+not be linear. The bilinear and semilinear forms introduced below have two
+arguments. They will be used to express how a variational problem depends on
+its trial and test functions.
 
 ::: {#def-functional}
 ## Functional

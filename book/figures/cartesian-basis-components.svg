@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="440" viewBox="0 0 760 440" role="img" aria-labelledby="title desc">
+  <title id="title">Cartesian basis and vector components in two dimensions</title>
+  <desc id="desc">A vector a is resolved into components a1 and a2 along the orthonormal basis vectors e1 and e2.</desc>
+  <defs>
+    <marker id="arrow-gray" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#687078"/>
+    </marker>
+    <marker id="arrow-teal" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#148b90"/>
+    </marker>
+    <marker id="arrow-navy" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#002554"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="440" fill="#ffffff"/>
+
+  <!-- Cartesian axes -->
+  <line x1="105" y1="350" x2="690" y2="350" stroke="#687078" stroke-width="2.2" marker-end="url(#arrow-gray)"/>
+  <line x1="105" y1="350" x2="105" y2="52" stroke="#687078" stroke-width="2.2" marker-end="url(#arrow-gray)"/>
+  <text x="700" y="358" font-family="Arial, sans-serif" font-size="22" fill="#40464b">x<tspan baseline-shift="sub" font-size="15">1</tspan></text>
+  <text x="91" y="42" font-family="Arial, sans-serif" font-size="22" fill="#40464b">x<tspan baseline-shift="sub" font-size="15">2</tspan></text>
+  <text x="82" y="376" font-family="Arial, sans-serif" font-size="20" fill="#40464b">O</text>
+
+  <!-- Unit basis vectors -->
+  <line x1="105" y1="350" x2="225" y2="350" stroke="#148b90" stroke-width="5" marker-end="url(#arrow-teal)"/>
+  <line x1="105" y1="350" x2="105" y2="230" stroke="#148b90" stroke-width="5" marker-end="url(#arrow-teal)"/>
+  <text x="182" y="382" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#148b90">e<tspan baseline-shift="sub" font-size="16">1</tspan></text>
+  <text x="66" y="260" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#148b90">e<tspan baseline-shift="sub" font-size="16">2</tspan></text>
+
+  <!-- Vector and component projections -->
+  <line x1="105" y1="350" x2="530" y2="112" stroke="#002554" stroke-width="5.5" marker-end="url(#arrow-navy)"/>
+  <line x1="530" y1="112" x2="530" y2="350" stroke="#9ca3a8" stroke-width="2.2" stroke-dasharray="8 7"/>
+  <line x1="105" y1="112" x2="530" y2="112" stroke="#9ca3a8" stroke-width="2.2" stroke-dasharray="8 7"/>
+  <circle cx="530" cy="112" r="5.5" fill="#002554"/>
+
+  <text x="455" y="91" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#002554">a</text>
+  <text x="302" y="382" font-family="Arial, sans-serif" font-size="23" fill="#40464b">a<tspan baseline-shift="sub" font-size="15">1</tspan></text>
+  <text x="62" y="173" font-family="Arial, sans-serif" font-size="23" fill="#40464b">a<tspan baseline-shift="sub" font-size="15">2</tspan></text>
+
+  <text x="395" y="420" font-family="Arial, sans-serif" font-size="24" fill="#002554">
+    a = a<tspan baseline-shift="sub" font-size="16">1</tspan><tspan baseline-shift="baseline">e</tspan><tspan baseline-shift="sub" font-size="16">1</tspan><tspan baseline-shift="baseline"> + a</tspan><tspan baseline-shift="sub" font-size="16">2</tspan><tspan baseline-shift="baseline">e</tspan><tspan baseline-shift="sub" font-size="16">2</tspan>
+  </text>
+</svg>
