@@ -178,8 +178,9 @@ of $\bm{z}\in\R^{d-1}$.
 The fine distinctions among boundary regularity classes are not a main topic
 of this book. When a result requires a Lipschitz boundary, a positive-measure
 Dirichlet boundary, or another geometric property, that condition will be
-assumed at the outset. These assumptions allow us to use traces, outward unit
-normals, integration by parts, and Poincare-type inequalities without
+assumed at the outset. These assumptions allow us to assign boundary values to
+$H^1$ functions, use outward unit normals, apply integration by parts, and use
+Poincare-type inequalities without
 interrupting the finite element development with additional technical proofs.
 :::
 
@@ -1830,15 +1831,25 @@ the closure of the set on which it is nonzero. The space
 $C_0^\infty(\Om)$ consists of infinitely differentiable functions whose
 support is a compact subset of $\Om$. Such functions vanish in a neighborhood
 of $\partial\Om$ and are commonly called **test functions**.
-Suppose first that $u$ is smooth and $\varphi\in C_0^\infty(\Om)$. Integration
-by parts gives
+Suppose first that $u$ is smooth and $\varphi\in C_0^\infty(\Om)$. For a fixed
+index $i$, apply @eq-foundations-green-scalar-indicial with the scalar field
+$\varphi$ and the vector field $u\bm{e}_i$. This gives the complete
+integration-by-parts identity
+
+$$
+\int_{\Om}\varphi\frac{\partial u}{\partial x_i}\,\dx
+=-\int_{\Om}u\frac{\partial\varphi}{\partial x_i}\,\dx
++\int_{\partial\Om}u\varphi n_i\,\ds.
+$$
+
+The boundary integral is zero because $\varphi=0$ on $\partial\Om$.
+Therefore,
 
 $$
 \int_{\Om}\frac{\partial u}{\partial x_i}\varphi\,\dx
 =-\int_{\Om}u\frac{\partial\varphi}{\partial x_i}\,\dx.
 $$ {#eq-foundations-weak-derivative-motivation}
 
-The boundary term vanishes because $\varphi$ has compact support in $\Om$.
 @eq-foundations-weak-derivative-motivation can therefore define a
 derivative without assuming that $u$ is classically differentiable.
 
@@ -2054,19 +2065,40 @@ $\norm{v}_{H^1(0,1)}$, $\seminorm{v}_{H^2(0,1)}$, and
 $\norm{v}_{H^2(0,1)}$.
 :::
 
-### Traces and homogeneous boundary data
+### Boundary values and the trace operator
 
-An $H^1$ function need not have pointwise boundary values in the classical
-sense. On a sufficiently regular domain, the trace operator assigns a boundary
-value to each $H^1$ function continuously. This allows us to define
+For a function in $C(\overline{\Om})$, the value on the boundary is obtained
+by ordinary evaluation. A function in $H^1(\Om)$ need not be continuous, so
+its value at an individual boundary point may not be defined. Nevertheless,
+when $\Om$ is a bounded Lipschitz domain, there is a continuous linear mapping
+
+$$
+\operatorname{Tr}:H^1(\Om)\to L^2(\partial\Om)
+$$
+
+that agrees with ordinary boundary evaluation whenever the function is also
+continuous on $\overline{\Om}$. The boundary function
+$\operatorname{Tr}v$ is called the **trace** of $v$. Thus the statement
+$v=g$ on a boundary portion $\Gamma$ means
+$\operatorname{Tr}v=g$ almost everywhere on $\Gamma$.
+
+This allows us to define
 
 $$
 H^1_{0,\Gam_D}(\Om)
-=\{v\in H^1(\Om):v=0\text{ on }\Gam_D\},
+=\{v\in H^1(\Om):v=0\text{ on }\Gam_D\}.
 $$ {#eq-foundations-h1-gamma-d}
 
-where the boundary equality is understood in the trace sense. When
-$\Gam_D=\partial\Om$, this space is denoted $H_0^1(\Om)$.
+When $\Gam_D=\partial\Om$, this space is denoted $H_0^1(\Om)$.
+
+::: {#rem-foundations-boundary-value-convention}
+## Boundary-value convention
+After introducing the trace operator, we will usually say that an
+$H^1$ function **has the boundary value** $g$ on $\Gamma$, and we will write
+$v=g$ on $\Gamma$. This wording is shorthand for
+$\operatorname{Tr}v=g$ almost everywhere on $\Gamma$. We will use the word
+“trace” explicitly only when the operator or a trace estimate is relevant.
+:::
 
 ::: {#exm-foundations-boundary-value-spaces}
 ## Homogeneous and nonhomogeneous boundary-value spaces
@@ -2201,8 +2233,9 @@ $$
 $$
 
 Let $\Gamma_t\subset\partial\Om$ be a measurable boundary portion on which a
-traction $\bm{t}\in[L^2(\Gamma_t)]^d$ is prescribed. The trace of $\bm{v}$ is
-defined on $\Gamma_t$, and the traction defines the functional
+traction $\bm{t}\in[L^2(\Gamma_t)]^d$ is prescribed. The field $\bm{v}$ has a
+well-defined boundary value on $\Gamma_t$, and the traction defines the
+functional
 
 $$
 \ell_t(\bm{v})

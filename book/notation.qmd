@@ -76,7 +76,7 @@ Uppercase operators distinguish differentiation with respect to reference coordi
 |---|---|
 | $L^2(\Om)$ | Square-integrable scalar functions on $\Om$ |
 | $H^m(\Om)$ | Functions with square-integrable weak derivatives through order $m$ |
-| $H_0^1(\Om)$ | $H^1$ functions with zero trace on the prescribed boundary |
+| $H_0^1(\Om)$ | $H^1$ functions with zero prescribed boundary value |
 | $\U$ | Generic trial space |
 | $\V$ | Generic test or variational space |
 | $\Ug$ | Trial space satisfying prescribed Dirichlet data $g$ |

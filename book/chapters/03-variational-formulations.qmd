@@ -45,10 +45,10 @@ $$
 $$ {#eq-variational-coefficient-bounds}
 
 Assume $k\in L^\infty(\Om)$, $f\in L^2(\Om)$, and
-$h\in L^2(\Gam_N)$. The Dirichlet datum $g$ is assumed to be the trace on
-$\Gam_D$ of at least one function in $H^1(\Om)$. These assumptions make the
-trial space nonempty and the volume and boundary terms in the weak formulation
-well defined.
+$h\in L^2(\Gam_N)$. We assume that at least one function in $H^1(\Om)$ has
+boundary value $g$ on $\Gam_D$. These assumptions make the trial space
+nonempty and the volume and boundary terms in the weak formulation well
+defined.
 
 Here $u$ is the primary field, $f$ is a volume source, $g$ is prescribed
 Dirichlet data, and $h$ is the prescribed conormal derivative. For heat
@@ -70,7 +70,7 @@ $$
 =\{w\in H^1(\Om):w=g\text{ on }\Gam_D\},
 $$ {#eq-variational-trial-space}
 
-where the boundary equality is understood in the trace sense. Admissible test
+using the boundary-value convention introduced in Chapter 2. Admissible test
 functions vanish on $\Gam_D$:
 
 $$
@@ -85,7 +85,7 @@ with one space $V$ for both trial and test functions hides an important part of
 the formulation.
 
 To convert the problem to one posed on a linear space, choose a lifting
-$u_g\in H^1(\Om)$ whose trace equals $g$ on $\Gam_D$ and write
+$u_g\in H^1(\Om)$ that has boundary value $g$ on $\Gam_D$ and write
 
 $$
 u=u_g+w,
@@ -164,7 +164,7 @@ Let $\Om=(0,1)$, $k=1$, and $f=1$. Impose $u(0)=0$ and $u'(1)=0$.
 
 The Dirichlet condition is called **essential** because it is imposed through
 membership in $\Ug$ and $\Vzero$. A candidate that does not satisfy the
-Dirichlet trace is not admissible.
+prescribed Dirichlet boundary value is not admissible.
 
 The Neumann condition is called **natural** because it enters through the
 boundary term produced by integration by parts. It contributes to $\ell(v)$ and
@@ -196,7 +196,7 @@ The derivation shows that a sufficiently smooth solution of the strong problem
 also satisfies the weak problem. The converse needs additional regularity. If a
 weak solution is smooth enough, testing first with compactly supported functions
 recovers @eq-variational-strong-pde in the interior. Allowing test functions with
-nonzero traces on $\Gam_N$ then recovers the natural boundary condition. Thus the
+nonzero boundary values on $\Gam_N$ then recovers the natural boundary condition. Thus the
 two statements are equivalent when the solution and data are sufficiently
 regular [@suli2012; @larson-bengzon2010].
 
@@ -212,7 +212,7 @@ are sufficiently smooth.
 
 1. Use test functions with compact support in $\Om$ to recover
    @eq-variational-strong-pde in the interior.
-2. Then allow test functions with nonzero trace on $\Gam_N$ and recover the
+2. Then allow test functions with nonzero boundary values on $\Gam_N$ and recover the
    Neumann condition in @eq-variational-boundary-data.
 
 For each part, state where the argument uses the freedom to choose the test
@@ -361,7 +361,8 @@ to be made explicitly [@jog].
 The same steps extend to vector-valued fields. For small-strain quasistatic
 elasticity, assume
 $\bb\in[L^2(\Om)]^d$ and $\bt\in[L^2(\Gam_N)]^d$, and let the prescribed
-displacement $\bm{g}$ be the trace of a function in $[H^1(\Om)]^d$. The
+displacement $\bm{g}$ be the boundary value of a function in
+$[H^1(\Om)]^d$. The
 strong problem is
 
 $$
