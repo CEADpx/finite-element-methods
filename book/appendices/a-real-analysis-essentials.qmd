@@ -1,0 +1,330 @@
+# Essential Real Analysis for Finite Element Methods {#sec-appendix-real-analysis}
+
+```{=latex}
+\chaptershorttitle{Real Analysis Essentials}
+```
+
+**Purpose.** This appendix supplements Chapter 2 and reviews a small collection of real-analysis concepts that appear repeatedly in finite element analysis and Sobolev-space arguments. The emphasis is on geometric and analytical meaning, useful examples, and the distinctions that are easy to blur: maximum versus supremum, closed versus bounded, pointwise versus uniform convergence, and supremum versus essential supremum. 
+
+## Sets in $\mathbb{R}^d$: balls, neighborhoods, interior, closure, and boundary
+
+For $\bm{x}\in\mathbb{R}^d$ and $r>0$, the **open ball** centered at $\bm{x}$ with radius $r$ is $$B_r(\bm{x})=\{\bm{y}\in\mathbb{R}^d:\left\lVert \bm{y}-\bm{x}\right\rVert_2<r\}.$$ The corresponding **closed ball** is $$\overline B_r(\bm{x})=\{\bm{y}\in\mathbb{R}^d:\left\lVert \bm{y}-\bm{x}\right\rVert_2\le r\}.$$ A set $U\subset\mathbb{R}^d$ is **open** if every point of $U$ has some open ball contained entirely in $U$: $$\forall \bm{x}\in U,\qquad \exists r>0\quad\text{such that}\quad B_r(\bm{x})\subset U.$$ A set $F\subset\mathbb{R}^d$ is **closed** if its complement $\mathbb{R}^d\setminus F$ is open.
+
+The **interior** of a set $A$, denoted $A^\circ$, is the union of all open subsets of $A$. Equivalently, $\bm{x}\in A^\circ$ if some open ball centered at $\bm{x}$ lies in $A$.
+
+The **closure** $\overline A$ consists of $A$ together with all points that can be approached arbitrarily closely by points of $A$. Equivalently, $$\bm{x}\in\overline A
+\quad\Longleftrightarrow\quad
+B_r(\bm{x})\cap A\ne\varnothing\quad\text{for every }r>0.$$ The **boundary** is $$\partial A=\overline A\setminus A^\circ.$$ A point on $\partial A$ has points of $A$ and points outside $A$ arbitrarily close to it.
+
+A useful sequential characterization is:
+
+**Closed-set criterion.** A set $F\subset\mathbb{R}^d$ is closed if and only if every convergent sequence $\{\bm{x}_n\}\subset F$ has its limit in $F$. Thus $$\bm{x}_n\in F,\quad \bm{x}_n\to\bm{x}
+\quad\Longrightarrow\quad
+\bm{x}\in F.$$ This criterion is often easier to use than the complement-based definition of closedness.
+
+::: {#exm-appendix-real-open-closed}
+## Open, closed, and neither
+In $\mathbb{R}$, the interval $(0,1)$ is open, $[0,1]$ is closed, and $[0,1)$ is neither open nor closed. The set $\mathbb{R}$ and the empty set are both open and closed. In $\mathbb{R}^d$, an open ball $B_r(\bm{x})$ is open and a closed ball $\overline B_r(\bm{x})$ is closed.
+:::
+
+### Why this matters for PDEs {#why-this-matters-for-pdes .unnumbered}
+
+A physical domain $\Omega$ is usually modeled as an open set because differential equations are imposed at interior points. Boundary conditions are prescribed on $\partial\Omega$. Many analytical results require additional regularity of the boundary, such as the Lipschitz assumption used in Chapter 2.
+
+## Bounded sets and compact sets
+
+A set $A\subset\mathbb{R}^d$ is **bounded** if it fits inside some sufficiently large ball: there are $\bm{x}_0\in\mathbb{R}^d$ and $R>0$ such that $$A\subset B_R(\bm{x}_0).$$ Boundedness and closedness are different properties. The interval $(0,1)$ is bounded but not closed. The set $[0,\infty)$ is closed but unbounded.
+
+A set $K\subset\mathbb{R}^d$ is **compact** if every open cover of $K$ has a finite subcover. For work in finite-dimensional Euclidean spaces, the following characterization is usually the most useful.
+
+**Heine--Borel theorem.** A subset $K\subset\mathbb{R}^d$ is compact if and only if it is closed and bounded.
+
+An equally useful sequential formulation is:
+
+**Sequential compactness.** A set $K\subset\mathbb{R}^d$ is compact if and only if every sequence in $K$ has a subsequence that converges to a point in $K$.
+
+::: {#exm-appendix-real-bounded-not-compact}
+## A bounded set that is not compact
+The interval $(0,1)$ is bounded, but it is not compact because it is not closed. The sequence $$x_n=\frac1n$$ lies in $(0,1)$ and converges to $0$, which does not belong to the interval.
+:::
+
+Compactness becomes much subtler in infinite-dimensional function spaces. Closed and bounded subsets of an infinite-dimensional normed space need not be compact. This distinction becomes important in advanced existence and approximation theory, but the finite-dimensional Heine--Borel theorem is enough for the present supplement.
+
+## Sequences, limits, subsequences, and Cauchy sequences
+
+A sequence in $\mathbb{R}^d$ is an ordered list $\{\bm{x}_n\}_{n=1}^\infty$. We say $$\bm{x}_n\to\bm{x}$$ if for every $\varepsilon>0$ there exists $N$ such that $$n\ge N\quad\Longrightarrow\quad \left\lVert \bm{x}_n-\bm{x}\right\rVert_2<\varepsilon.$$ The limit, if it exists, is unique.
+
+A **subsequence** is formed by selecting indices $$n_1<n_2<n_3<\cdots$$ and considering $\{\bm{x}_{n_k}\}$. A convergent sequence and all of its subsequences have the same limit. The converse is false: a nonconvergent sequence can have convergent subsequences.
+
+A sequence is **Cauchy** if its terms become arbitrarily close to one another: $$\forall\varepsilon>0,\quad \exists N\quad\text{such that}\quad
+m,n\ge N\Longrightarrow \left\lVert \bm{x}_m-\bm{x}_n\right\rVert_2<\varepsilon.$$ Every convergent sequence is Cauchy. In $\mathbb{R}^d$, every Cauchy sequence converges. This completeness property is one of the prototypes for Banach and Hilbert spaces.
+
+**Bolzano--Weierstrass theorem.** Every bounded sequence in $\mathbb{R}^d$ has a convergent subsequence.
+
+::: {#exm-appendix-real-subsequences}
+## A sequence with two convergent subsequences
+The sequence $x_n=(-1)^n$ does not converge. Its even subsequence converges to $1$, while its odd subsequence converges to $-1$.
+:::
+
+## Upper and lower bounds, supremum and infimum
+
+Let $A\subset\mathbb{R}$ be nonempty. A number $M\in\mathbb{R}$ is an **upper bound** for $A$ if $$a\le M\qquad\forall a\in A.$$ A number $m$ is a **lower bound** if $$m\le a\qquad\forall a\in A.$$ If $A$ has an upper bound, it is **bounded above**. If it has a lower bound, it is **bounded below**.
+
+The **supremum** $\sup A$ is the least upper bound of $A$. Thus $s=\sup A$ means
+
+1.  $a\le s$ for all $a\in A$;
+
+2.  for every $\varepsilon>0$, there exists $a\in A$ such that $s-\varepsilon<a$.
+
+Similarly, $i=\inf A$ is the greatest lower bound.
+
+A **maximum** is an element of the set. We write $M=\max A$ if $$M\in A,\qquad a\le M\quad\forall a\in A.$$ Therefore a maximum is always a supremum, but a supremum need not be a maximum. Likewise, a minimum is always an infimum, but an infimum need not be a minimum.
+
+::: {#exm-appendix-real-supremum-no-maximum}
+## Supremum without a maximum
+For $A=(0,1)$, $$\sup A=1,\qquad \inf A=0,$$ but $A$ has neither a maximum nor a minimum because neither endpoint belongs to the set.
+:::
+
+::: {#exm-appendix-real-supremum-attained}
+## Supremum attained
+For $A=[0,1]$, $$\max A=\sup A=1,
+\qquad
+\min A=\inf A=0.$$ The difference is not the numerical values. It is whether the extremal values are attained by elements of the set.
+:::
+
+The completeness of $\mathbb{R}$ can be expressed through the **least-upper-bound property**: every nonempty subset of $\mathbb{R}$ that is bounded above has a supremum in $\mathbb{R}$.
+
+## Extrema of functions
+
+For a real-valued function $f:A\to\mathbb{R}$, define $$\sup_A f=\sup\{f(x):x\in A\},
+\qquad
+\inf_A f=\inf\{f(x):x\in A\}.$$ A maximum is attained at some $x_*\in A$ if $$f(x_*)\ge f(x)\qquad\forall x\in A.$$ Then $f(x_*)=\max_A f=\sup_A f$.
+
+::: {#exm-appendix-real-domain-extremum}
+## The domain controls whether an extremum exists
+Let $f(x)=x$.
+
+- On $(0,1)$, $\sup f=1$ and $\inf f=0$, but neither is attained.
+
+- On $[0,1]$, $\max f=1$ and $\min f=0$.
+
+The formula for the function has not changed. Only the domain has changed.
+:::
+
+### Local and global extrema
+
+A point $\bm{x}_*\in A$ is a **global maximum point** if $$f(\bm{x}_*)\ge f(\bm{x})\qquad\forall\bm{x}\in A.$$ It is a **local maximum point** if the same inequality holds only for points of $A$ sufficiently close to $\bm{x}_*$. Local minima are defined analogously. A global extremum is automatically local, but a local extremum need not be global.
+
+If $f$ is differentiable on an open set and has a local extremum at an interior point $\bm{x}_*$, then Fermat's necessary condition gives $$\nabla f(\bm{x}_*)=\bm{0}.$$ The converse is false: a stationary point need not be a maximum or minimum. This distinction becomes important in energy minimization and optimization.
+
+## Continuity
+
+Let $A\subset\mathbb{R}^d$ and $f:A\to\mathbb{R}^m$. The function is **continuous at** $\bm{x}\in A$ if for every $\varepsilon>0$ there exists $\delta>0$ such that $$\bm{y}\in A,\quad \left\lVert \bm{y}-\bm{x}\right\rVert_2<\delta
+\quad\Longrightarrow\quad
+\left\lVert f(\bm{y})-f(\bm{x})\right\rVert_2<\varepsilon.$$ It is continuous on $A$ if it is continuous at every point of $A$.
+
+A particularly useful equivalent statement is the sequential characterization: $$\bm{x}_n\to\bm{x}\text{ in }A
+\quad\Longrightarrow\quad
+f(\bm{x}_n)\to f(\bm{x}).$$
+
+Continuity is defined relative to the domain. A boundary point of a closed interval, for example, is tested only with points that remain in the interval. Thus $f:[0,1]\to\mathbb{R}$ can be continuous at $0$ even though the domain contains no points to the left of $0$.
+
+### Continuity on open and closed sets
+
+There is nothing intrinsically stronger about "continuity on a closed set" than "continuity on an open set." The important difference is that compact domains give additional consequences.
+
+**Continuous image of a compact set.** If $K\subset\mathbb{R}^d$ is compact and $f:K\to\mathbb{R}^m$ is continuous, then $f(K)$ is compact. In particular, a real-valued continuous function on a compact set has a compact range.
+
+**Extreme value theorem.** If $K\subset\mathbb{R}^d$ is compact and $f:K\to\mathbb{R}$ is continuous, then $f$ is bounded and attains both a maximum and a minimum: $$\exists \bm{x}_{\min},\bm{x}_{\max}\in K
+\quad\text{such that}\quad
+f(\bm{x}_{\min})\le f(\bm{x})\le f(\bm{x}_{\max})
+\quad\forall \bm{x}\in K.$$
+
+**Heine--Cantor theorem.** If $K\subset\mathbb{R}^d$ is compact and $f:K\to\mathbb{R}^m$ is continuous, then $f$ is uniformly continuous on $K$.
+
+::: {#exm-appendix-real-continuity-no-maximum}
+## Continuity alone does not guarantee a maximum
+The function $f(x)=x$ is continuous on the open interval $(0,1)$, but it has no maximum there. Compactness of the domain is what allows the extreme value theorem to apply.
+:::
+
+## Uniform continuity and Lipschitz continuity
+
+A function $f:A\to\mathbb{R}^m$ is **uniformly continuous** if $$\forall\varepsilon>0,\quad \exists\delta>0\quad\text{such that}\quad
+\left\lVert \bm{x}-\bm{y}\right\rVert_2<\delta
+\Longrightarrow
+\left\lVert f(\bm{x})-f(\bm{y})\right\rVert_2<\varepsilon$$ for all $\bm{x},\bm{y}\in A$. The key point is that one value of $\delta$ works everywhere in $A$.
+
+A function is **Lipschitz continuous** if there exists $L\ge0$ such that $$\left\lVert f(\bm{x})-f(\bm{y})\right\rVert_2
+\le L\left\lVert \bm{x}-\bm{y}\right\rVert_2
+\qquad\forall\bm{x},\bm{y}\in A.$$ Every Lipschitz function is uniformly continuous, and every uniformly continuous function is continuous. The converses are false in general.
+
+::: {#exm-appendix-real-not-uniformly-continuous}
+## Continuous but not uniformly continuous
+The function $f(x)=1/x$ is continuous on $(0,1)$ but not uniformly continuous there. Its variation becomes arbitrarily rapid near $x=0$.
+:::
+
+Lipschitz regularity appears in FEM in several ways: geometric mappings, Lipschitz domains, nonlinear constitutive mappings, and estimates in which bounded derivatives imply controlled changes in a function.
+
+### A useful derivative-to-Lipschitz estimate
+
+In one dimension, the mean value theorem implies that if $f$ is differentiable on an interval and $|f'(x)|\le L$, then $$|f(x)-f(y)|\le L|x-y|.$$ More generally, if $A\subset\mathbb{R}^d$ is convex, $f:A\to\mathbb{R}$ is differentiable, and $\left\lVert \nabla f(\bm{x})\right\rVert_2\le L$ throughout $A$, then $$|f(\bm{x})-f(\bm{y})|\le L\left\lVert \bm{x}-\bm{y}\right\rVert_2.$$ This is one common route from derivative bounds to continuity estimates.
+
+## Almost everywhere, essential supremum, and essential infimum
+
+Lebesgue spaces identify functions that differ only on sets of measure zero. This motivates the **essential supremum** and **essential infimum**.
+
+A property holds **almost everywhere** (a.e.) on $\Omega$ if it fails only on a set of measure zero. In $\mathbb{R}^d$, individual points and finite or countable sets have measure zero. A curve in a three-dimensional domain also has three-dimensional measure zero.
+
+For a measurable function $f:\Omega\to\mathbb{R}$, the essential supremum is $$\operatorname*{ess\,sup}_{x\in\Omega} f(x)
+=
+\inf\{M\in\mathbb{R}:f(x)\le M\text{ for almost every }x\in\Omega\}.$$ The essential infimum is $$\operatorname*{ess\,inf}_{x\in\Omega} f(x)
+=
+\sup\{m\in\mathbb{R}:m\le f(x)\text{ for almost every }x\in\Omega\}.$$ The adjective *essential* means that exceptional values on measure-zero sets are ignored.
+
+::: {#exm-appendix-real-essential-supremum}
+## Supremum and essential supremum can differ
+Define $f:[0,1]\to\mathbb{R}$ by $$f(x)=
+\begin{cases}
+100, & x=1/2,\\
+1, & x\ne 1/2.
+\end{cases}$$ Then $$\sup_{[0,1]}f=100,
+\qquad
+\operatorname*{ess\,sup}_{[0,1]}f=1.$$ The single exceptional point has measure zero.
+:::
+
+The $L^\infty$ norm is defined through the essential supremum: $$\left\lVert f\right\rVert_{L^\infty(\Omega)}
+=
+\operatorname*{ess\,sup}_{x\in\Omega}|f(x)|.$$ This makes the norm insensitive to changes on measure-zero sets, consistent with the way $L^p$ spaces are defined.
+
+For a coefficient field $k(\bm{x})$ in an elliptic PDE, assumptions such as $$0<k_{\min}
+\le k(\bm{x})
+\le k_{\max}<\infty
+\qquad\text{a.e. in }\Omega$$ are more naturally expressed as $$0<\operatorname*{ess\,inf}_{\Omega}k,
+\qquad
+\operatorname*{ess\,sup}_{\Omega}k<\infty.$$ These bounds later enter coercivity and continuity estimates.
+
+## Sequences of functions: pointwise and uniform convergence
+
+Let $f_n:A\to\mathbb{R}$ be a sequence of functions.
+
+The sequence converges **pointwise** to $f$ if, for every fixed $x\in A$, $$f_n(x)\to f(x).$$ The index $N$ required to make $|f_n(x)-f(x)|<\varepsilon$ is allowed to depend on $x$.
+
+The sequence converges **uniformly** to $f$ if $$\sup_{x\in A}|f_n(x)-f(x)|\to0.$$ Equivalently, for every $\varepsilon>0$ there exists one $N$ that works for all $x\in A$.
+
+Uniform convergence is stronger than pointwise convergence. A uniform limit of continuous functions is continuous. A pointwise limit of continuous functions need not be continuous.
+
+::: {#exm-appendix-real-pointwise-not-uniform}
+## Pointwise but not uniform convergence
+On $[0,1]$, let $$f_n(x)=x^n.$$ Then $$f_n(x)\to
+\begin{cases}
+0, & 0\le x<1,\\
+1, & x=1.
+\end{cases}$$ The limit is discontinuous, so the convergence cannot be uniform.
+:::
+
+In finite element analysis, one often studies convergence in a norm such as $L^2$ or $H^1$, which is different from both pointwise and uniform convergence. The important habit is to always ask: *in what sense is the approximation converging?*
+
+## A compact list of implications worth remembering
+
+For subsets of $\mathbb{R}^d$ and functions defined on them: $$\boxed{\text{compact in }\mathbb{R}^d\iff\text{closed and bounded}}$$ $$\boxed{\text{continuous on compact}\Longrightarrow\text{bounded and attains max/min}}$$ $$\boxed{\text{continuous on compact}\Longrightarrow\text{uniformly continuous}}$$ $$\boxed{\text{Lipschitz}\Longrightarrow\text{uniformly continuous}\Longrightarrow\text{continuous}}$$ $$\boxed{\max A\text{ exists}\Longrightarrow\max A=\sup A,\quad
+\min A\text{ exists}\Longrightarrow\min A=\inf A}$$ No reverse implication in these statements should be assumed without additional hypotheses.
+
+## Practice problems
+
+::: {#exr-appendix-real-sets-compactness}
+## A. Sets and compactness
+
+1.  Classify each set as open, closed, both, or neither in $\mathbb{R}$: $(0,2)$, $[0,2]$, $[0,2)$, $\mathbb{R}$, $\varnothing$.
+
+2.  For $A=(0,1]\subset\mathbb{R}$, determine $A^\circ$, $\overline A$, and $\partial A$.
+
+3.  Is the set $\{1/n:n\in\mathbb N,\ n\ge1\}$ closed in $\mathbb{R}$? Is it compact? Explain.
+
+4.  Determine whether each set is compact in $\mathbb{R}^2$: the open unit disk, the closed unit disk, the line segment $\{(x,0):0\le x\le1\}$, and the whole $x$-axis.
+:::
+
+::: {#exr-appendix-real-sequences}
+## B. Sequences and limits
+
+1.  Determine the limit of $x_n=(1/n,\,1-1/n)$ in $\mathbb{R}^2$.
+
+2.  Show that $x_n=(-1)^n+1/n$ does not converge, and identify two convergent subsequences.
+
+3.  Determine whether $x_n=\log(n+1)-\log n$ is Cauchy.
+
+4.  Give an example of a bounded sequence that does not converge but has a convergent subsequence.
+:::
+
+::: {#exr-appendix-real-bounds}
+## C. Supremum, infimum, maximum, minimum
+
+1.  For each set, determine $\sup$, $\inf$, $\max$, and $\min$ when they exist: $$(2,5),\qquad [2,5),\qquad \{1-1/n:n\ge1\},\qquad \{(-1)^n:n\ge1\}.$$
+
+2.  Let $f(x)=x(1-x)$ on $(0,1)$ and on $[0,1]$. Determine the supremum, infimum, maximum, and minimum in each case.
+
+3.  Let $f(x)=1/x$ on $(0,1)$. Is $f$ bounded above? Does it have a minimum?
+:::
+
+::: {#exr-appendix-real-continuity}
+## D. Continuity and extrema
+
+1.  Explain why $f(x)=x^2+1$ has a maximum and minimum on $[-2,3]$.
+
+2.  Does $f(x)=x^2+1$ have a maximum on $\mathbb{R}$? Does it have a minimum?
+
+3.  Give an example of a continuous function on a bounded open set that does not attain its supremum.
+
+4.  Show that $f(x)=x^2$ is Lipschitz on $[-1,1]$. Find one admissible Lipschitz constant.
+
+5.  Is $f(x)=\sqrt{x}$ Lipschitz on $[0,1]$? Is it uniformly continuous there?
+:::
+
+::: {#exr-appendix-real-essential-bounds}
+## E. Essential bounds
+
+1.  Define $f:[0,1]\to\mathbb{R}$ by $f(0)=7$ and $f(x)=2$ for $x>0$. Find $\sup f$, $\inf f$, $\operatorname*{ess\,sup}f$, and $\operatorname*{ess\,inf}f$.
+
+2.  Define $f(x)=1$ if $x$ is rational and $f(x)=0$ if $x$ is irrational on $[0,1]$. Determine $\sup f$, $\inf f$, $\operatorname*{ess\,sup}f$, and $\operatorname*{ess\,inf}f$.
+
+3.  Suppose $k(x)=2+x$ for almost every $x\in(0,1)$ but $k(1/2)=1000$. Find $\operatorname*{ess\,inf}k$ and $\operatorname*{ess\,sup}k$.
+:::
+
+::: {#exr-appendix-real-function-convergence}
+## F. Pointwise and uniform convergence
+
+1.  For $f_n(x)=x/n$ on $[0,1]$, determine the pointwise limit and show that the convergence is uniform.
+
+2.  For $f_n(x)=x^n$ on $[0,1]$, compute $\sup_{x\in[0,1]}|f_n(x)-f(x)|$ for the pointwise limit $f$ and explain why convergence is not uniform.
+
+3.  Let $f_n(x)=1/(n+x)$ on $[0,\infty)$. Determine whether $f_n\to0$ uniformly.
+:::
+
+## Selected answers {#sec-appendix-real-analysis-answers .unnumbered}
+
+### A. Sets and compactness {.unnumbered}
+
+1.  $(0,2)$ open; $[0,2]$ closed; $[0,2)$ neither; $\mathbb{R}$ and $\varnothing$ both open and closed.
+
+2.  $A^\circ=(0,1)$, $\overline A=[0,1]$, $\partial A=\{0,1\}$.
+
+3.  The set is not closed because $0$ is a limit point not contained in it; therefore it is not compact.
+
+4.  Only the closed unit disk and the line segment are compact.
+
+### C. Supremum, infimum, maximum, minimum {.unnumbered}
+
+1.  $(2,5)$: $\sup=5$, $\inf=2$, no max/min. $[2,5)$: $\sup=5$, $\inf=\min=2$, no max. For $\{1-1/n\}$: $\sup=1$, no max, $\inf=\min=0$. For $\{(-1)^n\}$: $\sup=\max=1$, $\inf=\min=-1$.
+
+2.  On both domains, $\sup=\max=1/4$ at $x=1/2$. On $(0,1)$, $\inf=0$ but no minimum; on $[0,1]$, $\inf=\min=0$.
+
+3.  Unbounded above; minimum $1$ is not attained on $(0,1)$, so there is no minimum and $\inf=1$.
+
+### E. Essential bounds {.unnumbered}
+
+1.  $\sup=7$, $\inf=2$, $\operatorname*{ess\,sup}=\operatorname*{ess\,inf}=2$.
+
+2.  $\sup=1$, $\inf=0$, $\operatorname*{ess\,sup}=0$, $\operatorname*{ess\,inf}=0$ because the rationals have measure zero.
+
+3.  $\operatorname*{ess\,inf}k=2$ and $\operatorname*{ess\,sup}k=3$.
+
+

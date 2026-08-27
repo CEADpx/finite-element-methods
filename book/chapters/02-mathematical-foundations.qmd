@@ -9,7 +9,7 @@ functional analysis. Students often encounter these subjects separately. This
 chapter collects the concepts needed to formulate boundary-value problems and
 their finite element approximations in a consistent notation. The treatment is
 selective and assumes only multivariable calculus and elementary linear
-algebra.
+algebra. Additional details related to real analysis and tensor and continuum mechanics concepts used in this chapter can be found in @sec-appendix-real-analysis and @sec-appendix-tensor-notation.
 
 ## Sets and basic notation {#sec-foundations-sets}
 

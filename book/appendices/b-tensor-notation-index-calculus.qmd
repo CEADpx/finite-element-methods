@@ -1,0 +1,399 @@
+# Tensor Notation and Index Calculus {#sec-appendix-tensor-notation}
+
+```{=latex}
+\chaptershorttitle{Tensor Notation}
+```
+
+**Purpose.** This appendix supplements Chapter 2 and develops the notation used in finite element and continuum-mechanics calculations and provides practice translating among symbolic, component, and matrix forms.
+
+## Indices and the Einstein summation convention
+
+In a Cartesian basis $\{\bm{e}_1,\ldots,\bm{e}_d\}$, a vector is written $$\bm{a}=a_i\bm{e}_i.$$ Unless stated otherwise, repeated indices are summed over the spatial dimensions. Thus $$a_i b_i=\sum_{i=1}^d a_i b_i.$$ This is the **Einstein summation convention**.
+
+An index that appears exactly once in every term is a **free index**. A repeated index in one term is a **dummy index**; its name can be changed without changing the expression. For example, $$A_{ij}b_j=A_{ik}b_k$$ because $j$ and $k$ are dummy indices. The free index is $i$.
+
+A valid indexed equation must have the same free indices in every term. For example, $$c_i=A_{ij}b_j+d_i$$ is valid, while $$c_i=A_{ij}b_j+d_k$$ is not a valid component equation because the free indices do not match.
+
+As a practical rule, in ordinary tensor algebra an index should not appear more than twice in a single monomial unless the expression has been defined with a different convention.
+
+::: {#exm-appendix-tensor-indexed-expression}
+## Reading an indexed expression
+Consider $$y_i=A_{ij}B_{jk}x_k.$$ The free index is $i$. The indices $j$ and $k$ are summed. In matrix form this is simply $$\bm{y}=\bm{A}\bm{B}\bm{x}.$$
+:::
+
+## Kronecker delta
+
+The **Kronecker delta** is $$\delta_{ij}=
+\begin{cases}
+1, & i=j,\\
+0, & i\ne j.
+\end{cases}$$ It represents the components of the second-order identity tensor, $$\bm{I}=\delta_{ij}\bm{e}_i\otimes\bm{e}_j.$$ Its most useful property is index substitution: $$\delta_{ij}a_j=a_i,
+\qquad
+\delta_{ik}A_{kj}=A_{ij}.$$ Other useful identities include $$\delta_{ii}=d,
+\qquad
+\delta_{ij}\delta_{jk}=\delta_{ik}.$$
+
+::: {#exm-appendix-tensor-delta-expression}
+## Simplifying a delta expression
+Simplify $\delta_{ij}\delta_{jk}a_k$: $$\delta_{ij}\delta_{jk}a_k
+=\delta_{ik}a_k
+=a_i.$$
+:::
+
+## Vectors, dot products, and dyadic products
+
+For vectors $\bm{a}=a_i\bm{e}_i$ and $\bm{b}=b_i\bm{e}_i$, $$\bm{a}\cdot\bm{b}=a_i b_i.$$ Their **dyadic product** is the second-order tensor $$\bm{a}\otimes\bm{b}=a_i b_j\,\bm{e}_i\otimes\bm{e}_j,
+\qquad
+(\bm{a}\otimes\bm{b})_{ij}=a_i b_j.$$ Its action on a vector $\bm{c}$ is $$(\bm{a}\otimes\bm{b})\bm{c}
+=\bm{a}(\bm{b}\cdot\bm{c}).$$ The order matters: $\bm{a}\otimes\bm{b}$ and $\bm{b}\otimes\bm{a}$ are generally different.
+
+::: {#exm-appendix-tensor-dyadic-product}
+## Dyadic product
+Let $\bm{a}=(1,2)^T$ and $\bm{b}=(3,-1)^T$. Then $$\bm{a}\otimes\bm{b}
+=
+\begin{bmatrix}
+3&-1\\
+6&-2
+\end{bmatrix}.$$ For $\bm{c}=(1,1)^T$, $\bm{b}\cdot\bm{c}=2$, so $$(\bm{a}\otimes\bm{b})\bm{c}=2\bm{a}=(2,4)^T.$$
+:::
+
+## Second-order tensors
+
+A second-order tensor $\bm{A}$ is a linear mapping from vectors to vectors:
+
+$$
+\bm{A}(\alpha\bm{a}+\beta\bm{b})
+=\alpha\bm{A}\bm{a}+\beta\bm{A}\bm{b}
+$$
+
+for all vectors $\bm{a}$ and $\bm{b}$ and all scalars $\alpha$ and $\beta$.
+This definition does not require a basis. The tensor is the mapping itself: it
+is specified by the vector $\bm{A}\bm{a}$ that it assigns to every vector
+$\bm{a}$. For example, the identity tensor leaves every vector unchanged. A
+Cauchy stress tensor assigns the traction $\bm{t}=\bm{\sigma}\bm{n}$ to a
+surface with unit normal $\bm{n}$. These statements describe the actions of
+the tensors without introducing components.
+
+Choosing a Cartesian basis does not create the tensor; it provides a numerical
+representation of its action. Apply $\bm{A}$ to each basis vector and resolve
+the result in the same basis:
+
+$$
+\bm{A}\bm{e}_j=A_{ij}\bm{e}_i,
+\qquad
+A_{ij}=\bm{e}_i\cdot(\bm{A}\bm{e}_j).
+$$
+
+For a fixed $j$, the values $A_{ij}$ are the components of
+$\bm{A}\bm{e}_j$ and form the $j$th column of the matrix representing
+$\bm{A}$. The tensor may then be written
+
+$$
+\bm{A}=A_{ij}\bm{e}_i\otimes\bm{e}_j.
+$$
+
+Its action on $\bm{a}$ is $$\bm{A}\bm{a}
+=A_{ij}a_j\bm{e}_i,
+\qquad
+(\bm{A}\bm{a})_i=A_{ij}a_j.$$
+
+::: {#rem-appendix-tensor-object-matrix}
+## Tensor and matrix
+The tensor $\bm{A}$ and its component matrix $[A_{ij}]$ are not the same
+object. The tensor is the linear mapping, whereas the matrix records that
+mapping in a selected basis. A different basis generally gives a different
+matrix, but the vector $\bm{A}\bm{a}$ produced by the tensor is unchanged.
+:::
+
+::: {#exm-appendix-tensor-projection}
+## A tensor defined without a basis
+Let $\bm{n}$ be a unit vector and define
+
+$$
+\bm{P}\bm{a}=(\bm{a}\cdot\bm{n})\bm{n}
+$$
+
+for every vector $\bm{a}$. The tensor $\bm{P}=\bm{n}\otimes\bm{n}$ keeps
+the component of $\bm{a}$ parallel to $\bm{n}$ and removes the perpendicular
+component. This definition is independent of coordinates. In two dimensions,
+if a Cartesian basis is chosen with $\bm{e}_1=\bm{n}$, then
+
+$$
+[P_{ij}]=
+\begin{bmatrix}
+1&0\\
+0&0
+\end{bmatrix}.
+$$
+
+Another basis gives different entries, but it represents the same projection
+tensor.
+:::
+
+### Transpose, trace, and identity
+
+The transpose satisfies $$(\bm{A}^T)_{ij}=A_{ji}.$$ The trace is $$\operatorname{tr}\bm{A}=A_{ii}.$$ The identity tensor has components $I_{ij}=\delta_{ij}$ and satisfies $$\bm{I}\bm{a}=\bm{a},
+\qquad
+\bm{I}\bm{A}=\bm{A}\bm{I}=\bm{A}.$$
+
+### Tensor multiplication
+
+The product $\bm{A}\bm{B}$ has components $$(\bm{A}\bm{B})_{ij}=A_{ik}B_{kj}.$$ This is ordinary matrix multiplication in a Cartesian basis. In general, $$\bm{A}\bm{B}\ne\bm{B}\bm{A}.$$
+
+### Double contraction and Frobenius norm
+
+The double contraction is $$\bm{A}:\bm{B}=A_{ij}B_{ij}=\operatorname{tr}(\bm{A}^T\bm{B}).$$ The associated Frobenius norm is $$\left\lVert \bm{A}\right\rVert_F=(\bm{A}:\bm{A})^{1/2}=(A_{ij}A_{ij})^{1/2}.$$ A useful identity is $$\bm{A}:(\bm{a}\otimes\bm{b})=a_iA_{ij}b_j=\bm{a}\cdot(\bm{A}\bm{b}).$$
+
+### Symmetric and skew parts
+
+Every second-order tensor can be decomposed as $$\bm{A}=\operatorname{sym}\bm{A}+\operatorname{skw}\bm{A},$$ where $$\operatorname{sym}\bm{A}=\frac12(\bm{A}+\bm{A}^T),
+\qquad
+\operatorname{skw}\bm{A}=\frac12(\bm{A}-\bm{A}^T).$$ The two parts are orthogonal with respect to the double contraction: $$(\operatorname{sym}\bm{A}):(\operatorname{skw}\bm{A})=0.$$ If $\bm{S}$ is symmetric and $\bm{W}$ is skew-symmetric, then $\bm{S}:\bm{W}=0$.
+
+::: {#exm-appendix-tensor-sym-skew}
+## Symmetric and skew decomposition
+For $$\bm{A}=\begin{bmatrix}2&3\\-1&4\end{bmatrix},$$ $$\operatorname{sym}\bm{A}=
+\begin{bmatrix}2&1\\1&4\end{bmatrix},
+\qquad
+\operatorname{skw}\bm{A}=
+\begin{bmatrix}0&2\\-2&0\end{bmatrix}.$$
+:::
+
+## Trace, spherical part, and deviatoric part
+
+In $d$ dimensions, the spherical and deviatoric parts are $$\bm{A}_{\mathrm{sph}}=\frac{1}{d}(\operatorname{tr}\bm{A})\bm{I},
+\qquad
+\operatorname{dev}\bm{A}=\bm{A}-\frac{1}{d}(\operatorname{tr}\bm{A})\bm{I}.$$ By construction, $$\operatorname{tr}(\operatorname{dev}\bm{A})=0.$$ For the Cauchy stress tensor in three dimensions, this decomposition separates hydrostatic and deviatoric contributions.
+
+## The Levi-Civita symbol in three dimensions
+
+The permutation symbol $\epsilon_{ijk}$ is defined by $$\epsilon_{ijk}=
+\begin{cases}
++1, & (i,j,k)\text{ is an even permutation of }(1,2,3),\\
+-1, & (i,j,k)\text{ is an odd permutation of }(1,2,3),\\
+0, & \text{if any two indices are equal}.
+\end{cases}$$ The cross product can be written $$(\bm{a}\times\bm{b})_i=\epsilon_{ijk}a_jb_k.$$ A central identity is $$\epsilon_{ijk}\epsilon_{imn}
+=\delta_{jm}\delta_{kn}-\delta_{jn}\delta_{km}.$$ This identity is useful for converting products of cross products into dot products.
+
+::: {#exm-appendix-tensor-lagrange-identity}
+## Lagrange identity
+Using the epsilon-delta identity, $$\left\lVert \bm{a}\times\bm{b}\right\rVert^2
+=(\bm{a}\cdot\bm{a})(\bm{b}\cdot\bm{b})-(\bm{a}\cdot\bm{b})^2.$$ This is the familiar relation between the magnitude of a cross product and the angle between two vectors.
+:::
+
+## Fourth-order tensors
+
+A fourth-order tensor may be written $$\mathbb{C}=C_{ijkl}\,
+\bm{e}_i\otimes\bm{e}_j\otimes\bm{e}_k\otimes\bm{e}_l.$$ Its double contraction with a second-order tensor is another second-order tensor: $$(\mathbb{C}:\bm{A})_{ij}=C_{ijkl}A_{kl}.$$ The fourth-order identity on all second-order tensors is $$\mathbb{I}_{ijkl}=\delta_{ik}\delta_{jl},
+\qquad
+\mathbb{I}:\bm{A}=\bm{A}.$$ For symmetric second-order tensors, the symmetric fourth-order identity is $$\mathbb{I}^{s}_{ijkl}
+=\frac12\left(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}\right),$$ so that $$\mathbb{I}^{s}:\bm{A}=\operatorname{sym}\bm{A}.$$
+
+### Example: isotropic linear elasticity
+
+The fourth-order elasticity tensor for an isotropic linear elastic material is $$C_{ijkl}
+=\lambda\delta_{ij}\delta_{kl}
++\mu(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}),$$ where $\lambda$ and $\mu$ are Lamé parameters. If $\bm{\varepsilon}$ is symmetric, $$\sigma_{ij}=C_{ijkl}\varepsilon_{kl}
+=\lambda\varepsilon_{kk}\delta_{ij}+2\mu\varepsilon_{ij},$$ or, in tensor notation, $$\bm{\sigma}=\lambda\operatorname{tr}(\bm{\varepsilon})\bm{I}+2\mu\bm{\varepsilon}.$$
+
+Common symmetries of the elasticity tensor are $$C_{ijkl}=C_{jikl}=C_{ijlk}$$ (minor symmetries) and, for an elastic potential, $$C_{ijkl}=C_{klij}$$ (major symmetry).
+
+## Tensor fields and differential operators
+
+Let $u:\Omega\to\mathbb{R}$ be a scalar field, $\bm{u}:\Omega\to\mathbb{R}^d$ a vector field, and $\bm{A}:\Omega\to\mathbb{R}^{d\times d}$ a second-order tensor field. A comma denotes partial differentiation: $$u_{,i}=\frac{\partial u}{\partial x_i},
+\qquad
+u_{i,j}=\frac{\partial u_i}{\partial x_j}.$$ Then $$(\nabla u)_i=u_{,i},
+\qquad
+(\nabla\bm{u})_{ij}=u_{i,j},$$ $$\nabla\cdot\bm{u}=u_{i,i},
+\qquad
+(\nabla\cdot\bm{A})_i=A_{ij,j},$$ and $$\Delta u=u_{,ii}.$$ The infinitesimal strain tensor is the symmetric gradient, $$\bm{\varepsilon}(\bm{u})=\operatorname{sym}(\nabla\bm{u}),
+\qquad
+\varepsilon_{ij}(\bm{u})=\frac12(u_{i,j}+u_{j,i}).$$ For a Cauchy stress field, $$(\nabla\cdot\bm{\sigma})_i=\sigma_{ij,j},
+\qquad
+\bm{t}=\bm{\sigma}\bm{n},
+\qquad
+t_i=\sigma_{ij}n_j.$$
+
+### Integration by parts in index notation
+
+The divergence theorem applied to $v_iA_{ij}$ gives $$\int_\Omega v_iA_{ij,j}\,dx
+=
+\int_{\partial\Omega}v_iA_{ij}n_j\,ds
+-
+\int_\Omega v_{i,j}A_{ij}\,dx.$$ In tensor notation, $$\int_\Omega \bm{v}\cdot(\nabla\cdot\bm{A})\,dx
+=
+\int_{\partial\Omega}\bm{v}\cdot(\bm{A}\bm{n})\,ds
+-
+\int_\Omega \nabla\bm{v}:\bm{A}\,dx.$$ If $\bm{A}$ is symmetric, then $$\nabla\bm{v}:\bm{A}=\bm{\varepsilon}(\bm{v}):\bm{A},$$ because the skew part of $\nabla\bm{v}$ is orthogonal to a symmetric tensor. This is the component identity behind the standard weak form of linear elasticity.
+
+## Reference and spatial coordinates
+
+In finite-deformation mechanics it is useful to distinguish reference coordinates $\bm{X}$ from spatial coordinates $\bm{x}$. Lowercase indices $i,j,k$ are often used for spatial components and uppercase indices $I,J,K$ for material components. For the deformation map $$\bm{x}=\bm{\chi}(\bm{X}),$$ the deformation gradient has components $$F_{iJ}=\frac{\partial x_i}{\partial X_J}.$$ A reference divergence of the first Piola--Kirchhoff stress is $$(\operatorname{Div}\bm{P})_i=P_{iJ,J}.$$ The mixed index notation is useful because $\bm{F}$ and $\bm{P}$ map between reference and spatial vector spaces.
+
+## Basis changes and objectivity of tensor notation
+
+The geometric vector or tensor does not depend on the coordinates used to describe it. Let $\{\bm{e}_i\}$ and $\{\bm{e}'_i\}$ be orthonormal bases related by $$\bm{e}'_i=Q_{ji}\bm{e}_j,$$ where $\bm{Q}$ is orthogonal. The components transform as $$a'_i=Q_{ji}a_j,$$ $$A'_{ij}=Q_{ki}Q_{lj}A_{kl}.$$ These transformation laws distinguish true vectors and tensors from arbitrary arrays of numbers. Quantities such as $\bm{a}\cdot\bm{b}$, $\operatorname{tr}\bm{A}$, and $\bm{A}:\bm{B}$ are invariant under an orthogonal change of basis.
+
+## Derivatives with respect to tensors
+
+Later nonlinear FEM chapters use derivatives of tensor-valued quantities. At the component level, $$\frac{\partial A_{ij}}{\partial A_{kl}}
+=\delta_{ik}\delta_{jl}.$$ For a scalar function $\psi(\bm{A})$, its derivative with respect to $\bm{A}$ is the second-order tensor whose components are $$\left(\frac{\partial\psi}{\partial\bm{A}}\right)_{ij}
+=\frac{\partial\psi}{\partial A_{ij}}.$$ Its directional derivative in direction $\bm{H}$ is $$D\psi(\bm{A})[\bm{H}]
+=\frac{\partial\psi}{\partial A_{ij}}H_{ij}
+=\frac{\partial\psi}{\partial\bm{A}}:\bm{H}.$$ For a second-order tensor-valued function $\bm{S}(\bm{A})$, the derivative is fourth order: $$D\bm{S}(\bm{A})[\bm{H}]_{ij}
+=\frac{\partial S_{ij}}{\partial A_{kl}}H_{kl}.$$ This is the notation that later appears in consistent linearization and tangent operators.
+
+## Frequently used identities
+
+::: center
+  Tensor form                  Component form
+  ---------------------------- -------------------------------------
+  $\bm{a}\cdot\bm{b}$          $a_i b_i$
+  $\bm{A}\bm{a}$               $A_{ij}a_j$
+  $\bm{A}\bm{B}$               $A_{ik}B_{kj}$
+  $\bm{A}:\bm{B}$              $A_{ij}B_{ij}$
+  $\operatorname{tr}\bm{A}$    $A_{ii}$
+  $\bm{a}\otimes\bm{b}$        $a_i b_j$
+  $\operatorname{sym}\bm{A}$   $\tfrac12(A_{ij}+A_{ji})$
+  $\operatorname{dev}\bm{A}$   $A_{ij}-\tfrac1d A_{kk}\delta_{ij}$
+  $\nabla\cdot\bm{u}$          $u_{i,i}$
+  $\nabla\cdot\bm{A}$          $A_{ij,j}$
+  $\bm{\varepsilon}(\bm{u})$   $\tfrac12(u_{i,j}+u_{j,i})$
+  $\bm{t}=\bm{\sigma}\bm{n}$   $t_i=\sigma_{ij}n_j$
+  $\mathbb C:\bm{A}$           $C_{ijkl}A_{kl}$
+:::
+
+## Practice problems
+
+::: {#exr-appendix-tensor-index-bookkeeping}
+## A. Index bookkeeping
+For each expression, identify the free and dummy indices and decide whether the expression is valid.
+
+1.  $c_i=A_{ij}b_j$.
+
+2.  $A_{ij}B_{jk}=C_{ik}$.
+
+3.  $c_i=A_{ij}b_k$.
+
+4.  $A_{ij}B_{ij}+C_{kk}$.
+
+5.  $A_{ij}B_{jk}c_k+d_i$.
+
+6.  Rewrite $A_{ij}B_{jk}c_k$ by renaming all dummy indices without changing its meaning.
+:::
+
+::: {#exr-appendix-tensor-kronecker-delta}
+## B. Kronecker delta
+Simplify:
+
+1.  $\delta_{ij}a_j$.
+
+2.  $\delta_{ij}\delta_{jk}a_k$.
+
+3.  $\delta_{ij}A_{ij}$.
+
+4.  $\delta_{ij}\delta_{ij}$ in $d$ dimensions.
+
+5.  $(\delta_{ik}\delta_{jl})A_{kl}$.
+
+6.  $\tfrac12(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})A_{kl}$.
+:::
+
+::: {#exr-appendix-tensor-products}
+## C. Vector and tensor products
+Let $$\bm{a}=(1,2,-1)^T,\qquad
+\bm{b}=(2,0,3)^T,$$ and $$\bm{A}=
+\begin{bmatrix}
+2&1&0\\
+-1&3&2\\
+0&4&1
+\end{bmatrix}.$$ Compute:
+
+1.  $\bm{a}\cdot\bm{b}$ and $\bm{a}\otimes\bm{b}$.
+
+2.  $\bm{A}\bm{a}$.
+
+3.  $\operatorname{tr}\bm{A}$ and $\left\lVert \bm{A}\right\rVert_F$.
+
+4.  $\bm{A}:(\bm{a}\otimes\bm{b})$ and verify that it equals $\bm{a}\cdot(\bm{A}\bm{b})$.
+
+5.  $\operatorname{sym}\bm{A}$ and $\operatorname{skw}\bm{A}$.
+:::
+
+::: {#exr-appendix-tensor-symmetry-trace}
+## D. Symmetry, trace, and deviatoric tensors
+
+1.  Prove that $\operatorname{sym}\bm{A}:\operatorname{skw}\bm{A}=0$.
+
+2.  Show that $\operatorname{tr}(\operatorname{dev}\bm{A})=0$ in $d$ dimensions.
+
+3.  Let $\bm{\sigma}=\mathrm{diag}(5,2,-1)$. Compute its spherical and deviatoric parts in three dimensions.
+
+4.  If $\bm{S}$ is symmetric and $\bm{W}$ is skew-symmetric, show directly in components that $S_{ij}W_{ij}=0$.
+:::
+
+::: {#exr-appendix-tensor-fourth-order}
+## E. Fourth-order tensors and elasticity
+
+1.  Verify that $\mathbb I:\bm{A}=\bm{A}$ for $\mathbb I_{ijkl}=\delta_{ik}\delta_{jl}$.
+
+2.  Verify that $\mathbb I^s:\bm{A}=\operatorname{sym}\bm{A}$.
+
+3.  Starting from $$C_{ijkl}=\lambda\delta_{ij}\delta_{kl}
+    +\mu(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}),$$ derive $\bm{\sigma}=\lambda\operatorname{tr}(\bm{\varepsilon})\bm{I}+2\mu\bm{\varepsilon}$ for symmetric $\bm{\varepsilon}$.
+
+4.  Explain which symmetries of $C_{ijkl}$ are implied by symmetry of stress and strain, and which additional symmetry follows from an elastic potential.
+:::
+
+::: {#exr-appendix-tensor-differential-operators}
+## F. Differential operators
+Let $\bm{u}=(x_1^2x_2,\,x_1x_2^2)^T$ in $\mathbb{R}^2$.
+
+1.  Compute $\nabla\bm{u}$.
+
+2.  Compute $\nabla\cdot\bm{u}$.
+
+3.  Compute $\bm{\varepsilon}(\bm{u})$.
+
+4.  Let $\bm{A}=x_1\bm{I}$. Compute $\nabla\cdot\bm{A}$.
+
+5.  Write the strong equilibrium equation $-\nabla\cdot\bm{\sigma}=\bm{b}$ in index notation.
+
+6.  Starting from $\int_\Omega v_i\sigma_{ij,j}\,dx$, derive the integration-by-parts identity used in the weak form of linear elasticity.
+:::
+
+::: {#exr-appendix-tensor-mixed-indices}
+## G. Mixed reference/spatial indices
+Let $x_i=\chi_i(X_1,X_2,X_3)$.
+
+1.  Write the deformation-gradient components $F_{iJ}$.
+
+2.  Write $(\operatorname{Div}\bm{P})_i$ in components.
+
+3.  If $\bm{F}=\bm{I}+\operatorname{Grad}\bm{u}$, write $F_{iJ}$ in terms of $u_{i,J}$.
+
+4.  Explain why the first index of $P_{iJ}$ is naturally spatial and the second naturally referential.
+:::
+
+## Selected answers {#sec-appendix-tensor-answers .unnumbered}
+
+**A.** 1: free $i$, dummy $j$, valid. 2: free $i,k$, dummy $j$, valid. 3: free $i,j,k$ do not match between sides after summation rules, invalid. 4: both terms are scalars, valid. 5: free $i$, dummy $j,k$, valid. One renaming for 6 is $A_{ip}B_{pq}c_q$.
+
+**B.** $$\delta_{ij}a_j=a_i,
+\qquad
+\delta_{ij}\delta_{jk}a_k=a_i,
+\qquad
+\delta_{ij}A_{ij}=A_{ii}=\operatorname{tr}\bm{A},$$ $$\delta_{ij}\delta_{ij}=d,
+\qquad
+(\delta_{ik}\delta_{jl})A_{kl}=A_{ij},$$ $$\frac12(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})A_{kl}
+=\frac12(A_{ij}+A_{ji}).$$
+
+**C.** $\bm{a}\cdot\bm{b}=-1$, $\operatorname{tr}\bm{A}=6$, and $\left\lVert \bm{A}\right\rVert_F=6$. The remaining answers are most useful when checked by direct matrix multiplication and component calculation.
+
+**F.** $$\nabla\bm{u}=
+\begin{bmatrix}
+2x_1x_2 & x_1^2\\
+x_2^2 & 2x_1x_2
+\end{bmatrix},
+\qquad
+\nabla\cdot\bm{u}=4x_1x_2.$$ Also, if $A_{ij}=x_1\delta_{ij}$, then $$(\nabla\cdot\bm{A})_i=A_{ij,j}=\delta_{i1},$$ so $\nabla\cdot\bm{A}=\bm{e}_1$.

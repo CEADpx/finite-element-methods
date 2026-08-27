@@ -38,7 +38,10 @@ book:
     - part: "PDE-Constrained Optimization"
       chapters:
         - chapters/12-pde-constrained-optimization.qmd
-    - references.qmd
+  appendices:
+    - appendices/a-real-analysis-essentials.qmd
+    - appendices/b-tensor-notation-index-calculus.qmd
+  references: references.qmd
 
 bibliography: references.bib
 
