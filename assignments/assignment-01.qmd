@@ -1,0 +1,110 @@
+---
+title: "Assignment 1: Mathematical Foundations"
+subtitle: "ME/BME 736 — Advanced Finite Element Methods"
+author: "Prashant K. Jha"
+date: "27 August, 2026"
+---
+
+**Name:** \underline{\hspace{3.2in}} 
+
+\vspace{0.5in}
+
+**Date:** \underline{\hspace{1.5in}}
+
+
+\vspace{0.5in}
+
+Show the main steps in each calculation. When a requested maximum or minimum
+does not exist, state why it does not exist.
+
+# Problem 1 (10 marks): Sequences and limits
+
+1. Determine the limit of
+   $$
+   x_n=\left(\frac{1}{n},1-\frac{1}{n}\right)
+   $$
+   in $\R^2$.
+
+2. Show that
+   $$
+   x_n=(-1)^n+\frac{1}{n}
+   $$
+   does not converge, and identify two convergent subsequences. State the limit
+   of each subsequence.
+
+# Problem 2 (20 marks): Bounds and extrema
+
+1. For each set, determine $\sup$, $\inf$, $\max$, and $\min$ when they exist:
+
+   $$
+   (2,5),\qquad
+   [2,5),\qquad
+   \left\{1-\frac{1}{n}:n\geq1\right\},\qquad
+   \left\{(-1)^n:n\geq1\right\}.
+   $$
+
+2. Let $f(x)=x(1-x)$. Determine the supremum, infimum, maximum, and minimum of
+   $f$ on each of the following domains:
+
+   a. $(0,1)$;
+
+   b. $[0,1]$.
+
+3. Let $f(x)=1/x$ on $(0,1)$.
+
+   a. Is $f$ bounded above?
+
+   b. Does $f$ have a minimum?
+
+# Problem 3 (10 marks): Cartesian vectors
+
+In the Cartesian basis of $\R^3$, let
+
+$$
+\bm{a}=2\bm{e}_1-\bm{e}_2+2\bm{e}_3,
+\qquad
+\bm{b}=\bm{e}_1+3\bm{e}_2.
+$$
+
+1. List the components of $\bm{a}$ and $\bm{b}$.
+
+2. Compute $\bm{a}\cdot\bm{b}$, $\lVert\bm{a}\rVert$, and
+   $\lVert\bm{b}\rVert$.
+
+3. Use $a_i=\bm{a}\cdot\bm{e}_i$ to recover each component of $\bm{a}$.
+
+# Problem 4 (10 marks): Tensor-vector multiplication
+
+Let $\bm{c}=\bm{A}\bm{b}$. Starting from the basis expansions
+
+$$
+\bm{A}=A_{ij}\bm{e}_i\otimes\bm{e}_j,
+\qquad
+\bm{b}=b_k\bm{e}_k,
+$$
+
+use $\bm{e}_j\cdot\bm{e}_k=\delta_{jk}$ and the defining property of the
+Kronecker delta to show that
+
+$$
+c_i=A_{ij}b_j.
+$$
+
+# Problem 5 (50 marks): Identifying real vector spaces
+
+For each set, use the usual addition and multiplication by scalars from $\R$.
+Determine whether these operations make the set a real vector space. If they
+do not, identify at least one vector-space requirement that fails.
+
+1. $\mathbb{Q}$, the rational numbers;
+
+2. $C(\overline{\Om})
+   =\{u:\overline{\Om}\to\R:u\text{ is continuous}\}$, with operations
+   defined pointwise;
+
+3. $\{u\in C(\overline{\Om}):u(\bx_0)=1\}$, where
+   $\bx_0\in\overline{\Om}$ is fixed;
+
+4. $\{(x,y)\in\R^2:y=x\}$;
+
+5. $\{(x,y)\in\R^2:y=x+1\}$.

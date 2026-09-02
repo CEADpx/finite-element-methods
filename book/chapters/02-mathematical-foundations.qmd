@@ -250,7 +250,7 @@ $a_i=\bm{a}\cdot\bm{e}_i$. The vector is the geometric object, whereas the
 list of components $(a_1,\ldots,a_d)$ describes that vector in the selected
 basis.
 
-![Resolution of a vector into components along an orthonormal Cartesian basis in $\R^2$.](../figures/cartesian-basis-components.png){#fig-foundations-cartesian-basis width="72%" fig-align="center"}
+![Resolution of a vector into components along an orthonormal Cartesian basis in $\R^2$.](../figures/chapter02/cartesian-basis-components.png){#fig-foundations-cartesian-basis width="72%" fig-align="center"}
 
 For vectors
 $\bm{a}=a_i\bm{e}_i$ and $\bm{b}=b_i\bm{e}_i$, orthonormality gives
@@ -1826,11 +1826,46 @@ $-2/3+3=7/3$, which agrees with the left-hand side.
 
 ## Weak derivatives and Sobolev spaces {#sec-foundations-sobolev}
 
-In this section, $\Om\subset\R^d$ is open. The **support** of a function is
-the closure of the set on which it is nonzero. The space
-$C_0^\infty(\Om)$ consists of infinitely differentiable functions whose
-support is a compact subset of $\Om$. Such functions vanish in a neighborhood
-of $\partial\Om$ and are commonly called **test functions**.
+In this section, $\Om\subset\R^d$ is open.
+
+We write $L^p_{\mathrm{loc}}(\Om)$ for functions that belong to $L^p(K)$ on
+every compact subset $K\subset\Om$. This local condition allows a function to
+be integrable on each region strictly inside $\Om$ without requiring
+integrability up to the boundary or on an unbounded domain.
+
+::: {#def-foundations-test-functions}
+## Test functions
+For $\varphi\in C^\infty(\Om)$, the **support** of $\varphi$ is
+
+$$
+\operatorname{supp}\varphi
+=\overline{\{\bx\in\Om:\varphi(\bx)\ne0\}},
+$$
+
+where the closure is taken in $\R^d$. The space of test functions is
+
+$$
+C_0^\infty(\Om)
+=\{\varphi\in C^\infty(\Om):
+\operatorname{supp}\varphi\text{ is a compact subset of }\Om\}.
+$$
+
+Thus every $\varphi\in C_0^\infty(\Om)$ is infinitely differentiable and is
+zero in a neighborhood of $\partial\Om$.
+:::
+
+::: {#thm-foundations-fundamental-lemma}
+## Fundamental lemma for test functions
+Let $q\in L^1_{\mathrm{loc}}(\Om)$. If
+
+$$
+\int_{\Om}q\varphi\,\dx=0
+\qquad\forall\varphi\in C_0^\infty(\Om),
+$$
+
+then $q=0$ almost everywhere in $\Om$.
+:::
+
 Suppose first that $u$ is smooth and $\varphi\in C_0^\infty(\Om)$. For a fixed
 index $i$, apply @eq-foundations-green-scalar-indicial with the scalar field
 $\varphi$ and the vector field $u\bm{e}_i$. This gives the complete
@@ -1853,11 +1888,6 @@ $$ {#eq-foundations-weak-derivative-motivation}
 @eq-foundations-weak-derivative-motivation can therefore define a
 derivative without assuming that $u$ is classically differentiable.
 
-We write $L^p_{\mathrm{loc}}(\Om)$ for functions that belong to $L^p(K)$ on
-every compact subset $K\subset\Om$. This local condition allows a function to
-be integrable on each region strictly inside $\Om$ without requiring
-integrability up to the boundary or on an unbounded domain.
-
 ::: {#def-weak-derivative}
 ## Weak derivative
 A function $w_i\in L^1_{\mathrm{loc}}(\Om)$ is the **weak derivative** of
@@ -1872,11 +1902,12 @@ $$
 We then write $w_i=\partial u/\partial x_i$.
 :::
 
-A weak derivative, when it exists, is unique up to equality almost everywhere.
-For a smooth function it agrees with the classical derivative. A function may
-have a weak derivative even when its classical derivative fails at isolated
-points. This enlarged notion of differentiation is essential for piecewise
-polynomial finite element functions [@suli2012].
+The fundamental lemma @thm-foundations-fundamental-lemma shows that a weak
+derivative, when it exists, is unique up to equality almost everywhere. For a
+smooth function it agrees with the classical derivative. A function may have a
+weak derivative even when its classical derivative fails at isolated points.
+This enlarged notion of differentiation is essential for piecewise polynomial
+finite element functions [@suli2012].
 
 ::: {#exm-foundations-weak-absolute-value}
 ## Weak derivative of an absolute-value function

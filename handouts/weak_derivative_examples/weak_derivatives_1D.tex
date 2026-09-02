@@ -1,0 +1,355 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage[margin=1in]{geometry}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Om}{\Omega}
+\newcommand{\dd}{\mathrm{d}}
+
+\begin{document}
+
+\section*{Examples of Weak Derivatives}
+
+Recall that a function $w\in L^1_{\mathrm{loc}}(\Om)$ is the
+\emph{weak derivative} of $u\in L^1_{\mathrm{loc}}(\Om)$ if
+\begin{equation}
+    \int_{\Om} w\varphi\,\dd x
+    =
+    -\int_{\Om}u\frac{\dd\varphi}{\dd x}\,\dd x
+    \qquad
+    \forall \varphi\in C_0^\infty(\Om).
+    \label{eq:weak-derivative}
+\end{equation}
+We then write
+\[
+w=\frac{\dd u}{\dd x},
+\]
+where the derivative is understood in the weak sense.
+
+\subsection*{Example 1: The absolute-value function}
+
+Let
+\[
+\Om=(-1,1),
+\qquad
+u(x)=|x|.
+\]
+The classical derivative of $u$ does not exist at $x=0$. Define
+\[
+w(x)=
+\begin{cases}
+-1, & -1<x<0,\\[2mm]
+ 1, & 0<x<1.
+\end{cases}
+\]
+We claim that $w$ is the weak derivative of $u$.
+
+To prove the claim, let $\varphi\in C_0^\infty(-1,1)$. We must show that
+\[
+\int_{-1}^{1}w\varphi\,\dd x
+=
+-\int_{-1}^{1}u\frac{\dd\varphi}{\dd x}\,\dd x.
+\]
+
+For the left-hand side,
+\begin{align}
+\int_{-1}^{1}w\varphi\,\dd x
+&=
+\int_{-1}^{0}(-1)\varphi\,\dd x
++
+\int_{0}^{1}\varphi\,\dd x
+\nonumber\\
+&=
+-\int_{-1}^{0}\varphi\,\dd x
++
+\int_{0}^{1}\varphi\,\dd x.
+\label{eq:absolute-lhs}
+\end{align}
+
+For the right-hand side, since
+\[
+|x|=
+\begin{cases}
+-x, & -1<x<0,\\
+ x, & 0<x<1,
+\end{cases}
+\]
+we have
+\begin{align}
+-\int_{-1}^{1}|x|\frac{\dd\varphi}{\dd x}\,\dd x
+&=
+-\int_{-1}^{0}(-x)\frac{\dd\varphi}{\dd x}\,\dd x
+-\int_{0}^{1}x\frac{\dd\varphi}{\dd x}\,\dd x
+\nonumber\\
+&=
+\int_{-1}^{0}x\frac{\dd\varphi}{\dd x}\,\dd x
+-\int_{0}^{1}x\frac{\dd\varphi}{\dd x}\,\dd x.
+\label{eq:absolute-rhs-1}
+\end{align}
+
+Using the product rule,
+\[
+x\frac{\dd\varphi}{\dd x}
+=
+\frac{\dd}{\dd x}(x\varphi)-\varphi,
+\]
+so
+\begin{align}
+-\int_{-1}^{1}|x|\frac{\dd\varphi}{\dd x}\,\dd x
+&=
+\int_{-1}^{0}
+\left[
+\frac{\dd}{\dd x}(x\varphi)-\varphi
+\right]\dd x
+-
+\int_{0}^{1}
+\left[
+\frac{\dd}{\dd x}(x\varphi)-\varphi
+\right]\dd x
+\nonumber\\
+&=
+\left[x\varphi(x)\right]_{-1}^{0}
+-\int_{-1}^{0}\varphi\,\dd x
+-\left[x\varphi(x)\right]_{0}^{1}
++\int_{0}^{1}\varphi\,\dd x.
+\label{eq:absolute-rhs-2}
+\end{align}
+
+Since $\varphi\in C_0^\infty(-1,1)$,
+\[
+\varphi(-1)=\varphi(1)=0.
+\]
+The terms involving $\varphi(0)$ also vanish because they are
+multiplied by $x=0$. Therefore,
+\[
+\left[x\varphi(x)\right]_{-1}^{0}
+=
+\left[x\varphi(x)\right]_{0}^{1}
+=
+0.
+\]
+Hence,
+\[
+-\int_{-1}^{1}|x|\frac{\dd\varphi}{\dd x}\,\dd x
+=
+-\int_{-1}^{0}\varphi\,\dd x
++
+\int_{0}^{1}\varphi\,\dd x.
+\]
+Comparing with \eqref{eq:absolute-lhs},
+\[
+\int_{-1}^{1}w\varphi\,\dd x
+=
+-\int_{-1}^{1}u\frac{\dd\varphi}{\dd x}\,\dd x.
+\]
+Thus, $w$ is the weak derivative of $u$, and
+\[
+\boxed{
+\frac{\dd u}{\dd x}
+=
+\begin{cases}
+-1, & -1<x<0,\\[2mm]
+ 1, & 0<x<1,
+\end{cases}
+\quad\text{a.e. in }(-1,1).
+}
+\]
+
+The value assigned to the weak derivative at the single point $x=0$
+is irrelevant.
+
+\subsection*{Example 2: Strain jump at a material interface}
+
+Weak derivatives arise naturally in solid mechanics. Consider a
+one-dimensional bar occupying
+\[
+\Om=(0,L)
+\]
+and composed of two linear elastic materials joined at $x=a$, where
+$0<a<L$. The Young's modulus is
+\[
+E(x)=
+\begin{cases}
+E_1, & 0<x<a,\\[2mm]
+E_2, & a<x<L,
+\end{cases}
+\qquad
+E_1\neq E_2.
+\]
+
+Assume that the bar has constant cross-sectional area $A$, is fixed
+at $x=0$, and is subjected to an axial end load $P$ at $x=L$.
+The axial stress is constant throughout the bar:
+\[
+\sigma_{xx}=\frac{P}{A}.
+\]
+From Hooke's law,
+\[
+\sigma_{xx}=E\varepsilon_{xx},
+\]
+the strain is
+\[
+\varepsilon_{xx}(x)=
+\begin{cases}
+\dfrac{P}{AE_1}, & 0<x<a,\\[3mm]
+\dfrac{P}{AE_2}, & a<x<L.
+\end{cases}
+\]
+Thus,
+\[
+\varepsilon_{xx}(a^-)
+=
+\frac{P}{AE_1}
+\neq
+\frac{P}{AE_2}
+=
+\varepsilon_{xx}(a^+),
+\]
+so the strain has a jump at the material interface.
+
+Within each material,
+\[
+\varepsilon_{xx}=\frac{\dd u}{\dd x}.
+\]
+Using $u(0)=0$ and displacement continuity at $x=a$, the displacement
+field is
+\[
+u(x)=
+\begin{cases}
+\dfrac{P}{AE_1}x,
+&0\leq x\leq a,\\[4mm]
+\dfrac{P}{AE_1}a
++\dfrac{P}{AE_2}(x-a),
+&a<x\leq L.
+\end{cases}
+\]
+
+The displacement is continuous at the material interface:
+\[
+u(a^-)=u(a^+)=\frac{Pa}{AE_1}.
+\]
+However, its one-sided classical derivatives are
+\[
+\left.\frac{\dd u}{\dd x}\right|_{x=a^-}
+=
+\frac{P}{AE_1},
+\qquad
+\left.\frac{\dd u}{\dd x}\right|_{x=a^+}
+=
+\frac{P}{AE_2}.
+\]
+Since $E_1\neq E_2$, these two values are different. Therefore, the
+classical derivative of $u$ does not exist at $x=a$.
+
+Define
+\[
+w(x)=
+\begin{cases}
+\dfrac{P}{AE_1}, & 0<x<a,\\[3mm]
+\dfrac{P}{AE_2}, & a<x<L.
+\end{cases}
+\]
+We claim that $w$ is the weak derivative of $u$. Physically,
+\[
+w=\varepsilon_{xx}.
+\]
+
+To prove the claim, let $\varphi\in C_0^\infty(0,L)$. We must show that
+\[
+\int_0^L w\varphi\,\dd x
+=
+-\int_0^L u\frac{\dd\varphi}{\dd x}\,\dd x.
+\]
+
+Split the right-hand side at the material interface:
+\begin{align}
+-\int_0^L u\frac{\dd\varphi}{\dd x}\,\dd x
+&=
+-\int_0^a u\frac{\dd\varphi}{\dd x}\,\dd x
+-\int_a^L u\frac{\dd\varphi}{\dd x}\,\dd x.
+\label{eq:bar-split}
+\end{align}
+
+On each material subdomain, $u$ is classically differentiable.
+Using integration by parts,
+\begin{align}
+-\int_0^a u\frac{\dd\varphi}{\dd x}\,\dd x
+&=
+-\left[u\varphi\right]_0^a
++
+\int_0^a \frac{\dd u}{\dd x}\varphi\,\dd x
+\nonumber\\
+&=
+-u(a^-)\varphi(a)
++u(0)\varphi(0)
++
+\int_0^a \frac{P}{AE_1}\varphi\,\dd x,
+\label{eq:bar-left}
+\end{align}
+and
+\begin{align}
+-\int_a^L u\frac{\dd\varphi}{\dd x}\,\dd x
+&=
+-\left[u\varphi\right]_a^L
++
+\int_a^L \frac{\dd u}{\dd x}\varphi\,\dd x
+\nonumber\\
+&=
+-u(L)\varphi(L)
++u(a^+)\varphi(a)
++
+\int_a^L \frac{P}{AE_2}\varphi\,\dd x.
+\label{eq:bar-right}
+\end{align}
+
+Since $\varphi\in C_0^\infty(0,L)$,
+\[
+\varphi(0)=\varphi(L)=0.
+\]
+Moreover, displacement continuity at the material interface gives
+\[
+u(a^-)=u(a^+).
+\]
+Therefore, the interface terms cancel:
+\[
+-u(a^-)\varphi(a)+u(a^+)\varphi(a)=0.
+\]
+
+Adding \eqref{eq:bar-left} and \eqref{eq:bar-right} gives
+\begin{align}
+-\int_0^L u\frac{\dd\varphi}{\dd x}\,\dd x
+&=
+\int_0^a \frac{P}{AE_1}\varphi\,\dd x
++
+\int_a^L \frac{P}{AE_2}\varphi\,\dd x
+\nonumber\\
+&=
+\int_0^L w\varphi\,\dd x.
+\end{align}
+Hence, $w$ is the weak derivative of $u$, and
+\[
+\boxed{
+\frac{\dd u}{\dd x}
+=
+\varepsilon_{xx}
+=
+\begin{cases}
+\dfrac{P}{AE_1}, & 0<x<a,\\[3mm]
+\dfrac{P}{AE_2}, & a<x<L,
+\end{cases}
+\quad\text{a.e. in }(0,L).
+}
+\]
+
+The value assigned to the weak derivative at the single point $x=a$
+is irrelevant.
+
+Thus, the displacement $u$ is continuous but is not classically
+differentiable at the material interface. Nevertheless, it possesses
+a weak derivative, and this weak derivative is precisely the
+piecewise-defined strain $\varepsilon_{xx}$. This example illustrates
+why weak derivatives arise naturally in mechanics when material
+properties are discontinuous.
+
+\end{document}

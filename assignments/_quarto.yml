@@ -1,0 +1,26 @@
+project:
+  type: default
+  output-dir: _output
+
+format:
+  html:
+    theme:
+      - cosmo
+      - ../book/styles.scss
+    toc: true
+    toc-depth: 2
+    html-math-method: mathjax
+    include-in-header:
+      - ../book/latex/mathjax.html
+  pdf:
+    documentclass: scrartcl
+    pdf-engine: lualatex
+    keep-tex: true
+    geometry:
+      - margin=1in
+    colorlinks: true
+    include-in-header:
+      - ../book/latex/macros.tex
+      - latex/preamble.tex
+
+editor: source

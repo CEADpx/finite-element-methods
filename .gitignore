@@ -5,12 +5,16 @@ __pycache__/
 .venv/
 venv/
 .env
+.agent/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 book/.quarto/
 book/_book/
 book/Advanced-Finite-Element-Methods.tex
+assignments/.quarto/
+assignments/_output/
+assignments/assignment-01.tex
 
 # Local source PDFs used while authoring; not published with the repository.
 /references/
