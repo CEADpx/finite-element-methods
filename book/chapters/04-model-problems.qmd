@@ -22,21 +22,27 @@ The models use the same sequence:
 Steady heat conduction and small-strain linear elasticity lead to bilinear
 variational problems. Transient heat conduction adds a time derivative.
 Finite-deformation elasticity leads to a nonlinear variational problem. These
-continuous models will be discretized in Chapters 5, 10, and 11.
+continuous models will be solved numerically using the finite element method.
 
 ## Balance laws and constitutive equations {#sec-model-balance-laws}
 
-A balance law accounts for the change of a physical quantity in an arbitrary
-part of a body. For heat transfer, the quantity is thermal energy. For solid
-mechanics, linear momentum is balanced. A balance law does not by itself
-determine how heat flows or how a material develops stress. That information
-is supplied by a **constitutive equation**.
+Every material satisfies balance of mass, balance of linear and angular
+momentum, balance of energy, and the second law of thermodynamics. Which of
+these laws must be solved explicitly depends on the assumptions of the
+problem. In a purely thermal model of a stationary solid, deformation and
+mechanical forces are neglected, so the momentum balances are satisfied
+trivially. If the solid has constant density, mass balance also introduces no
+additional unknown. Energy balance remains the governing balance law for the
+temperature. In the isothermal mechanical models considered later in this
+chapter, temperature is prescribed and energy balance introduces no separate
+unknown field.
 
-The distinction is important. Conservation of energy applies to every
-material considered here, but Fourier's law is a model for conductive heat
-flux. Balance of momentum applies to every solid, but linear elasticity and
-hyperelasticity describe different material responses and deformation
-regimes.
+A balance law alone does not specify how heat flows or how a material
+develops stress. A **constitutive equation** supplies this material-dependent
+relation. Fourier's law relates heat flux to the temperature gradient. Linear
+elasticity and hyperelasticity relate stress to deformation under different
+kinematic assumptions. These constitutive equations must also be consistent
+with the second law of thermodynamics.
 
 ::: {#rem-model-data-and-unknowns}
 ## Data must be distinguished from unknown fields
@@ -50,15 +56,17 @@ whereas displacement, strain, and stress are determined by the solution.
 ## Heat conduction {#sec-model-heat}
 
 Let a stationary body occupy a bounded Lipschitz domain
-$\Om\subset\R^d$, where $d=1$, $2$, or $3$. Its temperature is denoted by
-$T(\bx,t)$. The material quantities used below are:
+$\Om\subset\R^d$, where $d=1$, $2$, or $3$. We use SI units and measure
+position $\bx$ in meters, time $t$ in seconds, and absolute temperature
+$T(\bx,t)$ in kelvin. The material quantities used below are:
 
-- mass density $\rho>0$;
-- specific heat capacity $c>0$;
-- conductive heat-flux vector $\bq$; and
-- volumetric heat supply $r$.
+- mass density $\rho>0$, in $\mathrm{kg}/\mathrm{m}^3$;
+- specific heat capacity $c>0$, in $\mathrm{J}/(\mathrm{kg}\,\mathrm{K})$;
+- conductive heat-flux vector $\bq$, in $\mathrm{W}/\mathrm{m}^2$; and
+- volumetric heat supply $r$, in $\mathrm{W}/\mathrm{m}^3$.
 
-The product $\rho c$ is the heat capacity per unit volume. The vector
+The product $\rho c$, in $\mathrm{J}/(\mathrm{m}^3\,\mathrm{K})$, is the
+heat capacity per unit volume. The vector
 $\bq(\bx,t)$ points in the direction of heat flow, and
 $\bq\cdot\bn$ is the rate of heat leaving the body per unit boundary area.
 The source $r$ is positive when heat is supplied within the body.
@@ -66,11 +74,12 @@ The source $r$ is positive when heat is supplied within the body.
 ### Energy balance and Fourier's law
 
 Consider an arbitrary subdomain $\omega\subset\Om$. If $\rho$ and $c$ are
-independent of temperature, the thermal energy stored in $\omega$, relative
-to the chosen temperature scale, is
+independent of temperature, the thermal energy stored in $\omega$ relative
+to a fixed reference temperature $T_{\mathrm{ref}}$ is
 
 $$
-\mathcal E_\omega(t)=\int_\omega \rho cT(\bx,t)\,\dx.
+\mathcal E_\omega(t)
+=\int_\omega \rho c\bigl(T(\bx,t)-T_{\mathrm{ref}}\bigr)\,\dx.
 $$
 
 The rate of stored energy equals the heat supplied inside $\omega$ minus the
@@ -81,10 +90,22 @@ $$
 =\int_\omega r\,\dx-\int_{\partial\omega}\bq\cdot\bn\,\ds.
 $$ {#eq-model-heat-integral-balance}
 
-Apply the Gauss divergence theorem
-@cor-foundations-divergence to the boundary integral. Because
-@eq-model-heat-integral-balance holds for every admissible subdomain,
-localization gives
+Apply the Gauss divergence theorem @cor-foundations-divergence to the boundary
+integral and move all terms to the left. This gives
+
+$$
+\int_\omega
+\left(\rho c\,\frac{\partial T}{\partial t}
++\divg\bq-r\right)\,\dx=0
+$$
+
+for every subdomain $\omega\subset\Om$. The passage from this integral
+statement to a relation at each point is called **localization**. If the
+integrand is continuous and nonzero at some point, it has one sign in a small
+neighborhood of that point, so its integral over that neighborhood cannot be
+zero. The integrand must therefore vanish at every point. With less regular
+fields, the same conclusion holds almost everywhere. Hence the local energy
+balance is
 
 $$
 \rho c\,\frac{\partial T}{\partial t}
@@ -92,14 +113,15 @@ $$
 \qquad\text{in }\Om.
 $$ {#eq-model-heat-local-balance}
 
-The balance equation contains two unknown fields, $T$ and $\bq$. Fourier's
-law closes the model:
+The balance equation contains two unknown fields, $T$ and $\bq$, and is not
+sufficient to determine both. Fourier's law supplies a relation between them:
 
 $$
 \bq=-k\grad T.
 $$ {#eq-model-fourier-law}
 
-For an isotropic material, the conductivity $k$ is a positive scalar. The
+For an isotropic material, the conductivity $k$, measured in
+$\mathrm{W}/(\mathrm{m}\,\mathrm{K})$, is a positive scalar. The
 minus sign states that conductive heat flows toward lower temperature. An
 anisotropic material instead uses
 $\bq=-\bm{K}\grad T$, where $\bm{K}$ is a symmetric positive-definite
@@ -117,21 +139,33 @@ $$ {#eq-model-transient-heat-equation}
 This derivation follows the standard balance-law treatment of heat flow
 [@arnold2018; @jog].
 
-::: {#exr-model-heat-localization}
-## From integral to local energy balance
-Starting from @eq-model-heat-integral-balance:
+::: {#exr-model-heat-units-sign}
+## Units and the direction of heat flow
 
-1. use the Gauss divergence theorem to replace the boundary integral;
-2. move all terms into one volume integral; and
-3. state why requiring the result for every subdomain $\omega$ gives the
-   local balance in @eq-model-heat-local-balance.
+1. Verify that every term in @eq-model-heat-local-balance has units of
+   $\mathrm{W}/\mathrm{m}^3$.
+2. Use @eq-model-fourier-law to verify the SI units of $k$.
+3. Let $T(\bx)=T_0+Gx_1$, where $G>0$ is constant. Compute $\bq$ and state
+   whether heat flows in the positive or negative $x_1$ direction.
 :::
 
 ### Boundary and initial data
 
-Divide the boundary into disjoint portions
-$\Gam_T$, $\Gam_q$, and $\Gam_R$, up to sets of boundary measure zero.
-Three common thermal boundary conditions are
+Let $\Gam_T$, $\Gam_q$, and $\Gam_R$ be relatively open portions of
+$\partial\Om$. We assume that they are pairwise disjoint and that their
+closures cover the boundary:
+
+$$
+\Gam_i\cap\Gam_j=\varnothing\quad(i\ne j),
+\qquad
+\partial\Om
+=\overline{\Gam_T}\cup\overline{\Gam_q}\cup\overline{\Gam_R}.
+$$
+
+The closures may meet along edges or at points. We assume that these
+interfaces have zero boundary measure, so they do not contribute to boundary
+integrals. Thus, away from an interface, every boundary point is assigned
+exactly one of the following conditions:
 
 $$
 \begin{aligned}
@@ -141,9 +175,10 @@ T&=\overline T &&\text{on }\Gam_T,\\
 \end{aligned}
 $$ {#eq-model-heat-boundary-conditions}
 
-Here $\overline T$ is a prescribed temperature,
-$\overline q_n$ is a prescribed **outward** heat flux, $h_c\geq0$ is a heat
-transfer coefficient, and $T_\infty$ is an ambient temperature. Thus
+Here $\overline T$ and $T_\infty$ are measured in kelvin,
+$\overline q_n$ is a prescribed **outward** heat flux in
+$\mathrm{W}/\mathrm{m}^2$, and $h_c\geq0$ is a heat-transfer coefficient in
+$\mathrm{W}/(\mathrm{m}^2\,\mathrm{K})$. Thus
 $\overline q_n>0$ means that heat leaves the body. An insulated boundary is
 the special case $\overline q_n=0$. The condition on $\Gam_R$ is a convection,
 or Robin, condition.
@@ -166,8 +201,16 @@ T(\bx,0)=T_0(\bx)
 \qquad\forall\bx\in\Om.
 $$ {#eq-model-heat-initial-condition}
 
-The initial and prescribed boundary temperatures must be compatible wherever
-they meet if a classical solution is sought.
+If a classical solution is sought and temperature is prescribed on
+$\Gam_T$, the initial and boundary data must agree at $t=0$:
+
+$$
+T_0(\bx)=\overline T(\bx,0)
+\qquad\forall\bx\in\Gam_T.
+$$ {#eq-model-heat-initial-boundary-compatibility}
+
+For a weak solution, this equality is understood in the boundary-value sense
+introduced in @rem-foundations-boundary-value-convention.
 
 ### Steady heat conduction
 
@@ -187,7 +230,10 @@ $$ {#eq-model-steady-heat-strong}
 
 Assume $k\in L^\infty(\Om)$ with
 $0<k_0\leq k\leq k_1$ almost everywhere, $r\in L^2(\Om)$,
-$\overline q_n\in L^2(\Gam_q)$, and suitable boundary data. Define
+$\overline q_n\in L^2(\Gam_q)$,
+$h_c\in L^\infty(\Gam_R)$ with $h_c\geq0$, and
+$T_\infty\in L^2(\Gam_R)$. Assume also that $\overline T$ is the boundary
+value of a function in $H^1(\Om)$. Define
 
 $$
 \begin{aligned}
@@ -221,7 +267,9 @@ The negative sign multiplying $\overline q_n$ follows from defining it as an
 outward flux. It also agrees with the global steady energy balance: internal
 heat generation must equal the net outward heat flow.
 
-Define
+To write @eq-model-steady-heat-weak in the abstract notation of Chapter 3,
+define the thermal bilinear form $a_T$ and the thermal load functional
+$\ell_T$ by
 
 $$
 \begin{aligned}
@@ -238,13 +286,33 @@ $$ {#eq-model-steady-heat-forms}
 Then @eq-model-steady-heat-weak is
 $a_T(T,v)=\ell_T(v)$ for every $v\in\mathcal V_0$. The form is symmetric. It
 is coercive when temperature is prescribed on a boundary portion of positive
-measure. A Robin boundary with $h_c>0$ on a portion of positive measure can
-also remove the undetermined constant.
+measure.
+
+::: {#rem-model-heat-pure-neumann}
+## Steady conduction without prescribed temperature
+Suppose $\Gam_T=\varnothing$ and $\Gam_R=\varnothing$, so that heat flux is
+prescribed on the entire boundary. Only $\grad T$ appears in the variational
+problem. If $T$ is a solution, then $T+C$ is also a solution for every
+constant $C$. A solution can exist only if the total heat supplied is
+consistent with the prescribed outward flux:
+
+$$
+\int_{\Om}r\,\dx=\int_{\partial\Om}\overline q_n\,\ds.
+$$
+
+The temperature becomes unique after fixing a reference value, such as its
+mean over $\Om$. Alternatively, if $\Gam_R$ has positive boundary measure and
+$h_c>0$ there, the term $\int_{\Gam_R}h_cT^2\,\ds$ is nonzero for a nonzero
+constant temperature. The Robin term then controls the constant part of $T$
+and can make the variational problem coercive without a prescribed-temperature
+boundary.
+:::
 
 ::: {#exm-model-one-dimensional-heat}
 ## Heat flux through a wall
 Let $\Om=(0,L)$, let $k$ be constant, and assume $r=0$. Prescribe
-$T(0)=T_0$ and an outward flux $\overline q_n$ at $x=L$. Then
+$T(0)=T_0$ and a constant outward flux $\overline q_n$ at $x=L$. The strong
+problem is
 
 $$
 -(kT')'=0,\qquad
@@ -252,14 +320,17 @@ T(0)=T_0,\qquad
 -kT'(L)=\overline q_n,
 $$
 
-and hence
+Because $k$ is constant, the differential equation gives $T''=0$. Therefore
+$T(x)=A+Bx$. The condition at $x=0$ gives $A=T_0$, and the flux condition at
+$x=L$ gives $B=-\overline q_n/k$. The resulting classical solution is
 
 $$
 T(x)=T_0-\frac{\overline q_n}{k}x.
 $$
 
-When $\overline q_n>0$, heat leaves through $x=L$ and temperature decreases
-in the positive $x$ direction.
+Direct substitution shows that this function satisfies the differential
+equation and both boundary conditions. When $\overline q_n>0$, heat leaves
+through $x=L$ and temperature decreases in the positive $x$ direction.
 :::
 
 ::: {#exr-model-steady-heat-form}
@@ -275,21 +346,22 @@ For @eq-model-steady-heat-strong:
 
 ### Thermal potential for the steady problem
 
-Because $a_T$ is symmetric, define
+Because $a_T$ is symmetric, the variational problem is also the stationarity
+condition of a potential functional. For $S\in\mathcal U_{\overline T}$,
+define
 
 $$
 \begin{aligned}
-\Pi_T(S)
+\Pi_T(S) = \frac12 a_T(S, S) - \ell_T(S)
 ={}&\frac12\int_{\Om}k|\grad S|^2\,\dx
 +\frac12\int_{\Gam_R}h_cS^2\,\ds
 -\int_{\Om}rS\,\dx\\
 &+\int_{\Gam_q}\overline q_nS\,\ds
--\int_{\Gam_R}h_cT_\infty S\,\ds,
-\qquad S\in\mathcal U_{\overline T}.
+-\int_{\Gam_R}h_cT_\infty S\,\ds.
 \end{aligned}
 $$ {#eq-model-thermal-potential}
 
-For $v\in\mathcal V_0$,
+For $v\in\mathcal V_0$, the first variation of $\Pi_T$ is
 
 $$
 \delta\Pi_T(T;v)=a_T(T,v)-\ell_T(v).
@@ -299,15 +371,26 @@ Thus stationarity gives @eq-model-steady-heat-weak. Under the coercivity
 conditions above, the stationary temperature is the unique minimizer. The
 functional $\Pi_T$ is a mathematical potential for steady conduction; it
 should not be confused with the total thermal energy
-$\int_\Om\rho cT\,\dx$ used in the physical energy balance.
+$\int_\Om\rho c(T-T_{\mathrm{ref}})\,\dx$ used in the physical energy
+balance.
 
 ### Transient heat conduction
 
 For $t\in(0,t_f]$, the transient problem consists of
 @eq-model-transient-heat-equation, the boundary conditions
 @eq-model-heat-boundary-conditions, and the initial condition
-@eq-model-heat-initial-condition. At each fixed time, use the same spatial
-spaces as in @eq-model-heat-spaces. The spatial variational problem is
+@eq-model-heat-initial-condition. When the prescribed temperature may depend
+on time, define the trial space at each fixed $t$ by
+
+$$
+\mathcal U_{\overline T}(t)
+=\{S\in H^1(\Om):S=\overline T(\cdot,t)\text{ on }\Gam_T\}.
+$$ {#eq-model-transient-heat-trial-space}
+
+The test space $\mathcal V_0$ remains the homogeneous space in
+@eq-model-heat-spaces. If $\overline T$ is independent of time, then
+$\mathcal U_{\overline T}(t)=\mathcal U_{\overline T}$. The spatial
+variational problem is
 
 $$
 \left.
@@ -322,7 +405,7 @@ $$
 \qquad\text{Spatial variational form}
 $$ {#eq-model-transient-heat-weak}
 
-The first integral is the **capacity term**. Equation
+The first integral is the **capacity term**. The variational problem
 @eq-model-transient-heat-weak remains continuous in time; no time-stepping
 method has been selected. Chapter 11 introduces temporal discretization.
 
@@ -355,16 +438,17 @@ Starting from @eq-model-transient-heat-equation:
 ## Small-strain elasticity {#sec-model-linear-elasticity}
 
 Let an elastic body occupy a bounded Lipschitz domain
-$\Om\subset\R^d$ in its undeformed configuration. A material point initially
-at $\bx$ moves to
+$\Om\subset\R^d$ in its undeformed configuration. Position $\bx$ and
+displacement $\bu$ are measured in meters. A material point initially at
+$\bx$ moves to
 
 $$
 \bm{\varphi}(\bx)=\bx+\bu(\bx),
 $$ {#eq-model-small-deformation-map}
 
-where $\bu:\Om\to\R^d$ is displacement. Small-strain theory assumes that the
-displacement gradient is sufficiently small for products of its components to
-be neglected.
+where $\bu:\Om\to\R^d$ is displacement. The displacement gradient and strain
+are dimensionless. Under small-strain theory, the strain is given by the
+symmetric part of $\grad\bu$.
 
 ### Infinitesimal strain
 
@@ -376,7 +460,7 @@ $$
 =\frac12\left(\grad\bu+(\grad\bu)^T\right),
 \qquad
 \varepsilon_{ij}(\bu)
-=\frac12\left(u_{i,j}+u_{j,i}\right).
+=\frac12\left(\frac{\partial u_i}{\partial x_j}+\frac{\partial u_j}{\partial x_i}\right)=\frac12\left(u_{i,j}+u_{j,i}\right).
 $$ {#eq-model-infinitesimal-strain}
 
 The diagonal component $\varepsilon_{ii}$ measures extension in the
@@ -420,8 +504,10 @@ engineering shear strain.
 ### Stress, traction, and balance of momentum
 
 The Cauchy stress tensor $\bsig(\bx)$ describes force per unit area in the
-current configuration. The traction acting on a plane with unit normal $\bn$
-is
+current configuration and is measured in pascals
+($\mathrm{Pa}=\mathrm{N}/\mathrm{m}^2$). In small-strain theory, the
+undeformed and current configurations are identified to first order. The
+traction acting on a plane with unit normal $\bn$ is
 
 $$
 \bt(\bn)=\bsig\bn,
@@ -430,12 +516,44 @@ t_i=\sigma_{ij}n_j.
 $$ {#eq-model-cauchy-traction}
 
 Balance of angular momentum gives $\bsig=\bsig^T$ in a classical continuum
-without couple stresses. If $\bb$ is body force per unit mass and $\rho$ is
-mass density, balance of linear momentum is
+without couple stresses. Let $\bb$ be body force per unit mass, in
+$\mathrm{N}/\mathrm{kg}$, and let $\rho$ be mass density, in
+$\mathrm{kg}/\mathrm{m}^3$. Then $\rho\bb$ is force per unit volume. Recall
+from @eq-foundations-tensor-divergence that the divergence of a second-order
+tensor is a vector defined row by row. For the stress tensor,
+
+$$
+(\divg\bsig)_i=\frac{\partial\sigma_{ij}}{\partial x_j}.
+$$
+
+Consider an arbitrary subdomain $\omega\subset\Om$. The rate of change of
+linear momentum equals the sum of the body and surface forces. Under the
+small-strain description, this balance is
+
+$$
+\int_\omega \rho\frac{\partial^2\bu}{\partial t^2}\,\dx
+=\int_\omega\rho\bb\,\dx
++\int_{\partial\omega}\bsig\bn\,\ds.
+$$ {#eq-model-linear-momentum-integral}
+
+Apply the tensor divergence theorem
+@eq-foundations-tensor-divergence-theorem to the surface-force integral and
+move all terms into one volume integral:
+
+$$
+\int_\omega
+\left(\divg\bsig+\rho\bb
+-\rho\frac{\partial^2\bu}{\partial t^2}\right)\,\dx
+=\bm 0.
+$$
+
+Because this identity holds for every $\omega\subset\Om$, the localization
+argument used for the energy balance gives the local equation
 
 $$
 \divg\bsig+\rho\bb
-=\rho\frac{\partial^2\bu}{\partial t^2}.
+=\rho\frac{\partial^2\bu}{\partial t^2}
+\qquad\text{in }\Om.
 $$ {#eq-model-linear-momentum}
 
 For quasistatic loading, inertia is neglected:
@@ -445,8 +563,17 @@ $$
 \qquad\text{in }\Om.
 $$ {#eq-model-quasistatic-equilibrium}
 
-Divide the boundary into a displacement portion $\Gam_u$ and a traction
-portion $\Gam_t$. The boundary conditions are
+Let $\Gam_u$ and $\Gam_t$ be relatively open, disjoint boundary portions such
+that
+
+$$
+\Gam_u\cap\Gam_t=\varnothing,
+\qquad
+\partial\Om=\overline{\Gam_u}\cup\overline{\Gam_t}.
+$$
+
+Their closures may meet along an interface of zero boundary measure, as in the
+thermal boundary partition. The boundary conditions are
 
 $$
 \bu=\overline{\bu}\quad\text{on }\Gam_u,
@@ -468,15 +595,17 @@ $$
 $$ {#eq-model-linear-elastic-law}
 
 where $\mathbb C$ is the fourth-order elasticity tensor. Symmetry of stress
-and strain gives the minor symmetries
+and strain gives the minor symmetries. The components of $\mathbb C$ have
+units of pascals:
 
 $$
 C_{ijkl}=C_{jikl}=C_{ijlk}.
 $$
 
-For a hyperelastic linear material, a quadratic strain energy also gives the
-major symmetry $C_{ijkl}=C_{klij}$. We assume that $\mathbb C$ is bounded and
-uniformly positive definite on symmetric tensors:
+If the linear constitutive equation is derived from a quadratic strain-energy
+density, the elasticity tensor also has the major symmetry
+$C_{ijkl}=C_{klij}$. We assume that $\mathbb C$ is bounded and uniformly
+positive definite on symmetric tensors:
 
 $$
 \bm{A}:\mathbb C:\bm{A}
@@ -492,8 +621,9 @@ $$
 \bsig=\lambda\,\tr(\beps)\bI+2\mu\beps,
 $$ {#eq-model-isotropic-elasticity}
 
-where $\lambda$ and $\mu$ are the Lamé parameters. In terms of Young's
-modulus $E$ and Poisson's ratio $\nu$,
+where $\lambda$ and $\mu$ are the Lamé parameters. The quantities
+$\lambda$, $\mu$, and Young's modulus $E$ have units of pascals, while
+Poisson's ratio $\nu$ is dimensionless. Their relations are
 
 $$
 \lambda=\frac{E\nu}{(1+\nu)(1-2\nu)},
@@ -504,6 +634,83 @@ $$ {#eq-model-lame-parameters}
 For three-dimensional isotropic elasticity, $E>0$ and $-1<\nu<1/2$ ensure
 positive strain energy. The limit $\nu\to1/2$ is nearly incompressible and
 will motivate the mixed formulation in Chapter 9.
+
+### Voigt and engineering notation
+
+A symmetric three-dimensional tensor has six independent components. For
+matrix calculations, we collect the stress components into the
+six-component **stress vector** $\bsig_{\mathrm V}$ and the strain components
+into the six-component **engineering-strain vector** $\beps_{\mathrm V}$. In
+this book, these vectors are defined by
+
+$$
+\bsig_{\mathrm V}
+=
+\begin{bmatrix}
+\sigma_{11}&\sigma_{22}&\sigma_{33}&\sigma_{23}&\sigma_{13}&\sigma_{12}
+\end{bmatrix}^{T},
+\qquad
+\beps_{\mathrm V}
+=
+\begin{bmatrix}
+\varepsilon_{11}&\varepsilon_{22}&\varepsilon_{33}&
+\gamma_{23}&\gamma_{13}&\gamma_{12}
+\end{bmatrix}^{T}.
+$$ {#eq-model-voigt-vectors}
+
+The first three entries of $\beps_{\mathrm V}$ are the normal strains. The
+last three entries are the engineering shear strains
+$\gamma_{ij}=2\varepsilon_{ij}$ for $i\ne j$.
+
+The factor of two can be understood from the double contraction introduced in
+@eq-foundations-double-contraction. Because $\bsig$ and $\beps$ are symmetric,
+
+$$
+\begin{aligned}
+\bsig:\beps
+={}&\sigma_{11}\varepsilon_{11}
++\sigma_{22}\varepsilon_{22}
++\sigma_{33}\varepsilon_{33}\\
+&+2\sigma_{23}\varepsilon_{23}
++2\sigma_{13}\varepsilon_{13}
++2\sigma_{12}\varepsilon_{12}.
+\end{aligned}
+$$ {#eq-model-voigt-work-components}
+
+Substituting $\gamma_{ij}=2\varepsilon_{ij}$ into this expression gives
+
+$$
+\bsig:\beps=\bsig_{\mathrm V}\cdot\beps_{\mathrm V}.
+$$ {#eq-model-voigt-work}
+
+Thus the double contraction of the stress and strain tensors equals the
+ordinary dot product of the corresponding six-component vectors. In this
+notation, the linear elastic constitutive equation is
+
+$$
+\bsig_{\mathrm V}=\bm C_{\mathrm V}\beps_{\mathrm V},
+$$ {#eq-model-voigt-constitutive-law}
+
+where $\bm C_{\mathrm V}$ is a $6\times6$ matrix. For the isotropic law in
+@eq-model-isotropic-elasticity,
+
+$$
+\bm C_{\mathrm V}
+=
+\begin{bmatrix}
+\lambda+2\mu&\lambda&\lambda&0&0&0\\
+\lambda&\lambda+2\mu&\lambda&0&0&0\\
+\lambda&\lambda&\lambda+2\mu&0&0&0\\
+0&0&0&\mu&0&0\\
+0&0&0&0&\mu&0\\
+0&0&0&0&0&\mu
+\end{bmatrix}.
+$$ {#eq-model-isotropic-voigt-matrix}
+
+The ordering of the shear components is not universal. A different ordering
+changes the corresponding rows and columns of $\bm C_{\mathrm V}$, so the
+chosen ordering must always be stated. Plane-stress and plane-strain models
+use reduced forms of these vectors and matrices.
 
 ::: {#rem-model-plane-stress-strain}
 ## Plane strain and plane stress
@@ -532,22 +739,62 @@ $$
 \qquad\text{Strong form}
 $$ {#eq-model-linear-elasticity-strong}
 
-Define
+In Cartesian components, the same problem is
+
+$$
+\left.
+\begin{aligned}
+-\frac{\partial}{\partial x_j}
+\left(C_{ijkl}\varepsilon_{kl}(\bu)\right)
+&=\rho b_i &&\text{in }\Om,\\
+u_i&=\overline u_i&&\text{on }\Gam_u,\\
+C_{ijkl}\varepsilon_{kl}(\bu)n_j
+&=\overline t_i&&\text{on }\Gam_t,
+\end{aligned}
+\right\}
+\qquad i=1,\ldots,d.
+$$ {#eq-model-linear-elasticity-strong-components}
+
+The indices $j$, $k$, and $l$ are repeated and are therefore summed. The
+index $i$ is free and identifies one scalar equilibrium equation and its
+boundary conditions for each displacement component.
+
+The displacement must satisfy its prescribed value on $\Gam_u$, whereas a
+test function must vanish there. We therefore use the trial and test spaces
 
 $$
 \begin{aligned}
 \mathcal U_{\overline{\bu}}
-&=\{\bm{w}\in[H^1(\Om)]^d:
+&=\{\bm{w}\in H^1(\Om;\R^d):
 \bm{w}=\overline{\bu}\text{ on }\Gam_u\},\\
 \mathcal V_0
-&=\{\bv\in[H^1(\Om)]^d:
+&=\{\bv\in H^1(\Om;\R^d):
 \bv=\bm{0}\text{ on }\Gam_u\}.
 \end{aligned}
 $$ {#eq-model-elasticity-spaces}
 
-Multiply equilibrium by $\bv\in\mathcal V_0$ and use tensor integration by
-parts from @eq-foundations-green-tensor. Since $\bsig$ is symmetric,
-$\bsig:\grad\bv=\bsig:\beps(\bv)$. The variational problem is
+To derive the variational form, let $\bv\in\mathcal V_0$. Take the dot product
+of the equilibrium equation in @eq-model-quasistatic-equilibrium with $\bv$
+and integrate over $\Om$:
+
+$$
+-\int_{\Om}(\divg\bsig)\cdot\bv\,\dx
+=\int_{\Om}\rho\bb\cdot\bv\,\dx.
+$$
+
+Tensor integration by parts, @eq-foundations-green-tensor, gives
+
+$$
+\int_{\Om}\bsig:\grad\bv\,\dx
+-\int_{\partial\Om}(\bsig\bn)\cdot\bv\,\ds
+=\int_{\Om}\rho\bb\cdot\bv\,\dx.
+$$ {#eq-model-elasticity-integration-by-parts}
+
+On $\Gam_u$, the boundary integral is zero because $\bv=\bm 0$. On
+$\Gam_t$, the traction condition gives
+$\bsig\bn=\overline{\bt}$. Moreover, $\bsig$ is symmetric, so
+$\bsig:\grad\bv=\bsig:\beps(\bv)$. Substituting the linear elastic law
+@eq-model-linear-elastic-law now gives the variational form
 
 $$
 \left.
@@ -561,11 +808,29 @@ $$
 \quad\forall\bv\in\mathcal V_0.
 \end{aligned}
 \right\}
-\qquad\text{Principle of virtual work}
+\qquad\text{Variational form}
 $$ {#eq-model-linear-elasticity-weak}
 
-The left-hand side is virtual internal work and the right-hand side is
-virtual work of the prescribed external loads [@jog]. Define
+The component form of the variational equation is
+
+$$
+\int_{\Om}
+\varepsilon_{ij}(\bv)C_{ijkl}\varepsilon_{kl}(\bu)\,\dx
+=\int_{\Om}\rho b_i v_i\,\dx
++\int_{\Gam_t}\overline t_i v_i\,\ds.
+$$ {#eq-model-linear-elasticity-weak-components}
+
+Every index in this equation is repeated, so each is summed. The result is
+one scalar equation for each test function $\bv\in\mathcal V_0$.
+
+In solid mechanics, @eq-model-linear-elasticity-weak is also called the
+**principle of virtual work**. Its left-hand side is the virtual internal
+work, and its right-hand side is the virtual work of the prescribed body
+force and traction [@jog].
+
+To write this problem in the abstract notation introduced in Chapter 3,
+define the bilinear form $a_{\mathrm{el}}$ and the linear functional
+$\ell_{\mathrm{el}}$ by
 
 $$
 \begin{aligned}
@@ -578,12 +843,60 @@ a_{\mathrm{el}}(\bm{w},\bv)
 \end{aligned}
 $$ {#eq-model-linear-elasticity-forms}
 
-Then @eq-model-linear-elasticity-weak is
-$a_{\mathrm{el}}(\bu,\bv)=\ell_{\mathrm{el}}(\bv)$ for all
-$\bv\in\mathcal V_0$.
+The compact statement of the variational problem is therefore
 
-The strain controls the full $H^1$ norm only after rigid-body motions have
-been excluded.
+$$
+\left.
+\begin{aligned}
+&\text{Find }\bu\in\mathcal U_{\overline{\bu}}\text{ such that}\\
+&a_{\mathrm{el}}(\bu,\bv)=\ell_{\mathrm{el}}(\bv)
+\qquad\forall\bv\in\mathcal V_0.
+\end{aligned}
+\right\}
+\qquad\text{Variational form}
+$$ {#eq-model-linear-elasticity-abstract}
+
+We next determine when this problem has a unique solution. Suppose the
+elasticity tensor satisfies
+$|\bm A:\mathbb C:\bm B|\leq C_{\mathbb C}|\bm A||\bm B|$ for symmetric
+tensors $\bm A$ and $\bm B$. The Cauchy--Schwarz inequality then gives
+
+$$
+\begin{aligned}
+|a_{\mathrm{el}}(\bm w,\bv)|
+&\leq C_{\mathbb C}
+\norm{\beps(\bm w)}_{L^2(\Om;\R^{d\times d})}
+\norm{\beps(\bv)}_{L^2(\Om;\R^{d\times d})}\\
+&\leq C_{\mathbb C}
+\norm{\bm w}_{H^1(\Om;\R^d)}
+\norm{\bv}_{H^1(\Om;\R^d)}.
+\end{aligned}
+$$ {#eq-model-elasticity-continuity}
+
+Thus the bilinear form is continuous. If
+$\rho\bb\in L^2(\Om;\R^d)$ and
+$\overline{\bt}\in L^2(\Gam_t;\R^d)$, the Cauchy--Schwarz and trace
+inequalities similarly give
+
+$$
+\begin{aligned}
+|\ell_{\mathrm{el}}(\bv)|
+&\leq
+\norm{\rho\bb}_{L^2(\Om;\R^d)}\norm{\bv}_{L^2(\Om;\R^d)}
++\norm{\overline{\bt}}_{L^2(\Gam_t;\R^d)}
+ \norm{\bv}_{L^2(\Gam_t;\R^d)}\\
+&\leq C_\ell\norm{\bv}_{H^1(\Om;\R^d)},
+\end{aligned}
+$$ {#eq-model-elasticity-load-continuity}
+
+so the load functional is continuous.
+
+The remaining requirement in the Lax--Milgram theorem
+@thm-lax-milgram is coercivity in the $H^1(\Om;\R^d)$ norm. The positive
+definiteness condition @eq-model-elasticity-positive-definite controls
+$\beps(\bv)$, but it does not directly control the full $H^1$ norm of
+$\bv$. Korn's inequality supplies the required estimate when the prescribed
+displacement boundary excludes rigid-body motions.
 
 ::: {#thm-model-korn-inequality}
 ## Korn inequality
@@ -591,33 +904,71 @@ Let $\Om$ be a bounded Lipschitz domain and let $\Gam_u$ have positive
 boundary measure. There is a constant $C_K>0$ such that
 
 $$
-\norm{\bv}_{[H^1(\Om)]^d}
+\norm{\bv}_{H^1(\Om;\R^d)}
 \leq C_K
-\norm{\beps(\bv)}_{[L^2(\Om)]^{d\times d}}
+\norm{\beps(\bv)}_{L^2(\Om;\R^{d\times d})}
 \qquad\forall\bv\in\mathcal V_0.
 $$
 :::
 
-Positive definiteness of $\mathbb C$ and Korn's inequality make
-$a_{\mathrm{el}}$ coercive. Boundedness of $\mathbb C$ gives continuity.
-Under the corresponding assumptions on the loads, the Lax--Milgram theorem
-therefore gives a unique weak displacement.
+Indeed, @eq-model-elasticity-positive-definite and Korn's inequality give
+
+$$
+a_{\mathrm{el}}(\bv,\bv)
+\geq c_{\mathbb C}
+\norm{\beps(\bv)}_{L^2(\Om;\R^{d\times d})}^2
+\geq \frac{c_{\mathbb C}}{C_K^2}
+\norm{\bv}_{H^1(\Om;\R^d)}^2.
+$$ {#eq-model-elasticity-coercivity}
+
+Thus $a_{\mathrm{el}}$ is coercive on $\mathcal V_0$. The Lax--Milgram
+theorem then gives a unique weak displacement.
 
 ::: {#rem-model-pure-traction-elasticity}
 ## A body with only prescribed tractions
-If $\Gam_u$ is empty, every infinitesimal rigid-body motion has zero strain.
-The displacement is not unique: a rigid translation or infinitesimal
-rotation can be added without changing stress. The applied body forces and
-tractions must also have zero resultant force and moment. Prescribing
-sufficient displacement data, or imposing separate constraints, removes the
-rigid-body modes.
+If $\Gam_u=\varnothing$, then $\mathcal V_0=H^1(\Om;\R^d)$. Every
+infinitesimal rigid-body motion has the form
+
+$$
+\bm r(\bx)=\bm c+\bm W\bx,
+\qquad \bm W^T=-\bm W,
+$$
+
+and satisfies $\beps(\bm r)=\bm 0$. Consequently,
+$a_{\mathrm{el}}(\bm r,\bm r)=0$ even when $\bm r\ne\bm 0$, so the bilinear
+form is not coercive on $H^1(\Om;\R^d)$. If $\bu$ is a solution, then
+$\bu+\bm r$ produces the same strain and stress and is also a solution.
+
+A solution can exist only if the loads do no work on any rigid-body motion:
+
+$$
+\ell_{\mathrm{el}}(\bm r)=0
+\qquad\text{for every infinitesimal rigid-body motion }\bm r.
+$$
+
+In three dimensions, this requirement is equivalent to zero resultant force
+and zero resultant moment:
+
+$$
+\int_{\Om}\rho\bb\,\dx
++\int_{\partial\Om}\overline{\bt}\,\ds=\bm 0,
+\qquad
+\int_{\Om}\bx\mathbin{\times}\rho\bb\,\dx
++\int_{\partial\Om}\bx\mathbin{\times}\overline{\bt}\,\ds=\bm 0.
+$$
+
+When these compatibility conditions hold, displacement is determined only up
+to a rigid-body motion. A unique displacement can be obtained by prescribing
+displacement on a suitable boundary portion or by imposing separate
+constraints on translation and rotation.
 :::
 
 ::: {#exr-model-linear-elasticity-derivation}
-## Deriving virtual work
+## Deriving the elasticity variational form
 Starting from @eq-model-quasistatic-equilibrium:
 
-1. multiply the equation by $\bv\in\mathcal V_0$ and integrate over $\Om$;
+1. take the dot product of both sides with $\bv\in\mathcal V_0$ and integrate
+   over $\Om$;
 2. apply tensor integration by parts and use
    $\bsig\bn=\overline{\bt}$ on $\Gam_t$;
 3. replace $\bsig:\grad\bv$ by $\bsig:\beps(\bv)$; and
@@ -627,31 +978,33 @@ Starting from @eq-model-quasistatic-equilibrium:
 
 ### Minimum potential energy
 
-For linear elasticity, define
+Assume that the elasticity tensor has the major symmetry
+$C_{ijkl}=C_{klij}$. The bilinear form $a_{\mathrm{el}}$ is then symmetric,
+and the variational problem is also the stationarity condition of the total
+potential energy. For $\bm{w}\in\mathcal U_{\overline{\bu}}$, define
 
 $$
 \begin{aligned}
-\Pi_{\mathrm{el}}(\bm{w})
+\Pi_{\mathrm{el}}(\bm{w}) = \frac12 a_{\mathrm{el}}(\bm{w}, \bm{w}) - \ell_{\mathrm{el}}(\bm{w})
 ={}&
 \frac12\int_{\Om}
 \beps(\bm{w}):\mathbb C:\beps(\bm{w})\,\dx\\
 &-\int_{\Om}\rho\bb\cdot\bm{w}\,\dx
--\int_{\Gam_t}\overline{\bt}\cdot\bm{w}\,\ds,
-\qquad
-\bm{w}\in\mathcal U_{\overline{\bu}}.
+-\int_{\Gam_t}\overline{\bt}\cdot\bm{w}\,\ds.
 \end{aligned}
 $$ {#eq-model-linear-elasticity-potential}
 
-For every $\bv\in\mathcal V_0$,
+For every $\bv\in\mathcal V_0$, we can show that
 
 $$
 \delta\Pi_{\mathrm{el}}(\bu;\bv)
 =a_{\mathrm{el}}(\bu,\bv)-\ell_{\mathrm{el}}(\bv).
 $$
 
-The stationarity condition is the principle of virtual work. Positive
+Therefore, the stationarity condition $\delta\Pi_{\mathrm{el}}(\bu;\bv) = 0$ is the principle of virtual work @eq-model-linear-elasticity-abstract. Positive
 definiteness of $\mathbb C$, together with Korn's inequality, makes the
-stationary displacement the unique minimizer.
+stationary displacement the unique minimizer when the prescribed displacement
+conditions exclude rigid-body motions.
 
 ::: {#exr-model-rigid-motion-and-energy}
 ## Strain, rigid motion, and elastic energy
@@ -678,8 +1031,23 @@ the deformation map between them.
 
 ### Reference and current configurations
 
-Let $\Om_0\subset\R^d$ be the reference configuration. A material point is
-labeled by $\bX\in\Om_0$. The deformation map
+Let the reference configuration $\Om_0\subset\R^d$ be a bounded Lipschitz
+domain. A material point is labeled by $\bX\in\Om_0$. Reference position
+$\bX$, current position $\bx$, and displacement $\bu$ are measured in meters.
+Throughout the
+finite-deformation formulation, uppercase $\Grad$ and $\Div$ denote
+differentiation with respect to the reference coordinate $\bX$. For a vector
+field $\bm w$ and a second-order tensor field $\bm A$,
+
+$$
+(\Grad\bm w)_{iJ}=\frac{\partial w_i}{\partial X_J},
+\qquad
+(\Div\bm A)_i=\frac{\partial A_{iJ}}{\partial X_J}.
+$$ {#eq-model-reference-differential-operators}
+
+The uppercase index $J$ identifies a reference-coordinate direction, while
+the lowercase index $i$ identifies a component in the current coordinate
+system. The deformation map
 
 $$
 \bm{\varphi}:\Om_0\to\Om_t,
@@ -711,21 +1079,31 @@ J=\det\bF,
 \bC=\bF^T\bF.
 $$ {#eq-model-jacobian-cauchy-green}
 
-An admissible deformation must satisfy $J>0$. Reference and current volume
-elements are related by
+The tensors $\bF$ and $\bC$, and the scalar $J$, are dimensionless. An
+admissible deformation must satisfy $J>0$: the deformation must preserve
+orientation and cannot collapse a volume element to zero. Reference and
+current volume elements are related by
 
 $$
 \dd V_t=J\,\dd V_0.
 $$ {#eq-model-volume-map}
 
-The tensor $\bC$ measures changes of squared length:
+Using @eq-model-line-element-map, the squared length of a reference line
+element after deformation is
 
 $$
 \dd\bx\cdot\dd\bx
 =\dd\bX\cdot\bC\,\dd\bX.
 $$
 
-The Green--Lagrange strain is
+Its change in squared length is therefore
+
+$$
+\dd\bx\cdot\dd\bx-\dd\bX\cdot\dd\bX
+=\dd\bX\cdot(\bC-\bI)\,\dd\bX.
+$$
+
+This relation motivates the Green--Lagrange strain tensor
 
 $$
 \bm{E}
@@ -735,8 +1113,11 @@ $$
 \right).
 $$ {#eq-model-green-lagrange-strain}
 
-Unlike infinitesimal strain, $\bm{E}$ retains the quadratic term needed at
-finite deformation. A rigid motion
+The strain $\bm E$ is dimensionless. When the components of $\Grad\bu$ are
+small, the quadratic term
+$(\Grad\bu)^T\Grad\bu$ can be neglected and $\bm E$ reduces to the
+infinitesimal strain in @eq-model-infinitesimal-strain. At finite deformation,
+that quadratic term is retained. A rigid motion
 $\bm{\varphi}(\bX)=\bm{Q}\bX+\bm{c}$, with
 $\bm{Q}^T\bm{Q}=\bI$ and $\det\bm{Q}=1$, gives
 $\bC=\bI$ and $\bm{E}=\bm{0}$.
@@ -775,13 +1156,48 @@ $$
 \bP=J\bsig\bF^{-T}.
 $$ {#eq-model-first-piola-transform}
 
-The traction per unit reference area is $\bP\bm{N}$, where $\bm{N}$ is the outward
-unit normal to $\partial\Om_0$. Although $\bsig$ is symmetric, $\bP$ is
-generally not symmetric because it relates current force components to
-reference area.
+Both $\bsig$ and $\bP$ have units of pascals, but they refer to different
+areas. If corresponding current and reference area elements are denoted by
+$\dd a$ and $\dd A$, the stress transformation ensures that the same force is
+represented by $\bsig\bn\,\dd a=\bP\bm N\,\dd A$. Thus the traction per unit
+reference area is $\bP\bm{N}$, where $\bm{N}$ is the outward unit normal to
+$\partial\Om_0$. Although $\bsig$ is symmetric, $\bP$ is generally not
+symmetric because it relates current force components to reference area.
 
-Let $\bb_0$ be body force per unit reference volume. Divide
-$\partial\Om_0$ into $\Gam_{0u}$ and $\Gam_{0t}$. Then
+Let $\bb_0$, measured in $\mathrm{N}/\mathrm{m}^3$, be body force per unit
+reference volume. Consider an arbitrary subdomain $\omega_0\subset\Om_0$.
+For quasistatic equilibrium, the total body and surface forces on
+$\omega_0$ must sum to zero:
+
+$$
+\int_{\omega_0}\bb_0\,\dd V
++\int_{\partial\omega_0}\bP\bm N\,\dd A
+=\bm 0.
+$$ {#eq-model-reference-equilibrium-integral}
+
+Apply the tensor divergence theorem
+@eq-foundations-tensor-divergence-theorem to the surface-force term in
+@eq-model-reference-equilibrium-integral. With $\bm A=\bP$ and
+$\omega=\omega_0$, the theorem gives
+
+$$
+\int_{\partial\omega_0}\bP\bm N\,\dd A
+=\int_{\omega_0}\Div\bP\,\dd V.
+$$ {#eq-model-reference-stress-divergence-theorem}
+
+Substituting this result into
+@eq-model-reference-equilibrium-integral gives the single volume integral
+
+$$
+\int_{\omega_0}(\Div\bP+\bb_0)\,\dd V=\bm 0.
+$$
+
+Because this equation holds for every $\omega_0\subset\Om_0$, localization
+gives $-\Div\bP=\bb_0$ in $\Om_0$.
+
+Let $\Gam_{0u}$ and $\Gam_{0t}$ be relatively open, disjoint portions whose
+closures cover $\partial\Om_0$. Displacement is prescribed on $\Gam_{0u}$,
+and reference traction is prescribed on $\Gam_{0t}$. The strong problem is
 
 $$
 \left.
@@ -794,26 +1210,57 @@ $$
 \qquad\text{Strong form}
 $$ {#eq-model-hyperelastic-strong}
 
-Uppercase $\Grad$ and $\Div$ indicate differentiation with respect to $\bX$.
+In components, @eq-model-hyperelastic-strong is
+
+$$
+\left.
+\begin{aligned}
+-\frac{\partial P_{iJ}}{\partial X_J}&=b_{0i}
+&&\text{in }\Om_0,\\
+u_i&=\overline u_i&&\text{on }\Gam_{0u},\\
+P_{iJ}N_J&=\overline t_{0i}&&\text{on }\Gam_{0t},
+\end{aligned}
+\right\}
+\qquad i=1,\ldots,d.
+$$ {#eq-model-hyperelastic-strong-components}
+
+The repeated reference index $J$ is summed, while $i$ identifies the spatial
+component of the equilibrium equation.
 
 ### Hyperelastic constitutive response
 
 A hyperelastic material is defined by a stored-energy density
-$\Psi(\bF)$ per unit reference volume. Its first Piola--Kirchhoff stress is
+$\Psi(\bF)$ per unit reference volume, measured in
+$\mathrm{J}/\mathrm{m}^3=\mathrm{Pa}$. For a fixed deformation gradient
+$\bF$ and an arbitrary tensor $\bm H$, the directional derivative of the
+energy density is
+
+$$
+\left.\frac{\dd}{\dd\epsilon}
+\Psi(\bF+\epsilon\bm H)\right|_{\epsilon=0}
+=\bP(\bF):\bm H.
+$$ {#eq-model-energy-density-derivative}
+
+Thus the first Piola--Kirchhoff stress is the derivative of $\Psi$ with
+respect to $\bF$:
 
 $$
 \bP=\frac{\partial\Psi}{\partial\bF}.
 $$ {#eq-model-hyperelastic-constitutive-law}
 
-The existence of $\Psi$ makes the material response conservative and
-path-independent. Material frame indifference requires
+The existence of $\Psi$ means that the stress work can be obtained from a
+stored energy. Now superpose a rigid rotation $\bm Q$ on the current
+configuration. The deformation gradient changes from $\bF$ to $\bm Q\bF$,
+where $\bm Q^T\bm Q=\bI$ and $\det\bm Q=1$. A rigid rotation must not change
+the stored energy, so material frame indifference requires
 
 $$
-\Psi(\bm{Q}\bF)=\Psi(\bF)
+\Psi(\bm{Q}\bF)=\Psi(\bF).
 $$
 
-for every proper orthogonal tensor $\bm{Q}$. Consequently, an objective
-isotropic energy can be expressed through invariants of $\bC$ and $J$
+For an isotropic material, the energy may be written in terms of scalar
+quantities that are unchanged by a change of orthonormal basis, such as
+$\tr\bC$ and $J$
 [@belytschko2000; @bonet-wood2008].
 
 A common compressible neo-Hookean model is
@@ -823,10 +1270,18 @@ $$
 =\frac{\mu}{2}\bigl(\tr\bC-d\bigr)
 -\mu\ln J
 +\frac{\lambda}{2}(\ln J)^2,
-\qquad J>0,
+\qquad J>0.
 $$ {#eq-model-neo-hookean-energy}
 
-for which
+The derivative identities
+
+$$
+\frac{\partial\,\tr\bC}{\partial\bF}=2\bF,
+\qquad
+\frac{\partial\ln J}{\partial\bF}=\bF^{-T}
+$$
+
+give the corresponding first Piola--Kirchhoff stress
 
 $$
 \bP
@@ -834,31 +1289,54 @@ $$
 +\lambda(\ln J)\bF^{-T}.
 $$ {#eq-model-neo-hookean-stress}
 
-The algorithmic tangent obtained by differentiating $\bP$ is not needed until
-Chapter 10.
+Chapter 10 differentiates $\bP$ with respect to $\bF$ when constructing
+Newton's method for the nonlinear equilibrium equations.
 
 ### Reference-configuration variational problem
 
-Define
+Using the same notation as in the small-strain problem, define the trial and
+test spaces over the reference configuration by
 
 $$
 \begin{aligned}
 \mathcal U_{\overline{\bu}}
-&=\{\bm{w}\in[H^1(\Om_0)]^d:
-\bm{w}=\overline{\bu}\text{ on }\Gam_{0u},\
-\det(\bI+\Grad\bm{w})>0\},\\
+&=\{\bm{w}\in H^1(\Om_0;\R^d):
+\bm{w}=\overline{\bu}\text{ on }\Gam_{0u}\},\\
 \mathcal V_0
-&=\{\bv\in[H^1(\Om_0)]^d:
+&=\{\bv\in H^1(\Om_0;\R^d):
 \bv=\bm{0}\text{ on }\Gam_{0u}\}.
 \end{aligned}
 $$ {#eq-model-hyperelastic-spaces}
 
-The determinant condition identifies locally admissible deformations.
-Additional hypotheses are required for global invertibility; that technical
-question is outside the scope of this chapter.
+::: {#rem-model-hyperelastic-admissibility}
+## Admissible deformations
+A finite deformation must also satisfy $J>0$, and the stored-energy integral
+must be finite. In this chapter, we assume that the displacement sought in
+$\mathcal U_{\overline{\bu}}$ satisfies these requirements. The function
+spaces and additional conditions used in a rigorous existence theory for
+nonlinear elasticity are outside the scope of this book.
+:::
 
-Multiply reference equilibrium by $\bv\in\mathcal V_0$ and integrate by
-parts over $\Om_0$. The variational problem is
+To derive the variational form, let $\bv\in\mathcal V_0$. Take the dot product
+of the equilibrium equation $-\Div\bP=\bb_0$ with $\bv$ and integrate over
+$\Om_0$:
+
+$$
+-\int_{\Om_0}(\Div\bP)\cdot\bv\,\dd V
+=\int_{\Om_0}\bb_0\cdot\bv\,\dd V.
+$$
+
+Tensor integration by parts gives
+
+$$
+\int_{\Om_0}\bP:\Grad\bv\,\dd V
+-\int_{\partial\Om_0}(\bP\bm N)\cdot\bv\,\dd A
+=\int_{\Om_0}\bb_0\cdot\bv\,\dd V.
+$$ {#eq-model-hyperelastic-integration-by-parts}
+
+The boundary integral is zero on $\Gam_{0u}$ because $\bv=\bm 0$. On
+$\Gam_{0t}$, use $\bP\bm N=\overline{\bt}_0$. Because the stress depends on
+the displacement through $\bF(\bu)=\bI+\Grad\bu$, the variational problem is
 
 $$
 \left.
@@ -875,28 +1353,81 @@ $$
 \qquad\text{Variational form}
 $$ {#eq-model-hyperelastic-weak}
 
-The internal form
+In components, the variational equation is the scalar relation
 
 $$
+\int_{\Om_0}
+P_{iJ}\bigl(\bF(\bu)\bigr)
+\frac{\partial v_i}{\partial X_J}\,\dd V
+=\int_{\Om_0}b_{0i}v_i\,\dd V
++\int_{\Gam_{0t}}\overline t_{0i}v_i\,\dd A.
+$$ {#eq-model-hyperelastic-weak-components}
+
+Both $i$ and $J$ are repeated and summed.
+
+To use the abstract notation of Chapter 3, define the internal semilinear
+form $a_{\mathrm{hyp}}$ and the external load functional
+$\ell_{\mathrm{hyp}}$ by
+
+$$
+\begin{aligned}
 a_{\mathrm{hyp}}(\bu;\bv)
-=\int_{\Om_0}
-\bP\bigl(\bF(\bu)\bigr):\Grad\bv\,\dd V
+&=\int_{\Om_0}
+\bP\bigl(\bF(\bu)\bigr):\Grad\bv\,\dd V,\\
+\ell_{\mathrm{hyp}}(\bv)
+&=\int_{\Om_0}\bb_0\cdot\bv\,\dd V
++\int_{\Gam_{0t}}\overline{\bt}_0\cdot\bv\,\dd A.
+\end{aligned}
 $$ {#eq-model-hyperelastic-semilinear-form}
 
-is nonlinear in $\bu$ and linear in $\bv$, and is therefore semilinear.
+The compact statement of the variational problem is
 
-For conservative body forces and prescribed tractions, define
+$$
+\left.
+\begin{aligned}
+&\text{Find }\bu\in\mathcal U_{\overline{\bu}}\text{ such that}\\
+&a_{\mathrm{hyp}}(\bu;\bv)=\ell_{\mathrm{hyp}}(\bv)
+\qquad\forall\bv\in\mathcal V_0.
+\end{aligned}
+\right\}
+\qquad\text{Variational form}
+$$ {#eq-model-hyperelastic-abstract}
+
+The dependence of $\bP$ on $\bF(\bu)$ makes $a_{\mathrm{hyp}}$ generally
+nonlinear in $\bu$. For a fixed $\bu$, it is linear in $\bv$. It is therefore
+a semilinear form in the sense of @def-semilinear-form.
+
+### Total potential energy and equilibrium
+
+The strong and variational equations are nonlinear in $\bu$, but this does
+not prevent them from having an energy structure. For a hyperelastic
+material, $\bP=\partial\Psi/\partial\bF$, so the internal semilinear form is
+the first variation of the stored energy. If $\bb_0$ and
+$\overline{\bt}_0$ are prescribed independently of the displacement, their
+external work also has a potential. Under these assumptions, define the total
+potential energy by
 
 $$
 \begin{aligned}
 \Pi_{\mathrm{hyp}}(\bm{w})
 ={}&\int_{\Om_0}\Psi\bigl(\bF(\bm{w})\bigr)\,\dd V
 -\int_{\Om_0}\bb_0\cdot\bm{w}\,\dd V\\
-&-\int_{\Gam_{0t}}\overline{\bt}_0\cdot\bm{w}\,\dd A.
+&-\int_{\Gam_{0t}}\overline{\bt}_0\cdot\bm{w}\,\dd A,
+\qquad \bm w\in\mathcal U_{\overline{\bu}}.
 \end{aligned}
 $$ {#eq-model-hyperelastic-potential}
 
-Using $\delta\bF(\bu;\bv)=\Grad\bv$ gives
+For a test function $\bv\in\mathcal V_0$, perturb the displacement as
+$\bu+\epsilon\bv$. The corresponding deformation gradient satisfies
+
+$$
+\bF(\bu+\epsilon\bv)
+=\bF(\bu)+\epsilon\Grad\bv,
+$$
+
+and therefore $\delta\bF(\bu;\bv)=\Grad\bv$. Applying the chain rule and
+@eq-model-energy-density-derivative to each term in
+@eq-model-hyperelastic-potential gives
 
 $$
 \begin{aligned}
@@ -909,10 +1440,14 @@ $$
 \end{aligned}
 $$ {#eq-model-hyperelastic-first-variation}
 
-Thus stationarity gives @eq-model-hyperelastic-weak. Unlike the
-linear-elastic energy, a finite-deformation potential need not be globally
-convex. A stationary solution may be a local minimum, a maximum, or a saddle
-point, and more than one equilibrium may exist.
+The stationarity condition
+$\delta\Pi_{\mathrm{hyp}}(\bu;\bv)=0$ for every
+$\bv\in\mathcal V_0$ is exactly the variational problem
+@eq-model-hyperelastic-weak. Thus, under the assumptions stated above, the
+equilibrium displacement can be obtained from either the variational problem
+or the stationarity of the total potential energy. Conditions under which a
+stationary point is a minimum, and questions of existence or uniqueness, are
+outside the scope of this chapter.
 
 ::: {#exr-model-finite-deformation-measures}
 ## Deformation measures

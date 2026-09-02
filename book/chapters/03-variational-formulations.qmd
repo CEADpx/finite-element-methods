@@ -301,12 +301,12 @@ $$
 \left|\int_{\Om}k\grad u\cdot\grad v\,\dx\right|
 \leq
 \norm{k}_{L^\infty(\Om)}
-\norm{\grad u}_{[L^2(\Om)]^d}
-\norm{\grad v}_{[L^2(\Om)]^d}.
+\norm{\grad u}_{L^2(\Om;\R^d)}
+\norm{\grad v}_{L^2(\Om;\R^d)}.
 $$ {#eq-variational-bilinear-bound-preliminary}
 
 Consequently, $u$ and $v$ should have first-order weak derivatives in
-$[L^2(\Om)]^d$. Combining this requirement with $u,v\in L^2(\Om)$ gives
+$L^2(\Om;\R^d)$. Combining this requirement with $u,v\in L^2(\Om)$ gives
 $u,v\in H^1(\Om)$. The Neumann term is also finite for such test functions.
 Indeed, Hölder on $\Gam_N$ and the trace inequality
 @thm-foundations-trace-inequality give
@@ -651,8 +651,8 @@ $$
 |a(w,v)|
 &=\left|\int_{\Om}k\grad w\cdot\grad v\,\dx\right|\\
 &\leq k_1
-\norm{\grad w}_{[L^2(\Om)]^d}
-\norm{\grad v}_{[L^2(\Om)]^d}\\
+\norm{\grad w}_{L^2(\Om;\R^d)}
+\norm{\grad v}_{L^2(\Om;\R^d)}\\
 &\leq k_1
 \norm{w}_{H^1(\Om)}
 \norm{v}_{H^1(\Om)}.
@@ -669,7 +669,7 @@ $$
 \begin{aligned}
 a(v,v)
 &=\int_{\Om}k|\grad v|^2\,\dx\\
-&\geq k_0\norm{\grad v}_{[L^2(\Om)]^d}^2\\
+&\geq k_0\norm{\grad v}_{L^2(\Om;\R^d)}^2\\
 &\geq
 \frac{k_0}{1+C_P^2}
 \norm{v}_{H^1(\Om)}^2

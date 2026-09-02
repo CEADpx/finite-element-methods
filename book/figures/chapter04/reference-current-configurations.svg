@@ -1,37 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="360" viewBox="0 0 1000 360">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560">
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#315f86"/>
+    <marker id="arrowhead" viewBox="0 0 12 12" refX="10.5" refY="6"
+            markerWidth="11" markerHeight="11" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 Z" fill="#315f86"/>
     </marker>
   </defs>
 
-  <rect width="920" height="360" fill="white"/>
+  <rect width="1400" height="560" fill="white"/>
 
-  <path d="M95,92 C145,45 260,48 310,104 C350,150 325,254 250,286
-           C171,319 76,272 63,202 C53,154 66,119 95,92 Z"
-        fill="#dcecf5" stroke="#315f86" stroke-width="4"/>
-  <path d="M506,78 C585,38 698,74 742,137 C783,196 730,286 649,300
-           C570,314 476,262 466,190 C458,136 472,96 506,78 Z"
-        fill="#f3e4cf" stroke="#9a602b" stroke-width="4"/>
+  <!-- Undeformed body in the reference configuration. -->
+  <path d="M113,126
+           C184,70 337,62 424,118
+           C498,166 505,286 443,356
+           C371,437 213,438 120,371
+           C43,316 42,185 113,126 Z"
+        fill="#e3eef5" stroke="#315f86" stroke-width="5"/>
 
-  <circle cx="205" cy="172" r="7" fill="#18384f"/>
-  <circle cx="618" cy="160" r="7" fill="#673b19"/>
+  <!-- The same body after a visible stretch and shear. -->
+  <path d="M906,104
+           C1011,63 1197,82 1303,151
+           C1370,195 1357,299 1267,368
+           C1164,447 955,432 865,357
+           C790,294 810,183 906,104 Z"
+        fill="#f5e7d2" stroke="#9a602b" stroke-width="5"/>
 
-  <path d="M330,172 C390,112 440,113 478,155"
-        fill="none" stroke="#315f86" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M503,244 C592,157 724,157 813,241"
+        fill="none" stroke="#315f86" stroke-width="5"
+        marker-end="url(#arrowhead)"/>
+  <text x="659" y="139" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif" font-size="31"
+        font-style="italic" fill="#315f86">φ : Ω<tspan baseline-shift="sub" font-size="20">0</tspan> → Ω<tspan baseline-shift="sub" font-size="20">t</tspan></text>
 
-  <line x1="205" y1="172" x2="255" y2="139" stroke="#18384f" stroke-width="3"/>
-  <line x1="618" y1="160" x2="677" y2="125" stroke="#673b19" stroke-width="3"/>
+  <circle cx="275" cy="244" r="10" fill="#17384f"/>
+  <text x="299" y="231"
+        font-family="Georgia, 'Times New Roman', serif" font-size="34"
+        font-style="italic" fill="#17384f">X</text>
 
-  <text x="140" y="330" font-family="Arial, sans-serif" font-size="25"
-        fill="#18384f">Reference configuration Ω₀</text>
-  <text x="536" y="330" font-family="Arial, sans-serif" font-size="25"
-        fill="#673b19">Current configuration Ωₜ</text>
-  <text x="263" y="140" font-family="Arial, sans-serif" font-size="25"
-        fill="#18384f">X</text>
-  <text x="685" y="126" font-family="Arial, sans-serif" font-size="25"
-        fill="#673b19">x = φ(X)</text>
-  <text x="405" y="93" font-family="Arial, sans-serif" font-size="25"
-        fill="#315f86">φ</text>
+  <circle cx="1068" cy="247" r="10" fill="#6e3e19"/>
+  <text x="1092" y="234"
+        font-family="Georgia, 'Times New Roman', serif" font-size="31"
+        font-style="italic" fill="#6e3e19">x = φ(X)</text>
+
+  <text x="275" y="500" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-size="30"
+        fill="#17384f">Reference configuration Ω<tspan baseline-shift="sub" font-size="19">0</tspan></text>
+  <text x="1090" y="500" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-size="30"
+        fill="#6e3e19">Current configuration Ω<tspan baseline-shift="sub" font-size="19">t</tspan></text>
 </svg>

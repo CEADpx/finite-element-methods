@@ -1484,8 +1484,11 @@ be small even when the error remains large on a set whose measure is small.
 Vector- and tensor-valued $L^2$ spaces are defined componentwise. For example,
 
 $$
-\norm{\bu}_{[L^2(\Om)]^d}^2
-=\int_{\Om}\bu\cdot\bu\,\dx.
+\norm{\bu}_{L^2(\Om;\R^d)}^2
+=\int_{\Om}\bu\cdot\bu\,\dx,
+\qquad
+\norm{\bm A}_{L^2(\Om;\R^{d\times d})}^2
+=\int_{\Om}\bm A:\bm A\,\dx.
 $$
 
 ## Differential operators {#sec-foundations-differential-operators}
@@ -1918,25 +1921,36 @@ $$
 w(x)=
 \begin{cases}
 -1, & -1<x<0,\\
+ 0, & x=0,\\
  1, & 0<x<1.
 \end{cases}
 $$
 
-For $\varphi\in C_0^\infty(-1,1)$, split the integral at the origin:
+To verify @def-weak-derivative, let
+$\varphi\in C_0^\infty(-1,1)$. Since $|x|=-x$ on $(-1,0)$ and
+$|x|=x$ on $(0,1)$, split the integral at the origin and integrate by parts
+on each subinterval:
 
 $$
 \begin{aligned}
 -\int_{-1}^{1}|x|\varphi'(x)\,\dd x
-&=\int_{-1}^{0}(-1)\varphi(x)\,\dd x
+&=\int_{-1}^{0}x\varphi'(x)\,\dd x
+  -\int_{0}^{1}x\varphi'(x)\,\dd x\\
+&=\left[x\varphi(x)\right]_{-1}^{0}
+  -\int_{-1}^{0}\varphi(x)\,\dd x
+  -\left[x\varphi(x)\right]_{0}^{1}
+  +\int_{0}^{1}\varphi(x)\,\dd x\\
+&=-\int_{-1}^{0}\varphi(x)\,\dd x
   +\int_{0}^{1}\varphi(x)\,\dd x\\
 &=\int_{-1}^{1}w(x)\varphi(x)\,\dd x.
 \end{aligned}
 $$
 
-The boundary contributions at $x=0$ cancel because $u$ is continuous there.
-Therefore $w$ is the weak derivative of $|x|$. Its value at the single point
-$x=0$ is irrelevant because $L^2$ functions are identified up to equality
-almost everywhere.
+The endpoint terms vanish because $\varphi(-1)=\varphi(1)=0$, and the two
+terms evaluated at the origin contain the factor $x=0$. The defining identity
+therefore holds for every $\varphi\in C_0^\infty(-1,1)$, so $w$ is the weak
+derivative of $|x|$. The assigned value $w(0)=0$ is immaterial; changing a
+function at one point does not change its equivalence class in $L^2(-1,1)$.
 :::
 
 ### Sobolev spaces $W^{k,p}(\Om)$
@@ -2024,18 +2038,20 @@ The $H^1$ norm is
 
 $$
 \norm{v}_{H^1(\Om)}^2
-=\norm{v}_{L^2(\Om)}^2+\norm{\grad v}_{[L^2(\Om)]^d}^2.
+=\norm{v}_{L^2(\Om)}^2+\norm{\grad v}_{L^2(\Om;\R^d)}^2.
 $$ {#eq-h1-norm}
 
 The corresponding $H^1$ seminorm is
 
 $$
 \seminorm{v}_{H^1(\Om)}
-=\norm{\grad v}_{[L^2(\Om)]^d}.
+=\norm{\grad v}_{L^2(\Om;\R^d)}.
 $$ {#eq-h1-seminorm}
 
-For vector-valued fields we use $[H^1(\Om)]^d$, with the squared norm obtained
-by summing the squared $H^1$ norms of the components.
+The vector-valued space $H^1(\Om;\R^d)$ consists of fields whose $d$
+components belong to $H^1(\Om)$. Its squared norm is the sum of the squared
+$H^1$ norms of those components. We use this codomain notation consistently
+for vector- and tensor-valued function spaces.
 
 ### The space $H^2(\Om)$
 
@@ -2074,7 +2090,7 @@ $$
 =\frac{\partial^2v}{\partial x_i\partial x_j}.
 $$
 
-For vector-valued fields, $[H^2(\Om)]^d$ is defined componentwise.
+For vector-valued fields, $H^2(\Om;\R^d)$ is defined componentwise.
 
 For first-order finite elements, the $H^2$ seminorm measures the second
 derivatives that appear in estimates of the error in the $H^1$ norm. These
@@ -2168,7 +2184,7 @@ If $\Gam_D$ has positive boundary measure, the Poincare inequality gives a
 constant $C_P>0$ such that
 
 $$
-\norm{v}_{L^2(\Om)}\leq C_P\norm{\grad v}_{[L^2(\Om)]^d}
+\norm{v}_{L^2(\Om)}\leq C_P\norm{\grad v}_{L^2(\Om;\R^d)}
 \qquad\forall v\in H^1_{0,\Gam_D}(\Om).
 $$ {#eq-foundations-poincare}
 
@@ -2255,8 +2271,8 @@ distributive property of the dot product.
 ::: {#exm-foundations-linear-functional-loads}
 ## Body-force and traction functionals
 Let $\Om$ be a bounded Lipschitz domain and let
-$\bm{v}\in V=[H^1(\Om)]^d$ be a displacement field. A body force
-$\bm{b}\in[L^2(\Om)]^d$ defines the functional
+$\bm{v}\in V=H^1(\Om;\R^d)$ be a displacement field. A body force
+$\bm{b}\in L^2(\Om;\R^d)$ defines the functional
 
 $$
 \ell_b(\bm{v})
@@ -2264,7 +2280,7 @@ $$
 $$
 
 Let $\Gamma_t\subset\partial\Om$ be a measurable boundary portion on which a
-traction $\bm{t}\in[L^2(\Gamma_t)]^d$ is prescribed. The field $\bm{v}$ has a
+traction $\bm{t}\in L^2(\Gamma_t;\R^d)$ is prescribed. The field $\bm{v}$ has a
 well-defined boundary value on $\Gamma_t$, and the traction defines the
 functional
 
@@ -2319,8 +2335,8 @@ For the loads in @exm-foundations-linear-functional-loads, use the
 Cauchy--Schwarz inequality and the trace estimate
 
 $$
-\norm{\bm{v}}_{[L^2(\Gamma_t)]^d}
-\leq C_{\mathrm{tr}}\norm{\bm{v}}_{[H^1(\Om)]^d}
+\norm{\bm{v}}_{L^2(\Gamma_t;\R^d)}
+\leq C_{\mathrm{tr}}\norm{\bm{v}}_{H^1(\Om;\R^d)}
 $$
 
 to prove
@@ -2329,10 +2345,10 @@ $$
 |\ell(\bm{v})|
 \leq
 \left(
-\norm{\bm{b}}_{[L^2(\Om)]^d}
-+C_{\mathrm{tr}}\norm{\bm{t}}_{[L^2(\Gamma_t)]^d}
+\norm{\bm{b}}_{L^2(\Om;\R^d)}
++C_{\mathrm{tr}}\norm{\bm{t}}_{L^2(\Gamma_t;\R^d)}
 \right)
-\norm{\bm{v}}_{[H^1(\Om)]^d}.
+\norm{\bm{v}}_{H^1(\Om;\R^d)}.
 $$
 
 Conclude that $\ell\in V^*$ and give an upper bound for
@@ -2546,7 +2562,7 @@ $$
 |DJ(u)[v]|
 \leq
 \left(
-\norm{k}_{L^\infty(\Om)}\norm{\grad u}_{[L^2(\Om)]^d}
+\norm{k}_{L^\infty(\Om)}\norm{\grad u}_{L^2(\Om;\R^d)}
 +\norm{f}_{L^2(\Om)}
 \right)
 \norm{v}_{H^1(\Om)},
@@ -2746,7 +2762,7 @@ constant $C_P>0$, depending on $\Om$ and $\Gam_D$, such that
 
 $$
 \norm{v}_{L^2(\Om)}
-\leq C_P\norm{\grad v}_{[L^2(\Om)]^d}
+\leq C_P\norm{\grad v}_{L^2(\Om;\R^d)}
 \qquad\forall v\in H^1_{0,\Gam_D}(\Om).
 $$
 
@@ -2759,10 +2775,10 @@ Under the assumptions of @thm-foundations-poincare-inequality,
 @eq-h1-norm and the Poincare inequality give
 
 $$
-\norm{\grad v}_{[L^2(\Om)]^d}
+\norm{\grad v}_{L^2(\Om;\R^d)}
 \leq\norm{v}_{H^1(\Om)}
 \leq\sqrt{1+C_P^2}\,
-\norm{\grad v}_{[L^2(\Om)]^d}
+\norm{\grad v}_{L^2(\Om;\R^d)}
 \qquad\forall v\in H^1_{0,\Gam_D}(\Om).
 $$ {#eq-foundations-h1-seminorm-equivalence}
 

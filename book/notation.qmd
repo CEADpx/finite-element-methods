@@ -75,7 +75,10 @@ Uppercase operators distinguish differentiation with respect to reference coordi
 | Symbol | Meaning |
 |---|---|
 | $L^2(\Om)$ | Square-integrable scalar functions on $\Om$ |
+| $L^2(\Om;\R^d)$ | Square-integrable vector fields on $\Om$ |
+| $L^2(\Om;\R^{d\times d})$ | Square-integrable second-order tensor fields on $\Om$ |
 | $H^m(\Om)$ | Functions with square-integrable weak derivatives through order $m$ |
+| $H^m(\Om;\R^d)$ | Vector fields whose components belong to $H^m(\Om)$ |
 | $H_0^1(\Om)$ | $H^1$ functions with zero prescribed boundary value |
 | $\U$ | Generic trial space |
 | $\V$ | Generic test or variational space |
