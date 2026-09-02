@@ -2624,10 +2624,6 @@ theorem to a diffusion problem. Later chapters will require more general
 stability conditions for mixed and constrained formulations
 [@arnold2018; @oden-demkowicz].
 
-```{=latex}
-\Needspace{12\baselineskip}
-```
-
 ::: {#exr-foundations-diffusion-continuity-coercivity}
 ## Continuity and coercivity of a diffusion form
 Let $V=H_0^1(\Om)$ with $\norm{v}_V=\norm{v}_{H^1(\Om)}$, and let

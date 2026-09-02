@@ -227,10 +227,6 @@ is not automatically a defect in the PDE, a mesh-refinement trend does not
 validate a constitutive model, and agreement with the assembled equations does
 not prove agreement with the continuum problem.
 
-```{=latex}
-\Needspace{15\baselineskip}
-```
-
 ::: {#exr-intro-workflow-classification}
 ## Classifying parts of an analysis
 For each item below, identify the stage in @eq-intro-workflow where it first
@@ -290,10 +286,6 @@ this enlargement of the admissible class. Chapter 2 develops that language. This
 broader solution space is important because piecewise polynomial finite element
 functions are generally not globally smooth enough to satisfy a second-order PDE
 pointwise, but they can satisfy the corresponding variational equation.
-
-```{=latex}
-\Needspace{12\baselineskip}
-```
 
 ::: {#exr-intro-piecewise-linear-weak-form}
 ## A piecewise-linear field and a second-order PDE

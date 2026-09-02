@@ -38,10 +38,6 @@ have the classical second derivatives required by a second-order differential
 equation. The variational formulation reduces the required derivative order
 and leads to the definition of a weak solution.
 
-```{=latex}
-\Needspace{32\baselineskip}
-```
-
 ### Abstract strong and variational problems
 
 Let $\mathcal{L}$ be a differential operator that may depend linearly or
@@ -876,10 +872,6 @@ conclude that the stationary point is a unique minimizer.
 5. Use coercivity to prove that $u$ is the unique minimizer of $\Pi$ over
    $\Ug$.
 :::
-
-```{=latex}
-\Needspace{24\baselineskip}
-```
 
 ## A nonlinear problem and its semilinear form {#sec-variational-nonlinear-example}
 
