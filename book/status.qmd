@@ -14,11 +14,11 @@ consistency with later chapters.
 
 - **Chapter 1: Introduction to the Finite Element Method**
 - **Chapter 2: Mathematical Foundations**
+- **Chapter 3: Partial Differential Equations and Variational Formulations**
+- **Chapter 4: Model Problems in Heat Transfer and Solid Mechanics** 
 
 ## Actively developed
 
-- **Chapter 3: Partial Differential Equations and Variational Formulations**
-- **Chapter 4: Model Problems in Heat Transfer and Solid Mechanics** 
 - **Chapter 5: Review of Finite Element Approximation**
 
 ## Yet to be started
