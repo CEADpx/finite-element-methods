@@ -17,7 +17,7 @@ date: "27 August, 2026"
 Show the main steps in each calculation. When a requested maximum or minimum
 does not exist, state why it does not exist.
 
-# Problem 1 (10 marks): Sequences and limits
+# Sequences and limits {.problem marks="10"}
 
 1. Determine the limit of
    $$
@@ -32,7 +32,7 @@ does not exist, state why it does not exist.
    does not converge, and identify two convergent subsequences. State the limit
    of each subsequence.
 
-# Problem 2 (20 marks): Bounds and extrema
+# Bounds and extrema {.problem marks="20"}
 
 1. For each set, determine $\sup$, $\inf$, $\max$, and $\min$ when they exist:
 
@@ -56,7 +56,7 @@ does not exist, state why it does not exist.
 
    b. Does $f$ have a minimum?
 
-# Problem 3 (10 marks): Cartesian vectors
+# Cartesian vectors {.problem marks="10"}
 
 In the Cartesian basis of $\R^3$, let
 
@@ -73,7 +73,7 @@ $$
 
 3. Use $a_i=\bm{a}\cdot\bm{e}_i$ to recover each component of $\bm{a}$.
 
-# Problem 4 (10 marks): Tensor-vector multiplication
+# Tensor-vector multiplication {.problem marks="10"}
 
 Let $\bm{c}=\bm{A}\bm{b}$. Starting from the basis expansions
 
@@ -90,7 +90,7 @@ $$
 c_i=A_{ij}b_j.
 $$
 
-# Problem 5 (50 marks): Identifying real vector spaces
+# Identifying real vector spaces {.problem marks="50"}
 
 For each set, use the usual addition and multiplication by scalars from $\R$.
 Determine whether these operations make the set a real vector space. If they

@@ -2,6 +2,9 @@ project:
   type: default
   output-dir: _output
 
+filters:
+  - filters/problem-numbering.lua
+
 format:
   html:
     theme:

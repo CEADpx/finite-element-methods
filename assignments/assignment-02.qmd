@@ -1,0 +1,249 @@
+---
+title: "Assignment 2: Functions and Functionals"
+subtitle: "ME/BME 736 — Advanced Finite Element Methods"
+author: "Prashant K. Jha"
+date: "4 September, 2026"
+---
+
+
+Show the main steps in each calculation. 
+
+# Equality almost everywhere {.problem marks="10"}
+
+Define the measurable function $w:(0,1)\to\R$ by
+
+$$
+w(x)=
+\begin{cases}
+1, & x\in\mathbb{Q},\\
+0, & x\notin\mathbb{Q}.
+\end{cases}
+$$
+
+1. Use the fact that $\mathbb{Q}\cap(0,1)$ is countable to show that
+   $w=0$ almost everywhere in $(0,1)$.
+2. Compute $\sup_{0<x<1}|w(x)|$ and
+   $\mathop{\mathrm{ess\,sup}}_{0<x<1}|w(x)|$.
+3. Show that $w$ and the zero function represent the same element of
+   $L^p(0,1)$ for every $1\leq p\leq\infty$.
+
+
+# Uniform and $L^2$ convergence are different {.problem marks="10"}
+
+Let $u_n(x)=x^n$ on $[0,1]$. Each $u_n$ is continuous. Moreover,
+
+$$
+\norm{u_n}_{\infty}=1,
+\qquad
+\norm{u_n}_{L^2(0,1)}
+=\left(\int_0^1x^{2n}\,\dd x\right)^{1/2}
+=\frac{1}{\sqrt{2n+1}}.
+$$
+
+Thus $u_n\to0$ in $L^2(0,1)$ but not in the supremum norm. An $L^2$ norm can
+be small even when the error remains large on a set whose measure is small.
+
+# Extensions of Gauss divergence theorem {.problem marks="10"}
+
+Let $\bv$ and $\bm{a}$ be continuously differentiable vector fields, and let
+$\bm{A}$ be a continuously differentiable second-order tensor field. Using
+the scalar gradient theorem, prove each identity independently:
+
+$$
+\begin{aligned}
+\int_{\Om}\frac{\partial v_i}{\partial x_j}\,\dx
+&=\int_{\partial\Om}v_i n_j\,\ds
+&& (i,j=1,\ldots,d),\\
+\int_{\Om}\frac{\partial a_i}{\partial x_i}\,\dx
+&=\int_{\partial\Om}a_i n_i\,\ds,\\
+\int_{\Om}\frac{\partial A_{ij}}{\partial x_j}\,\dx
+&=\int_{\partial\Om}A_{ij}n_j\,\ds
+&& (i=1,\ldots,d).
+\end{aligned}
+$$
+
+# Checking Gauss's theorem on a square {.problem marks="10"}
+
+Let $\Om=(0,1)^2$ and
+$\bm{a}=(x_1^2x_2,x_1x_2^2)$. Compute
+$\int_{\Om}\divg\bm{a}\,\dx$ directly. Then compute the outward flux on
+each side of $\partial\Om$ and verify
+
+$$
+\int_{\Om}\divg\bm{a}\,\dx
+=\int_{\partial\Om}\bm{a}\cdot\bn\,\ds.
+$$
+
+
+# Computing $H^1$ and $H^2$ norms {.problem marks="10"}
+
+For $v(x)=x(1-x)$ on $(0,1)$, compute
+$\norm{v}_{L^2(0,1)}$, $\seminorm{v}_{H^1(0,1)}$,
+$\norm{v}_{H^1(0,1)}$, $\seminorm{v}_{H^2(0,1)}$, and
+$\norm{v}_{H^2(0,1)}$.
+
+# Derivative of a nonlinear energy functional {.problem marks="10"}
+
+For smooth scalar functions on a bounded domain and prescribed
+$k,f\in C(\overline{\Om})$, let
+
+$$
+J(u)=\int_{\Om}\left(
+\frac{k}{2}|\grad u|^2+\frac14u^4-fu
+\right)\,\dx.
+$$
+
+Compute $DJ(u)[v]$ (also denoted by $\delta J(u; v)$) (see 2.9.4 in Chapter 2). Verify that the result is linear in
+$v$.
+
+# Continuity and coercivity of a diffusion form {.problem marks="15"}
+
+Let $V=H_0^1(\Om)$ with $\norm{v}_V=\norm{v}_{H^1(\Om)}$, and let
+
+$$
+a(u,v)=\int_{\Om}k\grad u\cdot\grad v\,\dx,
+$$
+
+where $0<k_0\leq k(\bx)\leq k_1$. Use the Cauchy--Schwarz and Poincare
+inequalities (see **Reference inequalities** section in Chapter 2) to prove
+
+$$
+|a(u,v)|
+\leq k_1\norm{u}_{H^1(\Om)}\norm{v}_{H^1(\Om)}
+\qquad\forall u,v\in V,
+$$
+
+and
+
+$$
+a(v,v)
+\geq \frac{k_0}{1+C_P^2}\norm{v}_{H^1(\Om)}^2
+\qquad\forall v\in V.
+$$
+
+Hence identify the continuity constant $M$ and coercivity constant $\alpha$; see definitions of continuity and coercivity in section 2.10 of Chapter 2.
+
+# Weak derivative of a tent function {.problem marks="25"}
+
+Let
+
+$$
+u(x)=1-|x|,
+\qquad x\in \Om = (-1,1).
+$$
+
+1. Determine the classical derivative of $u$ on $(-1,0)$ and $(0,1)$ and
+   propose a weak derivative $w$ on $(-1,1)$.
+
+2. Verify directly that $w$ is the weak derivative of $u$. That is, show that
+
+   $$
+   \int_{-1}^1 u(x)\phi'(x)\,\dd x
+   =
+   -\int_{-1}^1 w(x)\phi(x)\,\dd x
+   $$
+
+   for every $\phi\in C_0^\infty(-1,1)$ by splitting the integral at
+   $x=0$.
+
+3. Use the definition of $H^1(-1,1)$ to determine whether
+   $u\in H^1(-1,1)$.
+
+4. Determine whether $u\in H^2(-1,1)$. You will use the method of contradiction to answer this question. Follow the steps and for each step, answer the asked question by clearly writing your steps and assumptions. 
+
+   Recall that if $u\in H^2(-1,1)$, then its weak derivative $w$ must belong to
+   $H^1(-1,1)$. Hence there must exist some $g\in L^2(-1,1)$ such that
+
+   $$
+   \int_{-1}^1 w(x)\phi'(x)\,\dd x
+   =
+   -\int_{-1}^1 g(x)\phi(x)\,\dd x
+   \qquad
+   \forall \phi\in C_0^\infty(-1,1).
+   $$
+
+   Use the following steps to show that such a function $g$ cannot exist.
+
+   **Step 1.** Using the piecewise form of $w$, split the integral at $x=0$
+   and show that
+
+   $$
+   \int_{-1}^1 w(x)\phi'(x)\,\dd x
+   =
+   2\phi(0)\qquad \forall \phi\in C_0^\infty(-1,1)
+   $$
+
+   Therefore, the condition for $g$ to be a weak derivative of $w$ reduces to
+
+   $$
+   2\phi(0)
+   =
+   -\int_{-1}^1 g(x)\phi(x)\,\dd x
+   \qquad
+   \forall \phi\in C_0^\infty(-1,1). 
+   $$ {#eq-reduced-phi-g-relation}
+
+   **Step 2.** Choose any $\eta\in C_0^\infty(-1,1)$ satisfying
+   $\eta(0)=1$. For $0<\varepsilon<1$, define
+
+   $$
+   \phi_\varepsilon(x)
+   =
+   \eta\left(\frac{x}{\varepsilon}\right).
+   $$
+
+   Then $\phi_\varepsilon(0)=1$. Also,
+
+   $$
+   \norm{\phi_\varepsilon}_{L^2(-1,1)}
+   =
+   \sqrt{\varepsilon}\,
+   \norm{\eta}_{L^2(-1,1)}.
+   $$
+
+   You do not need to prove this identity, but it follows directly by
+   substituting the definition of $\phi_\varepsilon$ and using the change of
+   variables $y=x/\varepsilon$.
+
+   **Step 3.** Apply the reduced weak-derivative identity to
+   $\phi=\phi_\varepsilon$. Since $\phi_\varepsilon(0)=1$, the LHS of @eq-reduced-phi-g-relation is simply $2$ for $\phi=\phi_\varepsilon$. Thus, @eq-reduced-phi-g-relation is given by
+
+   $$
+   2
+   =
+   -\int_{-1}^1 g(x)\phi_\varepsilon(x)\,\dd x. 
+   $$
+
+   We take absolute value of the both side to get
+
+   $$
+   2
+   =
+   \left \vert \int_{-1}^1 g(x)\phi_\varepsilon(x)\,\dd x \right \vert. 
+   $$ {#eq-reduced-phi-g-relation-new}
+
+   Use the Cauchy--Schwarz inequality (see Section 2.11 of Chapter 2) on the above integral to show 
+
+   $$
+   2
+   \leq
+   \norm{g}_{L^2(-1,1)}
+   \norm{\phi_\varepsilon}_{L^2(-1,1)}.
+   $$
+
+   Combine this with the estimate from Step 2 to obtain
+
+   $$
+   2
+   \leq
+   \norm{g}_{L^2(-1,1)}
+   \sqrt{\varepsilon}\,
+   \norm{\eta}_{L^2(-1,1)}.
+   $$
+
+   **Step 4.** Let $\varepsilon\to0$. Explain why the right-hand side tends to
+   zero while the left-hand side remains equal to $2$. Conclude that the
+   resulting inequality is impossible.
+
+   Hence show that no $g\in L^2(-1,1)$ can be the weak derivative of $w$ (because we have shown it violates the integral relation in the definition of the weak derivative for some cases of test functions $\phi$), and
+   therefore determine whether $u\in H^2(-1,1)$.
