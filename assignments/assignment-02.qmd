@@ -43,15 +43,16 @@ $$
 $$
 
 
-Let $u_n(x)=x^n$ on $\Om = [0,1]$.
+Let $I=[0,1]$ and define $u_n(x)=x^n$ for $x\in I$.
 
 1. Determine the pointwise limit $u(x)=\lim_{n\to\infty}u_n(x)$ for every
-   $x\in \Om$.
-2. Show that $\norm{u_n-u}_{\infty}=1$ for every $n$. Hence determine whether $u_n$ converges to $u$ in the supremum norm.
+   $x\in I$.
+2. Show that $\norm{u_n-u}_{\infty}=1$ for every $n$. Hence determine
+   whether $u_n$ converges to $u$ in the supremum norm.
 3. Is the function $u$ obtained in Part 1 also the limit of $u_n$ in
-   $L^2(\Om)$? Justify your answer. If it is, identify a constant function
-   that is another representative of the same element of $L^2(\Om)$, and
-   explain why it is equivalent to $u$ in $L^2(\Om)$.
+   $L^2(I)$? Justify your answer. If it is, identify a constant function
+   that is another representative of the same element of $L^2(I)$, and
+   explain why it is equivalent to $u$ in $L^2(I)$.
 
 # Extensions of Gauss divergence theorem {.problem marks="10"}
 
@@ -114,8 +115,15 @@ $$
 a(u,v)=\int_{\Om}k\grad u\cdot\grad v\,\dx,
 $$
 
-where $0<k_0\leq k(\bx)\leq k_1$. Use the Cauchy--Schwarz and Poincare
-inequalities (see **Reference inequalities** section in Chapter 2) to prove
+where $k\in L^\infty(\Om)$ and
+
+$$
+0<k_0\leq k(\bx)\leq k_1
+\qquad\text{for almost every }\bx\in\Om.
+$$
+
+Use the Cauchy--Schwarz and Poincare inequalities (see **Reference
+inequalities** section in Chapter 2) to prove
 
 $$
 |a(u,v)|

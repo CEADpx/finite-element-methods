@@ -248,7 +248,7 @@ For subsets of $\mathbb{R}^d$ and functions defined on them: $$\boxed{\text{comp
 
 1.  Determine the limit of $x_n=(1/n,\,1-1/n)$ in $\mathbb{R}^2$.
 
-2.  Show that $x_n=(-1)^n+1/n$ does not converge, and identify two convergent subsequences.
+2.  Show that $x_n=(-1)^n+1/n$ does not converge, identify two convergent subsequences, and state the limit of each subsequence.
 
 3.  Determine whether $x_n=\log(n+1)-\log n$ is Cauchy.
 
@@ -257,6 +257,9 @@ For subsets of $\mathbb{R}^d$ and functions defined on them: $$\boxed{\text{comp
 
 ::: {#exr-appendix-real-bounds}
 ## C. Supremum, infimum, maximum, minimum
+
+When a requested maximum or minimum does not exist, state why it does not
+exist.
 
 1.  For each set, determine $\sup$, $\inf$, $\max$, and $\min$ when they exist: $$(2,5),\qquad [2,5),\qquad \{1-1/n:n\ge1\},\qquad \{(-1)^n:n\ge1\}.$$
 
@@ -326,5 +329,4 @@ For subsets of $\mathbb{R}^d$ and functions defined on them: $$\boxed{\text{comp
 2.  $\sup=1$, $\inf=0$, $\operatorname*{ess\,sup}=0$, $\operatorname*{ess\,inf}=0$ because the rationals have measure zero.
 
 3.  $\operatorname*{ess\,inf}k=2$ and $\operatorname*{ess\,sup}k=3$.
-
 

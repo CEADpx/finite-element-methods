@@ -1161,7 +1161,7 @@ therefore remains in $C(\overline{\Om})$.
 
 ::: {#exr-foundations-pointwise-not-uniform}
 ## Pointwise convergence need not be uniform
-Let $u_n(x)=x^n$ on $[0,1]$ and define
+Let $I=[0,1]$, define $u_n(x)=x^n$ for $x\in I$, and let
 
 $$
 u(x)=
@@ -1171,8 +1171,8 @@ u(x)=
 \end{cases}
 $$
 
-1. Show that $u_n(x)\to u(x)$ at every fixed $x\in[0,1]$.
-2. Show that $\sup_{0\leq x\leq1}|u_n(x)-u(x)|=1$ for every $n$.
+1. Show that $u_n(x)\to u(x)$ at every fixed $x\in I$.
+2. Show that $\sup_{x\in I}|u_n(x)-u(x)|=1$ for every $n$.
 3. Conclude that $(u_n)$ converges pointwise, but not uniformly, to $u$.
    Explain why this does not contradict the statement that a uniform limit of
    continuous functions is continuous.
@@ -1465,20 +1465,17 @@ $|u(\bx)|^2$ at every $\bx\in\overline{\Om}$.
 
 The two norms describe different kinds of convergence.
 
-::: {#exm-foundations-uniform-l2-convergence}
-## Uniform and $L^2$ convergence differ
-Let $u_n(x)=x^n$ on $[0,1]$. Each $u_n$ is continuous. Moreover,
+::: {#exr-foundations-uniform-l2-convergence}
+## Returning to $u_n(x)=x^n$
+Let $I=[0,1]$, and recall the sequence and its pointwise limit $u$ from
+@exr-foundations-pointwise-not-uniform.
 
-$$
-\norm{u_n}_{\infty}=1,
-\qquad
-\norm{u_n}_{L^2(0,1)}
-=\left(\int_0^1x^{2n}\,\dd x\right)^{1/2}
-=\frac{1}{\sqrt{2n+1}}.
-$$
-
-Thus $u_n\to0$ in $L^2(0,1)$ but not in the supremum norm. An $L^2$ norm can
-be small even when the error remains large on a set whose measure is small.
+1. Compute $\norm{u_n-u}_{L^2(I)}$ and determine whether $u_n\to u$ in
+   $L^2(I)$.
+2. Identify a constant function that represents the same element of $L^2(I)$
+   as $u$, and explain why the two functions are equivalent in $L^2(I)$.
+3. Compare this result with the failure of convergence in the supremum norm.
+   What distinction between the two norms does this example illustrate?
 :::
 
 Vector- and tensor-valued $L^2$ spaces are defined componentwise. For example,
@@ -2099,9 +2096,43 @@ been defined.
 
 ::: {#exr-foundations-weak-tent-function}
 ## Weak derivative of a tent function
-Let $u(x)=1-|x|$ on $(-1,1)$. Find its weak derivative and verify the defining
-identity by splitting the integral at $x=0$. Determine whether $u$ belongs to
-$H^1(-1,1)$ and whether it belongs to $H^2(-1,1)$, justifying both answers.
+Let $u(x)=1-|x|$ on $(-1,1)$.
+
+1. Determine the classical derivative of $u$ on $(-1,0)$ and $(0,1)$, and
+   propose a weak derivative $w$ on $(-1,1)$.
+2. For an arbitrary $\varphi\in C_0^\infty(-1,1)$, split the integral at
+   $x=0$ and verify
+
+   $$
+   \int_{-1}^1u(x)\varphi'(x)\,\dd x
+   =-\int_{-1}^1w(x)\varphi(x)\,\dd x.
+   $$
+
+3. Use the definition of $H^1(-1,1)$ to determine whether
+   $u\in H^1(-1,1)$.
+4. Determine whether $u\in H^2(-1,1)$ by completing the following
+   contradiction argument. If $w$ had a weak derivative
+   $g\in L^2(-1,1)$, then
+
+   $$
+   \int_{-1}^1w(x)\varphi'(x)\,\dd x
+   =-\int_{-1}^1g(x)\varphi(x)\,\dd x
+   \qquad\forall\varphi\in C_0^\infty(-1,1).
+   $$
+
+   First show that the left-hand side equals $2\varphi(0)$. Next, choose
+   $\eta\in C_0^\infty(-1,1)$ with $\eta(0)=1$ and set
+   $\varphi_\varepsilon(x)=\eta(x/\varepsilon)$ for $0<\varepsilon<1$.
+   Use
+
+   $$
+   \norm{\varphi_\varepsilon}_{L^2(-1,1)}
+   =\sqrt{\varepsilon}\,\norm{\eta}_{L^2(-1,1)}
+   $$
+
+   and the Cauchy--Schwarz inequality to obtain a contradiction as
+   $\varepsilon\to0$. Conclude whether $w\in H^1(-1,1)$ and therefore
+   whether $u\in H^2(-1,1)$.
 :::
 
 ::: {#exr-foundations-h1-norm}
@@ -2648,8 +2679,14 @@ $$
 a(u,v)=\int_{\Om}k\grad u\cdot\grad v\,\dx,
 $$
 
-where $0<k_0\leq k(\bx)\leq k_1$. Use the Cauchy--Schwarz and Poincare
-inequalities to prove
+where $k\in L^\infty(\Om)$ and
+
+$$
+0<k_0\leq k(\bx)\leq k_1
+\qquad\text{for almost every }\bx\in\Om.
+$$
+
+Use the Cauchy--Schwarz and Poincare inequalities to prove
 
 $$
 |a(u,v)|
