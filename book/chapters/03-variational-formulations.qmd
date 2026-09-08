@@ -196,14 +196,32 @@ In the integral equations below, the explicit dependence on $\bx$ is
 suppressed. Thus, for example, $k\grad u$ denotes the vector field
 $\bx\mapsto k(\bx)\grad u(\bx)$.
 
-To interpret this problem classically, suppose first that the boundary and the
-data are sufficiently smooth and compatible. For example, take
-$k\in C^1(\overline{\Om})$ with $k(\bx)\geq k_0>0$,
-$f\in C(\overline{\Om})$, and smooth boundary data $g$ and $h$, and suppose
-that a solution $u\in C^2(\Om)\cap C^1(\overline{\Om})$ exists. Then the
-quantities in @eq-variational-strong-pde and @eq-variational-boundary-data are
-defined at every stated point, and the equations can be imposed in the
-classical sense.
+To interpret this problem classically, suppose that $\partial\Om$ is of class
+$C^1$, so that the outward unit normal $\bn$ is defined pointwise on
+$\partial\Om$. Let
+
+$$
+k\in C^1(\Om)\cap C(\overline{\Om}),
+\qquad
+k(\bx)\geq k_0>0,
+\qquad
+f\in C(\Om),
+$$
+
+with boundary data
+
+$$
+g\in C(\overline{\Gam_D}),
+\qquad
+h\in C(\overline{\Gam_N}),
+$$
+
+and suppose that a solution
+$u\in C^2(\Om)\cap C^1(\overline{\Om})$ exists. Then
+$\divg(k\grad u)$ is defined pointwise in $\Om$, while $u$ and
+$k\grad u\cdot\bn$ are defined pointwise on the corresponding portions of the
+boundary. Hence @eq-variational-strong-pde and
+@eq-variational-boundary-data can be imposed in the classical sense.
 
 These regularity assumptions need not hold in applications. A material
 coefficient may be discontinuous, and source and flux data may have limited

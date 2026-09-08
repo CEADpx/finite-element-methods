@@ -30,18 +30,28 @@ $$
 
 # Uniform and $L^2$ convergence are different {.problem marks="10"}
 
-Let $u_n(x)=x^n$ on $[0,1]$. Each $u_n$ is continuous. Moreover,
+We first recall the definition of convergence in a normed vector space. 
+
+**Definition (convergence in a normed vector space).** Let $V$ be a normed
+vector space with norm $\norm{\cdot}_V$, and let $(a_n)_{n\in\mathbb N}$ be a
+sequence in $V$. We say that $(a_n)_{n\in\mathbb N}$ converges to $a\in V$, or
+that $a$ is the limit of the sequence in $V$, if
 
 $$
-\norm{u_n}_{\infty}=1,
-\qquad
-\norm{u_n}_{L^2(0,1)}
-=\left(\int_0^1x^{2n}\,\dd x\right)^{1/2}
-=\frac{1}{\sqrt{2n+1}}.
+\norm{a_n-a}_V\longrightarrow 0
+\qquad\text{as }n\to\infty.
 $$
 
-Thus $u_n\to0$ in $L^2(0,1)$ but not in the supremum norm. An $L^2$ norm can
-be small even when the error remains large on a set whose measure is small.
+
+Let $u_n(x)=x^n$ on $\Om = [0,1]$.
+
+1. Determine the pointwise limit $u(x)=\lim_{n\to\infty}u_n(x)$ for every
+   $x\in \Om$.
+2. Show that $\norm{u_n-u}_{\infty}=1$ for every $n$. Hence determine whether $u_n$ converges to $u$ in the supremum norm.
+3. Is the function $u$ obtained in Part 1 also the limit of $u_n$ in
+   $L^2(\Om)$? Justify your answer. If it is, identify a constant function
+   that is another representative of the same element of $L^2(\Om)$, and
+   explain why it is equivalent to $u$ in $L^2(\Om)$.
 
 # Extensions of Gauss divergence theorem {.problem marks="10"}
 
