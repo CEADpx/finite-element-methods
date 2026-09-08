@@ -51,7 +51,8 @@ $$
 \quad\text{(nonlinear)}.
 $$
 
-In above $\Delta$ is the Laplacian and is defined as $\Delta u(\bx) = \nabla \cdot (\nabla u(\bx))$.
+In the equations above, $\Delta$ is the Laplacian and is defined by
+$\Delta u(\bx)=\nabla\cdot(\nabla u(\bx))$.
 
 Suppose $\partial\Om$ is divided into two portions, $\Gam_D$ and $\Gam_N$,
 and let $\bm q(u)$ denote the flux associated with the differential equation.
@@ -844,7 +845,8 @@ $$
 \delta\Pi(u;v)=a(u;v)-\ell(v).
 $$ {#eq-variational-energy-existence-condition}
 
-Such a functional need not exist. For example, consider the case when a bilinear form $a$ is not symmetric. Take $J(u) := (1/2)a(u,u)$. It's first variation is 
+Such a functional need not exist. For example, let $a$ be a nonsymmetric
+bilinear form and define $J(u):=(1/2)a(u,u)$. Its first variation is
 
 $$
 \delta J(u;v)

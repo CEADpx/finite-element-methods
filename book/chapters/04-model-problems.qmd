@@ -317,7 +317,7 @@ problem is
 $$
 -(kT')'=0,\qquad
 T(0)=T_0,\qquad
--kT'(L)=\overline q_n,
+-kT'(L)=\overline q_n.
 $$
 
 Because $k$ is constant, the differential equation gives $T''=0$. Therefore
@@ -858,8 +858,9 @@ $$ {#eq-model-linear-elasticity-abstract}
 
 We next determine when this problem has a unique solution. Suppose the
 elasticity tensor satisfies
-$|\bm A:\mathbb C:\bm B|\leq C_{\mathbb C}|\bm A||\bm B|$ for symmetric
-tensors $\bm A$ and $\bm B$. The Cauchy--Schwarz inequality then gives
+$|\bm A:\mathbb C:\bm B|\leq
+C_{\mathbb C}\norm{\bm A}_F\norm{\bm B}_F$ for symmetric tensors
+$\bm A$ and $\bm B$. The Cauchy--Schwarz inequality then gives
 
 $$
 \begin{aligned}
