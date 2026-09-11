@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
+  <rect width="1200" height="680" fill="white"/>
+
+  <g font-family="Arial, sans-serif" fill="#183b56">
+    <text x="600" y="42" font-size="30" font-weight="bold" text-anchor="middle">Quadratic shape functions on K = [0, 2]</text>
+    <text x="600" y="375" font-size="30" font-weight="bold" text-anchor="middle">Quadratic finite element displacement</text>
+  </g>
+
+  <g stroke="#333" stroke-width="2" fill="none">
+    <line x1="150" y1="260" x2="1050" y2="260"/>
+    <line x1="180" y1="75" x2="180" y2="305"/>
+    <line x1="150" y1="550" x2="1050" y2="550"/>
+    <line x1="180" y1="405" x2="180" y2="605"/>
+  </g>
+
+  <g stroke="#d2d8dc" stroke-width="2" stroke-dasharray="7 7">
+    <line x1="180" y1="75" x2="180" y2="605"/>
+    <line x1="600" y1="75" x2="600" y2="605"/>
+    <line x1="1020" y1="75" x2="1020" y2="605"/>
+  </g>
+
+  <g fill="none" stroke-width="6">
+    <path d="M180 100 Q600 340 1020 260" stroke="#315f84"/>
+    <path d="M180 260 Q600 -60 1020 260" stroke="#327d83"/>
+    <path d="M180 260 Q600 340 1020 100" stroke="#a85b29"/>
+  </g>
+
+  <g font-family="Arial, sans-serif" font-size="24" font-style="italic">
+    <text x="225" y="115" fill="#315f84">ϕ<tspan baseline-shift="sub" font-size="17">1</tspan></text>
+    <text x="615" y="100" fill="#327d83">ϕ<tspan baseline-shift="sub" font-size="17">2</tspan></text>
+    <text x="965" y="115" fill="#a85b29">ϕ<tspan baseline-shift="sub" font-size="17">3</tspan></text>
+  </g>
+
+  <path d="M180 550 Q600 270 1020 470" fill="none" stroke="#315f84" stroke-width="7"/>
+  <g fill="#c66a2b" stroke="white" stroke-width="3">
+    <circle cx="180" cy="550" r="11"/>
+    <circle cx="600" cy="390" r="11"/>
+    <circle cx="1020" cy="470" r="11"/>
+  </g>
+
+  <g font-family="Arial, sans-serif" font-size="22" text-anchor="middle" fill="#222">
+    <text x="180" y="635">x = 0</text>
+    <text x="600" y="635">x = 1</text>
+    <text x="1020" y="635">x = 2</text>
+    <text x="145" y="558">0</text>
+    <text x="600" y="375">1</text>
+    <text x="1020" y="455">1/2</text>
+  </g>
+</svg>

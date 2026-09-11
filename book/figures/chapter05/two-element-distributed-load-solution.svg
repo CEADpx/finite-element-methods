@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="500" viewBox="0 0 1000 500">
+  <rect width="1000" height="500" fill="white"/>
+  <text x="500" y="42" font-family="Arial, sans-serif" font-size="27" font-weight="bold" text-anchor="middle" fill="#183b56">Displacement of the uniformly loaded bar</text>
+  <g stroke="#333" stroke-width="2">
+    <line x1="125" y1="410" x2="920" y2="410"/>
+    <line x1="145" y1="435" x2="145" y2="75"/>
+  </g>
+  <g stroke="#d2d8dc" stroke-width="2" stroke-dasharray="7 7">
+    <line x1="520" y1="90" x2="520" y2="410"/>
+    <line x1="895" y1="90" x2="895" y2="410"/>
+  </g>
+  <path d="M145 410 C330 303 715 117 895 90" fill="none" stroke="#327d83" stroke-width="7"/>
+  <path d="M145 410 L520 170 L895 90" fill="none" stroke="#c66a2b" stroke-width="6" stroke-dasharray="13 9"/>
+  <g fill="#c66a2b" stroke="white" stroke-width="2">
+    <circle cx="145" cy="410" r="10"/><circle cx="520" cy="170" r="10"/><circle cx="895" cy="90" r="10"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="22" fill="#222" text-anchor="middle">
+    <text x="145" y="462">0</text><text x="520" y="462">L/2</text><text x="895" y="462">L</text>
+    <text x="500" y="492">position x</text>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="21">
+    <line x1="620" y1="315" x2="675" y2="315" stroke="#327d83" stroke-width="6"/>
+    <text x="692" y="322" fill="#183b56">exact displacement</text>
+    <line x1="620" y1="352" x2="675" y2="352" stroke="#c66a2b" stroke-width="6" stroke-dasharray="13 9"/>
+    <text x="692" y="359" fill="#183b56">two-element solution</text>
+    <text x="52" y="235" transform="rotate(-90 52 235)" fill="#183b56">displacement</text>
+  </g>
+</svg>

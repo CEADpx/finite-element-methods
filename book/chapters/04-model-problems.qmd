@@ -1018,6 +1018,121 @@ conditions exclude rigid-body motions.
    in @eq-model-linear-elasticity-weak.
 :::
 
+## One-dimensional axial bar {#sec-model-axial-bar}
+
+The small-strain elasticity problem has a useful one-dimensional special case.
+Consider a straight bar occupying the interval $\Om=(0,L)$. Its cross-sectional
+area $A(x)>0$ and Young's modulus $E(x)>0$ may vary along the bar. We denote the
+scalar axial displacement by $u(x)$ and the distributed axial force per unit
+length by $f(x)$. The bar may have a prescribed displacement at an endpoint and
+an applied axial force at the other endpoint, as shown in
+@fig-model-axial-bar.
+
+In SI units, $u$ and $L$ are measured in meters, $A$ in square meters, $E$ and
+$\sigma$ in pascals, $f$ in newtons per meter, and $N$ and $\overline P$ in
+newtons.
+
+![One-dimensional axial bar with variable cross-sectional area, distributed axial load, prescribed displacement at the left endpoint, and applied axial force at the right endpoint.](../figures/chapter04/axial-bar-model.svg){#fig-model-axial-bar width="88%" fig-align="center"}
+
+Under the one-dimensional bar assumptions, the axial strain, stress, and
+resultant axial force are
+
+$$
+\varepsilon(x)=\frac{\dd u}{\dd x},
+\qquad
+\sigma(x)=E(x)\varepsilon(x),
+\qquad
+N(x)=A(x)\sigma(x)=A(x)E(x)\frac{\dd u}{\dd x}.
+$$ {#eq-model-bar-kinematics-constitutive}
+
+We take forces and displacements in the positive $x$-direction as positive.
+Balance of axial force on every subinterval gives
+
+$$
+-\frac{\dd N}{\dd x}=f
+\qquad\text{in }(0,L).
+$$ {#eq-model-bar-equilibrium}
+
+Substitution of @eq-model-bar-kinematics-constitutive into
+@eq-model-bar-equilibrium gives the strong equation
+
+$$
+-\frac{\dd}{\dd x}\left(AE\frac{\dd u}{\dd x}\right)=f
+\qquad\text{in }(0,L).
+$$ {#eq-model-bar-strong-equation}
+
+Let $\Gamma_u$ and $\Gamma_t$ be disjoint subsets of the two endpoints
+$\partial\Om=\{0,L\}$. The complete boundary-value problem is
+
+$$
+\left\{
+\begin{aligned}
+-\frac{\dd}{\dd x}\left(AE\frac{\dd u}{\dd x}\right)&=f
+&&\text{in }(0,L),\\
+u&=\overline u
+&&\text{on }\Gamma_u,\\
+Nn&=\overline P
+&&\text{on }\Gamma_t,
+\end{aligned}
+\right.
+$$ {#eq-model-bar-strong}
+
+where the outward unit normal is $n=-1$ at $x=0$ and $n=1$ at $x=L$.
+Thus $Nn$ is the outward axial force at an endpoint. For example,
+$N(L)=\overline P$ when the force is prescribed at the right endpoint.
+
+The trial and test spaces are
+
+$$
+\mathcal U_{\overline u}
+=\{w\in H^1(0,L):w=\overline u\text{ on }\Gamma_u\},
+\qquad
+\mathcal V_0
+=\{v\in H^1(0,L):v=0\text{ on }\Gamma_u\}.
+$$ {#eq-model-bar-spaces}
+
+Multiplying @eq-model-bar-strong-equation by $v\in\mathcal V_0$, integrating
+over $(0,L)$, and applying one-dimensional integration by parts gives
+
+$$
+\int_0^L AE\,u'v'\,\dd x
+=\int_0^L fv\,\dd x
++\sum_{x\in\Gamma_t}\overline P(x)v(x).
+$$ {#eq-model-bar-weak}
+
+Accordingly, the variational problem is
+
+$$
+\boxed{
+\text{find }u\in\mathcal U_{\overline u}
+\quad\text{such that}\quad
+a_{\mathrm{bar}}(u,v)=\ell_{\mathrm{bar}}(v)
+\quad\forall v\in\mathcal V_0,}
+$$ {#eq-model-bar-variational}
+
+where
+
+$$
+a_{\mathrm{bar}}(u,v)=\int_0^L AE\,u'v'\,\dd x,
+\qquad
+\ell_{\mathrm{bar}}(v)=\int_0^L fv\,\dd x
++\sum_{x\in\Gamma_t}\overline P(x)v(x).
+$$ {#eq-model-bar-forms}
+
+::: {#exr-model-bar-variational-form}
+## Variational form of an axial bar
+
+Starting from @eq-model-bar-strong:
+
+1. multiply the differential equation by a test function $v$ and integrate
+   over $(0,L)$;
+2. apply integration by parts and write the endpoint term using the outward
+   normal $n$;
+3. use the prescribed-force condition on $\Gamma_t$ and $v=0$ on
+   $\Gamma_u$; and
+4. obtain @eq-model-bar-variational and identify its trial and test spaces.
+:::
+
 ## Finite deformation and hyperelasticity {#sec-model-hyperelasticity}
 
 Small-strain kinematics are not appropriate when changes in length, angle, or

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520"><rect width="1100" height="520" fill="white"/>
+<text x="550" y="40" font-family="Arial" font-size="26" font-weight="bold" text-anchor="middle" fill="#183b56">Element contributions</text>
+<g font-family="Arial" font-size="21" fill="#183b56" text-anchor="middle"><text x="230" y="88">K⁰ → global nodes 0, 1</text><text x="550" y="88">K¹ → global nodes 1, 2</text><text x="870" y="88">K² → global nodes 2, 3</text></g>
+<g fill="#eef5f8" stroke="#315f84" stroke-width="2"><rect x="165" y="110" width="130" height="90"/><rect x="485" y="110" width="130" height="90"/><rect x="805" y="110" width="130" height="90"/></g>
+<g stroke="#9ab4c7" stroke-width="1"><path d="M230 110V200M165 155H295M550 110V200M485 155H615M870 110V200M805 155H935"/></g>
+<g font-family="serif" font-size="27" text-anchor="middle"><text x="198" y="145">1</text><text x="263" y="145">−1</text><text x="198" y="187">−1</text><text x="263" y="187">1</text><text x="518" y="145">1</text><text x="583" y="145">−1</text><text x="518" y="187">−1</text><text x="583" y="187">1</text><text x="838" y="145">1</text><text x="903" y="145">−1</text><text x="838" y="187">−1</text><text x="903" y="187">1</text></g>
+<g stroke="#315f84" stroke-width="3"><line x1="230" y1="215" x2="405" y2="280"/><line x1="550" y1="215" x2="550" y2="280"/><line x1="870" y1="215" x2="695" y2="280"/></g>
+<text x="550" y="315" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#183b56">Add entries having the same global indices</text>
+<rect x="390" y="340" width="320" height="160" rx="8" fill="#eef5f8" stroke="#315f84" stroke-width="3"/>
+<g stroke="#9ab4c7" stroke-width="1"><path d="M470 340V500M550 340V500M630 340V500M390 380H710M390 420H710M390 460H710"/></g>
+<g font-family="serif" font-size="26" text-anchor="middle"><text x="430" y="371">1</text><text x="510" y="371">−1</text><text x="590" y="371">0</text><text x="670" y="371">0</text><text x="430" y="411">−1</text><text x="510" y="411">2</text><text x="590" y="411">−1</text><text x="670" y="411">0</text><text x="430" y="451">0</text><text x="510" y="451">−1</text><text x="590" y="451">2</text><text x="670" y="451">−1</text><text x="430" y="491">0</text><text x="510" y="491">0</text><text x="590" y="491">−1</text><text x="670" y="491">1</text></g>
+</svg>

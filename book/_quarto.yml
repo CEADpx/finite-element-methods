@@ -25,19 +25,20 @@ book:
         - chapters/03-variational-formulations.qmd
         - chapters/04-model-problems.qmd
         - chapters/05-finite-element-review.qmd
+        - chapters/06-multidimensional-fem.qmd
     - part: "Error Analysis and Adaptivity"
       chapters:
-        - chapters/06-apriori-error.qmd
-        - chapters/07-aposteriori-adaptivity.qmd
+        - chapters/07-apriori-error.qmd
+        - chapters/08-aposteriori-adaptivity.qmd
     - part: "Advanced Finite Element Formulations"
       chapters:
-        - chapters/08-constraints.qmd
-        - chapters/09-mixed-fem.qmd
-        - chapters/10-nonlinear-fem.qmd
-        - chapters/11-transient-fem.qmd
+        - chapters/09-constraints.qmd
+        - chapters/10-mixed-fem.qmd
+        - chapters/11-nonlinear-fem.qmd
+        - chapters/12-transient-fem.qmd
     - part: "PDE-Constrained Optimization"
       chapters:
-        - chapters/12-pde-constrained-optimization.qmd
+        - chapters/13-pde-constrained-optimization.qmd
   appendices:
     - appendices/a-real-analysis-essentials.qmd
     - appendices/b-tensor-notation-index-calculus.qmd

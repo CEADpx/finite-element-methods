@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="390" viewBox="0 0 1050 390">
+<defs><marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5 0 9Z" fill="#315f84"/></marker></defs><rect width="1050" height="390" fill="white"/>
+<text x="55" y="45" font-family="Arial" font-size="25" font-weight="bold" fill="#183b56">Continuum model</text>
+<path d="M90 92L900 115L900 195L90 218Z" fill="#dcecf5" stroke="#315f84" stroke-width="4"/><text x="430" y="165" font-family="Arial" font-size="28" fill="#183b56">u(x)</text>
+<line x1="525" y1="245" x2="525" y2="290" stroke="#315f84" stroke-width="4" marker-end="url(#a)"/><text x="550" y="275" font-family="Arial" font-size="23">discretize</text>
+<text x="55" y="330" font-family="Arial" font-size="25" font-weight="bold" fill="#183b56">Finite element model</text>
+<line x1="360" y1="325" x2="950" y2="325" stroke="#315f84" stroke-width="6"/>
+<g fill="#c66a2b" stroke="white" stroke-width="2"><circle cx="360" cy="325" r="10"/><circle cx="530" cy="325" r="10"/><circle cx="720" cy="325" r="10"/><circle cx="950" cy="325" r="10"/></g>
+<g font-family="Arial" font-size="21" text-anchor="middle"><text x="360" y="360">node 0</text><text x="530" y="360">node 1</text><text x="720" y="360">node 2</text><text x="950" y="360">node 3</text><text x="445" y="310">K₀</text><text x="625" y="310">K₁</text><text x="835" y="310">K₂</text></g>
+</svg>

@@ -1,0 +1,7 @@
+# Finite Element Approximation in Multiple Dimensions {#sec-multidimensional-fem}
+
+```{=latex}
+\chaptershorttitle{Multidimensional FEM}
+```
+
+*Chapter placeholder. Content will generalize the construction of Chapter 5 to multidimensional cells and vector-valued fields.*

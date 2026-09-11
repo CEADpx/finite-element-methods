@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="380" viewBox="0 0 1000 380"><rect width="1000" height="380" fill="white"/>
+<g font-family="Arial" fill="#183b56"><text x="245" y="40" font-size="26" font-weight="bold">ϕ₁ᵉ(x)</text><text x="745" y="40" font-size="26" font-weight="bold">ϕ₂ᵉ(x)</text></g>
+<g stroke="#333" stroke-width="2"><line x1="90" y1="300" x2="430" y2="300"/><line x1="110" y1="325" x2="110" y2="70"/><line x1="570" y1="300" x2="910" y2="300"/><line x1="590" y1="325" x2="590" y2="70"/></g>
+<g stroke="#315f84" stroke-width="6" fill="none"><path d="M110 95L410 300"/><path d="M590 300L890 95"/></g>
+<g fill="#c66a2b"><circle cx="110" cy="95" r="8"/><circle cx="410" cy="300" r="8"/><circle cx="590" cy="300" r="8"/><circle cx="890" cy="95" r="8"/></g>
+<g font-family="Arial" font-size="22" fill="#222" text-anchor="middle"><text x="110" y="355">xₑ</text><text x="410" y="355">xₑ₊₁</text><text x="590" y="355">xₑ</text><text x="890" y="355">xₑ₊₁</text><text x="80" y="103">1</text><text x="560" y="103">1</text></g>
+</svg>

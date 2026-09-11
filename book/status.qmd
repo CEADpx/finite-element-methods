@@ -19,18 +19,19 @@ consistency with later chapters.
 
 ## Actively developed
 
-- **Chapter 5: Review of Finite Element Approximation**
+- **Chapter 5: The Finite Element Method in One Dimension**
 
 ## Yet to be started
 
 The following chapters currently contain placeholders:
 
-- **Chapter 6: A Priori Error Estimation and Convergence**
-- **Chapter 7: A Posteriori Error Estimation and Adaptive Finite Elements**
-- **Chapter 8: Constraints in Finite Element Methods**
-- **Chapter 9: Mixed Finite Element Methods**
-- **Chapter 10: Nonlinear Finite Element Methods**
-- **Chapter 11: Transient Finite Element Methods**
-- **Chapter 12: PDE-Constrained Optimization**
+- **Chapter 6: Finite Element Approximation in Multiple Dimensions**
+- **Chapter 7: A Priori Error Estimation and Convergence**
+- **Chapter 8: A Posteriori Error Estimation and Adaptive Finite Elements**
+- **Chapter 9: Constraints in Finite Element Methods**
+- **Chapter 10: Mixed Finite Element Methods**
+- **Chapter 11: Nonlinear Finite Element Methods**
+- **Chapter 12: Transient Finite Element Methods**
+- **Chapter 13: PDE-Constrained Optimization**
 
-Last updated: August 26, 2026.
+Last updated: September 8, 2026.

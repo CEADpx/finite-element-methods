@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650">
+  <rect width="1100" height="650" fill="white"/>
+  <g font-family="Arial, sans-serif" fill="#183b56">
+    <text x="550" y="38" font-size="27" font-weight="bold" text-anchor="middle">Weighted global basis functions</text>
+    <text x="550" y="365" font-size="27" font-weight="bold" text-anchor="middle">Finite element function: <tspan font-style="italic">u</tspan><tspan baseline-shift="sub" font-size="18">h</tspan><tspan baseline-shift="baseline" font-style="normal" font-size="27"> = Σ </tspan><tspan font-style="italic">U</tspan><tspan baseline-shift="sub" font-size="18">j</tspan><tspan baseline-shift="baseline" font-style="normal" font-size="27">ϕ</tspan><tspan baseline-shift="sub" font-size="18">j</tspan></text>
+  </g>
+  <g stroke="#333" stroke-width="2">
+    <line x1="135" y1="225" x2="975" y2="225"/>
+    <line x1="155" y1="75" x2="155" y2="325"/>
+    <line x1="135" y1="525" x2="975" y2="525"/>
+    <line x1="155" y1="390" x2="155" y2="605"/>
+  </g>
+  <g stroke="#d2d8dc" stroke-width="2" stroke-dasharray="6 6">
+    <line x1="155" y1="75" x2="155" y2="605"/>
+    <line x1="425" y1="75" x2="425" y2="605"/>
+    <line x1="695" y1="75" x2="695" y2="605"/>
+    <line x1="965" y1="75" x2="965" y2="605"/>
+  </g>
+  <g fill="none" stroke-width="6">
+    <path d="M155 225 L425 95 L695 225" stroke="#327d83"/>
+    <path d="M425 225 L695 290 L965 225" stroke="#a85b29"/>
+    <path d="M695 225 L965 160" stroke="#6b5b95"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="22">
+    <text x="430" y="88" fill="#327d83">U₁ϕ₁</text>
+    <text x="700" y="315" fill="#a85b29">U₂ϕ₂</text>
+    <text x="865" y="150" fill="#6b5b95">U₃ϕ₃</text>
+    <text x="180" y="205" fill="#777">U₀ϕ₀ = 0</text>
+  </g>
+  <path d="M155 525 L425 405 L695 585 L965 465" fill="none" stroke="#315f84" stroke-width="7"/>
+  <g fill="#c66a2b" stroke="white" stroke-width="2">
+    <circle cx="155" cy="525" r="9"/><circle cx="425" cy="405" r="9"/>
+    <circle cx="695" cy="585" r="9"/><circle cx="965" cy="465" r="9"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="21" text-anchor="middle" fill="#222">
+    <text x="155" y="630">x₀ = 0</text><text x="425" y="630">x₁ = 1</text>
+    <text x="695" y="630">x₂ = 2</text><text x="965" y="630">x₃ = 3</text>
+    <text x="120" y="532">0</text><text x="390" y="398">1</text>
+    <text x="660" y="593">−1/2</text><text x="930" y="458">1/2</text>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="360" viewBox="0 0 1000 360">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0L9 4.5 0 9Z" fill="#315f84"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="360" fill="white"/>
+  <g font-family="Arial, sans-serif" fill="#183b56" text-anchor="middle">
+    <text x="250" y="55" font-size="27" font-weight="bold">Reference element K̂</text>
+    <text x="750" y="55" font-size="27" font-weight="bold">Physical element Kₑ</text>
+  </g>
+  <line x1="105" y1="190" x2="395" y2="190" stroke="#327d83" stroke-width="8"/>
+  <line x1="600" y1="190" x2="920" y2="190" stroke="#a85b29" stroke-width="8"/>
+  <g fill="#c66a2b" stroke="white" stroke-width="2">
+    <circle cx="105" cy="190" r="11"/><circle cx="395" cy="190" r="11"/>
+    <circle cx="600" cy="190" r="11"/><circle cx="920" cy="190" r="11"/>
+  </g>
+  <path d="M420 150 C500 95 540 95 585 150" fill="none" stroke="#315f84" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="505" y="105" font-family="Arial, sans-serif" font-size="25" text-anchor="middle" fill="#315f84">x = Fₑ(ξ)</text>
+  <g font-family="Arial, sans-serif" font-size="23" text-anchor="middle" fill="#222">
+    <text x="105" y="235">ξ = −1</text><text x="395" y="235">ξ = 1</text>
+    <text x="600" y="235">xₑ</text><text x="920" y="235">xₑ₊₁</text>
+    <text x="250" y="295">fixed length 2</text><text x="760" y="295">length hₑ</text>
+  </g>
+</svg>

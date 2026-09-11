@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="500" viewBox="0 0 1050 500"><rect width="1050" height="500" fill="white"/>
+<g stroke="#bbb" stroke-width="2"><line x1="150" y1="100" x2="900" y2="100"/><line x1="150" y1="210" x2="900" y2="210"/><line x1="150" y1="320" x2="900" y2="320"/><line x1="150" y1="430" x2="900" y2="430"/></g>
+<g stroke-width="5" fill="none"><path d="M150 45L400 100L900 100" stroke="#315f84"/><path d="M150 210L400 155L650 210L900 210" stroke="#327d83"/><path d="M150 320L400 320L650 265L900 320" stroke="#a85b29"/><path d="M150 430L650 430L900 375" stroke="#6b5b95"/></g>
+<g font-family="Arial" font-size="23" fill="#183b56"><text x="65" y="84">ϕ₀</text><text x="65" y="194">ϕ₁</text><text x="65" y="304">ϕ₂</text><text x="65" y="414">ϕ₃</text></g>
+<g font-family="Arial" font-size="20" text-anchor="middle"><text x="150" y="480">x₀</text><text x="400" y="480">x₁</text><text x="650" y="480">x₂</text><text x="900" y="480">x₃</text></g><line x1="150" y1="455" x2="900" y2="455" stroke="#333" stroke-width="2"/>
+</svg>

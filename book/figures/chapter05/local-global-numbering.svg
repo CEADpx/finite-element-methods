@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="350" viewBox="0 0 1050 350"><rect width="1050" height="350" fill="white"/>
+<text x="70" y="55" font-family="Arial" font-size="25" font-weight="bold" fill="#183b56">Global numbering</text><line x1="235" y1="105" x2="930" y2="105" stroke="#315f84" stroke-width="6"/>
+<g fill="#c66a2b"><circle cx="235" cy="105" r="10"/><circle cx="455" cy="105" r="10"/><circle cx="680" cy="105" r="10"/><circle cx="930" cy="105" r="10"/></g><g font-family="Arial" font-size="23" text-anchor="middle"><text x="235" y="90">0</text><text x="455" y="90">1</text><text x="680" y="90">2</text><text x="930" y="90">3</text></g>
+<text x="70" y="205" font-family="Arial" font-size="25" font-weight="bold" fill="#183b56">Local numbering</text>
+<g stroke-width="7" fill="none"><line x1="235" y1="265" x2="455" y2="265" stroke="#327d83"/><line x1="455" y1="265" x2="680" y2="265" stroke="#a85b29"/><line x1="680" y1="265" x2="930" y2="265" stroke="#6b5b95"/></g>
+<g font-family="Arial" font-size="21" text-anchor="middle"><text x="345" y="245">element 0</text><text x="565" y="245">element 1</text><text x="805" y="245">element 2</text><text x="235" y="300">1</text><text x="455" y="300">2 | 1</text><text x="680" y="300">2 | 1</text><text x="930" y="300">2</text></g>
+</svg>

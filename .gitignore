@@ -18,3 +18,9 @@ assignments/*.tex
 
 # Local source PDFs used while authoring; not published with the repository.
 /references/
+
+# Quarto mediabag generated during render (PDF copies of source figures).
+book/index_files/
+
+# LaTeX SyncTeX artifacts.
+*.synctex.gz
