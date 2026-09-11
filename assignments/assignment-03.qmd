@@ -1,0 +1,564 @@
+---
+title: "Assignment 3: Variational Formulations and Energy Principles"
+subtitle: "ME/BME 736 — Advanced Finite Element Methods"
+author: "Prashant K. Jha"
+date: "11 September, 2026"
+---
+
+Show the main steps in each derivation. State the trial and test spaces
+explicitly whenever a variational problem is formulated.
+
+This assignment completes the continuous mathematical and variational
+foundations developed in Chapters 2 and 3 and applies them to steady heat
+conduction and small-strain linear elasticity. Read the relevant sections of
+Chapter 4 as needed for Problems 4 and 5.
+
+No finite element discretization is required in this assignment.
+
+# Problem 1 (15 marks): From strong form to variational form
+
+Let $\Om\subset\R^d$ be a bounded Lipschitz domain with
+
+$$
+\partial\Om
+=
+\overline{\Gam_D}\cup\overline{\Gam_N},
+\qquad
+\Gam_D\cap\Gam_N=\varnothing,
+$$
+
+where $\Gam_D$ has positive boundary measure. Consider
+
+$$
+-\divg(k\grad u)=f
+\qquad\text{in }\Om,
+$$
+
+with
+
+$$
+u=g
+\qquad\text{on }\Gam_D,
+$$
+
+and
+
+$$
+k\grad u\cdot\bn=h
+\qquad\text{on }\Gam_N.
+$$
+
+Assume
+
+$$
+k\in L^\infty(\Om),
+\qquad
+0<k_0\leq k(\bx)\leq k_1
+\quad\text{a.e. in }\Om,
+$$
+
+and assume that the remaining data have sufficient regularity for the
+variational problem below to be well defined.
+
+1. Define the trial space $\Ug$ and the test space $\Vzero$.
+
+2. Multiply the governing equation by an arbitrary
+   $v\in\Vzero$, integrate over $\Om$, and use integration by parts to derive
+   the variational formulation. Show the boundary term before applying the
+   boundary conditions.
+
+3. Explain separately how the Dirichlet and Neumann boundary conditions enter
+   the variational formulation.
+
+4. Identify the bilinear form $a(w,v)$ and linear functional $\ell(v)$ and
+   write the problem in the form
+
+   $$
+   \text{find }u\in\Ug\text{ such that}\qquad
+   a(u,v)=\ell(v)
+   \qquad\forall v\in\Vzero.
+   $$
+
+5. Explain why this variational problem is still infinite-dimensional and is
+   therefore not yet a finite element problem.
+
+
+# Problem 2 (15 marks): Well-posedness and stability of the diffusion problem
+
+For this problem, take homogeneous Dirichlet data, $g=0$, and define
+
+$$
+V
+=
+H^1_{0,\Gam_D}(\Om)
+=
+\{v\in H^1(\Om):v=0\text{ on }\Gam_D\}.
+$$
+
+Let
+
+$$
+a(w,v)
+=
+\int_{\Om}
+k\grad w\cdot\grad v\,\dx,
+$$
+
+and
+
+$$
+\ell(v)
+=
+\int_{\Om}fv\,\dx
++
+\int_{\Gam_N}hv\,\ds.
+$$
+
+You may use the continuity and coercivity estimates for the diffusion
+bilinear form established previously:
+
+$$
+|a(w,v)|
+\leq
+k_1
+\norm{w}_{H^1(\Om)}
+\norm{v}_{H^1(\Om)},
+$$
+
+and
+
+$$
+a(v,v)
+\geq
+\frac{k_0}{1+C_P^2}
+\norm{v}_{H^1(\Om)}^2.
+$$
+
+You may also use the trace inequality
+
+$$
+\norm{v}_{L^2(\Gam_N)}
+\leq
+C_{\mathrm{tr}}
+\norm{v}_{H^1(\Om)}.
+$$
+
+1. Use the Cauchy--Schwarz inequality and the trace inequality to show that
+
+   $$
+   |\ell(v)|
+   \leq
+   \left(
+   \norm{f}_{L^2(\Om)}
+   +
+   C_{\mathrm{tr}}
+   \norm{h}_{L^2(\Gam_N)}
+   \right)
+   \norm{v}_{H^1(\Om)}.
+   $$
+
+   Hence explain why $\ell$ is a continuous linear functional on $V$.
+
+2. State the Lax--Milgram theorem in the form needed here. Identify each of
+   its hypotheses and explain why they are satisfied for this problem.
+
+3. What does the Lax--Milgram theorem imply about existence and uniqueness of
+   the weak solution?
+
+4. Let $u\in V$ be the weak solution. Set $v=u$ in the variational equation
+   and use coercivity and continuity of $\ell$ to show that
+
+   $$
+   \norm{u}_{H^1(\Om)}
+   \leq
+   \frac{1+C_P^2}{k_0}
+   \left(
+   \norm{f}_{L^2(\Om)}
+   +
+   C_{\mathrm{tr}}
+   \norm{h}_{L^2(\Gam_N)}
+   \right).
+   $$
+
+5. Explain in words what this estimate means in terms of stability and
+   continuous dependence of the solution on the prescribed data.
+
+
+# Problem 3 (20 marks): Variational equation and energy minimization
+
+Return to the diffusion problem of Problem 1, allowing nonzero Dirichlet data.
+Let
+
+$$
+\Pi(z)
+=
+\frac12a(z,z)-\ell(z),
+\qquad
+z\in\Ug.
+$$
+
+Recall that if $u\in\Ug$, an admissible variation has the form
+
+$$
+u+\varepsilon v,
+\qquad
+v\in\Vzero.
+$$
+
+Assume that $a(\cdot,\cdot)$ is symmetric and coercive on $\Vzero$.
+
+1. Explain why the variation $v$ belongs to $\Vzero$ rather than $\Ug$.
+
+2. Expand $\Pi(u+\varepsilon v)-\Pi(u)$ and show that
+
+   $$
+   \Pi(u+\varepsilon v)-\Pi(u)
+   =
+   \varepsilon
+   \bigl(
+   a(u,v)-\ell(v)
+   \bigr)
+   +
+   \frac{\varepsilon^2}{2}a(v,v).
+   $$
+
+3. Using the definition of the first variation,
+
+   $$
+   \delta\Pi(u;v)
+   =
+   \left.
+   \frac{\dd}{\dd\varepsilon}
+   \Pi(u+\varepsilon v)
+   \right|_{\varepsilon=0},
+   $$
+
+   show that
+
+   $$
+   \delta\Pi(u;v)
+   =
+   a(u,v)-\ell(v).
+   $$
+
+4. Show that the stationarity condition
+
+   $$
+   \delta\Pi(u;v)=0
+   \qquad
+   \forall v\in\Vzero
+   $$
+
+   is exactly the variational diffusion problem.
+
+5. Suppose that $u$ satisfies the variational problem. For an arbitrary
+   $v\in\Vzero$, show that
+
+   $$
+   \Pi(u+v)-\Pi(u)
+   =
+   \frac12a(v,v).
+   $$
+
+6. Use coercivity to conclude that
+
+   $$
+   \Pi(u+v)>\Pi(u)
+   \qquad
+   \forall v\in\Vzero,\quad v\neq0.
+   $$
+
+   Hence show that $u$ is the unique minimizer of $\Pi$ over $\Ug$.
+
+7. Explain why symmetry of the bilinear form is important in defining the
+   quadratic energy
+
+   $$
+   \Pi(z)=\frac12a(z,z)-\ell(z).
+   $$
+
+   Does every weak or variational problem necessarily arise from an energy
+   minimization principle?
+
+
+# Problem 4 (20 marks): Steady heat conduction as a diffusion problem
+
+Let a solid occupy $\Om\subset\R^d$. Its boundary is decomposed into three
+disjoint portions,
+
+$$
+\partial\Om
+=
+\overline{\Gam_T}
+\cup
+\overline{\Gam_q}
+\cup
+\overline{\Gam_R}.
+$$
+
+The steady heat-conduction problem is
+
+$$
+-\divg(k\grad T)=r
+\qquad\text{in }\Om,
+$$
+
+with prescribed temperature
+
+$$
+T=\overline T
+\qquad\text{on }\Gam_T,
+$$
+
+prescribed outward heat flux
+
+$$
+-k\grad T\cdot\bn
+=
+\overline q_n
+\qquad\text{on }\Gam_q,
+$$
+
+and convection
+
+$$
+-k\grad T\cdot\bn
+=
+h_c(T-T_\infty)
+\qquad\text{on }\Gam_R.
+$$
+
+Here $k>0$ is the thermal conductivity, $r$ is the volumetric heat source,
+$\overline q_n$ is the prescribed outward heat flux, $h_c\geq0$ is the
+convection coefficient, and $T_\infty$ is the ambient temperature.
+
+1. Define the trial and test spaces for the temperature.
+
+2. Starting from the strong equation, multiply by an arbitrary test function
+   and derive the variational formulation. Show the boundary integral before
+   substituting the boundary conditions.
+
+3. Carefully track the signs associated with the outward heat flux and
+   convection conditions and show that the variational equation can be
+   written as
+
+   $$
+   a_T(T,v)=\ell_T(v)
+   \qquad\forall v\in\mathcal V_0,
+   $$
+
+   where
+
+   $$
+   a_T(S,v)
+   =
+   \int_{\Om}
+   k\grad S\cdot\grad v\,\dx
+   +
+   \int_{\Gam_R}
+   h_cSv\,\ds.
+   $$
+
+   Determine $\ell_T(v)$.
+
+4. Since $a_T$ is symmetric, define
+
+   $$
+   \Pi_T(S)
+   =
+   \frac12a_T(S,S)-\ell_T(S).
+   $$
+
+   Write $\Pi_T(S)$ explicitly in integral form.
+
+5. Compute the first variation
+   $\delta\Pi_T(T;v)$ and show that the stationarity condition
+
+   $$
+   \delta\Pi_T(T;v)=0
+   \qquad
+   \forall v\in\mathcal V_0
+   $$
+
+   reproduces the variational heat-conduction problem.
+
+6. Identify the correspondence between the abstract diffusion problem and the
+   heat-conduction problem. In particular, identify the physical meanings of
+
+   - the unknown field,
+   - the gradient,
+   - the diffusive flux,
+   - the source,
+   - the essential boundary condition, and
+   - the natural boundary condition.
+
+
+# Problem 5 (30 marks): Linear elasticity and minimum potential energy
+
+Let an elastic body occupy a bounded Lipschitz domain
+$\Om\subset\R^d$. Its boundary is decomposed as
+
+$$
+\partial\Om
+=
+\overline{\Gam_u}
+\cup
+\overline{\Gam_t},
+\qquad
+\Gam_u\cap\Gam_t=\varnothing,
+$$
+
+where $\Gam_u$ has positive boundary measure.
+
+For quasistatic small-strain linear elasticity, consider
+
+$$
+-\divg\bsig=\rho\bb
+\qquad\text{in }\Om,
+$$
+
+with
+
+$$
+\bu=\overline{\bu}
+\qquad\text{on }\Gam_u,
+$$
+
+and
+
+$$
+\bsig\bn=\overline{\bt}
+\qquad\text{on }\Gam_t.
+$$
+
+The infinitesimal strain is
+
+$$
+\beps(\bu)
+=
+\frac12
+\left(
+\grad\bu+(\grad\bu)^T
+\right),
+$$
+
+and the constitutive relation is
+
+$$
+\bsig(\bu)
+=
+\mathbb C:\beps(\bu).
+$$
+
+Assume that $\bsig$ is symmetric and that the elasticity tensor
+$\mathbb C$ has the usual symmetry and positive-definiteness properties.
+
+1. Define appropriate vector-valued trial and test spaces for the displacement.
+
+2. Multiply the balance equation by an arbitrary test function $\bv$ and
+   integrate over $\Om$. Using tensor integration by parts, show that
+
+   $$
+   \int_{\Om}
+   \bsig(\bu):\grad\bv\,\dx
+   =
+   \int_{\Om}
+   \rho\bb\cdot\bv\,\dx
+   +
+   \int_{\Gam_t}
+   \overline{\bt}\cdot\bv\,\ds.
+   $$
+
+3. Use the symmetry of $\bsig$ to show that
+
+   $$
+   \bsig:\grad\bv
+   =
+   \bsig:\beps(\bv).
+   $$
+
+   Hence obtain
+
+   $$
+   \int_{\Om}
+   \beps(\bv):\mathbb C:\beps(\bu)\,\dx
+   =
+   \int_{\Om}
+   \rho\bb\cdot\bv\,\dx
+   +
+   \int_{\Gam_t}
+   \overline{\bt}\cdot\bv\,\ds
+   \qquad
+   \forall\bv\in\mathcal V_0.
+   $$
+
+4. Define the elasticity bilinear form
+
+   $$
+   a_E(\bw,\bv)
+   $$
+
+   and the external-load functional
+
+   $$
+   \ell_E(\bv).
+   $$
+
+   Write the elasticity problem in the abstract form
+
+   $$
+   a_E(\bu,\bv)=\ell_E(\bv)
+   \qquad
+   \forall\bv\in\mathcal V_0.
+   $$
+
+5. Explain why the usual symmetry properties of $\mathbb C$ make
+   $a_E(\cdot,\cdot)$ symmetric.
+
+   You may use without proof the fact that positive definiteness of
+   $\mathbb C$, together with Korn's inequality and a displacement boundary
+   condition on a portion of positive measure, gives coercivity of
+   $a_E(\cdot,\cdot)$.
+
+6. Define the total potential energy
+
+   $$
+   \Pi_E(\bw)
+   =
+   \frac12a_E(\bw,\bw)-\ell_E(\bw).
+   $$
+
+   Write this functional explicitly as the sum of
+
+   - internal strain energy,
+   - negative work of the body force, and
+   - negative work of the prescribed traction.
+
+7. Compute the first variation
+
+   $$
+   \delta\Pi_E(\bu;\bv)
+   $$
+
+   and show that
+
+   $$
+   \delta\Pi_E(\bu;\bv)=0
+   \qquad
+   \forall\bv\in\mathcal V_0
+   $$
+
+   is exactly the weak equilibrium equation.
+
+8. Assuming coercivity of $a_E$, explain why the equilibrium displacement is
+   the unique minimizer of the total potential energy over the admissible
+   displacement space.
+
+9. Compare the mathematical structures of the scalar diffusion problem and
+   the linear-elasticity problem. Identify the quantities in elasticity that
+   play roles analogous to
+
+   - the scalar field $u$,
+   - the gradient $\grad u$,
+   - the diffusive flux $k\grad u$, and
+   - the coefficient $k$.
