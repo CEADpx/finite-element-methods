@@ -135,7 +135,7 @@ Additional meetings may be scheduled by email, subject to availability.
 
 \section{Course Meeting Times and Location}
 \coursefield{Course Start/End Dates:}{August 25 through December 8, 2026}
-\coursefield{Course Final Exam Date and Time:}{No in-person final examination is scheduled. The final computational project is due and will be presented on Tuesday, December 8, during the scheduled 9:30--10:45 AM class period. Submission instructions will be provided through D2L.}
+\coursefield{Course Final Exam Date and Time:}{No in-person final examination is scheduled. The final computational project is due on Wednesday, December 16, 2026, the final day of the Fall 2026 final examination period. Submission instructions will be provided through D2L.}
 \coursefield{Class:}{Tuesday/Thursday, 75 minutes}
 \coursefield{Time:}{09:30--10:45 AM, Tue/Thu}
 \coursefield{Location:}{Classroom Building, Room 206W}
@@ -150,7 +150,7 @@ Variational and weighted residual approach to finite element equations. Emphasis
 
 \coursefield{Course Prerequisites:}{Permission of instructor.}
 
-\coursefield{Expected Background:}{Students are expected to have prior exposure to the finite element method, linear algebra, multivariable calculus, differential equations, and basic continuum or solid mechanics. Familiarity with Python is helpful. The first five class meetings provide a focused review of the mathematical, variational, mechanics, and finite element foundations used throughout the course, but these topics will not be taught from first principles.}
+\coursefield{Expected Background:}{Students are expected to have prior exposure to the finite element method, linear algebra, multivariable calculus, differential equations, and basic continuum or solid mechanics. Familiarity with Python is helpful. The opening module provides a focused review of the mathematical, variational, and mechanics foundations used throughout the course, but these topics will not be taught from first principles.}
 
 \section{Student Learning Outcomes}
 Upon completion of this course, the student should be able to:
@@ -163,7 +163,7 @@ Upon completion of this course, the student should be able to:
   \item Formulate and solve PDE-constrained optimization problems using direct and adjoint sensitivity methods and gradient-based optimization.
 \end{enumerate}
 
-\coursefield{Course Goals:}{The objective of this course is to develop a rigorous and computationally useful understanding of advanced finite element methods. The course begins with a focused review of the mathematical and variational foundations of FEM, then develops error estimation and adaptivity, constrained and mixed formulations, nonlinear finite element methods, transient problems, and PDE-constrained optimization. Heat conduction and solid mechanics problems are used throughout as recurring model problems. FEniCSx is used throughout the course to implement, verify, and investigate the methods.}
+\coursefield{Course Goals:}{The objective of this course is to develop a rigorous and computationally useful understanding of advanced finite element methods. The course begins with mathematical and variational foundations, then develops finite element foundations, error estimation and adaptivity, constrained and mixed formulations, nonlinear finite element methods, transient problems, and PDE-constrained optimization. Heat conduction and solid mechanics problems are used throughout as recurring model problems. FEniCSx is used throughout the course to implement, verify, and investigate the methods.}
 
 \section{Course Topics and Tentative Schedule}
 {
@@ -177,45 +177,45 @@ Upon completion of this course, the student should be able to:
 \rowcolor{SDBlue}
 \textbf{Dates} & \textbf{Classes} & \textbf{Module and coverage}\\
 \endhead
-Aug.\ 25--Sept.\ 8 & 5 &
-\textbf{Module 0: Review and Foundations.}
-Mathematical preliminaries: vector spaces, norms, metrics, and Sobolev spaces; partial differential equations, integration by parts, variational formulations, and energy minimization; linear elasticity, hyperelasticity, and the transient heat equation with associated variational forms; finite element approximation for linear quasistatic problems, including trial and test functions, shape functions, isoparametric mappings, assembly, and boundary conditions. Detailed review handouts will be provided in advance. \\[0.18em]
+Aug.\ 25--Sept.\ 10 & 6 &
+\textbf{Module 0: Mathematical and Variational Foundations.}
+Mathematical preliminaries: vector spaces, norms, metrics, and Sobolev spaces; partial differential equations, integration by parts, variational formulations, and energy minimization; linear elasticity, hyperelasticity, and the transient heat equation with associated variational forms. Detailed review handouts will be provided in advance. \\[0.18em]
 
-Sept.\ 10--17 & 3 &
-\textbf{Module 1: A Priori Error Estimation and Convergence.}
+Sept.\ 15--22 & 3 &
+\textbf{Module 1: Finite Element Foundations.}
+Finite element approximation for linear quasistatic problems, including trial and test functions, shape functions, isoparametric mappings, assembly, numerical integration, and boundary conditions; one-dimensional and general-dimensional finite element formulations; FEniCSx implementation.\\[0.18em]
+
+Sept.\ 24--Oct.\ 1 & 3 &
+\textbf{Module 2: A Priori Error Estimation and Convergence.}
 Galerkin orthogonality; continuity and coercivity; interpolation error; energy-norm and $L^2$ error; $h$-convergence and the role of polynomial order; numerical verification of convergence rates.\\[0.18em]
 
-Sept.\ 22--29 & 3 &
-\textbf{Module 2: A Posteriori Error Estimation and Adaptive FEM.}
+Oct.\ 6--13 & 3 &
+\textbf{Module 3: A Posteriori Error Estimation and Adaptive FEM.}
 Uniform and local mesh refinement; residual-based error estimation; element residuals and interelement local indicators and global estimators; marking strategies; solve--estimate--mark--refine workflow and FEniCSx implementation.\\[0.18em]
 
-Oct.\ 1 & 1 &
-\textbf{Module 3: Constraints in Finite Element Problems.}
-Constrained variational and algebraic problems; penalty and Lagrange multiplier methods; interpretation of multipliers and implementation in FEniCSx.\\[0.18em]
-
-Oct.\ 6--8 & 2 &
-\textbf{Module 4: Mixed Finite Element Methods.}
-Volumetric locking in nearly incompressible elasticity; mixed displacement--pressure formulation; saddle-point structure; stable choices of displacement and pressure spaces; mixed-space implementation in FEniCSx.\\[0.18em]
-
 \rowcolor{SDBlue!65}
-Oct.\ 13 & 1 &
-\textbf{Midterm Exam.} Review and foundations through mixed finite element methods.\\[0.18em]
+Oct.\ 15 & 1 &
+\textbf{Midterm Exam.} Modules 0--3.\\[0.18em]
 
-Oct.\ 15--29 & 5 &
+Oct.\ 20--27 & 3 &
+\textbf{Module 4: Constraints and Mixed Finite Element Methods.}
+Constrained variational and algebraic problems; penalty and Lagrange multiplier methods; interpretation of multipliers and implementation in FEniCSx. Volumetric locking in nearly incompressible elasticity; mixed displacement--pressure formulation; saddle-point structure; stable choices of displacement and pressure spaces; mixed-space implementation in FEniCSx.\\[0.18em]
+
+Oct.\ 29--Nov.\ 10 & 4 &
 \textbf{Module 5: Nonlinear Finite Element Methods.}
 Sources of nonlinearity; nonlinear systems and Newton's method; residual equations; directional derivatives and consistent linearization; tangent operators and tangent matrices; convergence criteria; load stepping and basic globalization strategies; nonlinear variational formulation; finite element formulation and FEniCSx implementation for hyperelasticity.\\[0.18em]
 
-Nov.\ 3--10 & 3 &
+Nov.\ 12--17 & 2 &
 \textbf{Module 6: Transient Finite Element Methods.}
 Semidiscrete formulation of the transient heat equation; mass and stiffness matrices; forward Euler, backward Euler, and Crank--Nicolson methods; consistency, accuracy, and stability; FEniCSx implementation.\\[0.18em]
 
-Nov.\ 12--Dec.\ 3 & 6 &
+Nov.\ 19--Dec.\ 8 & 5 &
 \textbf{Module 7: PDE-Constrained Optimization.}
 Optimization problems governed by PDEs; state and design variables and objective functions; direct sensitivity analysis; Lagrangian and adjoint formulations; continuous and discrete adjoints; gradient verification; use of gradient-based optimization solvers; FEniCSx implementations with elasticity examples.\\[0.18em]
 
-\rowcolor{SDBlue!65}
-Dec.\ 8 & 1 &
-\textbf{Final Computational Project Due and Presentation.}\\
+Dec.\ 16 & -- &
+\textbf{Final Computational Project Due.} Final project due by the end of the final examination period.\\
+
 \end{longtable}
 }
 
@@ -272,7 +272,7 @@ Final computational project & 25\\
 
 \coursefield{Grade division:}{A: 90--100\%, B: 80--89\%, C: 70--79\%, D: 60--69\%, F: below 60\%.}
 
-\coursefield{Final grade calculation:}{Final grades will be calculated based on the weighted average of the above components. The final grade will be rounded to the nearest whole number. The final computational project and presentation will be due on December 8, 2026.}
+\coursefield{Final grade calculation:}{Final grades will be calculated based on the weighted average of the above components. The final grade will be rounded to the nearest whole number. The final computational project will be due on December 16, 2026.}
 
 \coursefield{Special Note Regarding Final Exams:}{Per South Dakota Mines \href{https://www.sdsmt.edu/about/assets/pdf-files/policy-manual/Policy\%202-8\%20Final\%20Examination.pdf}{Policy 2-8}, if you are scheduled to take three or more exams on the same day during Finals Week, you may request that the middle exam(s) of the day be rescheduled. \textbf{\textit{You are required to make this request directly to the instructor(s) of the middle exam(s) at least 30 days before the last day of regular classes.}}
 }
