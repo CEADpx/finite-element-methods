@@ -12,6 +12,12 @@ book:
         - name: "Leslie A. Rose Department of Mechanical Engineering, South Dakota School of Mines & Technology"
   site-url: "https://ceadpx.github.io/finite-element-methods/"
   repo-url: "https://github.com/CEADpx/finite-element-methods"
+  # The book is served from a path on ceadpx.github.io, so it reports to the lab
+  # site's GA4 property rather than one of its own. Same origin, same property
+  # means a reader moving between the lab site and these notes stays a single
+  # session; book-only numbers come from filtering Pages by
+  # "finite-element-methods" rather than from a separate property.
+  google-analytics: "G-XL3LW6J0HK"
   repo-actions: [edit, issue]
   downloads: [pdf]
   chapters:
