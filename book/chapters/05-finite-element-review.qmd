@@ -1,672 +1,1140 @@
-# The Finite Element Method in One Dimension {#sec-fem-one-dimensional}
+# The Finite Element Method in One Dimension {#sec-one-dimensional-fem}
 
 ```{=latex}
 \chaptershorttitle{One-Dimensional FEM}
 ```
 
-Chapter 4 formulated the axial-bar problem as a variational problem. We now use
-that problem to develop the finite element method from beginning to end. The
-one-dimensional setting allows us to see the mesh, basis functions, element
-calculations, assembly, boundary conditions, and computed solution without the
-additional geometry of two- and three-dimensional meshes. Chapter 6 will extend
-the same construction to higher dimensions.
+Chapter 4 derived the variational problem for a one-dimensional axial bar. We
+now use that problem to develop the finite element method from beginning to
+end. The one-dimensional setting is especially useful because the main ideas
+can be seen without the geometric complications of two- and three-dimensional
+meshes. We can construct the approximation functions explicitly, see where the
+algebraic equations come from, follow an element contribution into the global
+system, and recover the displacement, strain, stress, and reactions after the
+solve.
 
-The purpose of this chapter is not only to obtain a matrix equation. A finite
-element calculation represents a field over a continuum by joining simple local
-approximations. The unknown coefficients have a physical interpretation, element
-matrices describe local contributions, and assembly expresses how the connected
-elements form one global model. These ideas are developed below using the notation
-established in this book [@becker-carey-oden1981; @jog;
-@larson-bengzon2010].
+The discussion is detailed because these ideas are reused throughout the rest
+of the book. Chapter 6 will change the element geometry and introduce
+multidimensional mappings, but it will not change the basic sequence developed
+here.
 
-## From a bar to a finite element model {#sec-fem-bar-model}
+## Galerkin approximation and the finite element idea {#sec-c5-galerkin}
 
-Consider the axial bar from @sec-model-axial-bar. To keep the first finite element
-construction focused, suppose that $u(0)=0$, the right endpoint is traction free,
-and the bar is subjected to the distributed axial load $f(x)$. The corresponding
-trial and test space is
-
-$$
-\mathcal V_0=\{v\in H^1(0,L):v(0)=0\},
-$$
-
-and the corresponding variational problem is
+Consider the axial bar on $(0,L)$ with a prescribed displacement at the left
+endpoint, a distributed axial load $f(x)$, and an applied axial force
+$\overline P$ at the right endpoint. We first take the prescribed displacement
+to be zero. The admissible functions therefore belong to
 
 $$
-\text{find }u\in\mathcal V_0
-\quad\text{such that}\quad
-\int_0^L AE\,u'v'\,\dd x
-=\int_0^L fv\,\dd x
-\quad\forall v\in\mathcal V_0.
-$$ {#eq-fem-bar-continuous-problem}
+\mathcal{V}_0
+=
+\{v\in H^1(0,L):v(0)=0\}.
+$$
 
-The displacement $u$ is a function defined at every point of the interval. A
-finite element model introduces a finite set of nodes and divides the interval
-into elements. Within each element, the displacement is approximated by a
-polynomial. Values shared by adjacent elements connect the local approximations
-into one displacement field, as illustrated in @fig-fem-bar-discretization.
+The variational problem from Chapter 4 is
 
-![The continuum bar is represented by a mesh of interval elements connected at nodes. The nodal displacement values determine the finite element displacement between the nodes.](../figures/chapter05/bar-discretization.svg){#fig-fem-bar-discretization width="92%" fig-align="center"}
+$$
+\text{find }u\in\mathcal{V}_0\text{ such that}\qquad
+a(u,v)=\ell(v)
+\qquad\forall v\in\mathcal{V}_0,
+$$ {#eq-c5-continuous-variational}
 
-The principal steps are therefore:
+where
 
-1. divide the domain into elements;
-2. select the approximation and degrees of freedom on one element;
-3. join the elements to construct a global finite-dimensional space;
-4. restrict the variational problem to that space;
-5. calculate element matrices and vectors and assemble them globally;
-6. impose prescribed displacement values and solve the algebraic system; and
-7. use the computed displacement to evaluate strain, stress, axial force, and
-   reactions.
+$$
+a(u,v)=\int_0^L AE\,u'v'\,\dd x,
+\qquad
+\ell(v)=\int_0^L fv\,\dd x+\overline P\,v(L).
+$$ {#eq-c5-bar-forms}
 
-These steps distinguish FEM from a procedure that begins with an assumed global
-polynomial over the entire bar. The finite element approximation is assembled from
-local functions, so local mesh refinement and spatially varying material properties
-can be represented directly.
+![One-dimensional axial bar with a prescribed displacement at the left endpoint, a distributed axial load, and an applied force at the right endpoint.](../figures/chapter05/bar_loading_schematic.svg){#fig-c5-bar-loading width="95%" fig-align="center"}
 
-::: {.remark}
-## Relation to the direct stiffness method
+The unknown in this problem is a function. In principle, the equation must hold
+for every admissible test function $v\in\mathcal{V}_0$. A computer, however, cannot
+search an infinite-dimensional collection of functions directly. We therefore
+begin by replacing that collection with functions built from a finite number
+of known functions.
 
-For a linear axial bar, the direct stiffness method and FEM produce the same element
-stiffness matrix. Their starting points differ. The direct stiffness method begins
-with an element force--displacement relation, whereas FEM obtains the element
-equations by restricting a variational problem to a finite-dimensional function
-space. The latter construction extends directly to the general boundary-value
-problems considered in this book.
+Choose admissible functions
+
+$$
+\psi_1,\psi_2,\ldots,\psi_n\in\mathcal{V}_0.
+$$
+
+For any coefficients $V_1,\ldots,V_n$, the linear combination
+
+$$
+v_n(x)
+=
+V_1\psi_1(x)+\cdots+V_n\psi_n(x)
+=
+\sum_{i=1}^{n}V_i\psi_i(x)
+$$ {#eq-c5-test-linear-combination}
+
+also belongs to $\mathcal{V}_0$, because each $\psi_i$ satisfies the homogeneous
+essential boundary condition. Instead of allowing the test function to range
+over all of $\mathcal{V}_0$, we can require the variational equation only for
+functions of the form @eq-c5-test-linear-combination.
+
+The same known functions are used to approximate the displacement:
+
+$$
+u_n(x)
+=
+\sum_{j=1}^{n}U_j\psi_j(x),
+$$ {#eq-c5-trial-linear-combination}
+
+where the coefficients $U_j$ are unknown. The unknown function has therefore
+been replaced by $n$ unknown numbers.
+
+The collection of all linear combinations of
+$\psi_1,\ldots,\psi_n$ is a vector space contained in $\mathcal{V}_0$. In the
+terminology of Chapter 2,
+
+$$
+\mathcal{V}_n
+=
+\operatorname{span}\{\psi_1,\ldots,\psi_n\}
+\subset\mathcal{V}_0.
+$$ {#eq-c5-galerkin-space}
+
+The word *span* means precisely the set of all linear combinations in
+@eq-c5-test-linear-combination. If the $\psi_i$ are linearly independent, they
+form a basis of $\mathcal{V}_n$, and $\dim \mathcal{V}_n=n$. Thus *finite dimensional* means that
+every function in the approximation space is determined by finitely many
+coefficients.
+
+The Galerkin approximation restricts both the trial and test functions to this
+space:
+
+$$
+\text{find }u_n\in \mathcal{V}_n\text{ such that}\qquad
+a(u_n,v_n)=\ell(v_n)
+\qquad\forall v_n\in \mathcal{V}_n.
+$$ {#eq-c5-galerkin-problem}
+
+Substituting @eq-c5-test-linear-combination and
+@eq-c5-trial-linear-combination gives
+
+$$
+\sum_{i=1}^{n}
+V_i
+\left[
+\sum_{j=1}^{n}a(\psi_j,\psi_i)U_j-\ell(\psi_i)
+\right]
+=0.
+$$
+
+The coefficients $V_i$ are arbitrary. We may therefore choose them one at a
+time, or equivalently require each bracketed expression to vanish. This gives
+$n$ scalar equations,
+
+$$
+\sum_{j=1}^{n}a(\psi_j,\psi_i)U_j
+=
+\ell(\psi_i),
+\qquad
+i=1,\ldots,n.
+$$ {#eq-c5-galerkin-equations}
+
+Define
+
+$$
+K_{ij}=a(\psi_j,\psi_i),
+\qquad
+F_i=\ell(\psi_i).
+$$
+
+Then
+
+$$
+\bK\bU=\bF.
+$$ {#eq-c5-galerkin-system}
+
+The passage from the variational problem to the matrix system is therefore not
+specific to finite elements. Any finite-dimensional Galerkin space leads to a
+system of this form.
+
+What makes the finite element method different is the way the functions
+$\psi_i$ are chosen. If they are global polynomials or trigonometric functions,
+they are typically nonzero over most of $(0,L)$, so many pairs
+$(\psi_i,\psi_j)$ interact in the bilinear form and the matrix is generally
+dense. The finite element method instead constructs basis functions from small
+pieces associated with a partition of the domain. Each basis function is then
+nonzero only near a small number of neighboring points.
+
+![Global trial functions may extend across the entire interval, whereas a finite element basis function is tied to a small part of a mesh.](../figures/chapter05/global_vs_local_support.svg){#fig-c5-global-vs-local width="95%" fig-align="center"}
+
+This local support is the structural idea we now develop. The basis functions
+constructed below will play exactly the same role as the generic
+$\psi_i$ above; to emphasize their connection to the mesh, we will denote them
+by $\phi_i$.
+
+::: {#exm-c5-why-finite-dimensional}
+## Why finitely many basis functions lead to finitely many unknowns
+
+Suppose
+$\mathcal{V}_3=\operatorname{span}\{\psi_1,\psi_2,\psi_3\}$.
+Every function in $\mathcal{V}_3$ then has the form
+
+$$
+v_3=V_1\psi_1+V_2\psi_2+V_3\psi_3.
+$$
+
+No matter how complicated the functions $\psi_i$ themselves may be, the unknown
+function $v_3$ is completely determined once the three coefficients
+$V_1$, $V_2$, and $V_3$ are known. This is the basic reason the Galerkin
+approximation converts a variational problem for an unknown function into a
+system for finitely many unknown numbers.
 :::
 
-## A one-dimensional mesh {#sec-fem-one-dimensional-mesh}
+::: {#exr-c5-global-galerkin}
+## A Galerkin approximation with global functions
 
-The first step is to replace the interval $[0,L]$ by a finite collection of
-smaller intervals. Choose $N+1$ points
-
-$$
-0=x_0<x_1<\cdots<x_N=L.
-$$ {#eq-fem-node-coordinates}
-
-These points are the **nodes**. Consecutive nodes define $N$ **elements**
+For the same bar, take
 
 $$
-K_e=(x_e,x_{e+1}),
-\qquad e=0,\ldots,N-1.
-$$ {#eq-fem-interval-elements}
-
-Thus the number of nodes is $N_n=N+1$. With zero-based numbering, their indices
-are $0,\ldots,N_n-1$, or equivalently $0,\ldots,N$. The nodes may therefore be
-written as $x_0,x_1,\ldots,x_{N_n-1}$ or as $x_0,x_1,\ldots,x_N$.
-
-The collection
-
-$$
-\Th=\{K_0,K_1,\ldots,K_{N-1}\}
+\psi_1(x)=x,\qquad
+\psi_2(x)=x^2,\qquad
+\psi_3(x)=x^3.
 $$
 
-is a one-dimensional **mesh** of $(0,L)$. The open element interiors do not
-overlap, while their closures cover the closed interval:
+1. Verify that each function belongs to $\mathcal{V}_0$.
+2. Write $u_3(x)=\sum_{j=1}^3U_j\psi_j(x)$.
+3. Write the three Galerkin equations in terms of
+   $a(\psi_j,\psi_i)$ and $\ell(\psi_i)$.
+4. Explain why the approximation is finite dimensional even though the basis
+   functions are not finite element basis functions.
+:::
+
+## Mesh, elements, nodes, and connectivity {#sec-c5-mesh}
+
+The generic Galerkin construction tells us that we need a finite collection of
+basis functions, but it does not tell us how those functions should be chosen.
+The finite element method makes that choice by first introducing a geometric
+partition of the domain. The basis functions will then be built from simple
+polynomials defined on the pieces of that partition.
+
+For the bar occupying $[0,L]$, choose ordered points
 
 $$
-[0,L]=\bigcup_{e=0}^{N-1}[x_e,x_{e+1}].
-$$ {#eq-fem-one-dimensional-mesh-cover}
+0=x_1<x_2<\cdots<x_{N+1}=L.
+$$ {#eq-c5-mesh-nodes}
 
-The length of element $e$ and the mesh size are
+These points are the **nodes**. Consecutive nodes define the **elements**
+
+$$
+\mathcal{K}_e=(x_e,x_{e+1}),
+\qquad
+e=1,\ldots,N.
+$$ {#eq-c5-elements}
+
+The collection of elements
+
+$$
+\Th=\{\mathcal{K}_1,\mathcal{K}_2,\ldots,\mathcal{K}_{N}\}
+$$
+
+is the **finite element mesh**, or simply the **mesh**.
+
+![A one-dimensional finite element mesh partitions the interval into connected elements. Neighboring elements share endpoint nodes.](../figures/chapter05/mesh_partition.svg){#fig-c5-mesh-partition width="90%" fig-align="center"}
+
+The mesh has two roles. Geometrically, it partitions the bar into smaller
+intervals. Computationally, it gives us places on which simple local
+approximations can be defined and then connected. We will construct a
+polynomial approximation separately on each element, but neighboring element
+approximations will share information at their common node. This combination
+of local approximation and shared degrees of freedom is what allows a global
+finite element function to be assembled from small pieces.
+
+The length of element $e$ is
 
 $$
 h_e=x_{e+1}-x_e,
-\qquad h=\max_{0\le e\le N-1}h_e.
-$$ {#eq-fem-one-dimensional-mesh-size}
-
-We use the open interval $K_e$ when integrating over an element and its closure
-$[x_e,x_{e+1}]$ when referring to its endpoints. A uniform mesh has $h_e=L/N$
-for every element. A nonuniform mesh permits smaller elements where the
-displacement or material data vary more rapidly.
-
-For the linear element used first in this chapter, the two endpoints are its nodes,
-and each node carries one displacement degree of freedom.
-
-::: {#exm-fem-three-element-mesh}
-## A three-element mesh
-
-Let $L=3$ and choose the nodes
-
-$$
-x_0=0,\qquad x_1=1,\qquad x_2=2,\qquad x_3=3.
 $$
 
-Here $N=3$, $N_n=4$, and the mesh consists of
+and the mesh size is
 
 $$
-K_0=(0,1),\qquad K_1=(1,2),\qquad K_2=(2,3).
+h=\max_{1\le e\le N}h_e.
 $$
 
-The elements have separate interiors, but neighboring elements share an endpoint.
-For example, $x_1$ is the right endpoint of $K_0$ and the left endpoint of $K_1$.
-This shared node is what will connect the two local displacement approximations.
-:::
+A mesh is **uniform** if all element lengths are equal. It is **nonuniform** if
+they are not. Nonuniform meshes are useful when smaller elements are desired
+in selected parts of the domain, for example near a geometric feature or a
+region where the solution varies rapidly. The convergence consequences of
+mesh refinement are studied in Chapter 7; here we use the mesh to construct
+the approximation itself.
+
+The open element interiors are disjoint, while their closures cover the bar:
+
+$$
+[0,L]
+=
+\bigcup_{e=1}^{N}[x_e,x_{e+1}].
+$$
+
+This decomposition will later allow an integral over the whole bar to be
+written as a sum of element integrals.
+
+### Local and global numbering
+
+A node can be described in two different ways. The **global node number**
+identifies a point in the complete mesh. The **local node number** identifies
+the position of that point within one element. Local numbers restart on each
+element.
+
+For a two-node linear element, local node 1 is the left endpoint and local
+node 2 is the right endpoint. The **connectivity map**
+
+$$
+I^e:\{1,2\}\longrightarrow\{1,\ldots,N+1\}
+$$
+
+records which global nodes belong to element $e$. With the consecutive global
+numbering used here,
+
+$$
+I^e(1)=e,
+\qquad
+I^e(2)=e+1.
+$$ {#eq-c5-linear-connectivity}
+
+![Local node numbers restart on every element, whereas global node numbers identify shared nodes of the complete mesh. Connectivity records the relation between the two descriptions.](../figures/chapter05/local_global_numbering.svg){#fig-c5-local-global-numbering width="95%" fig-align="center"}
+
+For example, the point $x_2$ is local node 2 of $\mathcal{K}_1$ and local node 1 of
+$\mathcal{K}_2$, but it is only one global node. This distinction will matter during
+assembly: both neighboring elements will contribute to equations associated
+with that shared global node.
 
 ::: {.remark}
-## Node, degree of freedom, and unknown coefficient
+## Numbering in theory and in Python
 
-A node is a point in the mesh. For the linear bar element, the displacement value
-at each node is a degree of freedom. These nodal displacements are the unknown
-numbers that will be determined by solving the finite element equations. More
-general degrees of freedom will be discussed after the one-dimensional construction
-is complete.
+The mathematical development in this book numbers elements, nodes, basis
+functions, and matrix entries starting from 1. Python arrays and the degree-of-freedom
+maps used by FEniCSx start from 0. Thus mathematical node $i$ is stored at Python
+index `i - 1`, and mathematical element $e$ is stored at Python index `e - 1`.
+This translation is made only when the mathematical objects are represented in
+code; the two conventions should not be mixed within a derivation.
 :::
 
-## Approximating displacement within one element {#sec-fem-linear-element}
+It is also useful to distinguish a **node**, a **degree of freedom**, and an
+**unknown coefficient**. A node is a geometric point in the mesh. A degree of
+freedom is a quantity used to determine the finite element function. For the
+one-dimensional nodal elements considered first, the degree of freedom is the
+displacement value at a node. The corresponding coefficient is the number that
+will be determined by the algebraic system. In this simple setting these three
+ideas are closely aligned, but they are not identical concepts and need not
+remain so for other finite element families.
 
-Consider one element $K_e=[x_e,x_{e+1}]$. We retain the displacement values
-$U_e$ and $U_{e+1}$ at its two endpoints and approximate the displacement between
-them by the straight line joining those values. Begin with
+At this point the mesh has been defined, but no finite element basis functions
+have yet been chosen. We now use the mesh to make the generic Galerkin basis
+$\psi_i$ from @sec-c5-galerkin local.
+
+## Finite element basis functions on the mesh {#sec-c5-basis}
+
+The functions $\psi_i$ in the Galerkin discussion were deliberately generic.
+They only had to belong to the admissible function space and be linearly
+independent. For a finite element approximation, we now choose those basis
+functions in a particular mesh-based way. To distinguish this construction,
+we write the finite element basis as
 
 $$
-u_h|_{K_e}(x)=a_e+b_ex.
+\phi_1,\phi_2,\ldots,\phi_{N+1}.
 $$
 
-The endpoint conditions $u_h(x_e)=U_e$ and $u_h(x_{e+1})=U_{e+1}$ determine
-$a_e$ and $b_e$. Solving these two equations and collecting the coefficients of
-$U_e$ and $U_{e+1}$ gives
+Thus the symbols have changed, but their role has not:
+the $\phi_i$ are the basis functions used in the Galerkin expansion. The new
+feature is that each $\phi_i$ will be assembled from polynomial pieces defined
+on the elements of $\Th$.
+
+For the nodal $H^1$-conforming Lagrange elements used in this chapter, three
+requirements guide the construction.
+
+1. **Polynomial on each element.** On every element $\mathcal{K}_e$, the restriction of
+   a basis function belongs to a polynomial space
+   $\mathbb P_{p_e}(\mathcal{K}_e)$.
+2. **Continuous across shared endpoints.** The polynomial pieces from
+   neighboring elements agree at their common node. Their derivatives are not
+   required to agree.
+3. **Nodal interpolation.** The global basis function associated with node
+   $x_i$ satisfies
+   $$
+   \phi_i(x_j)=\delta_{ij}.
+   $$ {#eq-c5-global-nodal-property}
+
+The first requirement makes the approximation simple on each element. The
+second makes the global function conform to the $H^1$ space required by the
+axial-bar variational problem. The third gives the coefficients a direct nodal
+interpretation.
+
+These requirements describe the Lagrange family used here; they are not the
+most general definition of a finite element. We will return to the general
+definition near the end of the chapter after the concrete construction is
+familiar.
+
+### Linear basis functions
+
+Begin with $p_e=1$ on every element. Consider again the three-element mesh
 
 $$
-u_h|_{K_e}(x)
-=U_e\frac{x_{e+1}-x}{h_e}
-+U_{e+1}\frac{x-x_e}{h_e}.
+\mathcal{K}_1=[x_1,x_2],
+\qquad
+\mathcal{K}_2=[x_2,x_3],
+\qquad
+\mathcal{K}_3=[x_3,x_4].
 $$
 
-This expression motivates two functions associated with the two local nodes:
+We want one global basis function for each global node. Consider
+$\phi_2$, associated with the interior node $x_2$. The nodal interpolation
+property requires
+
+$$
+\phi_2(x_1)=0,\qquad
+\phi_2(x_2)=1,\qquad
+\phi_2(x_3)=0,\qquad
+\phi_2(x_4)=0.
+$$
+
+Now apply the elementwise polynomial requirement. On $\mathcal{K}_1$, $\phi_2$ must be
+the linear polynomial that rises from zero at $x_1$ to one at $x_2$:
+
+$$
+\phi_2(x)
+=
+\frac{x-x_1}{x_2-x_1},
+\qquad
+x\in[x_1,x_2].
+$$
+
+On $\mathcal{K}_2$, it must fall from one at $x_2$ to zero at $x_3$:
+
+$$
+\phi_2(x)
+=
+\frac{x_3-x}{x_3-x_2},
+\qquad
+x\in[x_2,x_3].
+$$
+
+On $\mathcal{K}_3$, the required nodal values at both endpoints are zero. The only
+linear polynomial with those endpoint values is the zero polynomial.
+Consequently,
+
+$$
+\phi_2(x)
+=
+\begin{cases}
+\dfrac{x-x_1}{x_2-x_1},
+&x\in[x_1,x_2],\\[1em]
+\dfrac{x_3-x}{x_3-x_2},
+&x\in[x_2,x_3],\\[1em]
+0,
+&\text{otherwise}.
+\end{cases}
+$$ {#eq-c5-global-phi2}
+
+The remaining global basis functions are obtained by applying the same three
+requirements at the other nodes.
+
+![Global linear basis functions on a three-element mesh. Each function equals one at its own node, vanishes at all other nodes, and is nonzero only on elements touching its node.](../figures/chapter05/global_linear_basis.svg){#fig-c5-global-linear-basis width="95%" fig-align="center"}
+
+This construction explains where **local support** comes from. On an element
+that does not contain the node associated with $\phi_i$, the function is zero
+at both endpoints. Since its restriction is linear, it must vanish throughout
+that element. An interior linear basis function therefore has support on only
+the two elements adjacent to its node; an endpoint basis function has support
+on only one element.
+
+The same construction can be viewed locally. On one element
+$\mathcal{K}_e=[x_e,x_{e+1}]$, define two local shape functions
+$\phi_1^e$ and $\phi_2^e$ by
+
+$$
+\phi_1^e(x_e)=1,\quad
+\phi_1^e(x_{e+1})=0,
+\qquad
+\phi_2^e(x_e)=0,\quad
+\phi_2^e(x_{e+1})=1.
+$$
+
+Since the local functions are linear,
 
 $$
 \phi_1^e(x)=\frac{x_{e+1}-x}{h_e},
 \qquad
 \phi_2^e(x)=\frac{x-x_e}{h_e}.
-$$ {#eq-fem-linear-element-basis}
+$$ {#eq-c5-linear-shape-functions}
 
-Their values and slopes are shown in @fig-fem-linear-shape-functions. They are
-called the local shape functions, or local basis functions. Their endpoint values
-are
+They satisfy
 
 $$
-\phi_1^e(x_e)=1,
+\phi_1^e(x)+\phi_2^e(x)=1.
+$$
+
+This partition-of-unity relation means that equal nodal values reproduce a
+constant field exactly.
+
+If the displacement values at the two endpoints are $U_e$ and $U_{e+1}$,
+then the finite element displacement on the element is
+
+$$
+\uh|_{\mathcal{K}_e}
+=
+U_e\phi_1^e+U_{e+1}\phi_2^e.
+$$ {#eq-c5-linear-interpolation}
+
+![Two nodal displacement values determine the complete linear displacement field on one element.](../figures/chapter05/linear_element_interpolation.svg){#fig-c5-linear-element-interpolation width="88%" fig-align="center"}
+
+The interpolation property makes the meaning of the coefficients immediate:
+evaluating @eq-c5-linear-interpolation at the left and right endpoints returns
+$U_e$ and $U_{e+1}$. Differentiating gives
+
+$$
+\varepsilon_h|_{\mathcal{K}_e}
+=
+\uh'|_{\mathcal{K}_e}
+=
+\frac{U_{e+1}-U_e}{h_e}.
+$$ {#eq-c5-linear-strain}
+
+Thus the two-node bar element has a linear displacement field and a constant
+strain field.
+
+For later calculations, collect the element coefficients and shape functions
+as
+
+$$
+\bU^e=
+\begin{bmatrix}
+U_e\\
+U_{e+1}
+\end{bmatrix},
 \qquad
-\phi_1^e(x_{e+1})=0,
+\bN^e=
+\begin{bmatrix}
+\phi_1^e&\phi_2^e
+\end{bmatrix}.
+$$
+
+Then
+
+$$
+\uh|_{\mathcal{K}_e}
+=
+\bN^e\bU^e,
 \qquad
-\phi_2^e(x_e)=0,
+\varepsilon_h|_{\mathcal{K}_e}
+=
+\bB^e\bU^e,
 \qquad
-\phi_2^e(x_{e+1})=1.
-$$
+\bB^e
+=
+\frac{\dd\bN^e}{\dd x}
+=
+\begin{bmatrix}
+-1/h_e&1/h_e
+\end{bmatrix}.
+$$ {#eq-c5-linear-NB}
 
-They also satisfy $\phi_1^e+\phi_2^e=1$.
+### From local shape functions to the global space
 
-![The two local shape functions of a linear interval element. Their values interpolate the two nodal displacement degrees of freedom.](../figures/chapter05/linear-shape-functions.svg){#fig-fem-linear-shape-functions width="88%" fig-align="center"}
-
-Using these functions, the displacement approximation within element $e$ is
-
-$$
-u_h|_{K_e}(x)
-=U_e\phi_1^e(x)+U_{e+1}\phi_2^e(x).
-$$ {#eq-fem-element-interpolation}
-
-Thus $u_h(x_e)=U_e$ and $u_h(x_{e+1})=U_{e+1}$. The shape functions describe how
-the two nodal values determine the displacement at an interior point. Differentiating
-@eq-fem-element-interpolation gives the element strain
+The local shape functions are not a second approximation. They are the pieces
+from which the global Galerkin basis is assembled. If local node $a$ of element
+$e$ corresponds to global node $I^e(a)$, then
 
 $$
-\varepsilon_h|_{K_e}=u_h'
-=-\frac{U_e}{h_e}+\frac{U_{e+1}}{h_e}.
-$$ {#eq-fem-linear-element-strain}
+\phi_{I^e(a)}|_{\mathcal{K}_e}
+=
+\phi_a^e.
+$$ {#eq-c5-local-global-relation}
 
-The displacement varies linearly, whereas strain is constant within a linear
-element.
+For example, the global basis function associated with an interior node $x_i$
+is $\phi_2^{\,i-1}$ on the element to the left, $\phi_1^{\,i}$ on the element
+to the right, and zero elsewhere. Shared nodal values join the elementwise
+pieces into one continuous global function.
 
-::: {#exr-fem-linear-interpolation}
-## Linear interpolation on an element
+The resulting piecewise-linear finite element space is
 
-Let $K=[2,5]$ with nodal displacements $U_1=1$ mm and $U_2=4$ mm.
+$$
+\mathcal{V}_h
+=
+\left\{
+v_h\in C([0,L]):
+v_h|_{\mathcal{K}_e}\in\mathbb P_1(\mathcal{K}_e)
+\text{ for }e=1,\ldots,N
+\right\}.
+$$ {#eq-c5-linear-space}
 
-1. Write the two shape functions.
-2. Determine $u_h(x)$ and evaluate $u_h(3)$.
-3. Compute the constant element strain.
+Its global nodal basis is
+$\{\phi_1,\phi_2,\ldots,\phi_{N+1}\}$. Every $u_h\in\mathcal{V}_h$ has a unique expansion
+
+$$
+u_h(x)
+=
+\sum_{j=1}^{N+1}U_j\phi_j(x).
+$$ {#eq-c5-global-expansion}
+
+At node $x_i$,
+
+$$
+u_h(x_i)
+=
+\sum_{j=1}^{N+1}U_j\phi_j(x_i)
+=
+U_i.
+$$ {#eq-c5-nodal-coefficient}
+
+The global coefficients are therefore the nodal displacement values. Because
+functions in $\mathcal{V}_h$ are continuous and have square-integrable piecewise
+derivatives,
+
+$$
+\mathcal{V}_h\subset H^1(0,L).
+$$
+
+This is the conformity required by the axial-bar variational problem.
+
+::: {#exm-c5-global-function}
+## Constructing a finite element function
+
+On the three-element mesh
+$x_1=0$, $x_2=1$, $x_3=2$, $x_4=3$, assign
+
+$$
+U_1=0,\qquad
+U_2=1,\qquad
+U_3=-\frac12,\qquad
+U_4=\frac12.
+$$
+
+Then
+
+$$
+u_h
+=
+U_1\phi_1+U_2\phi_2+U_3\phi_3+U_4\phi_4.
+$$
+
+On $\mathcal{K}_2=[1,2]$, only $\phi_2$ and $\phi_3$ are nonzero. Hence
+
+$$
+u_h|_{\mathcal{K}_2}
+=
+U_2\phi_2|_{\mathcal{K}_2}+U_3\phi_3|_{\mathcal{K}_2}
+=
+U_2\phi_1^2+U_3\phi_2^2.
+$$
+
+The global expansion and the local interpolation are two descriptions of the
+same finite element function.
 :::
 
-## From local functions to a global space {#sec-fem-global-basis}
+::: {#exr-c5-construct-basis}
+## Constructing a global basis function
 
-Local node numbers describe positions within one element; global node numbers
-identify nodes in the complete mesh. The connectivity map
+For the nonuniform mesh
+$x_1=0$, $x_2=1$, $x_3=3$, and $x_4=4$:
 
-$$
-I_e:\{1,2\}\longrightarrow\{0,\ldots,N\}
-$$
+1. construct $\phi_3$ from elementwise linearity, continuity, and the nodal
+   interpolation property;
+2. state its support; and
+3. verify its nodal values.
+:::
 
-assigns each local node to its global node. For the consecutively numbered mesh in
-@eq-fem-interval-elements,
 
-$$
-I_e(1)=e,
-\qquad I_e(2)=e+1.
-$$ {#eq-fem-connectivity-map}
+## From the finite element space to element equations {#sec-c5-discrete}
 
-@fig-fem-local-global-numbering shows why the node shared by two elements has two
-local numbers but only one global number.
+The approximation space has now been constructed. We next return to the
+variational problem and use exactly the same Galerkin idea as in
+@sec-c5-galerkin, but with the mesh-based basis
+$\phi_i$ in place of the generic basis $\psi_i$.
 
-![Local node numbers restart on each element, whereas global node numbers identify the shared nodes of the complete mesh.](../figures/chapter05/local-global-numbering.svg){#fig-fem-local-global-numbering width="88%" fig-align="center"}
-
-For linear elements, the global finite element space is
+For the homogeneous displacement condition at $x=0$, define
 
 $$
-\Vh=
-\{v_h\in C([0,L]):v_h|_{K_e}\in\mathbb P_1(K_e)
-\text{ for }e=0,\ldots,N-1\}.
-$$ {#eq-fem-one-dimensional-space}
-
-A function in $\Vh$ is linear on each element and continuous at every shared node.
-It need not have a continuous derivative. Since it is continuous and its cellwise
-derivative is square integrable, $\Vh\subset H^1(0,L)$.
-
-Chapter 2 defined a basis as a collection of functions whose linear combinations
-represent every function in a vector space. We now construct such a basis for
-$\Vh$. Instead of using powers $1,x,x^2,\ldots$, the finite element basis is tied
-to the mesh: one basis function is associated with each node.
-
-Let $\phi_i$ be the global basis function associated with node $x_i$. It equals one
-at $x_i$, equals zero at every other node, and is linear on each element. Thus
-
-$$
-\phi_i(x_j)=\delta_{ij}.
-$$ {#eq-fem-global-nodal-property}
-
-An interior basis function is nonzero only on the two elements meeting at its node:
-
-$$
-\phi_i(x)=
-\begin{cases}
-\dfrac{x-x_{i-1}}{x_i-x_{i-1}}, & x\in[x_{i-1},x_i],\\[6pt]
-\dfrac{x_{i+1}-x}{x_{i+1}-x_i}, & x\in[x_i,x_{i+1}],\\[6pt]
-0, & \text{otherwise}.
-\end{cases}
-$$ {#eq-fem-global-hat-function}
-
-@fig-fem-global-basis displays all four basis functions on a three-element mesh.
-The shared nodal values make the assembled displacement continuous.
-
-![Global linear basis functions on a three-element mesh. Each function equals one at one global node and vanishes at every other global node.](../figures/chapter05/global-hat-functions.svg){#fig-fem-global-basis width="92%" fig-align="center"}
-
-The relationship between a global basis function and a local shape function is
-
-$$
-\phi_{I_e(a)}|_{K_e}=\phi_a^e,
-\qquad a\in\{1,2\}.
-$$ {#eq-fem-local-global-basis-restriction}
-
-For example, global node $i$ is local node 2 of element $K_{i-1}$ and local node 1
-of element $K_i$. The two corresponding local shape functions form the two pieces
-of the global hat function $\phi_i$. This is how local functions are joined across
-the mesh.
-
-Every $u_h\in\Vh$ has the unique representation
-
-$$
-u_h(x)=\sum_{j=0}^{N}U_j\phi_j(x),
-$$ {#eq-fem-global-expansion}
-
-where $U_j=u_h(x_j)$. At any point inside $K_e$, all global basis functions except
-$\phi_e$ and $\phi_{e+1}$ vanish. Therefore,
-
-$$
-u_h|_{K_e}=U_e\phi_e|_{K_e}+U_{e+1}\phi_{e+1}|_{K_e}
-=U_e\phi_1^e+U_{e+1}\phi_2^e,
+\mathcal{V}_{h,0}
+=
+\mathcal{V}_h\cap\mathcal{V}_0
+=
+\{v_h\in\mathcal{V}_h:v_h(0)=0\}.
 $$
 
-which is the local interpolation in @eq-fem-element-interpolation.
-
-::: {#exm-fem-global-interpolant}
-## Constructing and plotting a finite element function
-
-Consider the three-element mesh with nodes
+The finite element problem is
 
 $$
-x_0=0,\qquad x_1=1,\qquad x_2=2,\qquad x_3=3,
-$$
+\text{find }u_h\in\mathcal{V}_{h,0}\text{ such that}\qquad
+a(u_h,v_h)=\ell(v_h)
+\qquad
+\forall v_h\in\mathcal{V}_{h,0}.
+$$ {#eq-c5-discrete-variational}
 
-and assign the nodal values
-
-$$
-U_0=0,\qquad U_1=1,\qquad U_2=-\frac12,\qquad U_3=\frac12.
-$$
-
-The corresponding finite element function is
-
-$$
-u_h=U_0\phi_0+U_1\phi_1+U_2\phi_2+U_3\phi_3.
-$$ {#eq-fem-example-global-expansion}
-
-Only two terms are nonzero on each element. Substituting the local shape functions
+Write $u_h=\sum_{j=1}^{N+1}U_j\phi_j$. The coefficient $U_1$ is prescribed by
+the essential boundary condition. Testing with each free nodal basis function
 gives
 
 $$
-u_h(x)=
-\begin{cases}
-x, & 0\le x\le1,\\
-\dfrac52-\dfrac32x, & 1\le x\le2,\\
-x-\dfrac52, & 2\le x\le3.
-\end{cases}
-$$ {#eq-fem-example-piecewise-function}
-
-To plot $u_h$, place the points $(x_j,U_j)$ on the coordinate plane and connect
-successive points by straight segments. This works because $u_h$ is linear on each
-element. @fig-fem-global-interpolation-example shows both the weighted basis-function
-contributions $U_j\phi_j$ and their sum.
-:::
-
-![A finite element function obtained by adding its weighted global basis functions. At each node, the value of the sum equals the corresponding coefficient.](../figures/chapter05/global-interpolation-example.svg){#fig-fem-global-interpolation-example width="94%" fig-align="center"}
-
-::: {#exr-fem-global-basis-support}
-## Local and global basis functions
-
-For a mesh with nodes $x_0=0$, $x_1=1$, $x_2=3$, and $x_3=4$:
-
-1. write the connectivity map for every element;
-2. write the global basis function $\phi_2$ piecewise; and
-3. identify the support of $\phi_2$ and verify its nodal values.
-:::
-
-## The discrete variational problem {#sec-fem-discrete-bar}
-
-Let
-
-$$
-\mathcal V_{h,0}=\Vh\cap\mathcal V_0
-=\{v_h\in\Vh:v_h(0)=0\}.
-$$ {#eq-fem-discrete-bar-spaces}
-
-Because $\Vh\subset H^1(0,L)$, $\mathcal V_{h,0}$ is a conforming finite element
-space. The
-finite element approximation is
-
-$$
-\boxed{
-\text{find }u_h\in\mathcal V_{h,0}
-\quad\text{such that}\quad
-a_{\mathrm{bar}}(u_h,v_h)=\ell_{\mathrm{bar}}(v_h)
-\quad\forall v_h\in\mathcal V_{h,0}.}
-$$ {#eq-fem-discrete-bar-problem}
-
-Write the finite element displacement using all nodal basis functions:
-
-$$
-u_h=\sum_{j=0}^{N}U_j\phi_j.
+\sum_{j=1}^{N+1}K_{ij}U_j=F_i,
 $$
 
-Some coefficients $U_j$ are prescribed by the displacement boundary conditions;
-the remaining coefficients are unknown. Let $\mathcal I_f$ denote the set of free
-node numbers. Since the test functions vanish at prescribed nodes, it is sufficient
-to enforce @eq-fem-discrete-bar-problem with $v_h=\phi_i$ for every
-$i\in\mathcal I_f$. This gives
+with
 
 $$
-\sum_{j=0}^{N}K_{ij}U_j=F_i,
-\qquad i\in\mathcal I_f,
-$$
-
-where
-
-$$
-K_{ij}=a_{\mathrm{bar}}(\phi_j,\phi_i),
+K_{ij}
+=
+a(\phi_j,\phi_i)
+=
+\int_0^L AE\,\phi_j'\phi_i'\,\dd x,
 \qquad
-F_i=\ell_{\mathrm{bar}}(\phi_i).
-$$ {#eq-fem-global-algebraic-system}
+F_i
+=
+\int_0^L f\phi_i\,\dd x+\overline P\,\phi_i(L).
+$$ {#eq-c5-global-entries}
 
-The row index $i$ is associated with the test function and the column index $j$
-with the trial function. In practice, element contributions are first assembled
-into a matrix $\bm K$ and vector $\bm F$ containing all nodes. The equations for
-the free nodes are then separated from the rows associated with prescribed nodes.
-Those remaining rows are used later to recover the reactions. The matrix is
-symmetric because $a_{\mathrm{bar}}$ is symmetric.
-
-## Element equations {#sec-fem-bar-element-equations}
-
-The global integrals are sums of element integrals:
-
-$$
-a_{\mathrm{bar}}(u_h,v_h)
-=\sum_{e=0}^{N-1}\int_{K_e}AE\,u_h'v_h'\,\dd x,
-\qquad
-\ell_{\mathrm{bar}}(v_h)
-=\sum_{e=0}^{N-1}\int_{K_e}fv_h\,\dd x.
-$$ {#eq-fem-element-decomposition}
-
-On element $e$, collect the nodal displacements in
-
-$$
-\bm U^e=\begin{bmatrix}U_e&U_{e+1}\end{bmatrix}^T,
-\qquad
-u_h|_{K_e}=\bm N^e\bm U^e,
-\qquad
-\bm N^e=\begin{bmatrix}\phi_1^e&\phi_2^e\end{bmatrix}.
-$$ {#eq-fem-element-displacement-matrix}
-
-The strain is
-
-$$
-\varepsilon_h|_{K_e}=\bm B^e\bm U^e,
-\qquad
-\bm B^e=\frac{\dd\bm N^e}{\dd x}
-=\begin{bmatrix}-1/h_e&1/h_e\end{bmatrix}.
-$$ {#eq-fem-bar-B-matrix}
-
-Similarly, write $v_h|_{K_e}=\bm N^e\bm V^e$, so that
-$v_h'|_{K_e}=\bm B^e\bm V^e$. Substitution into the two element integrals gives
-
-$$
-\int_{K_e}AE\,u_h'v_h'\,\dd x
-=(\bm V^e)^T
-\left[\int_{K_e}(\bm B^e)^TAE\bm B^e\,\dd x\right]\bm U^e,
-$$
-
+The formula for $K_{ij}$ also explains the sparsity of the global matrix. If
+the supports of $\phi_i$ and $\phi_j$ do not overlap except on a set of measure
+zero, then their derivatives are never simultaneously nonzero over an interval,
 and
 
 $$
-\int_{K_e}fv_h\,\dd x
-=(\bm V^e)^T\left[\int_{K_e}(\bm N^e)^Tf\,\dd x\right].
-$$
+K_{ij}=0.
+$$ {#eq-c5-support-sparsity}
 
-The quantities in square brackets define the element stiffness matrix and the
-element distributed-load vector:
+For linear elements, an interior basis function overlaps only with itself and
+its immediate neighbors.
+
+![Local support of the basis functions produces a sparse global stiffness matrix.](../figures/chapter05/basis_overlap_sparsity.svg){#fig-c5-basis-overlap-sparsity width="68%" fig-align="center"}
+
+Equation @eq-c5-global-entries is already a complete definition of the
+discrete problem. It would be possible to evaluate each entry by integrating
+over the whole interval. Doing so, however, would ignore the local structure
+that motivated the finite element basis.
+
+The mesh partitions the interval, so
 
 $$
-\bm K^e=\int_{K_e}(\bm B^e)^T AE\bm B^e\,\dd x,
+K_{ij}
+=
+\sum_{e=1}^{N}
+\int_{\mathcal{K}_e}
+AE\,\phi_j'\phi_i'\,\dd x.
+$$ {#eq-c5-global-entry-sum}
+
+Only elements lying in the common support of $\phi_i$ and $\phi_j$ contribute.
+On such an element, suppose
+$i=I^e(a)$ and $j=I^e(b)$. The local-global relation
+@eq-c5-local-global-relation gives
+
+$$
+\phi_i|_{\mathcal{K}_e}=\phi_a^e,
 \qquad
-\bm f^e=\int_{K_e}(\bm N^e)^T f\,\dd x.
-$$ {#eq-fem-bar-element-integrals}
+\phi_j|_{\mathcal{K}_e}=\phi_b^e.
+$$
 
-The vector $\bm f^e$ is called a **consistent load vector** because it is obtained
-by weighting the distributed load with the same shape functions used to approximate
-the displacement.
-
-If $AE$ and $f$ are constant on the element, these become
+The corresponding contribution can therefore be computed entirely with local
+shape functions:
 
 $$
-\boxed{
-\bm K^e=\frac{A_eE_e}{h_e}
-\begin{bmatrix}1&-1\\-1&1\end{bmatrix}},
+K_{ab}^e
+=
+\int_{\mathcal{K}_e}
+AE
+\frac{\dd\phi_b^e}{\dd x}
+\frac{\dd\phi_a^e}{\dd x}
+\,\dd x.
+$$ {#eq-c5-element-stiffness-entry}
+
+Likewise, the distributed load contributes
+
+$$
+f_a^e
+=
+\int_{\mathcal{K}_e}f\,\phi_a^e\,\dd x.
+$$ {#eq-c5-element-load-entry}
+
+Collecting the local entries gives
+
+$$
+\bK^e
+=
+\int_{\mathcal{K}_e}
+(\bB^e)^T AE\,\bB^e\,\dd x,
 \qquad
-\boxed{
-\bm f^e=\frac{f_eh_e}{2}
-\begin{bmatrix}1\\1\end{bmatrix}}.
-$$ {#eq-fem-linear-bar-element}
+\bfm^e
+=
+\int_{\mathcal{K}_e}
+(\bN^e)^T f\,\dd x.
+$$ {#eq-c5-element-matrix-vector}
 
-The two entries in the load vector are the algebraic representation of the
-distributed load within the linear finite element space; they are not additional
-loads applied to the original bar.
-
-::: {#exm-fem-linearly-varying-load}
-## Consistent load vector for a linearly varying load
-
-Suppose the distributed load varies linearly from $f_e^-$ at $x_e$ to $f_e^+$ at
-$x_{e+1}$. It can be written using the linear shape functions as
+For constant $A$, $E$, and $f$ on a linear element,
 
 $$
-f(x)=f_e^-\phi_1^e(x)+f_e^+\phi_2^e(x).
+\bK^e
+=
+\frac{A_eE_e}{h_e}
+\begin{bmatrix}
+1&-1\\
+-1&1
+\end{bmatrix},
+\qquad
+\bfm^e
+=
+\frac{f_eh_e}{2}
+\begin{bmatrix}
+1\\
+1
+\end{bmatrix}.
+$$ {#eq-c5-linear-element-matrix-vector}
+
+![A typical linear element, its local nodal unknowns, and the corresponding element stiffness matrix and consistent load vector.](../figures/chapter05/typical_element_matrix_guide.svg){#fig-c5-typical-element width="100%" fig-align="center"}
+
+The picture is worth pausing over. The geometry of one element
+$\mathcal{K}_e$, the two nodal displacement values collected in $\bU^e$, the
+interpolation formula for $u_h|_{\mathcal{K}_e}$, and the formulas for
+$\bK^e$ and $\bfm^e$ belong together. In implementation, one element at a time
+supplies exactly these local objects, which are then sent to the global system
+through assembly.
+
+The load vector is called a **consistent load vector** because it is obtained
+from the same variational equation and basis functions used for the
+displacement approximation. It is not an arbitrary replacement of the
+distributed load by nodal point forces.
+
+For example, if the distributed load varies linearly from $f_e^-$ to $f_e^+$
+across the element, then
+
+$$
+f(x)=f_e^-\phi_1^e(x)+f_e^+\phi_2^e(x),
 $$
 
-Substitution into @eq-fem-bar-element-integrals gives
+and direct integration gives
 
 $$
-\bm f^e
-=\frac{h_e}{6}
+\bfm^e
+=
+\frac{h_e}{6}
 \begin{bmatrix}
 2f_e^-+f_e^+\\
 f_e^-+2f_e^+
 \end{bmatrix}.
-$$ {#eq-fem-linear-varying-load-vector}
+$$ {#eq-c5-linear-varying-load}
 
-The two entries are generally unequal. Their sum is
+The entries are generally unequal, but their sum is
+$\int_{\mathcal{K}_e}f\,\dd x$. Thus the element vector preserves the total distributed
+load.
+
+The natural boundary term is already part of the global load functional. Since
+$\phi_i(L)=\delta_{i,N+1}$, an applied force $\overline P$ at $x=L$ contributes
+only to the right-end global load entry:
 
 $$
-f_1^e+f_2^e=\frac{h_e}{2}(f_e^-+f_e^+)
-=\int_{K_e}f(x)\,\dd x,
+F_{N+1}\mathrel{+}=\overline P.
 $$
 
-so the element vector preserves the total distributed load.
+This is the discrete counterpart of the way a natural boundary condition enters
+the continuous variational problem.
+
+::: {#exm-c5-end-force}
+## A natural boundary load at the right endpoint
+
+Suppose the bar carries no distributed load, but the right endpoint is subject
+to the axial force $\overline P$. Then every element load vector from the
+distributed load is zero, yet the global load vector is not. The finite element
+equations acquire the single contribution
+$F_{N+1}\mathrel{+}=\overline P$ at the global degree of freedom associated with
+$x=L$. This is why a natural boundary condition appears on the right-hand side
+rather than in the definition of the admissible displacement space.
 :::
 
-::: {#exr-fem-bar-element-calculation}
-## Linear bar element
+::: {#rem-c5-direct-stiffness}
+## Relation to the direct stiffness method
 
-Starting from @eq-fem-bar-element-integrals, use
-@eq-fem-linear-element-basis to derive both expressions in
-@eq-fem-linear-bar-element. Verify the physical units of every matrix and vector
-entry.
+For a two-node linear axial bar, the direct stiffness method and the finite
+element method give the same element stiffness matrix. The direct stiffness
+method starts from an element force--displacement relation. The finite element
+derivation starts from the variational problem and the finite-dimensional
+basis. The latter construction extends without changing its basic logic to the
+other boundary-value problems considered in this book.
 :::
 
-## Assembly {#sec-fem-one-dimensional-assembly}
+::: {#exr-c5-consistent-load}
+## Consistent loading
 
-Each element equation is written using local node numbers. Assembly adds its entries
-to the rows and columns associated with the corresponding global nodes:
+On $\mathcal{K}_e=[0,h_e]$, let $f(x)=f_0+cx$.
+
+1. Evaluate $\bfm^e$ exactly.
+2. Verify that the sum of its entries equals
+   $\int_{\mathcal{K}_e}f(x)\,\dd x$.
+3. Compare the result with simply dividing the total load equally between the
+   two nodes.
+:::
+
+::: {#exr-c5-foundation-matrix}
+## A bar attached to distributed axial springs
+
+Suppose the bar is attached to distributed axial springs that exert the
+resisting force $-c(x)u(x)$ per unit length, where $c(x)\ge 0$. The variational
+problem then contains the additional term
 
 $$
-K_{I_e(a),I_e(b)}\mathrel{+}=K_{ab}^e,
+\int_0^L c\,u v\,\dd x.
+$$
+
+For a linear element $\mathcal K_e$ on which $c(x)=c_e$ is constant:
+
+1. show that this term contributes the element matrix
+   $$
+   C_{ab}^e
+   =
+   \int_{\mathcal K_e}c_e\phi_a^e\phi_b^e\,\dd x,
+   \qquad a,b\in\{1,2\};
+   $$
+2. evaluate the integrals to obtain
+   $$
+   \bC^e
+   =
+   \frac{c_eh_e}{6}
+   \begin{bmatrix}
+   2&1\\
+   1&2
+   \end{bmatrix};
+   $$
+3. write the complete element matrix for the bar as
+   $\bK^e+\bC^e$; and
+4. explain why $\bK^e[1,1]^T=\bm{0}$ but
+   $\bC^e[1,1]^T\ne\bm{0}$ when $c_e>0$.
+
+The same matrix also appears in scalar reaction--diffusion equations
+[@flaherty2000, Sec. 1.3].
+:::
+
+## Assembly, boundary conditions, and the computed solution {#sec-c5-assembly}
+
+The element calculations produce small matrices and vectors in local numbering.
+The global finite element equations require contributions in global numbering.
+The connectivity map provides exactly the information needed to move from one
+description to the other.
+
+For each element $e$,
+
+$$
+F_{I^e(a)}\mathrel{+}=f_a^e,
 \qquad
-F_{I_e(a)}\mathrel{+}=f_a^e,
-\qquad a,b\in\{1,2\}.
-$$ {#eq-fem-assembly-rule}
+K_{I^e(a),I^e(b)}\mathrel{+}=K_{ab}^e.
+$$ {#eq-c5-assembly-rule}
 
-@fig-fem-assembly shows the contributions for three equal elements. Entries at an
-interior node receive contributions from both adjoining elements.
-
-![Assembly of three two-node element matrices into the global matrix. The connectivity determines the global row and column receiving each local entry.](../figures/chapter05/assembly-three-elements.svg){#fig-fem-assembly width="94%" fig-align="center"}
-
-For constant $AE$ and equal element length $h$, the assembled stiffness matrix is
+Consider again the three-element mesh with
 
 $$
-\bm K=\frac{AE}{h}
+I^1=(1,2),
+\qquad
+I^2=(2,3),
+\qquad
+I^3=(3,4).
+$$
+
+Element 1 contributes only to global rows and columns 1 and 2. Element 2
+contributes to rows and columns 2 and 3, and element 3 contributes to rows and
+columns 3 and 4. At a shared global node, contributions from the neighboring
+elements are added.
+
+If
+
+$$
+\bK^e=
+\begin{bmatrix}
+K_{11}^e&K_{12}^e\\
+K_{21}^e&K_{22}^e
+\end{bmatrix},
+$$
+
+the assembled matrix is
+
+$$
+\bK
+=
+\begin{bmatrix}
+K_{11}^1
+&
+K_{12}^1
+&
+0
+&
+0\\
+K_{21}^1
+&
+K_{22}^1+K_{11}^2
+&
+K_{12}^2
+&
+0\\
+0
+&
+K_{21}^2
+&
+K_{22}^2+K_{11}^3
+&
+K_{12}^3\\
+0
+&
+0
+&
+K_{21}^3
+&
+K_{22}^3
+\end{bmatrix}.
+$$ {#eq-c5-three-element-K}
+
+The distributed-load vector is
+
+$$
+\bF
+=
+\begin{bmatrix}
+f_1^1\\
+f_2^1+f_1^2\\
+f_2^2+f_1^3\\
+f_2^3
+\end{bmatrix}
+$$ {#eq-c5-three-element-F}
+
+before any additional natural boundary contribution is added.
+
+![Assembly places each local entry into the global row and column specified by connectivity. Shared global entries receive contributions from every incident element.](../figures/chapter05/assembly_scatter_add.svg){#fig-c5-assembly width="100%" fig-align="center"}
+
+For equal element length $h$ and constant $AE$,
+
+$$
+\bK
+=
+\frac{AE}{h}
 \begin{bmatrix}
 1&-1&0&0\\
 -1&2&-1&0\\
 0&-1&2&-1\\
 0&0&-1&1
 \end{bmatrix}.
-$$ {#eq-fem-three-element-global-matrix}
+$$ {#eq-c5-unconstrained-K}
 
-Before a displacement is prescribed, the matrix in
-@eq-fem-three-element-global-matrix has
-$[1,1,1,1]^T$ in its nullspace. This vector represents a rigid translation: all
-nodal displacements change by the same amount and the element strains remain zero.
-A displacement boundary condition removes this undetermined translation.
+Before an essential displacement condition is imposed,
+$[1,1,1,1]^T$ lies in the nullspace of this matrix. That vector represents a
+rigid translation: all nodal displacements change by the same amount, so the
+strain in every element remains zero.
 
-The zero entries in @eq-fem-three-element-global-matrix follow from the local
-support of the basis functions. In general,
+### Essential boundary conditions and reactions
 
-$$
-K_{ij}=0
-\qquad\text{if}\qquad
-\operatorname{supp}\phi_i\cap\operatorname{supp}\phi_j=\varnothing.
-$$ {#eq-fem-stiffness-local-support}
-
-Thus each basis function interacts only with basis functions supported on nearby
-elements. The global stiffness matrix is therefore sparse; with the sequential
-numbering used here, the linear one-dimensional matrix is also banded.
-
-If $AE>0$ and at least one displacement value removes the rigid translation, the
-reduced stiffness matrix is positive definite. Indeed, a nonzero finite element
-function $v_h$ satisfying the homogeneous displacement condition has
+Suppose some nodal displacements are prescribed. Those coefficients are already
+known and should not be solved for again. It is useful to see the algebra
+before introducing block notation. If $U_1$ is prescribed, a free global
+equation of the form
 
 $$
-\bm V_f^T\bm K_{ff}\bm V_f
-=\int_0^L AE\,(v_h')^2\,\dd x>0.
-$$ {#eq-fem-reduced-stiffness-positive-definite}
+K_{i1}U_1+K_{i2}U_2+\cdots+K_{i,N+1}U_{N+1}=F_i
+$$
 
-The reduced matrix is consequently symmetric positive definite for this bar
-problem.
+is rewritten by moving the known term to the right-hand side:
 
-::: {#exr-fem-nonuniform-assembly}
-## Assembly on a nonuniform bar
+$$
+K_{i2}U_2+\cdots+K_{i,N+1}U_{N+1}
+=
+F_i-K_{i1}U_1.
+$$
 
-Divide $[0,L]$ into two elements of lengths $h_1$ and $h_2$, with constant axial
-rigidities $(AE)_1$ and $(AE)_2$. Derive the two element stiffness matrices and
-assemble the $3\times3$ global stiffness matrix.
-:::
+A nonzero prescribed displacement therefore changes the right-hand side of the
+free equations. The same operation can be written compactly by partitioning the
+global vector into free and prescribed values,
 
-## Prescribed displacements and reactions {#sec-fem-bar-boundary-conditions}
+$$
+\bU=
+\begin{bmatrix}
+\bU_f\\
+\bU_p
+\end{bmatrix},
+$$
 
-Suppose the coefficient vector is partitioned into free values $\bm U_f$ and
-prescribed values $\bm U_p$. Partitioning the assembled equations gives
+and partitioning the assembled equations consistently:
 
 $$
 \begin{bmatrix}
-\bm K_{ff}&\bm K_{fp}\\
-\bm K_{pf}&\bm K_{pp}
+\bK_{ff}&\bK_{fp}\\
+\bK_{pf}&\bK_{pp}
 \end{bmatrix}
-\begin{bmatrix}\bm U_f\\\bm U_p\end{bmatrix}
+\begin{bmatrix}
+\bU_f\\
+\bU_p
+\end{bmatrix}
 =
-\begin{bmatrix}\bm F_f\\\bm F_p\end{bmatrix}.
-$$ {#eq-fem-partitioned-system}
+\begin{bmatrix}
+\bF_f\\
+\bF_p
+\end{bmatrix}.
+$$ {#eq-c5-partitioned-system}
 
-The free displacements satisfy
-
-$$
-\boxed{
-\bm K_{ff}\bm U_f
-=\bm F_f-\bm K_{fp}\bm U_p.}
-$$ {#eq-fem-reduced-system}
-
-After $\bm U_f$ is found, the forces required to enforce the prescribed
-displacements are
+The equations associated with the free degrees of freedom are
 
 $$
-\boxed{
-\bm R_p=\bm K_{pf}\bm U_f+\bm K_{pp}\bm U_p-\bm F_p.}
-$$ {#eq-fem-reaction-forces}
+\bK_{ff}\bU_f
+=
+\bF_f-\bK_{fp}\bU_p.
+$$ {#eq-c5-reduced-system}
 
-@fig-fem-boundary-dofs shows this separation. Replacing a matrix row by an identity
-row is another implementation, but the corresponding right-hand side and matrix
-columns must be treated consistently.
+For a nonzero prescribed displacement, the term
+$\bK_{fp}\bU_p$ is essential. It represents the contribution of the known
+displacement values to the free equilibrium equations.
 
-![Prescribed and free displacement degrees of freedom for a one-dimensional bar. Reactions are recovered at the prescribed degrees of freedom after solving for the free displacements.](../figures/chapter05/boundary-dofs.svg){#fig-fem-boundary-dofs width="88%" fig-align="center"}
+The equations associated with prescribed degrees of freedom are not discarded.
+After the free displacements have been found, they provide the forces required
+to enforce the prescribed values:
 
-::: {#exr-fem-prescribed-bar-displacements}
-## Prescribed endpoint displacement
+$$
+\bR_p
+=
+\bK_{pf}\bU_f+\bK_{pp}\bU_p-\bF_p.
+$$ {#eq-c5-reactions}
 
-For @eq-fem-three-element-global-matrix, let $U_0=0$ and $U_3=\overline u$.
-Write the reduced $2\times2$ system for $U_1$ and $U_2$. Then write the two
-reaction-force equations.
-:::
+![Prescribed nodal values are separated from the free values before the solve. The prescribed equations are then used to recover reactions.](../figures/chapter05/essential_bc_partition.svg){#fig-c5-essential-bc width="100%" fig-align="center"}
 
-## A complete two-element example {#sec-fem-two-element-example}
+The distinction from the continuous variational problem is worth keeping in
+view. Natural boundary data contribute through the load functional. Essential
+boundary data restrict the admissible functions and, after discretization,
+identify coefficients whose values are prescribed.
 
-Consider a uniform bar of length $L$ and constant axial rigidity $AE$. Let
-$u(0)=0$, let the right endpoint be traction free, and apply the constant
-distributed load $f_0$. Divide the bar into two equal elements of length $h=L/2$.
+::: {#exm-c5-complete-bar}
+## Complete analysis of a uniformly loaded bar
+
+Consider a uniform bar of length $L$ and constant axial rigidity $AE$. Let the
+left endpoint be fixed, the right endpoint be traction free, and let the
+distributed load be the constant $f_0$.
+
+Divide the bar into two equal elements. Then $h=L/2$ and
+
+$$
+I^1=(1,2),
+\qquad
+I^2=(2,3).
+$$
+
 Each element contributes
 
 $$
-\bm K^e=\frac{AE}{h}
-\begin{bmatrix}1&-1\\-1&1\end{bmatrix},
+\bK^e
+=
+\frac{AE}{h}
+\begin{bmatrix}
+1&-1\\
+-1&1
+\end{bmatrix},
 \qquad
-\bm f^e=\frac{f_0h}{2}
-\begin{bmatrix}1\\1\end{bmatrix}.
+\bfm^e
+=
+\frac{f_0h}{2}
+\begin{bmatrix}
+1\\
+1
+\end{bmatrix}.
 $$
 
-Adding the two element contributions at the shared node gives
+After assembly,
 
 $$
 \frac{AE}{h}
@@ -675,383 +1143,389 @@ $$
 -1&2&-1\\
 0&-1&1
 \end{bmatrix}
-\begin{bmatrix}U_0\\U_1\\U_2\end{bmatrix}
+\begin{bmatrix}
+U_1\\
+U_2\\
+U_3
+\end{bmatrix}
 =
 \frac{f_0h}{2}
-\begin{bmatrix}1\\2\\1\end{bmatrix}.
-$$ {#eq-fem-two-element-example-system}
+\begin{bmatrix}
+1\\
+2\\
+1
+\end{bmatrix}.
+$$ {#eq-c5-two-element-system}
 
-With $U_0=0$, the two free equations are
+The middle load entry contains one contribution from each neighboring element.
+Since $U_1=0$, the free equations are
 
 $$
 \frac{AE}{h}
-\begin{bmatrix}2&-1\\-1&1\end{bmatrix}
-\begin{bmatrix}U_1\\U_2\end{bmatrix}
-=\frac{f_0h}{2}\begin{bmatrix}2\\1\end{bmatrix}.
+\begin{bmatrix}
+2&-1\\
+-1&1
+\end{bmatrix}
+\begin{bmatrix}
+U_2\\
+U_3
+\end{bmatrix}
+=
+\frac{f_0h}{2}
+\begin{bmatrix}
+2\\
+1
+\end{bmatrix}.
 $$
 
 Solving and using $h=L/2$ gives
 
 $$
-U_1=\frac{3f_0L^2}{8AE},
+U_2
+=
+\frac{3f_0L^2}{8AE},
 \qquad
-U_2=\frac{f_0L^2}{2AE}.
-$$ {#eq-fem-two-element-example-solution}
+U_3
+=
+\frac{f_0L^2}{2AE}.
+$$ {#eq-c5-two-element-solution}
 
-The exact displacement for comparison is
-
-$$
-u(x)=\frac{f_0}{AE}\left(Lx-\frac{x^2}{2}\right).
-$$
-
-The finite element solution agrees with this function at all three nodes but is
-linear between them. The exact and finite element displacement fields are compared
-in @fig-fem-two-element-solution.
-
-![Exact and two-element finite element displacement fields for a uniformly loaded bar. The finite element solution matches the exact solution at the nodes and is linear within each element.](../figures/chapter05/two-element-distributed-load-solution.svg){#fig-fem-two-element-solution width="88%" fig-align="center"}
-
-The element strains are
+The exact displacement is
 
 $$
-\varepsilon_h^0=\frac{U_1-U_0}{h}=\frac{3f_0L}{4AE},
+u(x)
+=
+\frac{f_0}{AE}
+\left(
+Lx-\frac{x^2}{2}
+\right).
+$$ {#eq-c5-uniform-load-exact}
+
+For this particular problem, the finite element solution agrees with the exact
+solution at the three nodes, but it remains linear within each element.
+
+The corresponding element strains are
+
+$$
+\varepsilon_h^1
+=
+\frac{U_2-U_1}{h}
+=
+\frac{3f_0L}{4AE},
 \qquad
-\varepsilon_h^1=\frac{U_2-U_1}{h}=\frac{f_0L}{4AE}.
+\varepsilon_h^2
+=
+\frac{U_3-U_2}{h}
+=
+\frac{f_0L}{4AE}.
 $$
 
-They are constant on their respective elements, whereas the exact strain
-$u'(x)=f_0(L-x)/(AE)$ varies linearly. Finally, the reaction recovered at node 0 is
+The exact strain
+$u'(x)=f_0(L-x)/(AE)$ varies linearly, whereas the finite element strain is
+piecewise constant. The element stresses and axial forces are obtained from
 
 $$
-R_0=-\frac{AE}{h}U_1-\frac{f_0h}{2}=-f_0L,
-$$
-
-which balances the total distributed load on the bar.
-
-## Postprocessing and elementary checks {#sec-fem-bar-postprocessing}
-
-Once the nodal coefficients are known, displacement is evaluated from
-@eq-fem-global-expansion. On each element,
-
-$$
-\varepsilon_h^e=\bm B^e\bm U^e,
+\sigma_h^e=E\varepsilon_h^e,
 \qquad
-\sigma_h^e=E_e\varepsilon_h^e,
-\qquad
-N_h^e=A_e\sigma_h^e.
-$$ {#eq-fem-bar-postprocessing}
-
-For linear elements, these quantities are constant within each element when $A_e$
-and $E_e$ are constant. Values from adjacent elements may differ at a shared node.
-This does not make the displacement inadmissible: the finite element space requires
-continuous displacement, not continuous strain or stress.
-
-Before accepting a result, check that:
-
-1. the mesh and connectivity represent the intended bar;
-2. $A$, $E$, element lengths, loads, and displacements use consistent units;
-3. prescribed and free degrees of freedom are correctly identified;
-4. assembled applied loads and recovered reactions satisfy global force balance;
-5. the displacement and axial-force trends agree with the loading; and
-6. a refined mesh produces a stable result when the exact solution is not contained
-   in the finite element space.
-
-::: {#exr-fem-bar-equilibrium-check}
-## Global equilibrium
-
-For a bar fixed at $x=0$, subject to a distributed load $f(x)$, and traction free at
-$x=L$, show that the computed support reaction should satisfy
-
-$$
-R_0+\int_0^L f(x)\,\dd x=0.
+N_h^e=A\sigma_h^e.
 $$
 
-Explain how this relation can be used to check an assembled finite element model.
+Finally, the reaction at node 1 is obtained from the first row of the original
+assembled system:
+
+$$
+R_1
+=
+-\frac{AE}{h}U_2-\frac{f_0h}{2}
+=
+-f_0L.
+$$
+
+Because $\int_0^L f_0\,\dd x=f_0L$,
+
+$$
+R_1+\int_0^L f_0\,\dd x=0.
+$$
+
+The recovered reaction therefore satisfies global equilibrium.
 :::
 
-## Relation to one-dimensional heat conduction {#sec-fem-bar-heat-analogy}
+Once the global coefficient vector is known, postprocessing proceeds
+element by element. Connectivity extracts the local coefficient vector
+$\bU^e$ from $\bU$, and the formulas for $u_h$, strain, stress, and axial
+force are evaluated on each element. Adjacent linear elements may give
+different strains and stresses at a shared node. This does not violate
+conformity: $\mathcal{V}_h$ requires displacement to be continuous, not its derivative.
 
-The same finite element construction applies to steady one-dimensional heat
-conduction. The correspondence is
+Before accepting a result, check that the mesh and connectivity represent the
+intended bar, all quantities use consistent units, prescribed and free degrees
+of freedom are identified correctly, applied loads and recovered reactions
+satisfy global equilibrium, and the displacement and axial-force trends are
+consistent with the loading. Chapter 7 develops systematic error estimates and
+convergence theory.
 
-$$
-u\longleftrightarrow T,
-\qquad
-AE\longleftrightarrow kA,
-\qquad
-f\longleftrightarrow rA,
-\qquad
-N\longleftrightarrow -kA\,T'.
-$$ {#eq-fem-bar-heat-correspondence}
+::: {#exr-c5-assembly-error}
+## Diagnosing an assembly error
 
-The algebraic matrix has the same form, although the physical meanings and signs of
-the flux quantities must be retained. This correspondence illustrates why the same
-finite element ideas apply to different boundary-value problems.
-
-## Quadratic interpolation on a physical element {#sec-fem-quadratic-physical-element}
-
-The linear element retains the displacement at two endpoints and joins those
-values by a straight line. We can obtain a richer approximation by retaining one
-additional value at the element midpoint. Let
+Two linear elements have
+$k_1=(AE)_1/h_1$ and $k_2=(AE)_2/h_2$. A student assembles
 
 $$
-x_1^e=x_e,
-\qquad
-x_2^e=x_e+\frac{h_e}{2},
-\qquad
-x_3^e=x_{e+1}
-$$ {#eq-fem-quadratic-physical-nodes}
+\bK
+=
+\begin{bmatrix}
+k_1&-k_1&0\\
+-k_1&k_1&-k_2\\
+0&-k_2&k_2
+\end{bmatrix}.
+$$
 
-be the three local nodes. We seek a quadratic polynomial whose values at these
-points are $U_1^e$, $U_2^e$, and $U_3^e$. As in the linear construction, it is
-convenient to build one shape function for each nodal value. The Lagrange formula
-gives
+Identify the missing contribution, correct the matrix, and explain which global
+degree of freedom should receive the missing term.
+:::
+
+::: {#exm-c5-python-assembly}
+## Assembly and mesh refinement in Python
+
+We now repeat the uniformly loaded bar problem from
+@exm-c5-complete-bar with an arbitrary number of uniform linear elements. Set
+$L=AE=f_0=1$. The boundary-value problem and its exact solution are
+
+$$
+-u''=1\quad\text{in }(0,1),
+\qquad
+u(0)=0,
+\qquad
+u'(1)=0,
+\qquad
+u(x)=x-\frac{x^2}{2}.
+$$
+
+The following program exposes the element calculation, connectivity, assembly,
+imposition of the prescribed displacement, solution of the reduced system,
+and recovery of the reaction. The arrays use Python's zero-based indexing;
+thus `dofs = [e, e + 1]` represents the theoretical connectivity
+$I^{e+1}=(e+1,e+2)$.
+
+```{python}
+#| label: fig-c5-python-mesh-refinement
+#| fig-cap: "Linear finite element solutions for a uniformly loaded bar. Mesh refinement reduces the error between nodes."
+#| fig-width: 6.8
+#| fig-height: 3.7
+import numpy as np
+import matplotlib.pyplot as plt
+
+def solve_bar(num_elements):
+    x = np.linspace(0.0, 1.0, num_elements + 1)
+    K = np.zeros((num_elements + 1, num_elements + 1))
+    F = np.zeros(num_elements + 1)
+
+    for e in range(num_elements):
+        dofs = np.array([e, e + 1])
+        h = x[e + 1] - x[e]
+        K_e = np.array([[1.0, -1.0], [-1.0, 1.0]]) / h
+        F_e = 0.5 * h * np.ones(2)
+        K[np.ix_(dofs, dofs)] += K_e
+        F[dofs] += F_e
+
+    prescribed = np.array([0])
+    free = np.arange(1, num_elements + 1)
+    U = np.zeros(num_elements + 1)
+    rhs = F[free] - K[np.ix_(free, prescribed)] @ U[prescribed]
+    U[free] = np.linalg.solve(K[np.ix_(free, free)], rhs)
+    reaction = (K @ U - F)[prescribed]
+    return x, U, reaction
+
+x_plot = np.linspace(0.0, 1.0, 501)
+u_exact = x_plot - 0.5 * x_plot**2
+for N in (2, 4, 8):
+    x, U, reaction = solve_bar(N)
+    u_h = np.interp(x_plot, x, U)
+    error = np.max(np.abs(u_h - u_exact))
+    plt.plot(x, U, "o-", label=fr"$N={N}$, max. error $={error:.4f}$")
+
+plt.plot(x_plot, u_exact, "k--", linewidth=2, label="exact")
+plt.xlabel("$x$")
+plt.ylabel("$u(x)$")
+plt.legend()
+plt.tight_layout()
+```
+
+The finite element coefficients agree with the exact solution at the nodes for
+this particular problem, but the linear finite element field does not reproduce
+the quadratic variation between nodes. As $N$ increases, the element length
+decreases and the piecewise-linear curves in @fig-c5-python-mesh-refinement
+approach the exact solution. The recovered reaction is $-1$ for every mesh,
+which balances the total distributed load.
+:::
+
+## Higher-order elements and the reference interval {#sec-c5-higher-order}
+
+The construction above is not restricted to linear interpolation. We can keep
+the same mesh-based idea and enrich the polynomial space on each element.
+
+Consider a three-node quadratic element with local nodes
+
+$$
+x_1^e<x_2^e<x_3^e.
+$$
+
+The local basis functions belong to $\mathbb P_2(\mathcal{K}_e)$ and satisfy
+
+$$
+\phi_a^e(x_b^e)=\delta_{ab},
+\qquad
+a,b\in\{1,2,3\}.
+$$ {#eq-c5-quadratic-nodal-property}
+
+The three Lagrange polynomials are
 
 $$
 \begin{aligned}
 \phi_1^e(x)
-&=\frac{(x-x_2^e)(x-x_3^e)}
-        {(x_1^e-x_2^e)(x_1^e-x_3^e)},\\
+&=
+\frac{(x-x_2^e)(x-x_3^e)}
+{(x_1^e-x_2^e)(x_1^e-x_3^e)},\\
 \phi_2^e(x)
-&=\frac{(x-x_1^e)(x-x_3^e)}
-        {(x_2^e-x_1^e)(x_2^e-x_3^e)},\\
+&=
+\frac{(x-x_1^e)(x-x_3^e)}
+{(x_2^e-x_1^e)(x_2^e-x_3^e)},\\
 \phi_3^e(x)
-&=\frac{(x-x_1^e)(x-x_2^e)}
-        {(x_3^e-x_1^e)(x_3^e-x_2^e)}.
+&=
+\frac{(x-x_1^e)(x-x_2^e)}
+{(x_3^e-x_1^e)(x_3^e-x_2^e)}.
 \end{aligned}
-$$ {#eq-fem-quadratic-physical-basis}
+$$ {#eq-c5-quadratic-basis}
 
-Each shape function equals one at its own local node and zero at the other two:
-
-$$
-\phi_a^e(x_b^e)=\delta_{ab},
-\qquad a,b\in\{1,2,3\}.
-$$ {#eq-fem-quadratic-physical-nodal-property}
-
-The quadratic element interpolation is therefore
+The interpolation
 
 $$
-u_h|_{K_e}(x)
-=U_1^e\phi_1^e(x)+U_2^e\phi_2^e(x)+U_3^e\phi_3^e(x).
-$$ {#eq-fem-quadratic-physical-interpolation}
+u_h|_{\mathcal{K}_e}
+=
+U_1^e\phi_1^e+
+U_2^e\phi_2^e+
+U_3^e\phi_3^e
+$$
 
-The nodal property immediately gives $u_h(x_a^e)=U_a^e$. The displacement is
-quadratic within the element, and its derivative is linear. Thus a quadratic bar
-element can represent a linearly varying strain, whereas the linear bar element
-has constant strain.
+is quadratic, so its derivative is linear. A quadratic bar element can
+therefore represent a linearly varying strain within one element.
 
-::: {#exm-fem-quadratic-physical-interpolation}
-## A quadratic displacement on one element
-
-Consider $K=[0,2]$ with local nodes $0$, $1$, and $2$. Substitution into
-@eq-fem-quadratic-physical-basis gives
+On a mesh of quadratic elements, adjacent elements share endpoint nodes, while
+each midpoint node belongs to a single element. One convenient connectivity
+for three elements is
 
 $$
-\phi_1(x)=\frac{(x-1)(x-2)}{2},
+I^1=(1,2,3),
 \qquad
-\phi_2(x)=x(2-x),
+I^2=(3,4,5),
 \qquad
-\phi_3(x)=\frac{x(x-1)}{2}.
-$$ {#eq-fem-quadratic-example-basis}
+I^3=(5,6,7).
+$$ {#eq-c5-quadratic-connectivity}
 
-For the nodal values
+![Linear and quadratic meshes use the same local-to-global idea, but the quadratic element has an additional local interpolation node.](../figures/chapter05/linear_quadratic_connectivity.svg){#fig-c5-linear-quadratic-connectivity width="95%" fig-align="center"}
 
-$$
-U_1=0,
-\qquad U_2=1,
-\qquad U_3=\frac12,
-$$
+A global quadratic basis function associated with a midpoint is supported on
+one element. A basis function associated with a shared endpoint is obtained by
+joining one quadratic piece from each neighboring element.
 
-the interpolated displacement is
-
-$$
-u_h(x)=U_1\phi_1(x)+U_2\phi_2(x)+U_3\phi_3(x)
-=\frac74x-\frac34x^2.
-$$ {#eq-fem-quadratic-example-function}
-
-The curve passes through $(0,0)$, $(1,1)$, and $(2,1/2)$. Unlike the linear
-interpolant, it is not obtained by joining these points with straight segments.
-Its strain is $u_h'(x)=7/4-3x/2$, which varies linearly over the element.
-:::
-
-![The three quadratic shape functions and the displacement obtained from the nodal values in @exm-fem-quadratic-physical-interpolation.](../figures/chapter05/quadratic-physical-interpolation.svg){#fig-fem-quadratic-physical-interpolation width="92%" fig-align="center"}
-
-For a mesh of quadratic elements, adjacent elements share the displacement at
-their common endpoint. Their midpoint degrees of freedom belong to only one
-element. A mesh with $N$ quadratic elements therefore has $2N+1$ displacement
-degrees of freedom when no displacement has yet been prescribed.
+![Global quadratic basis functions on two elements. Midpoint basis functions have one-element support, whereas the basis at the shared endpoint spans both elements.](../figures/chapter05/global_quadratic_basis.svg){#fig-c5-global-quadratic-basis width="95%" fig-align="center"}
 
 The corresponding global space is
 
 $$
-\Vh^{(2)}
-=\{v_h\in C([0,L]):v_h|_{K_e}\in\mathbb P_2(K_e)
-\text{ for }e=0,\ldots,N-1\}.
-$$ {#eq-fem-one-dimensional-quadratic-space}
-
-Functions in $\Vh^{(2)}$ are continuous across element boundaries, but their
-derivatives need not be continuous there. This continuity is sufficient for
-$\Vh^{(2)}\subset H^1(0,L)$ and for the axial-bar variational problem.
-
-::: {#exr-fem-quadratic-physical-basis}
-## Properties of the quadratic shape functions
-
-For the element $K=[0,2]$:
-
-1. verify the nine nodal values $\phi_a(x_b)=\delta_{ab}$ for the functions in
-   @eq-fem-quadratic-example-basis;
-2. show that $\phi_1+\phi_2+\phi_3=1$; and
-3. use this identity to show that equal nodal values $U_1=U_2=U_3=c$ produce
-   the constant function $u_h(x)=c$.
-:::
-
-### Lagrange interpolation of degree $p$
-
-The same construction applies to any polynomial degree. Choose $p+1$ distinct
-local nodes $x_1^e,\ldots,x_{p+1}^e$ in $K_e$. The degree-$p$ Lagrange shape
-function associated with local node $a$ is
-
-$$
-\phi_a^e(x)
-=\prod_{\substack{b=1\\b\ne a}}^{p+1}
-\frac{x-x_b^e}{x_a^e-x_b^e},
-\qquad a=1,\ldots,p+1.
-$$ {#eq-fem-general-physical-lagrange-basis}
-
-Every factor in this product is one when $x=x_a^e$. When $x=x_b^e$ for
-$b\ne a$, one factor is zero. Consequently,
-$\phi_a^e(x_b^e)=\delta_{ab}$, and
-
-$$
-u_h|_{K_e}(x)
-=\sum_{a=1}^{p+1}U_a^e\phi_a^e(x)
-$$ {#eq-fem-general-physical-interpolation}
-
-is the unique polynomial in $\mathbb P_p(K_e)$ with the prescribed nodal values.
-Increasing $p$ adds local approximation functions without subdividing the element;
-this is called $p$-refinement. Subdividing the domain so that the element size
-$h$ decreases is called $h$-refinement.
-
-## The reference element {#sec-fem-reference-element}
-
-The linear and quadratic shape functions above were constructed using the physical
-coordinates of one element. The same calculation would have to be repeated for
-every element, even though all interval elements have the same basic structure.
-Numerical integration would also require quadrature points to be placed separately
-on every interval.
-
-A reference element avoids this repetition. Shape functions and quadrature rules
-are defined once on the fixed interval
-
-$$
-\widehat K=[-1,1]
+\mathcal{V}_h^{(2)}
+=
+\left\{
+v_h\in C([0,L]):
+v_h|_{\mathcal{K}_e}\in\mathbb P_2(\mathcal{K}_e)
+\text{ for every }e
+\right\}.
 $$
 
-with coordinate $\xi$. A map carries points from $\widehat K$ to each physical
-element $K_e$. The element coordinates, material data, distributed load, and
-connectivity may change with $e$, but the reference shape functions and quadrature
-points do not.
+Its functions are continuous across element boundaries, but their derivatives
+need not be continuous. Increasing the polynomial degree on a fixed mesh is
+called **$p$-refinement**; subdividing the mesh so that the element size
+decreases is called **$h$-refinement**.
 
-### Mapping the reference interval to a physical element
-
-For $K_e=[x_e,x_{e+1}]$, define
-
-$$
-x=F_e(\xi)
-=\frac{x_e+x_{e+1}}{2}+\frac{h_e}{2}\xi.
-$$ {#eq-fem-reference-map}
-
-This affine map sends $-1$ to $x_e$ and $1$ to $x_{e+1}$. Its derivative and
-inverse are
+The local matrix for a quadratic element is $3\times3$, but the assembly
+principle does not change. For two elements with
+$I^1=(1,2,3)$ and $I^2=(3,4,5)$, the shared global degree of freedom 3 receives
+contributions from both elements. For example,
 
 $$
-J_e=\frac{\dd x}{\dd\xi}=\frac{h_e}{2},
+K_{33}\mathrel{+}=K_{33}^1,
 \qquad
-\xi=F_e^{-1}(x)=\frac{2x-x_e-x_{e+1}}{h_e}.
-$$ {#eq-fem-reference-map-jacobian}
+K_{33}\mathrel{+}=K_{11}^2.
+$$
 
-The positive number $J_e$ is the Jacobian of the map. It measures the change in
-length between the reference and physical coordinates.
+The element has more local degrees of freedom, but connectivity still tells us
+where each local entry belongs.
 
-![The fixed reference interval is mapped to an element of length $h_e$ in the physical mesh.](../figures/chapter05/reference-interval-map.svg){#fig-fem-reference-interval-map width="88%" fig-align="center"}
+### Reference interval and general degree
 
-If $\widehat q$ is a function on $\widehat K$, its corresponding function on
-$K_e$ is defined by
+Constructing the linear and quadratic basis functions directly on physical
+elements makes their meaning clear. It also reveals a repeated calculation:
+every element uses the same type of interpolation problem. In a finite element
+implementation, it is more convenient to define the local basis once on a
+fixed reference interval and map it to each physical element.
+
+Let
 
 $$
-q(x)=\widehat q(F_e^{-1}(x)).
-$$ {#eq-fem-reference-pullback}
+\widehat{\mathcal{K}}=[-1,1]
+$$
 
-The chain rule and the change of integration variable give
+with reference coordinate $\xi$. For the physical interval
+$\mathcal{K}_e=[x_e,x_{e+1}]$, seek an affine map
+$F_e(\xi)=m_e\xi+c_e$ satisfying
+$F_e(-1)=x_e$ and $F_e(1)=x_{e+1}$. Solving for $m_e$ and $c_e$ gives
 
 $$
-\frac{\dd q}{\dd x}
-=\frac{1}{J_e}\frac{\dd\widehat q}{\dd\xi}
-=\frac{2}{h_e}\frac{\dd\widehat q}{\dd\xi},
-$$ {#eq-fem-reference-derivative-transformation}
+F_e(\xi)
+=
+\frac{x_e+x_{e+1}}{2}
++
+\frac{h_e}{2}\xi,
+\qquad
+J_e=\frac{\dd x}{\dd\xi}=\frac{h_e}{2}.
+$$ {#eq-c5-reference-map}
 
-and
+The inverse is
 
 $$
-\int_{K_e}q(x)\,\dd x
-=\int_{-1}^{1}\widehat q(\xi)J_e\,\dd\xi
-=\int_{-1}^{1}\widehat q(\xi)\frac{h_e}{2}\,\dd\xi.
-$$ {#eq-fem-reference-integral-transformation}
+F_e^{-1}(x)
+=
+\frac{2}{h_e}
+\left(
+x-\frac{x_e+x_{e+1}}{2}
+\right).
+$$
 
-### Linear element
+![The reference interval supplies one fixed coordinate system for local basis functions and quadrature points; the element map carries them to a physical interval.](../figures/chapter05/reference_mapping_quadrature.svg){#fig-c5-reference-map width="95%" fig-align="center"}
 
-The two reference nodes are $\xi_1=-1$ and $\xi_2=1$. Their shape functions are
+For a degree-$p$ Lagrange element, choose $p+1$ distinct reference nodes
+$\xi_1,\ldots,\xi_{p+1}$. The reference basis function associated with
+$\xi_a$ is
+
+$$
+\widehat\phi_a(\xi)
+=
+\prod_{\substack{b=1\\b\ne a}}^{p+1}
+\frac{\xi-\xi_b}{\xi_a-\xi_b},
+\qquad
+a=1,\ldots,p+1.
+$$ {#eq-c5-reference-lagrange}
+
+By construction,
+$\widehat\phi_a(\xi_b)=\delta_{ab}$. For $p=1$, with nodes $-1$ and $1$,
 
 $$
 \widehat\phi_1(\xi)=\frac{1-\xi}{2},
 \qquad
 \widehat\phi_2(\xi)=\frac{1+\xi}{2}.
-$$ {#eq-fem-reference-linear-basis}
-
-The element geometry and displacement can both be interpolated with these
-functions:
-
-$$
-x(\xi)=\widehat\phi_1(\xi)x_e
-+\widehat\phi_2(\xi)x_{e+1},
-\qquad
-u_h(\xi)=\widehat\phi_1(\xi)U_e
-+\widehat\phi_2(\xi)U_{e+1}.
-$$ {#eq-fem-linear-isoparametric-interpolation}
-
-Using the same shape functions for the geometry and the unknown field is called
-an **isoparametric mapping**. The expression for $x(\xi)$ in
-@eq-fem-linear-isoparametric-interpolation simplifies to the affine map
-@eq-fem-reference-map.
-
-The physical shape functions are
-
-$$
-\phi_a^e(x)=\widehat\phi_a(F_e^{-1}(x)).
-$$ {#eq-fem-linear-basis-mapping}
-
-For example,
-
-$$
-\widehat\phi_1(F_e^{-1}(x))
-=\frac12\left(1-\frac{2x-x_e-x_{e+1}}{h_e}\right)
-=\frac{x_{e+1}-x}{h_e}.
 $$
 
-This is precisely the first physical shape function in
-@eq-fem-linear-element-basis. The same substitution recovers
-$\phi_2^e(x)=(x-x_e)/h_e$.
-
-### Quadratic element
-
-For a quadratic element, choose the reference nodes
-
-$$
-\xi_1=-1,
-\qquad \xi_2=0,
-\qquad \xi_3=1.
-$$
-
-The reference shape functions are
+For $p=2$, with nodes $-1,0,1$,
 
 $$
 \widehat\phi_1(\xi)=\frac12\xi(\xi-1),
@@ -1059,537 +1533,374 @@ $$
 \widehat\phi_2(\xi)=1-\xi^2,
 \qquad
 \widehat\phi_3(\xi)=\frac12\xi(\xi+1).
-$$ {#eq-fem-quadratic-reference-basis}
+$$ {#eq-c5-quadratic-reference-basis}
 
-Let $x_1^e$, $x_2^e$, and $x_3^e$ be the coordinates of the left, middle, and
-right physical nodes. The quadratic isoparametric geometry map is
-
-$$
-x=F_e(\xi)
-=\widehat\phi_1(\xi)x_1^e
-+\widehat\phi_2(\xi)x_2^e
-+\widehat\phi_3(\xi)x_3^e.
-$$ {#eq-fem-quadratic-isoparametric-map}
-
-Differentiation gives
+The physical basis function is obtained by composition:
 
 $$
-J_e(\xi)=\frac{\dd F_e}{\dd\xi}
-=\frac{x_3^e-x_1^e}{2}
-+\xi\bigl(x_1^e-2x_2^e+x_3^e\bigr).
-$$ {#eq-fem-quadratic-isoparametric-jacobian}
+\phi_a^e(x)
+=
+\widehat\phi_a(F_e^{-1}(x)).
+$$ {#eq-c5-reference-to-physical}
 
-For the usual midpoint placement
-
-$$
-x_2^e=\frac{x_1^e+x_3^e}{2},
-$$
-
-the coefficient of $\xi$ vanishes. The quadratic geometry interpolation then
-reduces to the affine map in @eq-fem-reference-map, and
-$J_e=(x_3^e-x_1^e)/2=h_e/2$. The displacement interpolation remains quadratic
-because its three nodal coefficients need not lie on a straight line.
-
-For a one-to-one map from the reference interval to the physical interval, we
-require $J_e(\xi)>0$ for every $\xi\in[-1,1]$. This condition preserves the order
-of points along the element. With the midpoint placement it follows directly from
-$x_3^e>x_1^e$.
-
-Under the midpoint map, the reference nodes $-1$, $0$, and $1$ correspond to
-$x_e$, $x_e+h_e/2$, and $x_{e+1}$. Therefore,
+For an isoparametric degree-$p$ element, the same reference functions are used
+to interpolate the geometry,
 
 $$
-\phi_a^e(x)=\widehat\phi_a(F_e^{-1}(x)),
-\qquad a=1,2,3,
-$$ {#eq-fem-quadratic-basis-mapping}
-
-gives the three physical functions in @eq-fem-quadratic-physical-basis. Chapter 6
-will extend isoparametric mapping to multidimensional and curved cells.
-
-::: {#exm-fem-quadratic-reference-mapping}
-## Mapping a quadratic shape function
-
-Let $K_e=[2,5]$, so $h_e=3$ and
-
-$$
-F_e(\xi)=\frac72+\frac32\xi,
+F_e(\xi)
+=
+\sum_{a=1}^{p+1}
+\widehat\phi_a(\xi)x_a^e,
 \qquad
-F_e^{-1}(x)=\frac{2x-7}{3}.
-$$
+J_e(\xi)
+=
+\frac{\dd F_e}{\dd\xi}.
+$$ {#eq-c5-isoparametric-map}
 
-The midpoint reference function maps to
-
-$$
-\begin{aligned}
-\phi_2^e(x)
-&=\widehat\phi_2(F_e^{-1}(x))\\
-&=1-\left(\frac{2x-7}{3}\right)^2
-=\frac{4(x-2)(5-x)}{9}.
-\end{aligned}
-$$
-
-It equals zero at $x=2$ and $x=5$ and equals one at the midpoint $x=7/2$.
-:::
-
-### Element of degree $p$
-
-Choose distinct reference nodes $\xi_1,\ldots,\xi_{p+1}$ in $[-1,1]$. The
-reference Lagrange functions are
+For a quadratic interval whose middle node lies at the physical midpoint, this
+quadratic geometry interpolation reproduces the affine map exactly. If the
+geometry map is nonaffine, the Jacobian varies with $\xi$. A valid
+orientation-preserving map must satisfy
 
 $$
-\widehat\phi_a(\xi)
-=\prod_{\substack{b=1\\b\ne a}}^{p+1}
-\frac{\xi-\xi_b}{\xi_a-\xi_b},
-\qquad a=1,\ldots,p+1.
-$$ {#eq-fem-general-reference-lagrange-basis}
-
-They are defined once for the selected degree and reference nodes. On every
-physical element, an isoparametric degree-$p$ geometry map has the form
-
-$$
-F_e(\xi)=\sum_{a=1}^{p+1}\widehat\phi_a(\xi)x_a^e,
+J_e(\xi)>0
 \qquad
-J_e(\xi)=\frac{\dd F_e}{\dd\xi}
-=\sum_{a=1}^{p+1}
-\frac{\dd\widehat\phi_a}{\dd\xi}(\xi)x_a^e.
-$$ {#eq-fem-general-isoparametric-map}
+\text{for }-1\le\xi\le1.
+$$
 
-If the physical nodes $x_a^e$ are the images of the reference nodes under an
-affine map, polynomial interpolation reproduces that affine map exactly, even
-when $p>1$. Otherwise, $F_e$ and $J_e$ may vary with $\xi$, and the condition
-$J_e(\xi)>0$ must be checked.
-
-The field shape functions on the physical element satisfy
+The chain rule gives
 
 $$
-\phi_a^e(x)=\widehat\phi_a(F_e^{-1}(x)),
-\qquad
 \frac{\dd\phi_a^e}{\dd x}
-=\frac{1}{J_e(\xi)}\frac{\dd\widehat\phi_a}{\dd\xi}.
-$$ {#eq-fem-general-basis-mapping}
+=
+\frac{1}{J_e}
+\frac{\dd\widehat\phi_a}{\dd\xi}.
+$$ {#eq-c5-derivative-transform}
 
-The local interpolation can then be evaluated directly in reference coordinates:
+The reference basis can therefore be reused on every element; element-specific
+information enters through the map and connectivity.
 
-$$
-u_h(F_e(\xi))
-=\sum_{a=1}^{p+1}U_a^e\widehat\phi_a(\xi).
-$$ {#eq-fem-general-reference-interpolation}
+### Numerical integration on the reference interval
 
-This separation is useful in a program. Arrays containing
-$\widehat\phi_a(\xi_q)$ and $\dd\widehat\phi_a/\dd\xi(\xi_q)$ can be computed
-once. Each element calculation reuses those arrays and supplies only its map,
-coefficients, load values, and global degree-of-freedom numbers.
-
-::: {#exm-fem-quadratic-connectivity}
-## Quadratic connectivity and assembly
-
-Consider two quadratic elements with five global interpolation nodes ordered from
-left to right. The local-to-global maps are
+The same map standardizes element integration. For an integrable function
+$g$,
 
 $$
-\bigl(I_0(1),I_0(2),I_0(3)\bigr)=(0,1,2),
-\qquad
-\bigl(I_1(1),I_1(2),I_1(3)\bigr)=(2,3,4).
-$$
+\int_{\mathcal{K}_e}g(x)\,\dd x
+=
+\int_{-1}^{1}g(F_e(\xi))J_e(\xi)\,\dd\xi.
+$$ {#eq-c5-change-of-variables}
 
-Both elements use the same three reference shape functions. Their element
-matrices differ only through their lengths and the values of $A$ and $E$. During
-assembly, global degree of freedom 2 receives contributions from both elements.
-For example,
+The element entries become
 
 $$
-K_{22}\mathrel{+}=K_{33}^0,
-\qquad
-K_{22}\mathrel{+}=K_{11}^1.
-$$
-
-The reference calculation does not depend on the global node numbers. The
-connectivity maps determine where each calculated entry is added.
-:::
-
-## Element integration on the reference interval {#sec-fem-reference-element-integration}
-
-Substituting @eq-fem-general-basis-mapping and
-@eq-fem-reference-integral-transformation into the element stiffness entry gives
-
-$$
-\begin{aligned}
 K_{ab}^e
-&=\int_{K_e}
-\frac{\dd\phi_a^e}{\dd x}
-AE
-\frac{\dd\phi_b^e}{\dd x}\,\dd x\\
-&=\int_{-1}^{1}
-\frac{\dd\widehat\phi_a}{\dd\xi}
-A(F_e(\xi))E(F_e(\xi))
+=
+\int_{-1}^{1}
 \frac{\dd\widehat\phi_b}{\dd\xi}
-\frac{1}{J_e(\xi)}\,\dd\xi.
-\end{aligned}
-$$ {#eq-fem-reference-element-stiffness}
-
-Only one factor $1/J_e(\xi)$ remains: the two derivatives contribute
-$1/J_e(\xi)^2$, while the transformed length element contributes $J_e(\xi)$.
-Similarly, the element load entry becomes
-
-$$
-f_a^e
-=\int_{K_e}\phi_a^e f\,\dd x
-=\int_{-1}^{1}
-\widehat\phi_a(\xi)f(F_e(\xi))J_e(\xi)\,\dd\xi.
-$$ {#eq-fem-reference-element-load}
-
-These equations have the same limits of integration and the same reference basis
-on every element. After the local entries have been calculated, the connectivity
-map places them into the global matrix and vector using @eq-fem-assembly-rule.
-
-### Gauss quadrature
-
-The integrals in @eq-fem-reference-element-stiffness and
-@eq-fem-reference-element-load are usually evaluated numerically. A quadrature
-rule approximates
-
-$$
-\int_{-1}^{1}g(\xi)\,\dd\xi
-\approx\sum_{q=1}^{n_q}w_qg(\xi_q),
-$$ {#eq-fem-one-dimensional-quadrature}
-
-where $\xi_q$ is a quadrature point and $w_q$ is its weight. Gauss quadrature
-chooses these points and weights so that an $n_q$-point rule integrates every
-polynomial of degree at most $2n_q-1$ exactly.
-
-For a one-point rule, write
-
-$$
-\int_{-1}^{1}g(\xi)\,\dd\xi\approx w_1g(\xi_1).
-$$
-
-Requiring this rule to be exact for $g(\xi)=a_0+a_1\xi$ gives
-
-$$
-2a_0=w_1a_0+w_1\xi_1a_1.
-$$
-
-Equality for every $a_0$ and $a_1$ requires $w_1=2$ and $\xi_1=0$. Hence
-
-$$
-\int_{-1}^{1}g(\xi)\,\dd\xi\approx2g(0).
-$$ {#eq-fem-one-point-gauss-rule}
-
-For a two-point rule, symmetry suggests points $-\alpha$ and $\alpha$ with the
-same weight $w$. Exact integration of the constant function gives $2w=2$, so
-$w=1$. Exact integration of $\xi^2$ then gives
-
-$$
-2\alpha^2=\int_{-1}^{1}\xi^2\,\dd\xi=\frac23,
-$$
-
-and therefore $\alpha=1/\sqrt{3}$. The odd powers $\xi$ and $\xi^3$ integrate
-to zero both exactly and under this symmetric rule. The two-point rule is thus
-
-$$
-\int_{-1}^{1}g(\xi)\,\dd\xi
-\approx g\left(-\frac{1}{\sqrt3}\right)
-+g\left(\frac{1}{\sqrt3}\right).
-$$ {#eq-fem-two-point-gauss-rule}
-
-The first three Gauss rules are
-
-| $n_q$ | Quadrature points $\xi_q$ | Weights $w_q$ | Exact through degree |
-|---:|:---:|:---:|---:|
-| 1 | $0$ | $2$ | 1 |
-| 2 | $-1/\sqrt{3},\ 1/\sqrt{3}$ | $1,\ 1$ | 3 |
-| 3 | $-\sqrt{3/5},\ 0,\ \sqrt{3/5}$ | $5/9,\ 8/9,\ 5/9$ | 5 |
-
-Applying the rule to @eq-fem-reference-element-stiffness and
-@eq-fem-reference-element-load gives
-
-$$
-K_{ab}^e\approx
-\sum_{q=1}^{n_q}w_q
-\frac{\dd\widehat\phi_a}{\dd\xi}(\xi_q)
-A(x_q)E(x_q)
-\frac{\dd\widehat\phi_b}{\dd\xi}(\xi_q)
-\frac{1}{J_e(\xi_q)},
-$$ {#eq-fem-one-dimensional-stiffness-quadrature}
+A(F_e(\xi))E(F_e(\xi))
+\frac{\dd\widehat\phi_a}{\dd\xi}
+\frac{1}{J_e(\xi)}
+\,\dd\xi,
+$$ {#eq-c5-reference-stiffness}
 
 and
 
 $$
-f_a^e\approx
-\sum_{q=1}^{n_q}w_q
-\widehat\phi_a(\xi_q)f(x_q)J_e(\xi_q),
-\qquad x_q=F_e(\xi_q).
-$$ {#eq-fem-one-dimensional-load-quadrature}
+f_a^e
+=
+\int_{-1}^{1}
+\widehat\phi_a(\xi)
+f(F_e(\xi))
+J_e(\xi)
+\,\dd\xi.
+$$ {#eq-c5-reference-load}
 
-For an affine element with constant $AE$, the stiffness integrand has degree
-$2(p-1)$. A linear element therefore requires one Gauss point for exact stiffness
-integration, while a quadratic element requires two. If $f$ is constant, the load
-integrand has degree $p$: one point is exact for a linear element and two points
-are exact for a quadratic element. When $A$, $E$, $f$, or the geometric Jacobian
-varies, the quadrature order must be selected for the complete integrand rather
-than for the basis functions alone.
+These integrals have the same limits and use the same reference basis on every
+element. For constant coefficients and simple polynomial data, some of them
+can be evaluated analytically. A general finite element code, however, must
+also handle spatially varying material properties, loads, and geometry. It is
+therefore preferable to evaluate element integrals from values of the
+integrand at a fixed set of points on the reference interval.
 
-::: {#exm-fem-quadratic-element-matrices}
-## Quadratic bar element with constant data
-
-Using the quadratic reference functions in
-@eq-fem-quadratic-reference-basis and two-point Gauss quadrature in
-@eq-fem-reference-element-stiffness and @eq-fem-reference-element-load gives
+Gauss--Legendre quadrature provides such a rule. It approximates
 
 $$
-\bm K^e
-=\frac{A_eE_e}{3h_e}
+\int_{-1}^{1}g(\xi)\,\dd\xi
+\approx
+\sum_{q=1}^{n_q}w_qg(\xi_q).
+$$ {#eq-c5-gauss-rule}
+
+The first three rules are
+
+| $n_q$ | quadrature points | weights | exact through degree |
+|---:|---|---|---:|
+| 1 | $0$ | $2$ | 1 |
+| 2 | $-1/\sqrt{3},\,1/\sqrt{3}$ | $1,\,1$ | 3 |
+| 3 | $-\sqrt{3/5},\,0,\,\sqrt{3/5}$ | $5/9,\,8/9,\,5/9$ | 5 |
+
+Thus
+
+$$
+K_{ab}^e
+\approx
+\sum_{q=1}^{n_q}
+w_q
+\frac{\dd\widehat\phi_b}{\dd\xi}(\xi_q)
+A(x_q)E(x_q)
+\frac{\dd\widehat\phi_a}{\dd\xi}(\xi_q)
+\frac{1}{J_e(\xi_q)},
+$$
+
+and
+
+$$
+f_a^e
+\approx
+\sum_{q=1}^{n_q}
+w_q
+\widehat\phi_a(\xi_q)
+f(x_q)
+J_e(\xi_q),
+\qquad
+x_q=F_e(\xi_q).
+$$ {#eq-c5-quadrature-entries}
+
+For affine geometry and constant $AE$, the linear-element stiffness integrand
+is constant, so one Gauss point is sufficient. For a quadratic element the
+basis derivatives are linear, so the stiffness integrand is quadratic and two
+Gauss points integrate it exactly. If $A$, $E$, $f$, or the Jacobian varies,
+the required quadrature order depends on the complete integrand.
+
+For a three-node quadratic element with midpoint geometry and constant data,
+two-point quadrature gives
+
+$$
+\bK^e
+=
+\frac{AE}{3h_e}
 \begin{bmatrix}
 7&-8&1\\
 -8&16&-8\\
 1&-8&7
 \end{bmatrix},
 \qquad
-\bm f^e
-=\frac{f_eh_e}{6}
-\begin{bmatrix}1\\4\\1\end{bmatrix}.
-$$ {#eq-fem-quadratic-bar-element}
+\bfm^e
+=
+\frac{f_eh_e}{6}
+\begin{bmatrix}
+1\\
+4\\
+1
+\end{bmatrix}.
+$$ {#eq-c5-quadratic-element-matrix-vector}
 
-The three load entries add to $f_eh_e$, the total distributed load on the
-element. The stiffness matrix annihilates $[1,1,1]^T$, as expected for a constant
-element displacement with zero strain.
-:::
+The load entries add to $f_eh_e$, and
+$\bK^e[1,1,1]^T=\bm{0}$ because equal nodal displacements produce zero strain.
 
-::: {#exm-fem-one-quadratic-bar}
+::: {#exm-c5-quadratic-exact}
 ## One quadratic element for the uniformly loaded bar
 
-Return to the bar in @sec-fem-two-element-example. The exact displacement is a
-quadratic function, so consider one quadratic element with global nodes at
-$0$, $L/2$, and $L$. Using @eq-fem-quadratic-bar-element, the assembled system is
+Return to @exm-c5-complete-bar. The exact displacement
+@eq-c5-uniform-load-exact is quadratic. Use one quadratic element with
+interpolation nodes at $0$, $L/2$, and $L$.
+
+After imposing $U_1=0$, the finite element equations give
 
 $$
-\frac{AE}{3L}
-\begin{bmatrix}
-7&-8&1\\
--8&16&-8\\
-1&-8&7
-\end{bmatrix}
-\begin{bmatrix}U_0\\U_1\\U_2\end{bmatrix}
-=\frac{f_0L}{6}
-\begin{bmatrix}1\\4\\1\end{bmatrix}.
-$$ {#eq-fem-one-quadratic-bar-system}
-
-After imposing $U_0=0$, the free equations are
-
-$$
-\frac{AE}{3L}
-\begin{bmatrix}16&-8\\-8&7\end{bmatrix}
-\begin{bmatrix}U_1\\U_2\end{bmatrix}
-=\frac{f_0L}{6}
-\begin{bmatrix}4\\1\end{bmatrix}.
-$$
-
-Their solution is
-
-$$
-U_1=\frac{3f_0L^2}{8AE},
+U_2
+=
+\frac{3f_0L^2}{8AE},
 \qquad
-U_2=\frac{f_0L^2}{2AE}.
+U_3
+=
+\frac{f_0L^2}{2AE}.
 $$
 
-These are the exact displacement values at $x=L/2$ and $x=L$. The finite element
-interpolant and the exact solution
+These are the exact displacement values at $x=L/2$ and $x=L$. Since the exact
+solution and the finite element interpolant are both quadratic and agree at all
+three interpolation nodes,
 
 $$
-u(x)=\frac{f_0}{AE}\left(Lx-\frac{x^2}{2}\right)
+u_h(x)=u(x)
+\qquad\forall x\in[0,L].
 $$
 
-are both quadratic and agree at the three element nodes. The uniqueness of
-quadratic interpolation therefore gives $u_h(x)=u(x)$ for every $x\in[0,L]$.
-This exact agreement occurs because the solution of this particular problem lies
-in the quadratic finite element space; it is not a general property of every
-problem solved with a quadratic element.
+The agreement occurs because the exact solution belongs to the selected finite
+element space; it is not a general property of quadratic elements.
 :::
 
-::: {#exr-fem-quadratic-element}
-## Quadratic element calculation
+::: {#exr-c5-quadratic-connectivity}
+## Quadratic connectivity and assembly
 
-1. Differentiate the functions in @eq-fem-quadratic-reference-basis.
-2. Use two-point Gauss quadrature to derive the stiffness matrix in
-   @eq-fem-quadratic-bar-element when $AE$ is constant.
-3. Use the same quadrature rule to derive the load vector when $f$ is constant.
+For two quadratic elements with
+$I^1=(1,2,3)$ and $I^2=(3,4,5)$:
+
+1. state the support of each global basis function $\phi_1,\ldots,\phi_5$;
+2. identify every element contribution to the global entry $K_{33}$; and
+3. explain why the assembly rule has the same form as for linear elements.
 :::
 
-## Formal definition of a finite element {#sec-fem-formal-definition}
+::: {#exr-c5-quadrature}
+## Selecting a quadrature rule
 
-The preceding construction repeatedly used three pieces of information: the
-element interval, the functions allowed within that interval, and the values used
-to determine one such function. We can now state this construction in a form that
-also applies to higher-dimensional and higher-order elements.
+Determine the minimum Gauss--Legendre rule that integrates the stiffness matrix
+exactly for:
 
-::: {#def-fem-element-triple}
+1. a linear element with affine geometry and constant $AE$;
+2. a quadratic element with affine geometry and constant $AE$; and
+3. a quadratic element with affine geometry and $AE$ varying linearly with
+   $x$.
+:::
+
+## The finite element in general form {#sec-c5-general}
+
+The linear and quadratic elements above were described through nodal values:
+given the values of a polynomial at the interpolation nodes, the polynomial is
+determined uniquely. The essential idea is more general than point values.
+A local degree of freedom can be any linear rule that extracts a number from a
+function in the local approximation space.
+
+For example, point evaluation at $x_e$ is the rule
+
+$$
+N_1(w)=w(x_e).
+$$
+
+Such a rule is a **linear functional** because
+$N_1(\alpha w+\beta z)=\alpha N_1(w)+\beta N_1(z)$. The collection of all
+linear functionals on a vector space $\mathcal P$ is called its **dual
+space** and is denoted by $\mathcal P^*$. With this terminology, the
+construction can be stated without assuming that the degrees of freedom are
+nodal values.
+
+::: {#def-c5-finite-element}
 ## Finite element
 
-A finite element is a triple $(K,\mathcal P,\mathcal N)$, where
+A **finite element** is a triple $(K,\mathcal P,\mathcal N)$, where
 
 1. $K$ is a cell;
 2. $\mathcal P$ is a finite-dimensional vector space of functions on $K$; and
 3. $\mathcal N=\{N_1,\ldots,N_m\}$ is a basis for the dual space
    $\mathcal P^*$.
 
-Here $m=\dim\mathcal P$, and the linear functionals
+Here $m=\dim\mathcal P$, and the functionals
 $N_a:\mathcal P\to\R$ are the local degrees of freedom.
 :::
 
-For the two-node linear element used throughout this chapter, these three parts are
+For the two-node linear interval element,
 
 $$
 K=[x_e,x_{e+1}],
 \qquad
-\mathcal P=\mathbb P_1(K)=\operatorname{span}\{1,x\},
-\qquad
-N_1(w)=w(x_e),\quad N_2(w)=w(x_{e+1}).
-$$ {#eq-fem-linear-element-triple}
+\mathcal P=\mathbb P_1(K),
+$$
 
-Thus $K$ is the interval occupied by the element, $\mathcal P$ contains the linear
-displacement approximations allowed within it, and $N_1$ and $N_2$ evaluate a
-function at its two nodes. The two nodal values uniquely determine a function in
-$\mathbb P_1(K)$.
-
-More generally, the degrees of freedom must uniquely determine every function in
-$\mathcal P$. Equivalently,
+and
 
 $$
-N_a(w)=0\quad\text{for every }a=1,\ldots,m
-\qquad\Longrightarrow\qquad w=0.
-$$ {#eq-fem-one-dimensional-unisolvence}
+N_1(w)=w(x_e),
+\qquad
+N_2(w)=w(x_{e+1}).
+$$
 
-This uniqueness property is called *unisolvence*. It allows us to construct a
-unique basis $\{\phi_1,\ldots,\phi_m\}$ satisfying
+The degrees of freedom must determine every function in $\mathcal P$
+uniquely. Equivalently,
+
+$$
+N_a(w)=0
+\quad\forall a
+\qquad\Longrightarrow\qquad
+w=0.
+$$
+
+This property is called **unisolvence**. The nodal basis is characterized by
 
 $$
 N_a(\phi_b)=\delta_{ab}.
-$$ {#eq-fem-one-dimensional-nodal-basis}
+$$
 
-For the linear interval element, this relation is a compact statement of the four
-endpoint values used earlier to construct the shape functions in
-@eq-fem-linear-element-basis. The formal definition therefore describes the same
-element developed earlier; it does not introduce a different procedure.
+For the Lagrange elements used in this chapter, the degrees of freedom are
+point evaluations at interpolation nodes. Other finite element families use
+different functionals.
 
-## A complete one-dimensional finite element procedure {#sec-fem-one-dimensional-procedure}
+The complete one-dimensional calculation can now be stated without assuming a
+particular polynomial degree. Reference basis values and derivatives are
+evaluated for the chosen element family and quadrature rule. Each element then
+supplies its geometry, material data, loading, and connectivity:
 
-The derivations in this chapter can now be collected into one computational
-procedure. The required input consists of the nodal coordinates, element
-connectivity, polynomial degree, material functions, distributed load, and
-prescribed displacement values. For a degree-$p$ element, each row of the
-connectivity array contains the $p+1$ global degree-of-freedom numbers associated
-with its local nodes.
+```text
+initialize the global matrix K and vector F
 
-Before the element loop, select a quadrature rule and evaluate the reference shape
-functions and their $\xi$-derivatives at every quadrature point. These values are
-the same for every element. The element loop then performs the following
-calculations:
+for each element e:
+    read its coordinates and global degree-of-freedom numbers
+    initialize K_e and f_e
 
-1. read the physical coordinates and global degree-of-freedom numbers for the
-   element;
-2. calculate the map $F_e$, the physical quadrature point $x_q$, and the Jacobian
-   $J_e(\xi_q)$;
-3. use $\bm B=J_e(\xi_q)^{-1}\dd\bm N/\dd\xi$ to evaluate the physical
-   derivatives of the shape functions;
-4. add the quadrature-point contributions to $\bm K^e$ and $\bm f^e$; and
-5. assemble the local entries into the global matrix and vector.
+    for each quadrature point:
+        evaluate reference basis functions and derivatives
+        map the point to the physical element
+        compute the Jacobian and physical derivatives
+        accumulate the contribution to K_e and f_e
 
-After all elements have been assembled, separate the prescribed and free degrees
-of freedom, solve @eq-fem-reduced-system, and recover the reactions using
-@eq-fem-reaction-forces. Displacement, strain, stress, and axial force are then
-evaluated element by element.
+    assemble K_e and f_e into K and F using connectivity
 
-The following Python-like pseudocode shows the data flow. It is intended to make
-the algorithm explicit; it does not depend on a finite element library. It uses
-the isoparametric setting, so the same local-to-global array identifies the
-coordinates used by $F_e$ and the coefficients used by $u_h$.
-
-```python
-# Input data
-coordinates = [...]          # coordinates of all global interpolation nodes
-element_dofs = [...]         # p + 1 global interpolation nodes for each element
-prescribed_dofs = [...]
-prescribed_values = [...]
-
-# Reference data, computed once for the chosen degree and quadrature rule
-quadrature_points, quadrature_weights = gauss_rule(number_of_points)
-N_at_q = lagrange_basis(reference_nodes, quadrature_points)
-dN_dxi_at_q = lagrange_basis_derivatives(reference_nodes, quadrature_points)
-
-number_of_dofs = len(coordinates)
-K = zeros((number_of_dofs, number_of_dofs))
-F = zeros(number_of_dofs)
-
-for e in range(number_of_elements):
-    dofs = element_dofs[e]
-    x_e = coordinates[dofs]
-
-    K_e = zeros((p + 1, p + 1))
-    f_e = zeros(p + 1)
-
-    for q in range(number_of_points):
-        xi = quadrature_points[q]
-        weight = quadrature_weights[q]
-        N = N_at_q[q]
-        dN_dxi = dN_dxi_at_q[q]
-
-        x_q = N @ x_e
-        J_q = dN_dxi @ x_e
-        require(J_q > 0)
-        B = dN_dxi / J_q
-
-        K_e += outer(B, B) * A(x_q) * E(x_q) * J_q * weight
-        f_e += N * f(x_q) * J_q * weight
-
-    for a in range(p + 1):
-        row = dofs[a]
-        F[row] += f_e[a]
-        for b in range(p + 1):
-            column = dofs[b]
-            K[row, column] += K_e[a, b]
-
-free_dofs = all_dofs_except(prescribed_dofs)
-K_ff = submatrix(K, free_dofs, free_dofs)
-K_fp = submatrix(K, free_dofs, prescribed_dofs)
-F_free = F[free_dofs] - K_fp @ prescribed_values
-U_free = solve(K_ff, F_free)
-
-U = insert_prescribed_and_free_values(prescribed_values, U_free)
-reactions = K[prescribed_dofs, :] @ U - F[prescribed_dofs]
+identify free and prescribed degrees of freedom
+solve the reduced system
+insert prescribed values into the global coefficient vector
+recover reactions from the prescribed equations
+postprocess displacement, strain, stress, and axial force element by element
 ```
 
-::: {.remark}
-## What changes for linear and quadratic elements
+Changing the polynomial degree modifies the local basis, the number of local
+degrees of freedom, the size of the element arrays, the connectivity, and
+usually the quadrature requirement. The Galerkin formulation,
+local-to-global assembly, treatment of prescribed values, and overall solution
+procedure remain the same.
 
-The overall procedure is unchanged when the polynomial degree changes. For a
-linear element, `element_dofs[e]` contains two global numbers and the reference
-basis has two functions. For a quadratic element, it contains three global
-numbers and the reference basis has three functions. The sizes of the element
-arrays and the appropriate quadrature rule change, but the mapping, element loop,
-assembly, boundary-condition treatment, and solution steps retain the same form.
-:::
-
-::: {#exr-fem-trace-pseudocode}
+::: {#exr-c5-trace-element}
 ## Tracing one element through the procedure
 
-For the first element of the two-element mesh in
-@sec-fem-two-element-example, state `dofs`, `x_e`, $J_q$, $\bm K^e$, and
-$\bm f^e$. Then list the entries of the global matrix and vector that receive
-contributions from this element.
+For the first element in @exm-c5-complete-bar, state
+
+1. its connectivity and coordinate vector;
+2. its element stiffness matrix and load vector;
+3. every global matrix and vector entry to which it contributes;
+4. the free and prescribed degrees of freedom after assembly; and
+5. the quantities extracted during postprocessing.
 :::
 
-## Chapter summary {#sec-fem-one-dimensional-summary}
+## Chapter summary {#sec-c5-summary}
 
-A one-dimensional finite element model divides an interval into connected elements.
-Nodal displacements determine a simple approximation within each element, and shared
-nodal values join those local approximations into a continuous displacement field.
-The Galerkin problem produces element stiffness matrices and load vectors, and the
-connectivity map assembles them into a global system. Prescribed displacements reduce
-that system, reactions are recovered afterward, and element strains and stresses are
-computed from the nodal solution. Quadratic and degree-$p$ elements extend the same
-nodal interpolation construction. The reference element allows one set of basis
-functions and quadrature rules to be reused on every physical element. The formal
-triple $(K,\mathcal P,\mathcal N)$ collects the cell, the local function space, and
-the local degrees of freedom used in this construction. Chapter 6 will apply the
-same ideas to multidimensional cells, vector-valued fields, quadrature, and finite
-element software.
+A Galerkin approximation replaces the infinite-dimensional variational problem
+by a finite-dimensional one. The finite element method obtains that
+finite-dimensional space from a mesh. For the nodal $H^1$-conforming Lagrange
+elements used here, the basis functions are polynomial on each element,
+continuous across shared endpoints, and satisfy the nodal interpolation
+property.
+
+Those properties give the basis functions local support. The global
+coefficients are nodal values, and only basis functions with overlapping
+support contribute to the same stiffness entries. The local-global relation
+
+$$
+\phi_{I^e(a)}|_{\mathcal{K}_e}=\phi_a^e
+$$
+
+allows the global variational equations to be evaluated through element
+matrices and vectors. Connectivity then determines where those local
+contributions are added in the global algebraic system.
+
+Essential boundary conditions prescribe selected coefficients and lead to a
+reduced system for the free degrees of freedom. Natural boundary data enter the
+load functional. After the free coefficients have been found, reactions and
+derived fields are recovered from the assembled solution.
+
+Quadratic and higher-order Lagrange elements use the same construction with
+richer local polynomial spaces. The reference interval allows the basis,
+coordinate mapping, and quadrature to be organized uniformly across elements.
+The formal triple $(K,\mathcal P,\mathcal N)$ expresses the local finite
+element construction independently of a particular polynomial degree.
+
+Chapter 6 extends these ideas to multidimensional cells, vector-valued fields,
+multidimensional coordinate mappings, boundary integrals, and finite element
+software.

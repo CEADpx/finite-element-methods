@@ -15,17 +15,14 @@ consistency with later chapters.
 - **Chapter 1: Introduction to the Finite Element Method**
 - **Chapter 2: Mathematical Foundations**
 - **Chapter 3: Partial Differential Equations and Variational Formulations**
-- **Chapter 4: Model Problems in Heat Transfer and Solid Mechanics** 
-
-## Actively developed
-
+- **Chapter 4: Model Problems in Heat Transfer and Solid Mechanics**
 - **Chapter 5: The Finite Element Method in One Dimension**
+- **Chapter 6: Finite Element Approximation in Multiple Dimensions**
 
 ## Yet to be started
 
 The following chapters currently contain placeholders:
 
-- **Chapter 6: Finite Element Approximation in Multiple Dimensions**
 - **Chapter 7: A Priori Error Estimation and Convergence**
 - **Chapter 8: A Posteriori Error Estimation and Adaptive Finite Elements**
 - **Chapter 9: Constraints in Finite Element Methods**
@@ -34,4 +31,4 @@ The following chapters currently contain placeholders:
 - **Chapter 12: Transient Finite Element Methods**
 - **Chapter 13: PDE-Constrained Optimization**
 
-Last updated: September 8, 2026.
+Last updated: September 22, 2026.
