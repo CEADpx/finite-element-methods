@@ -307,6 +307,40 @@ $\mathcal{K}_2$, but it is only one global node. This distinction will matter du
 assembly: both neighboring elements will contribute to equations associated
 with that shared global node.
 
+The inverse connectivity map $J^e$ is defined only for the global nodes that
+belong to element $e$:
+
+$$
+J^e:\{I^e(1),I^e(2)\}\longrightarrow\{1,2\},
+\qquad
+J^e\bigl(I^e(a)\bigr)=a.
+$$ {#eq-c5-inverse-connectivity}
+
+Thus $J^e(i)$ gives the local number of global node $i$ on element $e$. For
+the shared node $x_2$ in @fig-c5-local-global-numbering,
+
+$$
+J^1(2)=2,
+\qquad
+J^2(2)=1.
+$$
+
+The element superscript is necessary because the same global node can have a
+different local number in each incident element.
+
+For a global node $i$, define the set of elements that contain that node by
+
+$$
+\mathcal{E}(i)
+=
+\{e\in\{1,\ldots,N\}:x_i\in\overline{\mathcal{K}}_e\}.
+$$ {#eq-c5-incident-elements}
+
+On the three-element mesh in @fig-c5-local-global-numbering,
+$\mathcal{E}(1)=\{1\}$, $\mathcal{E}(2)=\{1,2\}$, and
+$\mathcal{E}(3)=\{2,3\}$. This notation will be useful when element
+contributions are collected at a global node.
+
 ::: {.remark}
 ## Numbering in theory and in Python
 
@@ -446,8 +480,27 @@ that element. An interior linear basis function therefore has support on only
 the two elements adjacent to its node; an endpoint basis function has support
 on only one element.
 
+More precisely, the support of $\phi_i$ is the closure of the set on which it
+is nonzero. For the linear nodal basis,
+
+$$
+\operatorname{supp}\phi_i
+=
+\overline{\{x\in[0,L]:\phi_i(x)\ne0\}}
+=
+\bigcup_{e\in\mathcal{E}(i)}\overline{\mathcal{K}}_e.
+$$ {#eq-c5-basis-support}
+
 The same construction can be viewed locally. On one element
-$\mathcal{K}_e=[x_e,x_{e+1}]$, define two local shape functions
+$\mathcal{K}_e=[x_e,x_{e+1}]$, denote the coordinates of its local nodes by
+
+$$
+x_1^e=x_e,
+\qquad
+x_2^e=x_{e+1}.
+$$
+
+Define two local shape functions
 $\phi_1^e$ and $\phi_2^e$ by
 
 $$
@@ -475,25 +528,44 @@ $$
 This partition-of-unity relation means that equal nodal values reproduce a
 constant field exactly.
 
-If the displacement values at the two endpoints are $U_e$ and $U_{e+1}$,
-then the finite element displacement on the element is
+Let $U_a^e$ denote the displacement degree of freedom at local node $a$ of
+element $e$:
+
+$$
+U_a^e=u_h(x_a^e),
+\qquad a=1,2.
+$$
+
+The restriction of the finite element displacement to $\mathcal{K}_e$ is
 
 $$
 \uh|_{\mathcal{K}_e}
 =
-U_e\phi_1^e+U_{e+1}\phi_2^e.
+U_1^e\phi_1^e+U_2^e\phi_2^e.
 $$ {#eq-c5-linear-interpolation}
 
 ![Two nodal displacement values determine the complete linear displacement field on one element.](../figures/chapter05/linear_element_interpolation.svg){#fig-c5-linear-element-interpolation width="88%" fig-align="center"}
 
 The interpolation property makes the meaning of the coefficients immediate:
 evaluating @eq-c5-linear-interpolation at the left and right endpoints returns
-$U_e$ and $U_{e+1}$. Differentiating gives
+$U_1^e$ and $U_2^e$. The connectivity map relates the local and global
+coefficients:
+
+$$
+U_a^e=U_{I^e(a)},
+\qquad a=1,2.
+$$ {#eq-c5-local-global-dof}
+
+For the consecutive numbering in @eq-c5-linear-connectivity,
+$U_1^e=U_e$ and $U_2^e=U_{e+1}$. Differentiating the element interpolation
+therefore gives
 
 $$
 \varepsilon_h|_{\mathcal{K}_e}
 =
 \uh'|_{\mathcal{K}_e}
+=
+\frac{U_2^e-U_1^e}{h_e}
 =
 \frac{U_{e+1}-U_e}{h_e}.
 $$ {#eq-c5-linear-strain}
@@ -507,8 +579,8 @@ as
 $$
 \bU^e=
 \begin{bmatrix}
-U_e\\
-U_{e+1}
+U_1^e\\
+U_2^e
 \end{bmatrix},
 \qquad
 \bN^e=
@@ -705,7 +777,7 @@ its immediate neighbors.
 
 ![Local support of the basis functions produces a sparse global stiffness matrix.](../figures/chapter05/basis_overlap_sparsity.svg){#fig-c5-basis-overlap-sparsity width="68%" fig-align="center"}
 
-Equation @eq-c5-global-entries is already a complete definition of the
+@eq-c5-global-entries already defines the
 discrete problem. It would be possible to evaluate each entry by integrating
 over the whole interval. Doing so, however, would ignore the local structure
 that motivated the finite element basis.
@@ -744,13 +816,42 @@ AE
 \,\dd x.
 $$ {#eq-c5-element-stiffness-entry}
 
-Likewise, the distributed load contributes
+The distributed part of a global load entry can be decomposed in the same way:
 
 $$
-f_a^e
+F_i^{\mathrm{dist}}
 =
-\int_{\mathcal{K}_e}f\,\phi_a^e\,\dd x.
+\int_0^L f\phi_i\,\dd x
+=
+\sum_{e=1}^{N}\int_{\mathcal{K}_e}f\phi_i\,\dd x.
+$$ {#eq-c5-global-load-sum}
+
+For each element $e$, define its local load entries by
+
+$$
+F_a^e
+=
+\int_{\mathcal{K}_e}f\phi_a^e\,\dd x,
+\qquad a=1,2.
 $$ {#eq-c5-element-load-entry}
+
+If $e\notin\mathcal{E}(i)$, then $\phi_i$ vanishes on $\mathcal{K}_e$, so that
+element contributes zero. If $e\in\mathcal{E}(i)$, the local number of global
+node $i$ is $J^e(i)$, and
+$\phi_i|_{\mathcal{K}_e}=\phi_{J^e(i)}^e$. The global distributed-load entry is
+therefore
+
+$$
+F_i^{\mathrm{dist}}
+=
+\sum_{e\in\mathcal{E}(i)} F_{J^e(i)}^e.
+$$ {#eq-c5-assembled-load-entry}
+
+The complete global entry also contains the prescribed end load:
+
+$$
+F_i=F_i^{\mathrm{dist}}+\overline P\phi_i(L).
+$$ {#eq-c5-complete-load-entry}
 
 Collecting the local entries gives
 
@@ -760,7 +861,7 @@ $$
 \int_{\mathcal{K}_e}
 (\bB^e)^T AE\,\bB^e\,\dd x,
 \qquad
-\bfm^e
+\bF^e
 =
 \int_{\mathcal{K}_e}
 (\bN^e)^T f\,\dd x.
@@ -777,7 +878,7 @@ $$
 -1&1
 \end{bmatrix},
 \qquad
-\bfm^e
+\bF^e
 =
 \frac{f_eh_e}{2}
 \begin{bmatrix}
@@ -791,7 +892,7 @@ $$ {#eq-c5-linear-element-matrix-vector}
 The picture is worth pausing over. The geometry of one element
 $\mathcal{K}_e$, the two nodal displacement values collected in $\bU^e$, the
 interpolation formula for $u_h|_{\mathcal{K}_e}$, and the formulas for
-$\bK^e$ and $\bfm^e$ belong together. In implementation, one element at a time
+$\bK^e$ and $\bF^e$ belong together. In implementation, one element at a time
 supplies exactly these local objects, which are then sent to the global system
 through assembly.
 
@@ -810,7 +911,7 @@ $$
 and direct integration gives
 
 $$
-\bfm^e
+\bF^e
 =
 \frac{h_e}{6}
 \begin{bmatrix}
@@ -862,7 +963,7 @@ other boundary-value problems considered in this book.
 
 On $\mathcal{K}_e=[0,h_e]$, let $f(x)=f_0+cx$.
 
-1. Evaluate $\bfm^e$ exactly.
+1. Evaluate $\bF^e$ exactly.
 2. Verify that the sum of its entries equals
    $\int_{\mathcal{K}_e}f(x)\,\dd x$.
 3. Compare the result with simply dividing the total load equally between the
@@ -918,7 +1019,7 @@ description to the other.
 For each element $e$,
 
 $$
-F_{I^e(a)}\mathrel{+}=f_a^e,
+F_{I^e(a)}\mathrel{+}=F_a^e,
 \qquad
 K_{I^e(a),I^e(b)}\mathrel{+}=K_{ab}^e.
 $$ {#eq-c5-assembly-rule}
@@ -937,6 +1038,23 @@ Element 1 contributes only to global rows and columns 1 and 2. Element 2
 contributes to rows and columns 2 and 3, and element 3 contributes to rows and
 columns 3 and 4. At a shared global node, contributions from the neighboring
 elements are added.
+
+For example, the connectivity gives
+
+$$
+F_2^{\mathrm{dist}}=F_2^1+F_1^2,
+\qquad
+K_{22}=K_{22}^1+K_{11}^2,
+\qquad
+K_{23}=K_{12}^2,
+\qquad
+K_{14}=0.
+$$ {#eq-c5-assembly-entry-examples}
+
+The first two entries receive contributions from both elements incident on
+node 2. The entry $K_{23}$ receives one contribution because nodes 2 and 3
+share only element 2, while $K_{14}$ is zero because the supports of
+$\phi_1$ and $\phi_4$ do not overlap.
 
 If
 
@@ -991,14 +1109,26 @@ $$
 \bF
 =
 \begin{bmatrix}
-f_1^1\\
-f_2^1+f_1^2\\
-f_2^2+f_1^3\\
-f_2^3
+F_1^1\\
+F_2^1+F_1^2\\
+F_2^2+F_1^3\\
+F_2^3
 \end{bmatrix}
 $$ {#eq-c5-three-element-F}
 
 before any additional natural boundary contribution is added.
+
+::: {.remark}
+## Two equivalent views of load assembly
+
+@eq-c5-assembled-load-entry fixes a global node $i$ and collects the local
+entry from every element in $\mathcal{E}(i)$; the inverse map $J^e$ identifies
+the required local node on each element. In an implementation, one normally
+uses the equivalent forward operation: compute $\bF^e$, loop over its local
+entries $F_a^e$, and add each entry to the global position $I^e(a)$ according
+to @eq-c5-assembly-rule. Both views produce the global vector in
+@eq-c5-three-element-F.
+:::
 
 ![Assembly places each local entry into the global row and column specified by connectivity. Shared global entries receive contributions from every incident element.](../figures/chapter05/assembly_scatter_add.svg){#fig-c5-assembly width="100%" fig-align="center"}
 
@@ -1125,7 +1255,7 @@ $$
 -1&1
 \end{bmatrix},
 \qquad
-\bfm^e
+\bF^e
 =
 \frac{f_0h}{2}
 \begin{bmatrix}
@@ -1607,7 +1737,7 @@ $$ {#eq-c5-reference-stiffness}
 and
 
 $$
-f_a^e
+F_a^e
 =
 \int_{-1}^{1}
 \widehat\phi_a(\xi)
@@ -1655,7 +1785,7 @@ $$
 and
 
 $$
-f_a^e
+F_a^e
 \approx
 \sum_{q=1}^{n_q}
 w_q
@@ -1685,7 +1815,7 @@ $$
 1&-8&7
 \end{bmatrix},
 \qquad
-\bfm^e
+\bF^e
 =
 \frac{f_eh_e}{6}
 \begin{bmatrix}

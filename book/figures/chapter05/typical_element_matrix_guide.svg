@@ -636,51 +636,51 @@
   <g
      id="text_11"
      transform="translate(0,-4.5)">
-    <!-- $\mathbf{f}^e=\frac{f_eh_e}{2}$ -->
+    <!-- $\mathbf{F}^e=\frac{f_eh_e}{2}$ -->
     <g
        transform="matrix(0.17,0,0,-0.17,339.7452,108.37976)"
        id="g88">
       <defs
          id="defs80">
         <path
-           id="DejaVuSans-Bold-49"
-           d="m 2841,4863 v -735 h -619 q -238,0 -332,-86 -93,-86 -93,-298 v -244 h 956 V 2700 H 1797 V 0 H 678 V 2700 H 122 v 800 h 556 v 244 q 0,572 319,845 319,274 987,274 z"
+           id="DejaVuSans-Bold-29"
+           d="M 588,4666 H 3834 V 3756 H 1791 V 2888 H 3713 V 1978 H 1791 V 0 H 588 Z"
            transform="scale(0.015625)" />
       </defs>
       <use
-         xlink:href="#DejaVuSans-Bold-49"
+         xlink:href="#DejaVuSans-Bold-29"
          transform="translate(0,0.239253)"
          id="use81" />
       <use
          xlink:href="#DejaVuSans-Oblique-48"
-         transform="matrix(0.7,0,0,0.7,44.462891,41.539253)"
+         transform="matrix(0.7,0,0,0.7,69.267578,41.539253)"
          id="use82" />
       <use
          xlink:href="#DejaVuSans-20"
-         transform="translate(109.74609,0.239253)"
+         transform="translate(134.550781,0.239253)"
          id="use83" />
       <use
          xlink:href="#DejaVuSans-Oblique-49"
-         transform="matrix(0.7,0,0,0.7,219.26758,45.810938)"
+         transform="matrix(0.7,0,0,0.7,244.072266,45.810938)"
          id="use84" />
       <use
          xlink:href="#DejaVuSans-Oblique-48"
-         transform="matrix(0.49,0,0,0.49,243.91113,35.310972)"
+         transform="matrix(0.49,0,0,0.49,268.71582,35.310972)"
          id="use85" />
       <use
          xlink:href="#DejaVuSans-Oblique-4b"
-         transform="matrix(0.7,0,0,0.7,275.97168,45.810938)"
+         transform="matrix(0.7,0,0,0.7,300.776367,45.810938)"
          id="use86" />
       <use
          xlink:href="#DejaVuSans-Oblique-48"
-         transform="matrix(0.49,0,0,0.49,320.33691,35.310972)"
+         transform="matrix(0.49,0,0,0.49,345.141602,35.310972)"
          id="use87" />
       <use
          xlink:href="#DejaVuSans-15"
-         transform="matrix(0.7,0,0,0.7,263.26758,-36.088872)"
+         transform="matrix(0.7,0,0,0.7,288.072266,-36.088872)"
          id="use88" />
       <path
-         d="m 219.26758,22.114253 v 6.25 h 133.12988 v -6.25 z"
+         d="m 244.072266,22.114253 v 6.25 h 133.129882 v -6.25 z"
          id="path88" />
     </g>
   </g>
