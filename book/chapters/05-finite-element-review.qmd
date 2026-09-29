@@ -657,9 +657,41 @@ u_h(x_i)
 U_i.
 $$ {#eq-c5-nodal-coefficient}
 
-The global coefficients are therefore the nodal displacement values. Because
-functions in $\mathcal{V}_h$ are continuous and have square-integrable piecewise
-derivatives,
+The global coefficients are therefore the nodal displacement values.
+
+Connectivity also tells us how to recover the element description from the
+global one. Restrict @eq-c5-global-expansion to one element $\mathcal{K}_e$.
+By @eq-c5-basis-support, every basis function whose node does not belong to
+$\mathcal{K}_e$ vanishes on that element, so only the terms with
+$j=I^e(1)$ and $j=I^e(2)$ remain. Applying @eq-c5-local-global-relation to
+those two terms gives
+
+$$
+u_h|_{\mathcal{K}_e}
+=
+\sum_{j=1}^{N+1}U_j\,\phi_j|_{\mathcal{K}_e}
+=
+U_{I^e(1)}\phi_1^e+U_{I^e(2)}\phi_2^e
+=
+\bN^e\bU^e,
+\qquad
+\bU^e=
+\begin{bmatrix}
+U_{I^e(1)}\\
+U_{I^e(2)}
+\end{bmatrix}.
+$$ {#eq-c5-global-restriction}
+
+This is the element field @eq-c5-linear-NB, now obtained from the global
+expansion instead of being written directly on the element, and it confirms
+the coefficient relation @eq-c5-local-global-dof. In a program, forming
+$\bU^e$ from $\bU$ is called a **gather** operation: connectivity selects the
+global coefficients that belong to element $e$. Assembly, developed in
+@sec-c5-assembly, performs the reverse operation and adds element
+contributions to the global positions selected by the same connectivity.
+
+Because functions in $\mathcal{V}_h$ are continuous and have square-integrable
+piecewise derivatives,
 
 $$
 \mathcal{V}_h\subset H^1(0,L).
@@ -712,6 +744,24 @@ $x_1=0$, $x_2=1$, $x_3=3$, and $x_4=4$:
    interpolation property;
 2. state its support; and
 3. verify its nodal values.
+:::
+
+::: {#exr-c5-affine-reproduction}
+## Exact reproduction of an affine displacement
+
+Let $p(x)=c_0+c_1x$ with constants $c_0$ and $c_1$, and set
+$U_1^e=p(x_e)$ and $U_2^e=p(x_{e+1})$.
+
+1. Using @eq-c5-linear-shape-functions, show that
+   $$
+   p(x)=U_1^e\phi_1^e(x)+U_2^e\phi_2^e(x)
+   \qquad\text{for every }x\in\mathcal{K}_e.
+   $$
+2. Use @eq-c5-linear-strain to show that the element strain equals $c_1$.
+   Thus a linear bar element reproduces every constant strain exactly.
+3. Take $p(x)=x^2$ on $\mathcal{K}_e=[0,h_e]$ with the same nodal values.
+   Compute the largest value of $|p(x)-U_1^e\phi_1^e(x)-U_2^e\phi_2^e(x)|$ on
+   the element and state where it occurs.
 :::
 
 
@@ -816,6 +866,24 @@ AE
 \,\dd x.
 $$ {#eq-c5-element-stiffness-entry}
 
+It remains to identify which elements contribute and which local entry each
+one supplies. An element lies in the common support of $\phi_i$ and $\phi_j$
+exactly when it contains both nodes, that is, when
+$e\in\mathcal{E}(i)\cap\mathcal{E}(j)$. On such an element, the inverse
+connectivity map @eq-c5-inverse-connectivity gives the local numbers
+$a=J^e(i)$ and $b=J^e(j)$. Collecting the contributions of all such elements
+in @eq-c5-global-entry-sum gives
+
+$$
+K_{ij}
+=
+\sum_{e\in\mathcal{E}(i)\cap\mathcal{E}(j)}
+K_{J^e(i),J^e(j)}^e.
+$$ {#eq-c5-assembled-stiffness-entry}
+
+If $\mathcal{E}(i)\cap\mathcal{E}(j)$ is empty, the sum has no terms and
+$K_{ij}=0$, in agreement with @eq-c5-support-sparsity.
+
 The distributed part of a global load entry can be decomposed in the same way:
 
 $$
@@ -835,9 +903,10 @@ F_a^e
 \qquad a=1,2.
 $$ {#eq-c5-element-load-entry}
 
-If $e\notin\mathcal{E}(i)$, then $\phi_i$ vanishes on $\mathcal{K}_e$, so that
-element contributes zero. If $e\in\mathcal{E}(i)$, the local number of global
-node $i$ is $J^e(i)$, and
+The argument is the same as for the stiffness entry, now with one global index
+instead of two. If $e\notin\mathcal{E}(i)$, then $\phi_i$ vanishes on
+$\mathcal{K}_e$, so that element contributes zero. If $e\in\mathcal{E}(i)$,
+the local number of global node $i$ is $J^e(i)$, and
 $\phi_i|_{\mathcal{K}_e}=\phi_{J^e(i)}^e$. The global distributed-load entry is
 therefore
 
@@ -1054,7 +1123,11 @@ $$ {#eq-c5-assembly-entry-examples}
 The first two entries receive contributions from both elements incident on
 node 2. The entry $K_{23}$ receives one contribution because nodes 2 and 3
 share only element 2, while $K_{14}$ is zero because the supports of
-$\phi_1$ and $\phi_4$ do not overlap.
+$\phi_1$ and $\phi_4$ do not overlap. Each of these statements is an instance
+of @eq-c5-assembled-load-entry or @eq-c5-assembled-stiffness-entry. For
+$K_{22}$, the sum runs over $\mathcal{E}(2)=\{1,2\}$ with $J^1(2)=2$ and
+$J^2(2)=1$; for $K_{14}$, the set $\mathcal{E}(1)\cap\mathcal{E}(4)$ is
+empty.
 
 If
 
@@ -1103,7 +1176,34 @@ K_{22}^3
 \end{bmatrix}.
 $$ {#eq-c5-three-element-K}
 
-The distributed-load vector is
+The load vector can be built in the same way. Write the contribution of each
+element as a vector of global length that is zero except in the two rows
+selected by its connectivity:
+
+$$
+\begin{bmatrix}
+F_1^1\\
+F_2^1\\
+0\\
+0
+\end{bmatrix}
++
+\begin{bmatrix}
+0\\
+F_1^2\\
+F_2^2\\
+0
+\end{bmatrix}
++
+\begin{bmatrix}
+0\\
+0\\
+F_1^3\\
+F_2^3
+\end{bmatrix}.
+$$
+
+Adding these three vectors gives the distributed-load vector
 
 $$
 \bF
@@ -1119,7 +1219,7 @@ $$ {#eq-c5-three-element-F}
 before any additional natural boundary contribution is added.
 
 ::: {.remark}
-## Two equivalent views of load assembly
+## Two equivalent views of assembly
 
 @eq-c5-assembled-load-entry fixes a global node $i$ and collects the local
 entry from every element in $\mathcal{E}(i)$; the inverse map $J^e$ identifies
@@ -1127,7 +1227,12 @@ the required local node on each element. In an implementation, one normally
 uses the equivalent forward operation: compute $\bF^e$, loop over its local
 entries $F_a^e$, and add each entry to the global position $I^e(a)$ according
 to @eq-c5-assembly-rule. Both views produce the global vector in
-@eq-c5-three-element-F.
+@eq-c5-three-element-F. The stiffness matrix is treated in the same way:
+@eq-c5-assembled-stiffness-entry gathers the contributions to one global entry
+$K_{ij}$, whereas the forward rule loops over the local pairs $(a,b)$ of each
+element and adds $K_{ab}^e$ to $K_{I^e(a),I^e(b)}$. The forward operation is
+called **scatter-add** because each element scatters its local entries into
+the global arrays and adds them to what is already there.
 :::
 
 ![Assembly places each local entry into the global row and column specified by connectivity. Shared global entries receive contributions from every incident element.](../figures/chapter05/assembly_scatter_add.svg){#fig-c5-assembly width="100%" fig-align="center"}
@@ -1222,12 +1327,72 @@ $$
 \bK_{pf}\bU_f+\bK_{pp}\bU_p-\bF_p.
 $$ {#eq-c5-reactions}
 
+In computation it is convenient to insert the prescribed values into $\bU$,
+form the complete residual vector
+
+$$
+\bR=\bK\bU-\bF,
+$$ {#eq-c5-residual-vector}
+
+and read the reactions from its prescribed entries. The free entries of
+$\bR$ are $\bK_{ff}\bU_f+\bK_{fp}\bU_p-\bF_f$, which vanish, up to rounding
+error, because they are exactly the equations solved in
+@eq-c5-reduced-system. Checking them is therefore a simple test of the solve.
+
 ![Prescribed nodal values are separated from the free values before the solve. The prescribed equations are then used to recover reactions.](../figures/chapter05/essential_bc_partition.svg){#fig-c5-essential-bc width="100%" fig-align="center"}
 
 The distinction from the continuous variational problem is worth keeping in
 view. Natural boundary data contribute through the load functional. Essential
 boundary data restrict the admissible functions and, after discretization,
 identify coefficients whose values are prescribed.
+
+The partition also completes the variational statement for a nonzero
+prescribed displacement, which the beginning of this chapter set aside.
+Suppose $u(0)=\overline u$. The finite element trial space is then
+
+$$
+\mathcal U_{h,\overline u}
+=
+\{w_h\in\mathcal{V}_h:w_h(0)=\overline u\},
+$$
+
+while the test space remains $\mathcal{V}_{h,0}$. As in Chapter 3,
+$\mathcal U_{h,\overline u}$ is not a vector space when $\overline u\ne0$.
+Since $\phi_1(0)=1$ and every other nodal basis function vanishes at $x=0$,
+each $w_h\in\mathcal U_{h,\overline u}$ can be written uniquely as
+$w_h=\overline u\,\phi_1+z_h$ with $z_h\in\mathcal{V}_{h,0}$. The finite
+element problem is to find $u_h\in\mathcal U_{h,\overline u}$ such that
+$a(u_h,v_h)=\ell(v_h)$ for every $v_h\in\mathcal{V}_{h,0}$. Substituting
+$u_h=\overline u\,\phi_1+z_h$ and using bilinearity gives
+
+$$
+\text{find }z_h\in\mathcal{V}_{h,0}\text{ such that}\qquad
+a(z_h,v_h)=\ell(v_h)-\overline u\,a(\phi_1,v_h)
+\qquad\forall v_h\in\mathcal{V}_{h,0}.
+$$ {#eq-c5-nonzero-prescribed}
+
+The known function $\overline u\,\phi_1$ carries the prescribed value, and its
+contribution moves to the right-hand side. Writing
+$z_h=\sum_{j=2}^{N+1}U_j\phi_j$ and testing with $\phi_i$ for a free node $i$
+gives
+
+$$
+\sum_{j=2}^{N+1}K_{ij}U_j=F_i-K_{i1}\overline u,
+$$
+
+because $a(\phi_1,\phi_i)=K_{i1}$. This is the free equation written at the
+beginning of this subsection with $U_1=\overline u$, and hence
+@eq-c5-reduced-system with $\bU_p=[\overline u]$.
+
+The continuous problem @eq-model-bar-variational can be treated in the same
+way. If $w$ is any function in $H^1(0,L)$ with $w(0)=\overline u$, write
+$u=w+z$ with $z\in\mathcal V_0$. Then $z$ must satisfy
+$a(z,v)=\ell(v)-a(w,v)$ for every $v\in\mathcal V_0$. The right-hand side is a
+continuous linear functional on $\mathcal V_0$, so the Lax--Milgram theorem
+@thm-lax-milgram gives a unique $z$ whenever $a$ is continuous and coercive on
+$\mathcal V_0$. The resulting $u$ does not depend on the choice of $w$: the
+difference of two solutions lies in $\mathcal V_0$, satisfies the homogeneous
+variational equation, and is therefore zero by coercivity.
 
 ::: {#exm-c5-complete-bar}
 ## Complete analysis of a uniformly loaded bar
@@ -1435,7 +1600,9 @@ The following program exposes the element calculation, connectivity, assembly,
 imposition of the prescribed displacement, solution of the reduced system,
 and recovery of the reaction. The arrays use Python's zero-based indexing;
 thus `dofs = [e, e + 1]` represents the theoretical connectivity
-$I^{e+1}=(e+1,e+2)$.
+$I^{e+1}=(e+1,e+2)$. The two nested loops over the local indices `a` and `b`
+transcribe the scatter-add rule @eq-c5-assembly-rule line by line, and the
+reaction is read from the residual vector @eq-c5-residual-vector.
 
 ```{python}
 #| label: fig-c5-python-mesh-refinement
@@ -1455,8 +1622,11 @@ def solve_bar(num_elements):
         h = x[e + 1] - x[e]
         K_e = np.array([[1.0, -1.0], [-1.0, 1.0]]) / h
         F_e = 0.5 * h * np.ones(2)
-        K[np.ix_(dofs, dofs)] += K_e
-        F[dofs] += F_e
+
+        for a in range(2):
+            F[dofs[a]] += F_e[a]
+            for b in range(2):
+                K[dofs[a], dofs[b]] += K_e[a, b]
 
     prescribed = np.array([0])
     free = np.arange(1, num_elements + 1)
@@ -1487,6 +1657,13 @@ the quadratic variation between nodes. As $N$ increases, the element length
 decreases and the piecewise-linear curves in @fig-c5-python-mesh-refinement
 approach the exact solution. The recovered reaction is $-1$ for every mesh,
 which balances the total distributed load.
+
+The maximum error reported in the legend decreases by a factor of about four
+each time the number of elements is doubled. Because the nodal values are
+exact here, this error is entirely the error of linear interpolation between
+the nodes. Chapter 7 explains why the nodal values are exact for this problem,
+why the displacement error behaves like $h^2$, and why the strain error
+decreases only like $h$.
 :::
 
 ## Higher-order elements and the reference interval {#sec-c5-higher-order}
@@ -2017,13 +2194,18 @@ $$
 $$
 
 allows the global variational equations to be evaluated through element
-matrices and vectors. Connectivity then determines where those local
-contributions are added in the global algebraic system.
+matrices and vectors. Connectivity then works in both directions: it gathers
+the local coefficient vector $\bU^e$ from $\bU$, and it scatter-adds element
+contributions into the global algebraic system. A global entry $K_{ij}$ or
+$F_i$ receives contributions only from the elements incident on the
+corresponding nodes.
 
 Essential boundary conditions prescribe selected coefficients and lead to a
-reduced system for the free degrees of freedom. Natural boundary data enter the
-load functional. After the free coefficients have been found, reactions and
-derived fields are recovered from the assembled solution.
+reduced system for the free degrees of freedom; a nonzero prescribed value
+contributes a known term to the right-hand side. Natural boundary data enter the
+load functional. After the free coefficients have been found, reactions are
+read from the prescribed entries of the residual vector, and derived fields
+are recovered element by element.
 
 Quadratic and higher-order Lagrange elements use the same construction with
 richer local polynomial spaces. The reference interval allows the basis,

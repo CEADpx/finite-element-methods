@@ -1,0 +1,14 @@
+name: fem-diffusion-demo
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - fenics-dolfinx=0.11.0
+  - mpich
+  - numpy
+  - matplotlib
+  - jupyterlab
+  - ipykernel
+  - nbclient
+  - nbformat
