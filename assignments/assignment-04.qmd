@@ -1,0 +1,255 @@
+---
+title: "Assignment 4: Finite Element Computation in One and Two Dimensions"
+subtitle: "ME/BME 736 — Advanced Finite Element Methods"
+author: "Prashant K. Jha"
+date: "29 September, 2026"
+---
+
+## Submission
+
+Before beginning, follow the
+[`environment/README.md`](https://github.com/CEADpx/finite-element-methods/blob/main/environment/README.md)
+setup instructions, launch JupyterLab from the activated `finite-elements`
+environment, and select the kernel **Python (Finite Elements)**.
+
+Submit the following two executed Jupyter notebooks:
+
+1. `lastname_assignment04_1d.ipynb` for Problem 1;
+2. `lastname_assignment04_2d.ipynb` for Problem 2.
+
+Each notebook must run from the first cell to the last cell without an error.
+Before submission, use **Restart Kernel and Run All Cells** to verify this.
+Keep all requested tables and figures in the executed notebook. Use Markdown
+cells to identify the problem data, explain the organization of the code, and
+state the conclusions requested below. Do not submit a separate written report.
+
+Code should be readable and organized around the finite element procedure. Do
+not replace the requested assembly calculations with a finite element library.
+
+# A linear finite element code for a one-dimensional bar {.problem marks="60"}
+
+**For help:** See Chapter 5, especially the sections *Mesh, elements, nodes,
+and connectivity*, *From the finite element space to element equations*,
+*Assembly, boundary conditions, and the computed solution*, *Assembly and mesh
+refinement in Python*, and *Numerical integration on the reference interval*.
+
+Consider a uniform axial bar occupying $0<x<1$. Set $AE=1$, prescribe
+$u(0)=0$, apply the distributed axial load $f(x)$, and apply the point load
+$P$ at $x=1$. The boundary-value problem is
+
+$$
+-u''(x)=f(x)\quad\text{for }0<x<1,
+\qquad
+u(0)=0,
+\qquad
+u'(1)=P.
+$$
+
+The corresponding finite element equations use
+
+$$
+K_{ij}
+=
+\int_0^1\phi_j'(x)\phi_i'(x)\,\dd x,
+\qquad
+F_i
+=
+\int_0^1 f(x)\phi_i(x)\,\dd x
++P\phi_i(1).
+$$
+
+Implement the method using uniform two-node linear elements. Use NumPy for the
+arrays and linear solve and Matplotlib for the figures. Do not use FEniCSx or
+another finite element package in this problem.
+
+Your code must perform the following steps explicitly:
+
+1. Create the nodal coordinates and the two-node connectivity of every
+   element.
+2. Compute
+
+   $$
+   \bK^e
+   =
+   \frac{1}{h_e}
+   \begin{bmatrix}
+   1&-1\\
+   -1&1
+   \end{bmatrix}.
+   $$
+
+3. Evaluate the consistent distributed-load vector
+
+   $$
+   F_a^e
+   =
+   \int_{\mathcal K_e}f(x)\phi_a^e(x)\,\dd x,
+   \qquad a=1,2,
+   $$
+
+   using two-point Gauss quadrature on the reference interval.
+4. Assemble each entry of $\bK^e$ and $\bF^e$ into the global arrays using
+   the element connectivity and explicit loops over the local indices.
+5. Add the point load $P$ to the last global load entry.
+6. Impose $u(0)=0$, solve for the free nodal coefficients, and recover the
+   reaction at the prescribed degree of freedom from the residual of the
+   original assembled system.
+
+Use the same solver for the following two cases:
+
+| case | exact displacement $u_\star(x)$ | distributed load $f(x)$ | point load $P$ |
+|---|---:|---:|---:|
+| A | $2x-\dfrac{x^2}{2}$ | $1$ | $1$ |
+| B | $2x-\dfrac{x^3}{3}$ | $2x$ | $1$ |
+
+For each case, complete the following calculations.
+
+1. Solve the problem using $N=4$, $8$, and $16$ elements. On one figure, plot
+   the exact displacement and the three finite element solutions. Show the
+   finite element nodes on each computed curve.
+2. Compute the errors
+
+   $$
+   \norm{u_\star-u_h}_{L^2(0,1)}
+   =
+   \left[
+   \int_0^1 (u_\star-u_h)^2\,\dd x
+   \right]^{1/2},
+   $$
+
+   and
+
+   $$
+   \norm{u_\star-u_h}_{H^1(0,1)}
+   =
+   \left[
+   \int_0^1
+   \left((u_\star-u_h)^2+(u_\star'-u_h')^2\right)\,\dd x
+   \right]^{1/2}.
+   $$
+
+   Evaluate these integrals element by element using four-point Gauss
+   quadrature. Evaluate $u_h$ and $u_h'$ from the local nodal coefficients and
+   linear basis functions rather than interpolating values from a plotting
+   grid.
+3. Print a table containing $N$, $h$, the $L^2$ error, and the $H^1$ error.
+   Plot both errors against $h$ on logarithmic axes. Compute the observed rate
+   between each pair of consecutive meshes and report it in the notebook.
+4. For every mesh, print the recovered left reaction and the equilibrium
+   residual
+
+   $$
+   R_1+\int_0^1 f(x)\,\dd x+P.
+   $$
+
+   Confirm numerically that the residual is zero up to rounding error.
+
+# Mixed-boundary diffusion with FEniCSx {.problem marks="40"}
+
+**For help:** See Chapter 6, especially the sections *Scalar diffusion and
+element equations*, *Multidimensional quadrature and boundary integration*,
+*Assembly and essential boundary conditions*, and *Connection to FEniCSx*.
+The lecture notebook gives a complete example with different problem data.
+
+Use the
+[`diffusion_2d_demo.ipynb`](https://github.com/CEADpx/finite-element-methods/blob/main/notebooks/diffusion/diffusion_2d_demo.ipynb)
+notebook as the starting point for this problem. Create a new notebook rather
+than modifying the supplied file.
+
+Let $\Om=(0,1)^2$. Prescribe the value of $u$ on the vertical sides and normal
+flux on the horizontal sides:
+
+$$
+-\Delta u=f
+\quad\text{in }\Om,
+$$
+
+$$
+u=g
+\quad\text{on }
+\Gam_D=\{x=0\}\cup\{x=1\},
+$$
+
+and
+
+$$
+\grad u\cdot\bn=h_N
+\quad\text{on }
+\Gam_N=\{y=0\}\cup\{y=1\}.
+$$
+
+Use the manufactured solution
+
+$$
+u_\star(x,y)
+=
+1+x+x(1-x)(y+y^2).
+$$
+
+The corresponding problem data are
+
+$$
+f(x,y)
+=
+2(y+y^2)-2x(1-x),
+$$
+
+$$
+g(x,y)=1+x
+\qquad\text{on }\Gam_D,
+$$
+
+and
+
+$$
+h_N(x,y)
+=
+\begin{cases}
+-x(1-x), & y=0,\\
+3x(1-x), & y=1.
+\end{cases}
+$$
+
+Complete the following tasks using continuous $P_1$ triangular elements.
+
+1. Begin with the mesh, function-space, plotting, and error-calculation ideas
+   in the lecture notebook. Replace the lecture problem by the manufactured
+   solution above. Identify the left and right facets for the Dirichlet
+   condition. Give the bottom and top facets different tags so that their two
+   flux functions enter the linear functional separately.
+2. Solve the problem on uniform $n\times n$ square subdivisions with
+   $n=4$, $8$, $16$, and $32$. Each square subdivision contains two
+   triangles. Use
+
+   $$
+   h=\frac{\sqrt{2}}{n}
+   $$
+
+   as the mesh size.
+3. For the $8\times8$ subdivision, show the triangular mesh and produce
+   separate plots of the finite element solution $u_h$ and the absolute nodal
+   error $|u_\star-u_h|$. State the maximum absolute error at the nodes.
+4. Compute $\norm{u_\star-u_h}_{L^2(\Om)}$ for all four meshes using a
+   quadrature degree of at least six for the error integral. Print a table
+   containing $n$, the number of triangles, the number of degrees of freedom,
+   $h$, and the $L^2$ error. Plot the error against $h$ on logarithmic axes,
+   include a reference line proportional to $h^2$, and compute the observed
+   rates between consecutive meshes.
+5. Assemble the stiffness matrix before modifying it to impose the Dirichlet
+   conditions. For $n=4$ and $n=16$, plot its nonzero pattern and report the
+   number of degrees of freedom, the number of stored nonzero entries, and
+
+   $$
+   \text{sparsity ratio}
+   =
+   \frac{\text{number of nonzero entries}}
+        {(\text{number of degrees of freedom})^2}.
+   $$
+
+   Remove explicitly stored numerical zeros before counting the entries. Keep
+   the matrix in sparse form. Do not convert the $n=16$ matrix to a dense array
+   merely to produce the plot.
+6. Confirm that the prescribed nodal values are satisfied on both vertical
+   sides and that the $L^2$ error decreases under refinement. End the notebook
+   with a short Markdown cell reporting these two checks and the observed
+   convergence rates.
