@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="520" viewBox="0 0 820 520">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#244f73"/>
+    </marker>
+    <style>
+      .axis { stroke: #244f73; stroke-width: 3; marker-end: url(#arrow); }
+      .edge { fill: #dcecf5; stroke: #244f73; stroke-width: 4; }
+      .node { fill: #244f73; }
+      .label { font: 28px 'DejaVu Sans', sans-serif; fill: #20252b; }
+      .math { font: italic 30px 'DejaVu Serif', serif; fill: #183b56; }
+      .basis { font: 27px 'DejaVu Serif', serif; fill: #20252b; }
+    </style>
+  </defs>
+
+  <line x1="120" y1="420" x2="660" y2="420" class="axis"/>
+  <line x1="120" y1="420" x2="120" y2="72" class="axis"/>
+  <polygon points="150,390 590,390 150,105" class="edge"/>
+
+  <circle cx="150" cy="390" r="10" class="node"/>
+  <circle cx="590" cy="390" r="10" class="node"/>
+  <circle cx="150" cy="105" r="10" class="node"/>
+
+  <text x="685" y="432" class="math">ξ</text>
+  <text x="92" y="63" class="math">η</text>
+
+  <text x="72" y="465" class="label">1: (0,0)</text>
+  <text x="548" y="465" class="label">2: (1,0)</text>
+  <text x="42" y="94" class="label">3: (0,1)</text>
+
+  <text x="430" y="116" class="basis">φ̂₁ = 1 − ξ − η</text>
+  <text x="430" y="166" class="basis">φ̂₂ = ξ</text>
+  <text x="430" y="216" class="basis">φ̂₃ = η</text>
+</svg>

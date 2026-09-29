@@ -1008,6 +1008,8 @@ $$
 \widehat{\bx}_3=(0,1).
 $$
 
+![The reference $P_1$ triangle, its local vertex numbering, and its reference coordinates.](../figures/chapter06/reference_p1_triangle.svg){#fig-c6-reference-p1-triangle width="65%" fig-align="center"}
+
 We collect the reference coordinates as
 
 $$
@@ -1032,8 +1034,28 @@ $$
 \eta.
 $$ {#eq-c6-reference-triangle-basis}
 
-For the physical triangle with vertices
-$\bx_1^e,\bx_2^e,\bx_3^e$, define the affine map
+The reference basis also constructs the geometry map. For a physical triangle
+with vertices $\bx_1^e,\bx_2^e,\bx_3^e$, define
+
+$$
+F_e:\widehat{\mathcal K}\longrightarrow\mathcal K_e
+$$
+
+by
+
+$$
+\bx
+=
+F_e(\bm\xi)
+=
+\sum_{a=1}^{3}
+\widehat\phi_a(\bm\xi)\bx_a^e.
+$$ {#eq-c6-triangle-geometry-interpolation}
+
+The nodal property gives
+$F_e(\widehat{\bx}_a)=\bx_a^e$, so each reference vertex is sent to the
+corresponding physical vertex. Substituting the three reference basis functions
+and collecting terms gives
 
 $$
 \bx
@@ -1060,8 +1082,30 @@ y_2^e-y_1^e & y_3^e-y_1^e
 \end{bmatrix}.
 $$ {#eq-c6-triangle-jacobian}
 
-The two columns of $\bm J_e$ are the physical edge vectors from local vertex 1
-to local vertices 2 and 3.
+Thus
+
+$$
+\bm J_e
+=
+\frac{\partial\bx}{\partial\bm\xi},
+$$
+
+and its two columns are the physical edge vectors from local vertex 1 to local
+vertices 2 and 3.
+
+The finite element field is interpolated on the same reference triangle:
+
+$$
+u_h(F_e(\bm\xi))
+=
+\sum_{a=1}^{3}
+U_a^e\widehat\phi_a(\bm\xi).
+$$ {#eq-c6-triangle-field-interpolation}
+
+The geometry and field therefore use the same $P_1$ interpolation. According to
+the classification introduced in @sec-c5-parametric-interpolation, this is an
+isoparametric description. The map is affine because the $P_1$ basis functions
+are affine.
 
 ![Affine mapping from the reference triangle to a physical triangle.](../figures/chapter06/reference_triangle_mapping.svg){#fig-c6-reference-triangle-map width="95%" fig-align="center"}
 
@@ -1267,16 +1311,29 @@ mesh edge. A vertex degree of freedom is shared by every cell incident on that
 vertex, whereas an edge degree of freedom is shared only by the cells that
 contain the edge.
 
-The straight-sided physical cell is still described by the affine map
-@eq-c6-affine-triangle-map. The physical basis functions are
+There are two equivalent ways to describe a straight-sided quadratic triangle.
+The field may use the six quadratic basis functions while the geometry retains
+the affine $P_1$ map @eq-c6-affine-triangle-map; this is a subparametric
+description. Alternatively, an isoparametric quadratic geometry map is
+
+$$
+F_e^{(2)}(\bm\xi)
+=
+\sum_{a=1}^{6}
+\widehat\phi_a(\bm\xi)\bx_a^e.
+$$ {#eq-c6-p2-isoparametric-map}
+
+When the three physical edge nodes are placed at the edge midpoints, the
+quadratic terms in this map cancel and $F_e^{(2)}$ reduces exactly to the affine
+map @eq-c6-affine-triangle-map. Moving an edge geometry node away from the
+midpoint produces a curved edge and a nonconstant Jacobian. Curved quadratic
+geometry is not developed further in this chapter.
+
+For either straight-sided description, the physical basis functions are
 $\phi_a^e=\widehat\phi_a\circ F_e^{-1}$, their gradients follow from
 @eq-c6-gradient-transform, and the physical interpolation nodes are the images
-of the reference nodes, which are the vertices and edge midpoints of
-$\mathcal K_e$. If the quadratic basis were also used to interpolate the
-geometry, as in the isoparametric construction of Chapter 5, placing the
-geometric edge nodes at the physical midpoints would reproduce this same affine
-map. Curved edges, obtained by moving those nodes off the midpoints, are not
-treated in this chapter.
+of the six reference nodes. Here $F_e$ denotes the geometry map selected for
+the element.
 
 Unlike the $P_1$ case, the gradients of the quadratic basis functions are
 linear rather than constant on the cell. The quadrature requirement for a
@@ -2447,7 +2504,7 @@ initialize the global matrix K and vector F
 
 for each cell e:
     read the cell coordinates and global degree-of-freedom map
-    initialize the element matrix K_e and domain-load vector f_e
+    initialize the element matrix K^e and domain-load vector F^e
 
     for each cell quadrature point q:
         evaluate reference basis functions and reference gradients
@@ -2455,20 +2512,20 @@ for each cell e:
         evaluate J_e, det(J_e), and J_e^{-T}
         transform the basis gradients to physical coordinates
         evaluate coefficients and source or body-force data
-        add the quadrature contribution to K_e and f_e
+        add the quadrature contribution to K^e and F^e
 
-    scatter-add K_e and f_e into K and F
+    scatter-add K^e and F^e into K and F
 
 for each boundary facet carrying natural data:
     read the facet degree-of-freedom map and geometry
-    initialize the facet load vector f_F
+    initialize the facet load vector F^facet
 
     for each facet quadrature point:
         evaluate the restricted basis functions and facet Jacobian
         evaluate the prescribed flux or traction
-        add the quadrature contribution to f_F
+        add the quadrature contribution to F^facet
 
-    scatter-add f_F into F
+    scatter-add F^facet into F
 
 identify prescribed and free degrees of freedom
 solve K_ff U_f = F_f - K_fp U_p
@@ -2521,10 +2578,11 @@ volume or area, and its inverse transpose transforms gradients. Quadrature is
 then performed on fixed reference cells, and boundary facets use an edge or
 surface Jacobian in the same way. The six-node $P_2$ triangle raises the
 polynomial degree by adding edge-midpoint degrees of freedom, which are shared
-only by the cells containing the edge. Quadrilateral and hexahedral elements
-use tensor-product basis functions and generally nonconstant isoparametric
-mappings; tetrahedra extend the affine simplex construction to three
-dimensions.
+only by the cells containing the edge. A straight-sided $P_2$ triangle may use
+either a lower-order affine geometry map or a quadratic isoparametric map whose
+edge nodes lie at the midpoints. Quadrilateral and hexahedral elements use
+tensor-product basis functions and generally nonconstant isoparametric
+mappings; tetrahedra extend the affine simplex construction to three dimensions.
 
 Vector-valued elasticity uses the same scalar basis to interpolate each
 displacement component. The strain-displacement matrix collects basis

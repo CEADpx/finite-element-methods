@@ -1782,9 +1782,21 @@ $$
 \widehat{\mathcal{K}}=[-1,1]
 $$
 
-with reference coordinate $\xi$. For the physical interval
-$\mathcal{K}_e=[x_e,x_{e+1}]$, seek an affine map
-$F_e(\xi)=m_e\xi+c_e$ satisfying
+with reference coordinate $\xi$. A coordinate map for element $e$ is a
+one-to-one map
+
+$$
+F_e:\widehat{\mathcal K}\longrightarrow\mathcal K_e,
+\qquad
+x=F_e(\xi),
+$$ {#eq-c5-abstract-element-map}
+
+from the reference element to the physical element. The reference element and
+its basis functions are the same for every element. The map $F_e$ contains the
+element-specific geometry.
+
+For the physical interval $\mathcal{K}_e=[x_e,x_{e+1}]$, first seek an affine
+map $F_e(\xi)=m_e\xi+c_e$ satisfying
 $F_e(-1)=x_e$ and $F_e(1)=x_{e+1}$. Solving for $m_e$ and $c_e$ gives
 
 $$
@@ -1797,7 +1809,8 @@ F_e(\xi)
 J_e=\frac{\dd x}{\dd\xi}=\frac{h_e}{2}.
 $$ {#eq-c5-reference-map}
 
-The inverse is
+Thus $F_e$ sends the two reference nodes to the two physical nodes. Its inverse
+is
 
 $$
 F_e^{-1}(x)
@@ -1808,7 +1821,7 @@ x-\frac{x_e+x_{e+1}}{2}
 \right).
 $$
 
-![The reference interval supplies one fixed coordinate system for local basis functions and quadrature points; the element map carries them to a physical interval.](../figures/chapter05/reference_mapping_quadrature.svg){#fig-c5-reference-map width="95%" fig-align="center"}
+![The coordinate map sends the fixed reference interval to one physical element. Reference nodes and quadrature points are mapped separately.](../figures/chapter05/reference_mapping_quadrature.svg){#fig-c5-reference-map width="95%" fig-align="center"}
 
 For a degree-$p$ Lagrange element, choose $p+1$ distinct reference nodes
 $\xi_1,\ldots,\xi_{p+1}$. The reference basis function associated with
@@ -1842,7 +1855,17 @@ $$
 \widehat\phi_3(\xi)=\frac12\xi(\xi+1).
 $$ {#eq-c5-quadratic-reference-basis}
 
-The physical basis function is obtained by composition:
+If $U_a^e$ are the local coefficients, the finite element field is evaluated on
+the reference interval as
+
+$$
+u_h(F_e(\xi))
+=
+\sum_{a=1}^{p+1}
+U_a^e\widehat\phi_a(\xi).
+$$ {#eq-c5-reference-field-interpolation}
+
+Equivalently, the physical basis function is obtained by composition:
 
 $$
 \phi_a^e(x)
@@ -1850,8 +1873,37 @@ $$
 \widehat\phi_a(F_e^{-1}(x)).
 $$ {#eq-c5-reference-to-physical}
 
-For an isoparametric degree-$p$ element, the same reference functions are used
-to interpolate the geometry,
+### Geometry and field interpolation {#sec-c5-parametric-interpolation}
+
+The geometry map and the finite element field are two different
+interpolations. In general, write the geometry map as
+
+$$
+F_e(\xi)
+=
+\sum_{A=1}^{n_g}
+\widehat N_A^{\mathrm{geo}}(\xi)x_A^e,
+$$ {#eq-c5-general-geometry-map}
+
+where $\widehat N_A^{\mathrm{geo}}$ are geometry interpolation functions and
+$x_A^e$ are physical geometry nodes. The field interpolation remains
+@eq-c5-reference-field-interpolation, with basis functions
+$\widehat\phi_a$ and field coefficients $U_a^e$. Keeping these two
+interpolations distinct makes the standard terminology precise:
+
+| description | relation between geometry and field interpolation |
+|---|---|
+| **subparametric** | the geometry interpolation has lower polynomial degree than the field interpolation |
+| **isoparametric** | the geometry and field use the same interpolation functions |
+| **superparametric** | the geometry interpolation has higher polynomial degree than the field interpolation |
+
+These names compare the geometry interpolation with the approximation of the
+unknown field [@jog, pp. 78--79].
+
+![Subparametric, isoparametric, and superparametric descriptions compare the interpolation used for the geometry with that used for the finite element field.](../figures/chapter05/parametric_mapping_types.svg){#fig-c5-parametric-types width="98%" fig-align="center"}
+
+For an isoparametric degree-$p$ Lagrange element,
+$n_g=p+1$ and $\widehat N_a^{\mathrm{geo}}=\widehat\phi_a$. Therefore,
 
 $$
 F_e(\xi)
@@ -1864,10 +1916,14 @@ J_e(\xi)
 \frac{\dd F_e}{\dd\xi}.
 $$ {#eq-c5-isoparametric-map}
 
-For a quadratic interval whose middle node lies at the physical midpoint, this
-quadratic geometry interpolation reproduces the affine map exactly. If the
-geometry map is nonaffine, the Jacobian varies with $\xi$. A valid
-orientation-preserving map must satisfy
+For $p=1$, @eq-c5-isoparametric-map is exactly the affine map in
+@eq-c5-reference-map. For $p=2$, the same three quadratic functions used to
+interpolate $u_h$ also interpolate the geometry. If the middle geometry node
+lies at the physical midpoint, the quadratic terms cancel and the map again
+reduces to @eq-c5-reference-map. If the middle geometry node is not at the
+midpoint, the parameterization is nonaffine and $J_e$ varies with $\xi$.
+
+A valid orientation-preserving one-dimensional map must satisfy
 
 $$
 J_e(\xi)>0
@@ -1886,6 +1942,23 @@ $$ {#eq-c5-derivative-transform}
 
 The reference basis can therefore be reused on every element; element-specific
 information enters through the map and connectivity.
+
+::: {#exr-c5-parametric-classification}
+## Classifying geometry and field interpolation
+
+Consider a three-node quadratic field approximation on an interval.
+
+1. Write the field interpolation using the three functions in
+   @eq-c5-quadratic-reference-basis.
+2. Classify the description as subparametric when the geometry uses only the
+   two linear endpoint functions.
+3. Write the isoparametric geometry map using all three quadratic functions.
+4. Substitute
+   $x_2^e=(x_1^e+x_3^e)/2$ into the isoparametric map and show that it reduces
+   to an affine map.
+5. Explain why moving $x_2^e$ away from the midpoint makes $J_e$ depend on
+   $\xi$, even though the physical element remains an interval.
+:::
 
 ### Numerical integration on the reference interval
 
@@ -2141,15 +2214,15 @@ initialize the global matrix K and vector F
 
 for each element e:
     read its coordinates and global degree-of-freedom numbers
-    initialize K_e and f_e
+    initialize K^e and F^e
 
     for each quadrature point:
         evaluate reference basis functions and derivatives
         map the point to the physical element
         compute the Jacobian and physical derivatives
-        accumulate the contribution to K_e and f_e
+        accumulate the contribution to K^e and F^e
 
-    assemble K_e and f_e into K and F using connectivity
+    assemble K^e and F^e into K and F using connectivity
 
 identify free and prescribed degrees of freedom
 solve the reduced system
@@ -2210,6 +2283,9 @@ are recovered element by element.
 Quadratic and higher-order Lagrange elements use the same construction with
 richer local polynomial spaces. The reference interval allows the basis,
 coordinate mapping, and quadrature to be organized uniformly across elements.
+Geometry and field interpolation need not have the same polynomial degree;
+subparametric, isoparametric, and superparametric descriptions distinguish the
+three possible relationships.
 The formal triple $(K,\mathcal P,\mathcal N)$ expresses the local finite
 element construction independently of a particular polynomial degree.
 
