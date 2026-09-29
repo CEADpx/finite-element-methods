@@ -4,6 +4,9 @@ The `finite-elements` environment contains Quarto, Python, Jupyter, FEniCSx,
 and the supporting scientific-computing and visualization packages used by the
 book and course materials.
 
+These instructions assume that Conda is already installed. Run all commands
+below from the repository root unless stated otherwise.
+
 The specification includes `python-gmsh` in addition to `gmsh` because the
 former supplies the Python module required by the repository's import test.
 
@@ -42,6 +45,26 @@ python -m ipykernel install \
     --display-name "Python (Finite Elements)"
 ```
 
+## Work with the assignment notebooks
+
+Activate the environment and start JupyterLab from the repository root:
+
+```bash
+conda activate finite-elements
+jupyter lab
+```
+
+Open the required notebook and select the kernel **Python (Finite Elements)**.
+Before submitting a notebook, use **Restart Kernel and Run All Cells** and
+confirm that every cell runs without an error. Save the notebook with all
+requested tables and figures visible.
+
+The one-dimensional assignment uses NumPy and Matplotlib. The two-dimensional
+assignment uses DOLFINx, UFL, MPI, PETSc, SciPy, and Matplotlib; all are
+provided by the same `finite-elements` environment. Quarto and TinyTeX are
+needed to render the assignment and book documents, but not to execute the
+assignment notebooks.
+
 ## Verify the environment
 
 ```bash
@@ -58,8 +81,9 @@ python -c "import gmsh; print('Gmsh imported successfully')"
 
 quarto check
 quarto check jupyter
-quarto check latex
 ```
+
+The general `quarto check` command includes the LaTeX and TinyTeX checks.
 
 Verify MPI with two processes:
 

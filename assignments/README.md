@@ -2,6 +2,15 @@
 
 - [Assignment 1: Mathematical Foundations](assignment-01.qmd)
 - [Assignment 2: Mathematical Foundations](assignment-02.qmd)
+- [Assignment 3: Variational Formulations and Energy Principles](assignment-03.qmd)
+- [Assignment 4: Finite Element Computation in One and Two Dimensions](assignment-04.qmd)
+
+The Chapter 6 lecture notebook distributed with Assignment 4 is available at
+[`notebooks/diffusion/diffusion_2d_demo.ipynb`](../notebooks/diffusion/diffusion_2d_demo.ipynb).
+Create and activate the repository's Conda environment, register its Jupyter
+kernel, and launch JupyterLab by following
+[`environment/README.md`](../environment/README.md). Use the kernel
+**Python (Finite Elements)** for the assignment notebooks.
 
 ## Problem headings
 

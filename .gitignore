@@ -22,8 +22,9 @@ assignments/*.tex
 output/
 tmp/
 
-# Local lecture slides and classroom demonstration files.
-lectures/slides/
+# LaTeX intermediate files generated while building lecture slides. The slide
+# sources, figures, notebooks, and final PDFs are part of the course materials.
+lectures/slides/**/build/
 
 # Local source PDFs used while authoring; not published with the repository.
 /references/
