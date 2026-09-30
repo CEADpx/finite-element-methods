@@ -916,10 +916,10 @@ Gauss--Legendre quadrature approximates
 \begin{equation}
 \int_{-1}^{1}g(\xi)\dd\xi
 \approx
-\sum_{q=1}^{Q}w_qg(\xi_q),
+\sum_{r=1}^{Q}w_rg(\xi_r),
 \label{eq:gauss}
 \end{equation}
-where $\xi_q$ are quadrature points and $w_q$ are weights.
+where $\xi_r$ are quadrature points and $w_r$ are weights.
 
 \begin{center}
 \begin{tabular}{c c c c}
@@ -937,18 +937,18 @@ Therefore
 \begin{align}
 F_a^e
 &\approx
-J_x^e\sum_{q=1}^{Q}
-w_q f(x^e(\xi_q))\widehat\phi_a(\xi_q),
+J_x^e\sum_{r=1}^{Q}
+w_r f(x^e(\xi_r))\widehat\phi_a(\xi_r),
 \label{eq:gauss-load}\\
 K_{ab}^e
 &\approx
-\sum_{q=1}^{Q}w_q
+\sum_{r=1}^{Q}w_r
 \left[
-\frac{a(x^e(\xi_q))}{J_x^e}
-\widehat\phi_b'(\xi_q)\widehat\phi_a'(\xi_q)
+\frac{a(x^e(\xi_r))}{J_x^e}
+\widehat\phi_b'(\xi_r)\widehat\phi_a'(\xi_r)
 +
-J_x^e c(x^e(\xi_q))
-\widehat\phi_b(\xi_q)\widehat\phi_a(\xi_q)
+J_x^e c(x^e(\xi_r))
+\widehat\phi_b(\xi_r)\widehat\phi_a(\xi_r)
 \right].
 \label{eq:gauss-K}
 \end{align}

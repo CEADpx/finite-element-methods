@@ -15,8 +15,9 @@ book/Advanced-Finite-Element-Methods.tex
 book/chapters/*_files/
 book/site_libs/
 assignments/.quarto/
-assignments/_output/
-assignments/*.tex
+# Rendered assignment files. The PDF next to each .qmd is committed;
+# the HTML, .tex, and supporting files are moved to _output/.
+assignments/*/_output/
 
 # Rendered deliverables and temporary visual-QA files.
 output/

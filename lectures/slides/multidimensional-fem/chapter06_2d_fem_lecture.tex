@@ -29,6 +29,7 @@
 \newcommand{\bx}{\bm x}
 \newcommand{\bxi}{\bm\xi}
 \newcommand{\bn}{\bm n}
+\newcommand{\bq}{\bm q}
 
 \graphicspath{{figures/}}
 
@@ -137,7 +138,8 @@ assembly procedure is in Chapter 6.
     \[
       \begin{gathered}
         \Gam_N=\{y=0\}\cup\{y=1\},\\
-        \nabla u\cdot\bn=h_N\quad\text{on }\Gam_N.
+        \bq=-\nabla u,\qquad
+        q=\bq\cdot\bn\quad\text{on }\Gam_N.
       \end{gathered}
     \]
   \end{column}
@@ -154,7 +156,7 @@ Substitution into the differential equation and boundary conditions gives
   \begin{aligned}
     f(x,y)&=\bigl[2+\pi^2x(1-x)\bigr]\sin(\pi y),\\
     g(x,y)&=1+x && \text{on }\Gam_D,\\
-    h_N(x,y)&=-\pi x(1-x) && \text{on }\Gam_N.
+    q(x,y)&=\pi x(1-x) && \text{on }\Gam_N.
   \end{aligned}
 \]
 Thus $u=1$ on the left edge and $u=2$ on the right edge. The prescribed
@@ -176,7 +178,7 @@ The variational problem is
   \int_\Om\nabla u\cdot\nabla v\,\dd\bx
   =
   \int_\Om f v\,\dd\bx
-  +\int_{\Gam_N}h_Nv\,\dd s
+  -\int_{\Gam_N}qv\,\dd s
   \quad\forall v\in\mathcal V_0.
 \]
 
@@ -203,7 +205,7 @@ with entries
   K_{ij}=\int_\Om\nabla\phi_j\cdot\nabla\phi_i\,\dd\bx,
   \qquad
   F_i=\int_\Om f\phi_i\,\dd\bx
-      +\int_{\Gam_N}h_N\phi_i\,\dd s.
+      -\int_{\Gam_N}q\phi_i\,\dd s.
 \]
 
 In practice, the code computes cell matrices $\bK^e$, cell load vectors

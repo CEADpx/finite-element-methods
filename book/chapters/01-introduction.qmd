@@ -310,7 +310,7 @@ from the variational structure.
 ## A steady heat-conduction model
 A rectangular plate $\Om=(0,L)\times(0,H)$ has constant thermal conductivity
 $k$ and a volumetric heat source $r$. The temperature is $T_0$ on the left
-edge, the normal heat flux is $\bar q$ on the right edge, and the top and bottom
+edge, the outward normal heat flux is $q$ on the right edge, and the top and bottom
 edges are insulated. Without solving the problem:
 
 1. identify the primary unknown and state whether it is scalar, vector, or

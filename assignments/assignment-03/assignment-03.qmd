@@ -39,10 +39,18 @@ u=0
 \qquad\text{on }\Gam_D,
 $$
 
-and
+Define the diffusion-flux vector and its outward normal component by
 
 $$
-k\grad u\cdot\bn=h
+\bq=-k\grad u,
+\qquad
+q=\bq\cdot\bn.
+$$
+
+The boundary conditions are
+
+$$
+\bq\cdot\bn=q
 \qquad\text{on }\Gam_N.
 $$
 
@@ -65,7 +73,7 @@ almost everywhere in $\Om$, with
 $$
 f\in L^2(\Om),
 \qquad
-h\in L^2(\Gam_N).
+q\in L^2(\Gam_N).
 $$
 
 Use
@@ -112,7 +120,7 @@ $$
    \left(
    \norm{f}_{L^2(\Om)}
    +
-   C_{\mathrm{tr}}\norm{h}_{L^2(\Gam_N)}
+   C_{\mathrm{tr}}\norm{q}_{L^2(\Gam_N)}
    \right)
    \norm{v}_{H^1(\Om)}.
    $$
@@ -127,7 +135,8 @@ $$
 For directional derivatives and first variations, see Chapter 2, Section
 *Directional derivatives and first variations*.
 
-Use the same coefficient functions $k$ and $c$, source $f$, boundary flux $h$,
+Use the same coefficient functions $k$ and $c$, source $f$, outward normal
+flux $q$,
 and boundary partition as in Problem 1. Now allow a prescribed value
 
 $$
@@ -158,8 +167,8 @@ k|\grad z|^2+cz^2
 \right)\,\dx
 -
 \int_{\Om}fz\,\dx
--
-\int_{\Gam_N}hz\,\ds.
++
+\int_{\Gam_N}qz\,\ds.
 $$
 
 1. Let $u\in\mathcal U_g$. A variation, or perturbation, of $u$ should preserve

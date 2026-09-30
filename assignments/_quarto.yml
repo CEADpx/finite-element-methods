@@ -1,6 +1,8 @@
 project:
   type: default
-  output-dir: _output
+  render:
+    - "*/*.qmd"
+  post-render: filters/move-outputs.py
 
 filters:
   - filters/problem-numbering.lua

@@ -55,7 +55,8 @@ In the equations above, $\Delta$ is the Laplacian and is defined by
 $\Delta u(\bx)=\nabla\cdot(\nabla u(\bx))$.
 
 Suppose $\partial\Om$ is divided into two portions, $\Gam_D$ and $\Gam_N$,
-and let $\bm q(u)$ denote the flux associated with the differential equation.
+and let $\bq(u)$ denote the flux vector associated with the differential
+equation. Its outward normal component is $q(u)=\bq(u)\cdot\bn$.
 The abstract strong problem is
 
 $$
@@ -65,7 +66,7 @@ $$
 &&\forall\bx\in\Om,\\
 u(\bx)&=g(\bx)
 &&\forall\bx\in\Gam_D,\\
-\bm q(u)(\bx)\cdot\bn(\bx)&=h(\bx)
+\bq(u)(\bx)\cdot\bn(\bx)&=q(\bx)
 &&\forall\bx\in\Gam_N.
 \end{aligned}
 \right\}
@@ -123,13 +124,13 @@ space.
 
 For a second-order equation, integration by parts transfers one derivative
 from the candidate field to the test function and introduces boundary terms.
-After the prescribed normal flux $h$ is substituted on $\Gam_N$, the resulting
+After the prescribed normal flux $q$ is substituted on $\Gam_N$, the resulting
 equation has the form stated in @eq-variational-abstract-weak-problem. The form
 $a$ contains the terms involving the unknown, while $\ell$ contains the
-prescribed source $f$ and flux $h$.
+prescribed source $f$ and normal flux $q$.
 
-If $\mathcal L$ and the flux $\bm q$ depend linearly on $u$, then $a$ is
-bilinear and is written $a(u,v)$. If $\mathcal L$ or $\bm q$ depends
+If $\mathcal L$ and the flux $\bq$ depend linearly on $u$, then $a$ is
+bilinear and is written $a(u,v)$. If $\mathcal L$ or $\bq$ depends
 nonlinearly on $u$, then $a$ is generally nonlinear in the trial argument but
 remains linear in the test argument. It is written $a(u;v)$ and is semilinear
 in the sense of @def-semilinear-form. The semicolon identifies the argument in
@@ -179,19 +180,26 @@ $$
 \qquad\forall\bx\in\Om,
 $$ {#eq-variational-strong-pde}
 
-with boundary conditions
+Define the diffusion-flux vector and its outward normal component by
+
+$$
+\bq=-k\grad u,
+\qquad
+q=\bq\cdot\bn.
+$$ {#eq-variational-flux-definition}
+
+The boundary conditions are
 
 $$
 u(\bx)=g(\bx)
 \quad\forall\bx\in\Gam_D,
 \qquad
-k(\bx)\grad u(\bx)\cdot\bn(\bx)=h(\bx)
+\bq(\bx)\cdot\bn(\bx)=q(\bx)
 \quad\forall\bx\in\Gam_N.
 $$ {#eq-variational-boundary-data}
 
 The condition on $\Gam_D$ prescribes the value of $u$. The condition on
-$\Gam_N$ prescribes the component of $k\grad u$ normal to the boundary, which
-we call the normal flux for this prototype problem.
+$\Gam_N$ prescribes the outward normal component of the flux vector.
 
 In the integral equations below, the explicit dependence on $\bx$ is
 suppressed. Thus, for example, $k\grad u$ denotes the vector field
@@ -214,13 +222,13 @@ with boundary data
 $$
 g\in C(\overline{\Gam_D}),
 \qquad
-h\in C(\overline{\Gam_N}),
+q\in C(\overline{\Gam_N}),
 $$
 
 and suppose that a solution
 $u\in C^2(\Om)\cap C^1(\overline{\Om})$ exists. Then
 $\divg(k\grad u)$ is defined pointwise in $\Om$, while $u$ and
-$k\grad u\cdot\bn$ are defined pointwise on the corresponding portions of the
+$\bq\cdot\bn$ are defined pointwise on the corresponding portions of the
 boundary. Hence @eq-variational-strong-pde and
 @eq-variational-boundary-data can be imposed in the classical sense.
 
@@ -235,7 +243,7 @@ k\in L^\infty(\Om),
 \quad\text{for almost every }\bx\in\Om,
 $$ {#eq-variational-coefficient-bounds}
 
-and let $f\in L^2(\Om)$ and $h\in L^2(\Gam_N)$. We also assume that there is
+and let $f\in L^2(\Om)$ and $q\in L^2(\Gam_N)$. We also assume that there is
 at least one function $u_g\in H^1(\Om)$ with boundary value $g$ on $\Gam_D$.
 This last assumption ensures that the trial space introduced below is nonempty.
 
@@ -284,12 +292,13 @@ $$
 -\int_{\Gam_N}v\,k\grad u\cdot\bn\,\ds.
 $$
 
-The first integral is zero because $v=0$ on $\Gam_D$. On $\Gam_N$, substitute
-$k\grad u\cdot\bn=h$. Equation @eq-variational-after-parts then becomes
+The first integral is zero because $v=0$ on $\Gam_D$. On $\Gam_N$,
+@eq-variational-flux-definition gives $k\grad u\cdot\bn=-q$. Equation
+@eq-variational-after-parts then becomes
 
 $$
 \int_{\Om}k\grad u\cdot\grad v\,\dx
-=\int_{\Om}fv\,\dx+\int_{\Gam_N}hv\,\ds.
+=\int_{\Om}fv\,\dx-\int_{\Gam_N}qv\,\ds.
 $$ {#eq-variational-diffusion-weak}
 
 The highest derivative of $u$ in this identity is its first derivative. This
@@ -302,7 +311,7 @@ We now choose the space containing the solution, called the **trial space**, and
 the space containing the weighting functions, called the **test space**. They
 must be chosen so that every term in @eq-variational-diffusion-weak is well
 defined; in particular, each integral must be finite for the assumed $k$, $f$,
-and $h$.
+and $q$.
 
 By the $p=q=2$ case of the Hölder inequality in
 @thm-foundations-holder-inequality, the source term satisfies
@@ -331,11 +340,11 @@ Indeed, Hölder on $\Gam_N$ and the trace inequality
 @thm-foundations-trace-inequality give
 
 $$
-\left|\int_{\Gam_N}hv\,\ds\right|
+\left|\int_{\Gam_N}qv\,\ds\right|
 \leq
-\norm{h}_{L^2(\Gam_N)}\norm{v}_{L^2(\Gam_N)}
+\norm{q}_{L^2(\Gam_N)}\norm{v}_{L^2(\Gam_N)}
 \leq
-C_{\mathrm{tr}}\norm{h}_{L^2(\Gam_N)}\norm{v}_{H^1(\Om)}.
+C_{\mathrm{tr}}\norm{q}_{L^2(\Gam_N)}\norm{v}_{H^1(\Om)}.
 $$ {#eq-variational-neumann-bound}
 
 The derivation of @eq-variational-diffusion-weak additionally requires the test
@@ -370,7 +379,7 @@ that
 
 $$
 \int_{\Om}k\grad u\cdot\grad v\,\dx
-=\int_{\Om}fv\,\dx+\int_{\Gam_N}hv\,\ds
+=\int_{\Om}fv\,\dx-\int_{\Gam_N}qv\,\ds
 \qquad\forall v\in\Vzero.
 $$ {#eq-variational-weak-with-spaces}
 
@@ -383,7 +392,7 @@ naturally to a bilinear form $a$ and a linear functional $\ell$, defined by
 $$
 a(w,v)=\int_{\Om}k\grad w\cdot\grad v\,\dx,
 \qquad
-\ell(v)=\int_{\Om}fv\,\dx+\int_{\Gam_N}hv\,\ds.
+\ell(v)=\int_{\Om}fv\,\dx-\int_{\Gam_N}qv\,\ds.
 $$ {#eq-variational-forms}
 
 ::: {#def-weak-diffusion-problem}
@@ -476,7 +485,7 @@ The condition $u=g$ on $\Gam_D$ is called an **essential boundary condition**
 because it is imposed through membership in $\Ug$. The corresponding test
 function has the homogeneous value $v=0$ on $\Gam_D$.
 
-The condition $k\grad u\cdot\bn=h$ on $\Gam_N$ is called a **natural boundary
+The condition $\bq\cdot\bn=q$ on $\Gam_N$ is called a **natural boundary
 condition** because it enters through the boundary integral produced by
 integration by parts. It contributes to $\ell(v)$ but does not restrict the
 test functions on $\Gam_N$. The terms essential and natural describe how the
@@ -486,12 +495,11 @@ importance.
 A Robin condition combines the unknown and its normal flux. If
 
 $$
-k(\bx)\grad u(\bx)\cdot\bn(\bx)
-+\beta(\bx)u(\bx)=r(\bx)
+q(\bx)=\beta(\bx)u(\bx)-r(\bx)
 \qquad\forall\bx\in\Gam_N,
 $$
 
-then $k\grad u\cdot\bn=r-\beta u$. Substitution into
+then $k\grad u\cdot\bn=-q=r-\beta u$. Substitution into
 @eq-variational-after-parts gives
 
 $$
@@ -526,7 +534,7 @@ $\Gam_N=\partial\Om$ and $v=1$ in
 @eq-variational-weak-with-spaces. Because $\grad v=0$, the equation gives
 
 $$
-\int_{\Om}f\,\dx+\int_{\partial\Om}h\,\ds=0.
+\int_{\Om}f\,\dx=\int_{\partial\Om}q\,\ds.
 $$
 
 When this condition holds, a requirement such as
@@ -572,7 +580,7 @@ $v\in\Vzero$ gives
 
 $$
 \int_{\Gam_N}v
-\bigl(k\grad u\cdot\bn-h\bigr)\,\ds=0.
+\bigl(\bq\cdot\bn-q\bigr)\,\ds=0.
 $$
 
 No value is prescribed for $v$ on $\Gam_N$, so the boundary value of $v$ can
@@ -580,7 +588,7 @@ be varied there. Under classical boundary regularity, the identity therefore
 implies
 
 $$
-k(\bx)\grad u(\bx)\cdot\bn(\bx)=h(\bx)
+\bq(\bx)\cdot\bn(\bx)=q(\bx)
 \qquad\forall\bx\in\Gam_N.
 $$
 
@@ -641,7 +649,7 @@ relevant interface condition for this diffusion problem.
 ## Well-posedness and stability {#sec-variational-well-posedness}
 
 We now ask whether the variational problem has a unique solution and whether
-that solution depends continuously on $f$ and $h$. For this discussion, assume
+that solution depends continuously on $f$ and $q$. For this discussion, assume
 $g=0$. The trial and test spaces are then the same Hilbert space,
 $\Ug=\Vzero$, equipped with the $H^1(\Om)$ norm, and the problem is
 
@@ -709,11 +717,11 @@ $$
 |\ell(v)|
 &\leq
 \norm{f}_{L^2(\Om)}\norm{v}_{L^2(\Om)}
-+\norm{h}_{L^2(\Gam_N)}\norm{v}_{L^2(\Gam_N)}\\
++\norm{q}_{L^2(\Gam_N)}\norm{v}_{L^2(\Gam_N)}\\
 &\leq
 \left(
 \norm{f}_{L^2(\Om)}
-+C_{\mathrm{tr}}\norm{h}_{L^2(\Gam_N)}
++C_{\mathrm{tr}}\norm{q}_{L^2(\Gam_N)}
 \right)
 \norm{v}_{H^1(\Om)}.
 \end{aligned}
@@ -732,7 +740,7 @@ $$
 \frac{1}{\alpha}
 \left(
 \norm{f}_{L^2(\Om)}
-+C_{\mathrm{tr}}\norm{h}_{L^2(\Gam_N)}
++C_{\mathrm{tr}}\norm{q}_{L^2(\Gam_N)}
 \right).
 $$ {#eq-variational-stability}
 

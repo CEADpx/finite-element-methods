@@ -48,7 +48,7 @@ $$
 \qquad\text{for almost every }\bx\in\Om.
 $$
 
-Assume $f\in L^2(\Om)$ and $h\in L^2(\Gam_N)$, and take $g=0$. The trial and
+Assume $f\in L^2(\Om)$ and $q\in L^2(\Gam_N)$, and take $g=0$. The trial and
 test spaces then coincide with $\Vzero=H^1_{0,\Gam_D}(\Om)$ from
 @eq-variational-test-space, and the continuous problem is
 
@@ -58,9 +58,8 @@ a(u,v)=\ell(v)
 \qquad\forall v\in\Vzero,
 $$ {#eq-c7-continuous-problem}
 
-with $a$ and $\ell$ given by @eq-variational-forms. The Neumann datum keeps
-the name $h$ from Chapter 3, but it enters the analysis only through $\ell$.
-Everywhere else in this chapter, $h$ denotes the mesh size. Chapter 3 verified that
+with $a$ and $\ell$ given by @eq-variational-forms. Here $q=\bq\cdot\bn$ is
+the prescribed outward normal flux, while $h$ denotes the mesh size. Chapter 3 verified that
 $a$ is continuous with constant $M=k_1$ and coercive with constant
 $\alpha=k_0/(1+C_P^2)$ in the $H^1(\Om)$ norm; see
 @eq-variational-continuity and @eq-variational-coercivity.
@@ -1319,7 +1318,7 @@ def reference_basis(p, xi):
     return phi, dphi
 
 
-xi_q, w_q = np.polynomial.legendre.leggauss(6)
+xi_r, w_r = np.polynomial.legendre.leggauss(6)
 
 ```
 
@@ -1331,19 +1330,19 @@ def solve_bar(N, p):
     nodes = np.linspace(0.0, 1.0, N + 1)
     K = np.zeros((p * N + 1, p * N + 1))
     F = np.zeros(p * N + 1)
-    phi, dphi = reference_basis(p, xi_q)
+    phi, dphi = reference_basis(p, xi_r)
 
     for e in range(N):
         dofs = p * e + np.arange(p + 1)
         J = (nodes[e + 1] - nodes[e]) / 2
-        x_q = nodes[e] + (xi_q + 1) * J
+        x_r = nodes[e] + (xi_r + 1) * J
 
         K_e = np.zeros((p + 1, p + 1))
         F_e = np.zeros(p + 1)
-        for q in range(len(w_q)):
-            dphi_dx = dphi[:, q] / J
-            K_e += np.outer(dphi_dx, dphi_dx) * w_q[q] * J
-            F_e += phi[:, q] * f(x_q[q]) * w_q[q] * J
+        for r in range(len(w_r)):
+            dphi_dx = dphi[:, r] / J
+            K_e += np.outer(dphi_dx, dphi_dx) * w_r[r] * J
+            F_e += phi[:, r] * f(x_r[r]) * w_r[r] * J
 
         for a in range(p + 1):
             F[dofs[a]] += F_e[a]
@@ -1361,17 +1360,17 @@ derivative. This avoids the misleading nodal-only error discussed above.
 
 ```{python}
 def error_norms(nodes, U, p):
-    phi, dphi = reference_basis(p, xi_q)
+    phi, dphi = reference_basis(p, xi_r)
     l2_squared = 0.0
     energy_squared = 0.0
     for e in range(len(nodes) - 1):
         dofs = p * e + np.arange(p + 1)
         J = (nodes[e + 1] - nodes[e]) / 2
-        x_q = nodes[e] + (xi_q + 1) * J
+        x_r = nodes[e] + (xi_r + 1) * J
         u_h = U[dofs] @ phi
         du_h = (U[dofs] @ dphi) / J
-        l2_squared += np.sum(w_q * J * (u_exact(x_q) - u_h) ** 2)
-        energy_squared += np.sum(w_q * J * (du_exact(x_q) - du_h) ** 2)
+        l2_squared += np.sum(w_r * J * (u_exact(x_r) - u_h) ** 2)
+        energy_squared += np.sum(w_r * J * (du_exact(x_r) - du_h) ** 2)
     return np.sqrt(l2_squared), np.sqrt(energy_squared)
 
 ```

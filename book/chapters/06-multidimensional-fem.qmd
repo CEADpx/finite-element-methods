@@ -21,14 +21,15 @@ terms are integrated over element facets rather than over endpoints.
 
 This chapter develops those changes without restarting the finite element
 method from the beginning. We first construct a linear triangular element
-directly on a physical triangle, then build the corresponding global space and
-discrete scalar-diffusion problem. Only after that construction is clear do we
-introduce reference cells, Jacobians, quadratic triangles, multidimensional
-quadrature, and isoparametric mappings. The final sections extend the scalar
-construction to vector-valued elasticity and connect the mathematical objects
-to their FEniCSx counterparts. The presentation follows the physical-element and
-local-to-global constructions commonly used in finite element texts and lecture
-notes [@jog; @larson-bengzon2010; @arnold2018].
+directly on a physical triangle and then build the corresponding global space.
+The support of the global basis functions explains the sparsity of the
+assembled matrix. We next introduce the reference triangle, coordinate map,
+Jacobian, and quadrature rules before applying these constructions to one
+scalar-diffusion problem from element equations through a FEniCSx computation.
+The remaining sections extend the construction to higher-order and other cell
+types and finally to vector-valued elasticity. The presentation follows the
+physical-element and local-to-global constructions commonly used in finite
+element texts and lecture notes [@jog; @larson-bengzon2010; @arnold2018].
 
 ## From intervals to multidimensional meshes {#sec-c6-meshes}
 
@@ -179,7 +180,7 @@ $$
    definition above.
 :::
 
-## The linear triangular element on a physical triangle {#sec-c6-p1-triangle}
+## The $P_1$ triangular finite element space {#sec-c6-p1-triangle}
 
 We begin with the simplest conforming two-dimensional element: a scalar
 linear triangular element. The cell
@@ -455,7 +456,7 @@ at every point $\bx\in\mathcal K_e$. Thus a $P_1$ triangle reproduces every
 affine scalar field exactly.
 :::
 
-## From local triangles to a global conforming space {#sec-c6-global-space}
+### From local triangles to a global conforming space {#sec-c6-global-space}
 
 A finite element function is constructed cell by cell, but the final function
 must be globally admissible. For the scalar diffusion problem, the natural
@@ -481,8 +482,16 @@ $$
 \phi_i(\bx_j)=\delta_{ij}
 $$
 
-and is linear on every cell. Its support is the union of the cells incident to
-vertex $\bx_i$.
+and is linear on every cell. If $\mathcal E(i)$ is the set of cells incident
+to vertex $\bx_i$, then
+
+$$
+\operatorname{supp}\phi_i
+=
+\bigcup_{e\in\mathcal E(i)}\overline{\mathcal K_e}.
+$$ {#eq-c6-global-basis-support}
+
+Thus $\phi_i$ is zero outside the patch of cells that contain vertex $i$.
 
 The local and global basis functions are related exactly as in Chapter 5:
 
@@ -520,6 +529,24 @@ The difference from one dimension is geometric rather than algebraic. A global
 basis function may now be supported on several triangles surrounding a vertex,
 and the pattern of neighboring interactions depends on the mesh connectivity.
 
+![A global nodal basis function is nonzero only on the cells incident to its node.](../figures/chapter06/global_basis_support.png){#fig-c6-global-basis-support width="100%" fig-align="center"}
+
+This local support determines the sparsity of the stiffness matrix. For the
+diffusion problem introduced later in this chapter,
+
+$$
+K_{ij}
+=
+\int_\Om k\,\grad\phi_j\cdot\grad\phi_i\,\dx.
+$$
+
+If the supports of $\phi_i$ and $\phi_j$ do not overlap on a cell, the
+integrand is zero throughout the domain and $K_{ij}=0$. A basis function
+therefore interacts only with basis functions whose node patches overlap its
+own patch.
+
+![Nonzero matrix entries follow the overlap of basis-function supports.](../figures/chapter06/stiffness_sparsity.png){#fig-c6-stiffness-sparsity width="58%" fig-align="center"}
+
 ::: {#exr-c6-shared-facet-continuity}
 ## Continuity across a shared edge
 
@@ -533,454 +560,7 @@ Two $P_1$ triangles share the edge connecting global vertices $i$ and $j$.
    independent degree of freedom in the interior of the shared edge.
 :::
 
-## Scalar diffusion and element equations {#sec-c6-scalar-diffusion}
-
-The Neumann datum retains the symbol $h$ of Chapter 3. In a boundary integral
-it denotes prescribed data; in a mesh-size statement it denotes the largest
-cell diameter.
-
-We now apply the multidimensional space to the scalar diffusion problem from
-@sec-variational-spaces. Let $\Gam_D$ and $\Gam_N$ partition the boundary, and
-consider
-
-$$
--\divg(k\grad u)=f
-\qquad\text{in }\Om,
-$$
-
-with
-
-$$
-u=g\quad\text{on }\Gam_D,
-\qquad
-k\grad u\cdot\bn=h
-\quad\text{on }\Gam_N.
-$$
-
-The variational problem is
-
-$$
-\text{find }u\in\mathcal U_g
-\text{ such that}\qquad
-a(u,v)=\ell(v)
-\qquad\forall v\in\mathcal V_0,
-$$
-
-where
-
-$$
-a(w,v)
-=
-\int_\Om
-k\,\grad w\cdot\grad v\,\dx,
-$$
-
-and
-
-$$
-\ell(v)
-=
-\int_\Om f v\,\dx
-+
-\int_{\Gam_N}h v\,\ds.
-$$ {#eq-c6-diffusion-forms}
-
-The homogeneous finite element test space is
-
-$$
-\mathcal V_{h,0}
-=
-\mathcal V_h\cap\mathcal V_0
-=
-\left\{
-v_h\in\mathcal V_h:
-v_h=0\text{ on }\Gam_D
-\right\}.
-$$ {#eq-c6-discrete-test-space}
-
-To describe nonzero prescribed data, suppose $g$ is continuous on $\Gam_D$ and
-let $g_h$ denote its nodal finite element interpolant on that boundary. The
-finite element trial space is
-
-$$
-\mathcal U_{h,g_h}
-=
-\left\{
-w_h\in\mathcal V_h:
-w_h=g_h\text{ on }\Gam_D
-\right\}.
-$$ {#eq-c6-discrete-trial-space}
-
-In general, $g_h$ is an approximation of $g$ rather than the exact boundary
-function. If $g$ is itself piecewise linear on the boundary mesh, then
-$g_h=g$. The discrete variational problem is
-
-$$
-\text{find }u_h\in\mathcal U_{h,g_h}
-\text{ such that}\qquad
-a(u_h,v_h)=\ell(v_h)
-\qquad
-\forall v_h\in\mathcal V_{h,0}.
-$$ {#eq-c6-discrete-diffusion}
-
-With the global basis,
-$u_h=\sum_j U_j\phi_j$. This sum includes both prescribed and unknown nodal
-coefficients. Testing with a basis function $\phi_i$ associated with a free
-degree of freedom gives
-
-$$
-\sum_j
-K_{ij}U_j
-=
-F_i,
-$$
-
-where
-
-$$
-K_{ij}
-=
-\int_\Om
-k\,\grad\phi_j\cdot\grad\phi_i\,\dx,
-$$
-
-and
-
-$$
-F_i
-=
-\int_\Om f\phi_i\,\dx
-+
-\int_{\Gam_N}h\phi_i\,\ds.
-$$ {#eq-c6-global-diffusion-entries}
-
-After assembly, the terms containing prescribed coefficients are moved to the
-right-hand side, exactly as in @eq-c5-reduced-system.
-
-The global domain integral is decomposed cell by cell:
-
-$$
-K_{ij}
-=
-\sum_{e=1}^{N_c}
-\int_{\mathcal K_e}
-k\,\grad\phi_j\cdot\grad\phi_i\,\dx.
-$$
-
-Using @eq-c6-local-global-restriction, define the local stiffness entries
-
-$$
-K_{ab}^e
-=
-\int_{\mathcal K_e}
-k\,
-\grad\phi_b^e\cdot\grad\phi_a^e
-\,\dx,
-$$ {#eq-c6-scalar-element-stiffness}
-
-and the local domain-load entries
-
-$$
-F_a^e
-=
-\int_{\mathcal K_e}
-f\,\phi_a^e\,\dx.
-$$ {#eq-c6-scalar-element-load}
-
-Natural boundary data contribute through boundary facets. If a facet
-$\mathcal F\subset\partial\mathcal K_e\cap\Gam_N$, its contribution is
-
-$$
-F_a^{\mathcal F}
-=
-\int_{\mathcal F}
-h\,\phi_a^e\,\ds.
-$$ {#eq-c6-boundary-facet-load}
-
-To evaluate this integral, map the reference interval
-$\widehat{\mathcal F}=[-1,1]$ to the straight physical edge with endpoints
-$\bx_i$ and $\bx_j$:
-
-$$
-\bx(\zeta)
-=
-\frac{1-\zeta}{2}\bx_i
-+
-\frac{1+\zeta}{2}\bx_j.
-$$ {#eq-c6-edge-map}
-
-The edge Jacobian is the length of the tangent vector,
-
-$$
-J_{\mathcal F}
-=
-\norm{\frac{\dd\bx}{\dd\zeta}}_2
-=
-\frac{\norm{\bx_j-\bx_i}_2}{2}
-=
-\frac{L_{\mathcal F}}{2}.
-$$ {#eq-c6-edge-jacobian}
-
-Therefore,
-
-$$
-\int_{\mathcal F}h\,\phi_a^e\,\ds
-=
-\int_{-1}^{1}
-h(\bx(\zeta))
-\phi_a^e(\bx(\zeta))
-J_{\mathcal F}
-\,\dd\zeta.
-$$ {#eq-c6-edge-integral-transform}
-
-This is an ordinary one-dimensional integral on the reference edge.
-
-![A natural boundary condition contributes through an integral over a boundary facet.](../figures/chapter06/boundary_facet_load.svg){#fig-c6-boundary-facet width="95%" fig-align="center"}
-
-The global load vector therefore receives contributions from both cells and
-boundary facets.
-
-::: {#exm-c6-concrete-triangle-matrix}
-## Element matrix for the concrete triangle
-
-For the triangle in @fig-c6-physical-p1, the area is
-
-$$
-|\mathcal K_e|=1.
-$$
-
-If $k$ is constant on the cell, the basis gradients in
-@eq-c6-example-triangle-gradients are constant, so
-
-$$
-K_{ab}^e
-=
-k|\mathcal K_e|
-\grad\phi_b^e\cdot\grad\phi_a^e.
-$$
-
-Hence
-
-$$
-\bK^e
-=
-k
-\begin{bmatrix}
-5/4 & -1/4 & -1\\
--1/4 & 1/4 & 0\\
--1 & 0 & 1
-\end{bmatrix}.
-$$ {#eq-c6-example-triangle-stiffness}
-
-If the source $f$ is constant, each linear basis function has average value
-$1/3$ over the triangle. Therefore
-
-$$
-\bF^e
-=
-\frac{f|\mathcal K_e|}{3}
-\begin{bmatrix}
-1\\
-1\\
-1
-\end{bmatrix}
-=
-\frac{f}{3}
-\begin{bmatrix}
-1\\
-1\\
-1
-\end{bmatrix}.
-$$ {#eq-c6-example-triangle-load}
-
-As in one dimension,
-
-$$
-\bK^e
-\begin{bmatrix}
-1\\
-1\\
-1
-\end{bmatrix}
-=
-\bm{0},
-$$
-
-because a constant nodal field has zero gradient.
-:::
-
-::: {#exm-c6-boundary-edge-load}
-## A constant flux on one edge
-
-Let a boundary edge of a $P_1$ triangle have length $L_{\mathcal F}$ and let
-the prescribed normal flux be the constant $h_0$. Only the two vertex basis
-functions associated with the edge are nonzero on that facet. Their
-restrictions are $(1-\zeta)/2$ and $(1+\zeta)/2$. Using
-@eq-c6-edge-integral-transform gives
-
-$$
-\int_{\mathcal F}h_0\phi_i^e\,\ds
-=
-\frac{h_0L_{\mathcal F}}{2}
-\int_{-1}^{1}\frac{1-\zeta}{2}\,\dd\zeta
-=
-\frac{h_0L_{\mathcal F}}{2},
-$$
-
-and the same value is obtained for the other endpoint. Hence the facet load
-vector is
-
-$$
-\bF^{\mathcal F}
-=
-\frac{h_0L_{\mathcal F}}{2}
-\begin{bmatrix}
-1\\
-1
-\end{bmatrix}.
-$$
-
-These two entries are assembled into the global load vector at the two global
-vertices of the boundary edge.
-:::
-
-::: {#exr-c6-edge-integration}
-## A linearly varying boundary flux
-
-On a straight edge of length $L_{\mathcal F}$, let the prescribed flux vary
-linearly from $h_i$ at endpoint $i$ to $h_j$ at endpoint $j$.
-
-1. Express $h(\zeta)$ using the two linear reference-edge basis functions.
-2. Use @eq-c6-edge-integral-transform to derive the two-entry consistent
-   facet load vector.
-3. Verify that the sum of its entries equals
-   $L_{\mathcal F}(h_i+h_j)/2$, the integral of the prescribed flux over the
-   edge.
-:::
-
-::: {#exr-c6-triangle-element-matrix}
-## A $P_1$ diffusion element
-
-For the triangle with vertices
-$(0,0)$, $(1,0)$, and $(0,1)$:
-
-1. derive the three basis functions;
-2. compute their gradients;
-3. derive the element stiffness matrix for constant $k$;
-4. derive the element load vector for constant $f$; and
-5. verify that the row sums of the stiffness matrix are zero.
-:::
-
-![A two-triangle mesh used to reproduce the linear solution $u(x,y)=x$.](../figures/chapter06/two_triangle_patch_test.svg){#fig-c6-two-triangle-patch width="90%" fig-align="center"}
-
-::: {#exm-c6-two-triangle-solution}
-## Assembly and solution on two triangles
-
-Consider the unit square with vertices
-
-$$
-\bx_1=(0,0),\quad
-\bx_2=(1,0),\quad
-\bx_3=(0,1),\quad
-\bx_4=(1,1),
-$$
-
-and triangle connectivities
-
-$$
-I^1=(1,2,3),
-\qquad
-I^2=(2,4,3).
-$$
-
-Let $k=1$ and $f=0$. Prescribe $u=0$ on the left boundary,
-$\grad u\cdot\bn=1$ on the right boundary, and zero normal flux on the top and
-bottom boundaries.
-
-Direct calculation gives
-
-$$
-\bK^1
-=
-\frac12
-\begin{bmatrix}
-2&-1&-1\\
--1&1&0\\
--1&0&1
-\end{bmatrix},
-\qquad
-\bK^2
-=
-\frac12
-\begin{bmatrix}
-1&-1&0\\
--1&2&-1\\
-0&-1&1
-\end{bmatrix}.
-$$
-
-Scatter-adding these matrices with the two connectivity maps produces
-
-$$
-\bK
-=
-\begin{bmatrix}
-1&-1/2&-1/2&0\\
--1/2&1&0&-1/2\\
--1/2&0&1&-1/2\\
-0&-1/2&-1/2&1
-\end{bmatrix}.
-$$ {#eq-c6-two-triangle-global-matrix}
-
-The right boundary edge has length one, so the constant-flux calculation in
-@exm-c6-boundary-edge-load gives
-
-$$
-\bF
-=
-\begin{bmatrix}
-0&1/2&0&1/2
-\end{bmatrix}^T.
-$$
-
-The entries are ordered by global vertices $1,2,3,4$.
-
-The prescribed coefficients are $U_1=U_3=0$. The equations for the two free
-coefficients are
-
-$$
-\begin{bmatrix}
-1&-1/2\\
--1/2&1
-\end{bmatrix}
-\begin{bmatrix}
-U_2\\U_4
-\end{bmatrix}
-=
-\begin{bmatrix}
-1/2\\1/2
-\end{bmatrix},
-$$
-
-which gives $U_2=U_4=1$. Therefore the assembled finite element field is
-$u_h(x,y)=x$ on both triangles. This linear field satisfies the differential
-equation and all four boundary conditions, so the two-element mesh reproduces
-the exact solution.
-:::
-
-::: {#exr-c6-two-triangle-source}
-## Reusing the two-triangle mesh
-
-On the mesh in @exm-c6-two-triangle-solution, set $k=1$, $f=1$, prescribe
-$u=0$ on the left boundary, and prescribe zero normal flux elsewhere.
-
-1. Derive the element load vector on each triangle.
-2. Assemble the global load vector.
-3. Solve the two-by-two reduced system for $U_2$ and $U_4$.
-4. Write the resulting piecewise-linear function separately on each triangle.
-:::
-
-## Reference triangles and coordinate mappings {#sec-c6-reference-triangle}
+## Reference triangle, mappings, and quadrature {#sec-c6-reference-triangle}
 
 The physical-triangle construction shows exactly what the basis functions mean,
 but an implementation should not solve a new interpolation system on every
@@ -1230,6 +810,926 @@ $(1,1)$, $(4,1)$, and $(2,3)$:
    computed gradients agree with the transformed gradients from Part 4.
 :::
 
+### Numerical integration on triangles and edges {#sec-c6-quadrature}
+
+After transformation to a reference cell, a typical element integral has the
+form
+
+$$
+\int_{\mathcal K_e}
+g(\bx)\,\dx
+=
+\int_{\widehat{\mathcal K}}
+g(F_e(\bm{\xi}))
+|\det\bm J_e(\bm{\xi})|
+\,\dd\bm{\xi}.
+$$ {#eq-c6-reference-integration}
+
+For affine triangles, $\bm J_e$ is constant. For more general isoparametric
+cells, the Jacobian may vary across the cell.
+
+A quadrature rule on the reference triangle approximates
+
+$$
+\int_{\widehat{\mathcal K}}
+g(\xi,\eta)\,\dd\xi\,\dd\eta
+\approx
+\sum_{r=1}^{n_q}
+w_r g(\xi_r,\eta_r).
+$$ {#eq-c6-triangle-quadrature}
+
+For the reference triangle in @eq-c6-reference-triangle, useful low-order rules
+include:
+
+| rule | points | weights | polynomial exactness |
+|---|---|---|---|
+| one point | $(1/3,1/3)$ | $1/2$ | degree 1 |
+| three point | $(1/6,1/6)$, $(2/3,1/6)$, $(1/6,2/3)$ | $1/6$ each | degree 2 |
+
+The weights sum to $1/2$, the area of the reference triangle.
+
+![One-point and three-point quadrature rules on the reference triangle.](../figures/chapter06/triangle_quadrature.svg){#fig-c6-triangle-quadrature width="80%" fig-align="center"}
+
+The transformed scalar-diffusion stiffness entry is
+
+$$
+K_{ab}^e
+=
+\int_{\widehat{\mathcal K}}
+k(F_e(\bm{\xi}))
+\left(
+\bm J_e^{-T}
+\grad_{\bm{\xi}}\widehat\phi_b
+\right)
+\cdot
+\left(
+\bm J_e^{-T}
+\grad_{\bm{\xi}}\widehat\phi_a
+\right)
+|\det\bm J_e|
+\,\dd\bm{\xi}.
+$$ {#eq-c6-reference-stiffness}
+
+For a $P_1$ affine triangle with constant $k$, the physical gradients and the
+Jacobian are constant, so the stiffness integrand is constant. A one-point rule
+is therefore sufficient. More complicated coefficients, higher-order basis
+functions, or nonaffine geometry may require higher-order quadrature.
+
+For example, the element load entry is approximated by
+
+$$
+F_a^e
+\approx
+\sum_{r=1}^{n_q}
+w_r
+f(F_e(\bm\xi_r))
+\widehat\phi_a(\bm\xi_r)
+|\det\bm J_e(\bm\xi_r)|.
+$$ {#eq-c6-triangle-load-quadrature}
+
+For constant $f$ on an affine $P_1$ triangle, the integrand is linear. The
+one-point rule gives
+
+$$
+F_a^e
+=
+\frac12 f\frac13|\det\bm J_e|
+=
+\frac{f|\mathcal K_e|}{3},
+$$
+
+which agrees with @eq-c6-example-triangle-load.
+
+Boundary-facet integrals are transformed separately. In two dimensions a facet
+is a line segment, so the one-dimensional quadrature rules from Chapter 5 can
+be reused on a reference edge. In three dimensions a facet is a two-dimensional
+surface and requires a surface quadrature rule.
+
+::: {#exr-c6-triangle-quadrature}
+## Triangle quadrature
+
+1. Verify that the one-point rule integrates the three reference basis
+   functions exactly.
+2. Verify that the three-point rule integrates
+   $\xi^2$, $\xi\eta$, and $\eta^2$ exactly.
+3. Explain why the one-point rule is sufficient for the stiffness matrix of a
+   $P_1$ affine triangle with constant diffusivity.
+4. Determine whether the one-point rule exactly evaluates the load vector when
+   $f(x,y)=x+y$ and the geometry map is affine.
+5. For the $P_2$ triangle of @sec-c6-p2-triangle on an affine cell with
+   constant diffusivity, determine the polynomial degree of the stiffness
+   integrand in @eq-c6-reference-stiffness and decide whether the one-point or
+   the three-point rule integrates it exactly.
+:::
+
+## Scalar diffusion: from the variational problem to computation {#sec-c6-scalar-diffusion}
+
+We now apply the multidimensional space to the scalar diffusion problem from
+@sec-variational-spaces. Let $\Gam_D$ and $\Gam_N$ partition the boundary, and
+consider
+
+$$
+-\divg(k\grad u)=f
+\qquad\text{in }\Om,
+$$
+
+with
+
+$$
+u=g\quad\text{on }\Gam_D,
+\qquad
+\bq\cdot\bn=q
+\quad\text{on }\Gam_N.
+$$
+
+Here
+
+$$
+\bq=-k\grad u,
+\qquad
+q=\bq\cdot\bn.
+$$
+
+The scalar $q$ is the outward normal flux; $q>0$ represents flux leaving the
+domain. The symbol $h$ remains reserved for the mesh size.
+
+The variational problem is
+
+$$
+\text{find }u\in\mathcal U_g
+\text{ such that}\qquad
+a(u,v)=\ell(v)
+\qquad\forall v\in\mathcal V_0,
+$$
+
+where
+
+$$
+a(w,v)
+=
+\int_\Om
+k\,\grad w\cdot\grad v\,\dx,
+$$
+
+and
+
+$$
+\ell(v)
+=
+\int_\Om f v\,\dx
+-
+\int_{\Gam_N}q v\,\ds.
+$$ {#eq-c6-diffusion-forms}
+
+The homogeneous finite element test space is
+
+$$
+\mathcal V_{h,0}
+=
+\mathcal V_h\cap\mathcal V_0
+=
+\left\{
+v_h\in\mathcal V_h:
+v_h=0\text{ on }\Gam_D
+\right\}.
+$$ {#eq-c6-discrete-test-space}
+
+To describe nonzero prescribed data, suppose $g$ is continuous on $\Gam_D$ and
+let $g_h$ denote its nodal finite element interpolant on that boundary. The
+finite element trial space is
+
+$$
+\mathcal U_{h,g_h}
+=
+\left\{
+w_h\in\mathcal V_h:
+w_h=g_h\text{ on }\Gam_D
+\right\}.
+$$ {#eq-c6-discrete-trial-space}
+
+In general, $g_h$ is an approximation of $g$ rather than the exact boundary
+function. If $g$ is itself piecewise linear on the boundary mesh, then
+$g_h=g$. The discrete variational problem is
+
+$$
+\text{find }u_h\in\mathcal U_{h,g_h}
+\text{ such that}\qquad
+a(u_h,v_h)=\ell(v_h)
+\qquad
+\forall v_h\in\mathcal V_{h,0}.
+$$ {#eq-c6-discrete-diffusion}
+
+With the global basis,
+$u_h=\sum_j U_j\phi_j$. This sum includes both prescribed and unknown nodal
+coefficients. Testing with a basis function $\phi_i$ associated with a free
+degree of freedom gives
+
+$$
+\sum_j
+K_{ij}U_j
+=
+F_i,
+$$
+
+where
+
+$$
+K_{ij}
+=
+\int_\Om
+k\,\grad\phi_j\cdot\grad\phi_i\,\dx,
+$$
+
+and
+
+$$
+F_i
+=
+\int_\Om f\phi_i\,\dx
+-
+\int_{\Gam_N}q\phi_i\,\ds.
+$$ {#eq-c6-global-diffusion-entries}
+
+After assembly, the terms containing prescribed coefficients are moved to the
+right-hand side, exactly as in @eq-c5-reduced-system.
+
+The global domain integral is decomposed cell by cell:
+
+$$
+K_{ij}
+=
+\sum_{e=1}^{N_c}
+\int_{\mathcal K_e}
+k\,\grad\phi_j\cdot\grad\phi_i\,\dx.
+$$
+
+Using @eq-c6-local-global-restriction, define the local stiffness entries
+
+$$
+K_{ab}^e
+=
+\int_{\mathcal K_e}
+k\,
+\grad\phi_b^e\cdot\grad\phi_a^e
+\,\dx,
+$$ {#eq-c6-scalar-element-stiffness}
+
+and the local domain-load entries
+
+$$
+F_a^e
+=
+\int_{\mathcal K_e}
+f\,\phi_a^e\,\dx.
+$$ {#eq-c6-scalar-element-load}
+
+Natural boundary data contribute through boundary facets. If a facet
+$\mathcal F\subset\partial\mathcal K_e\cap\Gam_N$, its contribution is
+
+$$
+F_a^{\mathcal F}
+=
+-\int_{\mathcal F}
+q\,\phi_a^e\,\ds.
+$$ {#eq-c6-boundary-facet-load}
+
+To evaluate this integral, map the reference interval
+$\widehat{\mathcal F}=[-1,1]$ to the straight physical edge with endpoints
+$\bx_i$ and $\bx_j$:
+
+$$
+\bx(\zeta)
+=
+\frac{1-\zeta}{2}\bx_i
++
+\frac{1+\zeta}{2}\bx_j.
+$$ {#eq-c6-edge-map}
+
+The edge Jacobian is the length of the tangent vector,
+
+$$
+J_{\mathcal F}
+=
+\norm{\frac{\dd\bx}{\dd\zeta}}_2
+=
+\frac{\norm{\bx_j-\bx_i}_2}{2}
+=
+\frac{L_{\mathcal F}}{2}.
+$$ {#eq-c6-edge-jacobian}
+
+Therefore,
+
+$$
+F_a^{\mathcal F}
+=
+-\int_{-1}^{1}
+q(\bx(\zeta))
+\phi_a^e(\bx(\zeta))
+J_{\mathcal F}
+\,\dd\zeta.
+$$ {#eq-c6-edge-integral-transform}
+
+This is an ordinary one-dimensional integral on the reference edge.
+
+![A natural boundary condition contributes through an integral over a boundary facet.](../figures/chapter06/boundary_facet_load.svg){#fig-c6-boundary-facet width="95%" fig-align="center"}
+
+The global load vector therefore receives contributions from both cells and
+boundary facets.
+
+::: {#exm-c6-concrete-triangle-matrix}
+## Element matrix for the concrete triangle
+
+For the triangle in @fig-c6-physical-p1, the area is
+
+$$
+|\mathcal K_e|=1.
+$$
+
+If $k$ is constant on the cell, the basis gradients in
+@eq-c6-example-triangle-gradients are constant, so
+
+$$
+K_{ab}^e
+=
+k|\mathcal K_e|
+\grad\phi_b^e\cdot\grad\phi_a^e.
+$$
+
+Hence
+
+$$
+\bK^e
+=
+k
+\begin{bmatrix}
+5/4 & -1/4 & -1\\
+-1/4 & 1/4 & 0\\
+-1 & 0 & 1
+\end{bmatrix}.
+$$ {#eq-c6-example-triangle-stiffness}
+
+If the source $f$ is constant, each linear basis function has average value
+$1/3$ over the triangle. Therefore
+
+$$
+\bF^e
+=
+\frac{f|\mathcal K_e|}{3}
+\begin{bmatrix}
+1\\
+1\\
+1
+\end{bmatrix}
+=
+\frac{f}{3}
+\begin{bmatrix}
+1\\
+1\\
+1
+\end{bmatrix}.
+$$ {#eq-c6-example-triangle-load}
+
+As in one dimension,
+
+$$
+\bK^e
+\begin{bmatrix}
+1\\
+1\\
+1
+\end{bmatrix}
+=
+\bm{0},
+$$
+
+because a constant nodal field has zero gradient.
+:::
+
+::: {#exm-c6-boundary-edge-load}
+## A constant flux on one edge
+
+Let a boundary edge of a $P_1$ triangle have length $L_{\mathcal F}$ and let
+the prescribed outward normal flux be the constant $q_0$. Only the two vertex basis
+functions associated with the edge are nonzero on that facet. Their
+restrictions are $(1-\zeta)/2$ and $(1+\zeta)/2$. Using
+@eq-c6-edge-integral-transform gives
+
+$$
+-\int_{\mathcal F}q_0\phi_i^e\,\ds
+=
+-\frac{q_0L_{\mathcal F}}{2}
+\int_{-1}^{1}\frac{1-\zeta}{2}\,\dd\zeta
+=
+-\frac{q_0L_{\mathcal F}}{2},
+$$
+
+and the same value is obtained for the other endpoint. Hence the facet load
+vector is
+
+$$
+\bF^{\mathcal F}
+=
+-\frac{q_0L_{\mathcal F}}{2}
+\begin{bmatrix}
+1\\
+1
+\end{bmatrix}.
+$$
+
+These two entries are assembled into the global load vector at the two global
+vertices of the boundary edge.
+:::
+
+::: {#exr-c6-edge-integration}
+## A linearly varying boundary flux
+
+On a straight edge of length $L_{\mathcal F}$, let the prescribed flux vary
+linearly from $q_i$ at endpoint $i$ to $q_j$ at endpoint $j$.
+
+1. Express $q(\zeta)$ using the two linear reference-edge basis functions.
+2. Use @eq-c6-edge-integral-transform to derive the two-entry consistent
+   facet load vector.
+3. Verify that the sum of the entries equals
+   $-L_{\mathcal F}(q_i+q_j)/2$. Separately verify that the outward flux
+   integral itself is $L_{\mathcal F}(q_i+q_j)/2$.
+:::
+
+::: {#exr-c6-triangle-element-matrix}
+## A $P_1$ diffusion element
+
+For the triangle with vertices
+$(0,0)$, $(1,0)$, and $(0,1)$:
+
+1. derive the three basis functions;
+2. compute their gradients;
+3. derive the element stiffness matrix for constant $k$;
+4. derive the element load vector for constant $f$; and
+5. verify that the row sums of the stiffness matrix are zero.
+:::
+
+![A two-triangle mesh used to reproduce the linear solution $u(x,y)=x$.](../figures/chapter06/two_triangle_patch_test.svg){#fig-c6-two-triangle-patch width="90%" fig-align="center"}
+
+::: {#exm-c6-two-triangle-solution}
+## Assembly and solution on two triangles
+
+Consider the unit square with vertices
+
+$$
+\bx_1=(0,0),\quad
+\bx_2=(1,0),\quad
+\bx_3=(0,1),\quad
+\bx_4=(1,1),
+$$
+
+and triangle connectivities
+
+$$
+I^1=(1,2,3),
+\qquad
+I^2=(2,4,3).
+$$
+
+Let $k=1$ and $f=0$. Prescribe $u=0$ on the left boundary,
+$q=-1$ on the right boundary, and $q=0$ on the top and bottom boundaries.
+Because $\bq=-\grad u$, these are the boundary data satisfied by
+$u(x,y)=x$.
+
+Direct calculation gives
+
+$$
+\bK^1
+=
+\frac12
+\begin{bmatrix}
+2&-1&-1\\
+-1&1&0\\
+-1&0&1
+\end{bmatrix},
+\qquad
+\bK^2
+=
+\frac12
+\begin{bmatrix}
+1&-1&0\\
+-1&2&-1\\
+0&-1&1
+\end{bmatrix}.
+$$
+
+Scatter-adding these matrices with the two connectivity maps produces
+
+$$
+\bK
+=
+\begin{bmatrix}
+1&-1/2&-1/2&0\\
+-1/2&1&0&-1/2\\
+-1/2&0&1&-1/2\\
+0&-1/2&-1/2&1
+\end{bmatrix}.
+$$ {#eq-c6-two-triangle-global-matrix}
+
+The right boundary edge has length one and $q=-1$. The minus sign in the
+variational boundary term therefore makes the two load entries positive. The
+constant-flux calculation in @exm-c6-boundary-edge-load gives
+
+$$
+\bF
+=
+\begin{bmatrix}
+0&1/2&0&1/2
+\end{bmatrix}^T.
+$$
+
+The entries are ordered by global vertices $1,2,3,4$.
+
+The prescribed coefficients are $U_1=U_3=0$. The equations for the two free
+coefficients are
+
+$$
+\begin{bmatrix}
+1&-1/2\\
+-1/2&1
+\end{bmatrix}
+\begin{bmatrix}
+U_2\\U_4
+\end{bmatrix}
+=
+\begin{bmatrix}
+1/2\\1/2
+\end{bmatrix},
+$$
+
+which gives $U_2=U_4=1$. Therefore the assembled finite element field is
+$u_h(x,y)=x$ on both triangles. This linear field satisfies the differential
+equation and all four boundary conditions, so the two-element mesh reproduces
+the exact solution.
+:::
+
+::: {#exr-c6-two-triangle-source}
+## Reusing the two-triangle mesh
+
+On the mesh in @exm-c6-two-triangle-solution, set $k=1$, $f=1$, prescribe
+$u=0$ on the left boundary, and prescribe zero normal flux elsewhere.
+
+1. Derive the element load vector on each triangle.
+2. Assemble the global load vector.
+3. Solve the two-by-two reduced system for $U_2$ and $U_4$.
+4. Write the resulting piecewise-linear function separately on each triangle.
+:::
+
+### Assembly and boundary conditions {#sec-c6-assembly}
+
+For scalar $P_1$ diffusion, each triangular cell has three local degrees of
+freedom. For two-dimensional displacement elasticity, the same triangle has
+six. The local-to-global assembly rule itself is unchanged.
+
+If local scalar indices $a,b$ correspond to global indices
+$I^e(a),I^e(b)$,
+
+$$
+K_{I^e(a),I^e(b)}
+\mathrel{+}=
+K_{ab}^e,
+\qquad
+F_{I^e(a)}
+\mathrel{+}=
+F_a^e.
+$$ {#eq-c6-scalar-assembly}
+
+![Scatter-add assembly of a three-by-three element matrix into the rows and columns selected by its connectivity.](../figures/chapter06/assembly_scatter.svg){#fig-c6-assembly-scatter width="95%" fig-align="center"}
+
+The gather form of the same rule also carries over unchanged. Let
+$\mathcal E(i)$ now denote the set of cells incident on global vertex $i$, and
+let $J^e(i)$ be the local number of that vertex in cell $e$. The argument that
+led to @eq-c5-assembled-stiffness-entry gives
+
+$$
+K_{ij}
+=
+\sum_{e\in\mathcal E(i)\cap\mathcal E(j)}
+K_{J^e(i),J^e(j)}^e,
+\qquad
+F_i
+=
+\sum_{e\in\mathcal E(i)}F_{J^e(i)}^e
+$$ {#eq-c6-gather-assembly}
+
+for the cell contributions, with boundary-facet contributions added to $F_i$
+in the same way. The formulas are identical to those of Chapter 5; what
+changes is the size of the incident sets. In one dimension $\mathcal E(i)$
+contains at most two elements, whereas around an interior vertex of a
+triangular mesh it contains every triangle of the surrounding patch.
+
+For the two-triangle mesh of @exm-c6-two-triangle-solution, vertex 2 is local
+vertex 2 of $\mathcal K_1$ and local vertex 1 of $\mathcal K_2$, and vertex 3
+is local vertex 3 of both cells. Hence
+
+$$
+K_{22}=K_{22}^1+K_{11}^2=\tfrac12+\tfrac12=1,
+\qquad
+K_{23}=K_{23}^1+K_{13}^2=0+0=0,
+$$
+
+in agreement with @eq-c6-two-triangle-global-matrix. The second entry is zero
+even though vertices 2 and 3 share an edge. On each of these right triangles
+the gradients of the two corresponding basis functions are orthogonal. Mesh
+adjacency determines which entries can be nonzero, but an individual entry
+within that pattern may still vanish because of the cell geometry.
+
+For vector-valued elements, the element degree-of-freedom map replaces the
+vertex map in this rule. A vertex shared by several cells contributes the same
+global displacement components to each incident cell.
+
+The global stiffness matrix remains sparse because a basis function interacts
+only with basis functions supported on cells that overlap its support. In two
+and three dimensions, the sparsity pattern is no longer a simple narrow band
+under arbitrary numbering, but it still reflects mesh adjacency.
+
+Essential boundary conditions are imposed on global degrees of freedom
+associated with the prescribed boundary. The same partitioning from Chapter 5
+applies:
+
+$$
+\bK_{ff}\bU_f
+=
+\bF_f-\bK_{fp}\bU_p.
+$$ {#eq-c6-reduced-system}
+
+The geometric task is more involved because a boundary condition is usually
+specified on a boundary portion rather than at a single endpoint. The mesh
+must therefore identify the boundary facets belonging to $\Gam_D$ or
+$\Gam_u$, and the finite element software must identify the degrees of freedom
+attached to those facets.
+
+Natural boundary conditions require the same boundary-facet identification,
+but their contribution is assembled into the load vector through facet
+integrals rather than through prescribed coefficient values.
+
+After the solve, the prescribed values are inserted into $\bU$ and the
+residual vector $\bR=\bK\bU-\bF$ is formed exactly as in
+@eq-c5-residual-vector. Its free entries vanish up to rounding error, and its
+prescribed entries are the discrete reactions. For elasticity they are the
+nodal support forces. For scalar diffusion, the entry associated with a
+prescribed nodal degree of freedom $i$ is
+$R_i=a(u_h,\phi_i)-\ell(\phi_i)$. If $u_h$ is replaced by a sufficiently smooth
+exact solution, integration by parts shows that this quantity equals
+$-\int_{\Gam_D}q\,\phi_i\,\ds$. The reactions are discrete
+counterparts of these weighted boundary fluxes; they need not equal direct
+boundary integrals of the computed gradient. Their sum is also a useful check.
+The nodal basis functions sum to one, the free equations give
+$a(u_h,\phi_i)=\ell(\phi_i)$ for every free nodal degree of freedom, and
+$a(u_h,1)=0$. Together these facts give
+
+$$
+\sum_{i\text{ prescribed}}R_i
+=
+-\ell(1)
+=
+-\int_\Om f\,\dx+\int_{\Gam_N}q\,\ds.
+$$
+
+The discrete reactions therefore balance the source and the prescribed
+boundary flux exactly. This is the multidimensional counterpart of the
+equilibrium check in @exm-c5-complete-bar.
+
+### Complete multidimensional finite element procedure {#sec-c6-procedure}
+
+The multidimensional finite element method can now be organized as the same
+local-to-global procedure used in one dimension, with additional geometric
+transformations.
+
+```text
+read the mesh coordinates, cell connectivity, and boundary tags
+choose the finite element and quadrature rules
+initialize the global matrix K and vector F
+
+for each cell e:
+    read the cell coordinates and global degree-of-freedom map
+    initialize the element matrix K^e and domain-load vector F^e
+
+    for each cell quadrature point:
+        evaluate reference basis functions and reference gradients
+        map the quadrature point to the physical cell
+        evaluate J_e, det(J_e), and J_e^{-T}
+        transform the basis gradients to physical coordinates
+        evaluate coefficients and source or body-force data
+        add the quadrature contribution to K^e and F^e
+
+    scatter-add K^e and F^e into K and F
+
+for each boundary facet carrying natural data:
+    read the facet degree-of-freedom map and geometry
+    initialize the facet load vector F^facet
+
+    for each facet quadrature point:
+        evaluate the restricted basis functions and facet Jacobian
+        evaluate the prescribed flux or traction
+        add the negative normal-flux contribution to F^facet
+
+    scatter-add F^facet into F
+
+identify prescribed and free degrees of freedom
+solve K_ff U_f = F_f - K_fp U_p
+insert prescribed values into the global coefficient vector
+postprocess flux, strain, stress, and reactions as required
+```
+
+The outer algorithm is largely independent of whether the cell is a triangle,
+quadrilateral, tetrahedron, or hexahedron. What changes are the reference
+basis, geometry map, Jacobian, quadrature rule, and number of local degrees of
+freedom.
+
+::: {#exr-c6-trace-cell}
+## Trace one triangle through the complete algorithm
+
+Use cell $\mathcal K_1$ with connectivity $I^1=(1,2,3)$ in
+@exm-c6-two-triangle-solution.
+
+1. Write its coordinate array, reference basis, and reference gradients.
+2. Compute $\bm J_1$, $\det\bm J_1$, $\bm J_1^{-T}$, and the physical basis
+   gradients.
+3. Use one-point quadrature to recover $\bK^1$.
+4. List all nine global matrix entries that receive contributions from
+   $\bK^1$.
+5. Identify the boundary facet of $\mathcal K_2$ that produces the right-edge
+   flux vector and list the two global vector entries that receive it.
+6. Starting from the assembled system, reproduce the reduced two-by-two system
+   and solution reported in the example.
+:::
+
+### FEniCSx implementation and mesh refinement {#sec-c6-fenicsx}
+
+The mathematical construction above corresponds closely to the objects used by
+FEniCSx. The software automates reference-cell evaluation, coordinate mapping,
+quadrature, degree-of-freedom maps, local element kernels, and sparse assembly,
+but the objects being manipulated are the same ones developed in this chapter.
+The theory in Chapters 5 and 6 uses one-based numbering. Python arrays and
+FEniCSx degree-of-freedom maps use zero-based indices, so mathematical index
+$i$ is represented by Python index `i - 1` when these objects are stored in
+code. Accordingly, `x[0]` in the example below denotes the first spatial
+coordinate.
+
+| Mathematical object | FEniCSx counterpart |
+|---|---|
+| mesh $\mathcal T_h$ | `dolfinx.mesh.Mesh` |
+| cell type and geometry | mesh topology and geometry |
+| finite element space $\mathcal V_h$ | `fem.functionspace(...)` |
+| trial and test functions | `ufl.TrialFunction`, `ufl.TestFunction` |
+| gradient and inner products | UFL `grad`, `inner` |
+| domain integral | `ufl.dx` |
+| boundary-facet integral | `ufl.ds` |
+| Dirichlet degrees of freedom | `fem.locate_dofs_*` |
+| essential boundary condition | `fem.dirichletbc` |
+| assembled linear problem | `dolfinx.fem.petsc.LinearProblem` |
+
+A manufactured solution gives a direct check of the implementation. On the
+unit square, choose
+
+$$
+u_\star(x,y)=1+x+x(1-x)\sin(\pi y).
+$$
+
+Prescribe $u=g=1+x$ on the vertical sides and the outward normal flux $q$ on
+the horizontal sides. Substitution gives
+
+$$
+f(x,y)=\left[2+\pi^2x(1-x)\right]\sin(\pi y),
+\qquad
+q(x,y)=\pi x(1-x).
+$$ {#eq-c6-fenicsx-manufactured-data}
+
+The same expression for $q$ holds on the top and bottom edges because the
+outward unit normal changes direction between the two edges. The domain and
+boundary partition are shown in @fig-c6-diffusion-domain.
+
+![Mixed boundary conditions for the manufactured diffusion problem.](../figures/chapter06/diffusion_domain_bc.png){#fig-c6-diffusion-domain width="58%" fig-align="center"}
+
+The central part of the FEniCSx implementation is:
+
+```python
+import numpy as np
+import ufl
+from mpi4py import MPI
+from petsc4py import PETSc
+from dolfinx import fem, mesh
+from dolfinx.fem.petsc import LinearProblem
+
+domain = mesh.create_unit_square(
+    MPI.COMM_WORLD, 16, 16, cell_type=mesh.CellType.triangle)
+
+V = fem.functionspace(domain, ("Lagrange", 1))
+
+x = ufl.SpatialCoordinate(domain)
+u_exact = 1 + x[0] + x[0] * (1 - x[0]) * ufl.sin(np.pi * x[1])
+f = (2 + np.pi**2 * x[0] * (1 - x[0])) * ufl.sin(np.pi * x[1])
+q = np.pi * x[0] * (1 - x[0])
+
+fdim = domain.topology.dim - 1
+vertical_facets = mesh.locate_entities_boundary(
+    domain, fdim,
+    lambda X: np.isclose(X[0], 0.0) | np.isclose(X[0], 1.0)
+)
+horizontal_facets = mesh.locate_entities_boundary(
+    domain, fdim,
+    lambda X: np.isclose(X[1], 0.0) | np.isclose(X[1], 1.0)
+)
+facet_tags = mesh.meshtags(
+    domain, fdim, horizontal_facets,
+    np.ones(len(horizontal_facets), dtype=np.int32)
+)
+
+prescribed_dofs = fem.locate_dofs_topological(
+    V, fdim, vertical_facets)
+g = fem.Function(V)
+g.interpolate(lambda X: 1.0 + X[0])
+bc = fem.dirichletbc(g, prescribed_dofs)
+
+u = ufl.TrialFunction(V)
+v = ufl.TestFunction(V)
+ds = ufl.Measure("ds", domain=domain, subdomain_data=facet_tags)
+a = ufl.inner(ufl.grad(u), ufl.grad(v)) * ufl.dx
+L = f * v * ufl.dx - q * v * ds(1)
+
+problem = LinearProblem(
+    a,
+    L,
+    bcs=[bc],
+    petsc_options_prefix="diffusion_",
+    petsc_options={"ksp_type": "preonly", "pc_type": "lu"},
+)
+
+u_h = problem.solve()
+error_form = fem.form((u_h - u_exact) ** 2 * ufl.dx)
+error_local = fem.assemble_scalar(error_form)
+error_L2 = np.sqrt(domain.comm.allreduce(error_local, op=MPI.SUM))
+
+if domain.comm.rank == 0:
+    print(f"L2 error: {error_L2:.6e}")
+```
+
+The boundary-facet term in `L` has a minus sign because $q=\bq\cdot\bn$ and
+$\bq=-\grad u$. The notebook
+[`diffusion_2d_demo.ipynb`](https://github.com/CEADpx/finite-element-methods/blob/main/notebooks/diffusion/diffusion_2d_demo.ipynb)
+contains the complete calculation, including boundary tags, plots, error
+evaluation, and a refinement loop.
+
+The UFL expression
+
+```python
+ufl.inner(ufl.grad(u), ufl.grad(v)) * ufl.dx
+```
+
+represents the same bilinear form as
+
+$$
+\int_\Om
+k\,\grad u_h\cdot\grad v_h\,\dx.
+$$
+
+FEniCSx evaluates this form cell by cell, transforms basis gradients from
+reference to physical coordinates, applies quadrature, and assembles the local
+contributions into a global PETSc matrix. The code does not replace the
+derivation; it implements it.
+
+@fig-c6-diffusion-four-triangles shows the finite element solution and nodal
+error on the coarsest mesh. Refining the mesh from 4 to 16 and then 64
+triangles gives the results in @fig-c6-diffusion-refinement.
+
+![Finite element solution and nodal error on a four-triangle mesh.](../figures/chapter06/diffusion_4_triangles.png){#fig-c6-diffusion-four-triangles width="92%" fig-align="center"}
+
+![Finite element solutions on three successively refined triangular meshes.](../figures/chapter06/diffusion_refinement.png){#fig-c6-diffusion-refinement width="100%" fig-align="center"}
+
+| number of triangles | $h$ | $L^2$ error | observed rate |
+|---:|---:|---:|---:|
+| 4  | 1.118 | $1.291\times10^{-1}$ | -- |
+| 16 | 0.559 | $3.870\times10^{-2}$ | 1.74 |
+| 64 | 0.280 | $1.079\times10^{-2}$ | 1.84 |
+
+The error decreases as the mesh is refined. The rates approach two, which is
+the $L^2$ rate predicted for sufficiently smooth solutions approximated by
+$P_1$ elements. Chapter 7 develops this estimate and its assumptions.
+
+![The $L^2$ error decreases under mesh refinement.](../figures/chapter06/diffusion_l2_convergence.png){#fig-c6-diffusion-l2-convergence width="64%" fig-align="center"}
+
+::: {#exr-c6-fenicsx-correspondence}
+## Verifying the FEniCSx solution
+
+Using the accompanying notebook:
+
+1. Identify the mesh, finite element space, trial function, test function,
+   bilinear form, linear functional, and prescribed boundary condition in the
+   code.
+2. Verify @eq-c6-fenicsx-manufactured-data by differentiating $u_\star$ and
+   evaluating $q=-\grad u_\star\cdot\bn$ on both horizontal edges.
+3. Run the calculation with $(n_x,n_y)=(1,2)$, $(2,4)$, and $(4,8)$ and
+   reproduce the error table above.
+4. Explain which steps of the element loop in @sec-c6-procedure are carried
+   out internally by FEniCSx.
+:::
+
+## Extensions to other cells and polynomial degrees {#sec-c6-extensions}
+
 ### Quadratic triangular elements {#sec-c6-p2-triangle}
 
 Chapter 5 raised the polynomial degree on an interval by adding an interior
@@ -1354,164 +1854,7 @@ you to verify.
    of them are shared by both cells.
 :::
 
-## Multidimensional quadrature and boundary integration {#sec-c6-quadrature}
-
-After transformation to a reference cell, a typical element integral has the
-form
-
-$$
-\int_{\mathcal K_e}
-g(\bx)\,\dx
-=
-\int_{\widehat{\mathcal K}}
-g(F_e(\bm{\xi}))
-|\det\bm J_e(\bm{\xi})|
-\,\dd\bm{\xi}.
-$$ {#eq-c6-reference-integration}
-
-For affine triangles, $\bm J_e$ is constant. For more general isoparametric
-cells, the Jacobian may vary across the cell.
-
-A quadrature rule on the reference triangle approximates
-
-$$
-\int_{\widehat{\mathcal K}}
-g(\xi,\eta)\,\dd\xi\,\dd\eta
-\approx
-\sum_{q=1}^{n_q}
-w_qg(\xi_q,\eta_q).
-$$ {#eq-c6-triangle-quadrature}
-
-For the reference triangle in @eq-c6-reference-triangle, useful low-order rules
-include:
-
-| rule | points | weights | polynomial exactness |
-|---|---|---|---|
-| one point | $(1/3,1/3)$ | $1/2$ | degree 1 |
-| three point | $(1/6,1/6)$, $(2/3,1/6)$, $(1/6,2/3)$ | $1/6$ each | degree 2 |
-
-The weights sum to $1/2$, the area of the reference triangle.
-
-![One-point and three-point quadrature rules on the reference triangle.](../figures/chapter06/triangle_quadrature.svg){#fig-c6-triangle-quadrature width="80%" fig-align="center"}
-
-The transformed scalar-diffusion stiffness entry is
-
-$$
-K_{ab}^e
-=
-\int_{\widehat{\mathcal K}}
-k(F_e(\bm{\xi}))
-\left(
-\bm J_e^{-T}
-\grad_{\bm{\xi}}\widehat\phi_b
-\right)
-\cdot
-\left(
-\bm J_e^{-T}
-\grad_{\bm{\xi}}\widehat\phi_a
-\right)
-|\det\bm J_e|
-\,\dd\bm{\xi}.
-$$ {#eq-c6-reference-stiffness}
-
-For a $P_1$ affine triangle with constant $k$, the physical gradients and the
-Jacobian are constant, so the stiffness integrand is constant. A one-point rule
-is therefore sufficient. More complicated coefficients, higher-order basis
-functions, or nonaffine geometry may require higher-order quadrature.
-
-For example, the element load entry is approximated by
-
-$$
-F_a^e
-\approx
-\sum_{q=1}^{n_q}
-w_q
-f(F_e(\bm\xi_q))
-\widehat\phi_a(\bm\xi_q)
-|\det\bm J_e(\bm\xi_q)|.
-$$ {#eq-c6-triangle-load-quadrature}
-
-For constant $f$ on an affine $P_1$ triangle, the integrand is linear. The
-one-point rule gives
-
-$$
-F_a^e
-=
-\frac12 f\frac13|\det\bm J_e|
-=
-\frac{f|\mathcal K_e|}{3},
-$$
-
-which agrees with @eq-c6-example-triangle-load.
-
-Boundary-facet integrals are transformed separately. In two dimensions a facet
-is a line segment, so the one-dimensional quadrature rules from Chapter 5 can
-be reused on a reference edge. In three dimensions a facet is a two-dimensional
-surface and requires a surface quadrature rule.
-
-The three-dimensional facet transformation is the analogue of the edge
-Jacobian @eq-c6-edge-jacobian. Let a facet $\mathcal F$ of a tetrahedral or
-hexahedral cell be parameterized by a map $\bx(\zeta_1,\zeta_2)$ from a
-reference facet $\widehat{\mathcal F}$, which is the reference triangle for a
-tetrahedral face and the square $[-1,1]^2$ for a hexahedral face. The two
-vectors
-
-$$
-\bm g_1=\frac{\partial\bx}{\partial\zeta_1},
-\qquad
-\bm g_2=\frac{\partial\bx}{\partial\zeta_2}
-$$
-
-are tangent to the facet. The parallelogram they span has area
-$\norm{\bm g_1\times\bm g_2}_2$, so the surface measure transforms as
-
-$$
-\ds
-=
-\norm{\bm g_1\times\bm g_2}_2\,\dd\zeta_1\dd\zeta_2
-$$ {#eq-c6-facet-jacobian}
-
-[@belytschko2000, p. 4-44]. A facet load entry then becomes
-
-$$
-\int_{\mathcal F}h\,\phi_a^e\,\ds
-=
-\int_{\widehat{\mathcal F}}
-h(\bx(\bm\zeta))\,
-\phi_a^e(\bx(\bm\zeta))\,
-\norm{\bm g_1\times\bm g_2}_2
-\,\dd\zeta_1\dd\zeta_2,
-\qquad
-\bm\zeta=(\zeta_1,\zeta_2),
-$$
-
-which is evaluated with a quadrature rule on $\widehat{\mathcal F}$. The unit
-normal is $\bn=\pm(\bm g_1\times\bm g_2)/\norm{\bm g_1\times\bm g_2}_2$, with
-the sign chosen so that $\bn$ points out of the cell. For a planar triangular
-face with vertices $\bx_i$, $\bx_j$, and $\bx_k$, the affine parameterization
-$\bx=\bx_i+\zeta_1(\bx_j-\bx_i)+\zeta_2(\bx_k-\bx_i)$ gives constant tangent
-vectors, and $\norm{\bm g_1\times\bm g_2}_2=2|\mathcal F|$. For a face of a
-distorted hexahedron, the tangent vectors vary over the face and the facet
-Jacobian must be evaluated at every facet quadrature point.
-
-::: {#exr-c6-triangle-quadrature}
-## Triangle quadrature
-
-1. Verify that the one-point rule integrates the three reference basis
-   functions exactly.
-2. Verify that the three-point rule integrates
-   $\xi^2$, $\xi\eta$, and $\eta^2$ exactly.
-3. Explain why the one-point rule is sufficient for the stiffness matrix of a
-   $P_1$ affine triangle with constant diffusivity.
-4. Determine whether the one-point rule exactly evaluates the load vector when
-   $f(x,y)=x+y$ and the geometry map is affine.
-5. For the $P_2$ triangle of @sec-c6-p2-triangle on an affine cell with
-   constant diffusivity, determine the polynomial degree of the stiffness
-   integrand in @eq-c6-reference-stiffness and decide whether the one-point or
-   the three-point rule integrates it exactly.
-:::
-
-## Quadrilateral cells {#sec-c6-quadrilateral}
+### Quadrilateral cells {#sec-c6-quadrilateral}
 
 An affine map sends the reference triangle to any physical triangle. A general
 four-sided cell requires a different construction because an affine map can
@@ -1556,7 +1899,7 @@ $$ {#eq-c6-q1-basis}
 They satisfy the nodal interpolation property and sum to one. Each restriction
 to a reference edge is a one-dimensional linear function.
 
-### Isoparametric geometry and field interpolation
+#### Isoparametric geometry and field interpolation
 
 The geometry map is defined by
 
@@ -1676,7 +2019,7 @@ A tensor-product Gauss rule is natural on the reference square. A $2\times2$
 rule uses the four combinations
 
 $$
-(\xi_q,\eta_q)
+(\xi_r,\eta_r)
 \in
 \left\{-\frac1{\sqrt3},\frac1{\sqrt3}\right\}
 \times
@@ -1726,7 +2069,7 @@ define is not convex: its interior angle at $\bx_3$ exceeds $180^\circ$.
    invalid even though the four points form a square.
 :::
 
-## Tetrahedral cells {#sec-c6-tetrahedron}
+### Tetrahedral cells {#sec-c6-tetrahedron}
 
 The three-dimensional analogue of a triangle is a tetrahedron. The reference
 tetrahedron is
@@ -1805,12 +2148,12 @@ $$
 The centroid rule evaluates the integrand at
 
 $$
-\bm\xi_q
+\bm\xi_1
 =
 \begin{bmatrix}1/4&1/4&1/4\end{bmatrix}^T
 $$
 
-with weight $w_q=1/6$. It integrates every polynomial of total degree at most
+with weight $w_1=1/6$. It integrates every polynomial of total degree at most
 one exactly on the reference tetrahedron.
 
 ::: {#exr-c6-tetra-basis}
@@ -1840,12 +2183,13 @@ with vertices $(2,0,0)$, $(0,1,0)$, and $(0,0,3)$.
 2. Use @eq-c6-facet-jacobian to compute the area of $\mathcal F$.
 3. Determine the outward unit normal and verify that it points away from the
    fourth vertex $(0,0,0)$.
-4. For a constant normal flux $h_0$ on this face, compute the three facet load
-   entries associated with the $P_1$ basis functions of the face vertices, and
-   verify that they sum to $h_0|\mathcal F|$.
+4. For a constant outward normal flux $q_0$ on this face, compute the three
+   facet load entries associated with the $P_1$ basis functions of the face
+   vertices, and verify that they sum to $-q_0|\mathcal F|$. Separately
+   verify that the outward flux integral is $q_0|\mathcal F|$.
 :::
 
-## Hexahedral cells {#sec-c6-hexahedron}
+### Hexahedral cells {#sec-c6-hexahedron}
 
 A hexahedron is the three-dimensional tensor-product analogue of a
 quadrilateral. On the reference cube $[-1,1]^3$, associate each vertex with a
@@ -1909,6 +2253,53 @@ to triangles, quadrilaterals, tetrahedra, and hexahedra.
 4. Explain why the Jacobian is constant for an affine parallelepiped, including
    a rectangular box, but may vary for a general distorted hexahedron.
 :::
+
+### Boundary-face integration in three dimensions {#sec-c6-facet-integration-3d}
+
+The three-dimensional facet transformation is the analogue of the edge
+Jacobian @eq-c6-edge-jacobian. Let a facet $\mathcal F$ of a tetrahedral or
+hexahedral cell be parameterized by a map $\bx(\zeta_1,\zeta_2)$ from a
+reference facet $\widehat{\mathcal F}$, which is the reference triangle for a
+tetrahedral face and the square $[-1,1]^2$ for a hexahedral face. The two
+vectors
+
+$$
+\bm g_1=\frac{\partial\bx}{\partial\zeta_1},
+\qquad
+\bm g_2=\frac{\partial\bx}{\partial\zeta_2}
+$$
+
+are tangent to the facet. The parallelogram they span has area
+$\norm{\bm g_1\times\bm g_2}_2$, so the surface measure transforms as
+
+$$
+\ds
+=
+\norm{\bm g_1\times\bm g_2}_2\,\dd\zeta_1\dd\zeta_2
+$$ {#eq-c6-facet-jacobian}
+
+[@belytschko2000, p. 4-44]. A facet load entry then becomes
+
+$$
+-\int_{\mathcal F}q\,\phi_a^e\,\ds
+=
+-\int_{\widehat{\mathcal F}}
+q(\bx(\bm\zeta))\,
+\phi_a^e(\bx(\bm\zeta))\,
+\norm{\bm g_1\times\bm g_2}_2
+\,\dd\zeta_1\dd\zeta_2,
+\qquad
+\bm\zeta=(\zeta_1,\zeta_2),
+$$
+
+which is evaluated with a quadrature rule on $\widehat{\mathcal F}$. The unit
+normal is $\bn=\pm(\bm g_1\times\bm g_2)/\norm{\bm g_1\times\bm g_2}_2$, with
+the sign chosen so that $\bn$ points out of the cell. For a planar triangular
+face with vertices $\bx_i$, $\bx_j$, and $\bx_k$, the affine parameterization
+$\bx=\bx_i+\zeta_1(\bx_j-\bx_i)+\zeta_2(\bx_k-\bx_i)$ gives constant tangent
+vectors, and $\norm{\bm g_1\times\bm g_2}_2=2|\mathcal F|$. For a face of a
+distorted hexahedron, the tangent vectors vary over the face and the facet
+Jacobian must be evaluated at every facet quadrature point.
 
 ## Vector-valued approximation and linear elasticity {#sec-c6-elasticity}
 
@@ -2239,323 +2630,6 @@ Assume two displacement components per vertex.
    degree-of-freedom map.
 :::
 
-## Assembly and essential boundary conditions {#sec-c6-assembly}
-
-For scalar $P_1$ diffusion, each triangular cell has three local degrees of
-freedom. For two-dimensional displacement elasticity, the same triangle has
-six. The local-to-global assembly rule itself is unchanged.
-
-If local scalar indices $a,b$ correspond to global indices
-$I^e(a),I^e(b)$,
-
-$$
-K_{I^e(a),I^e(b)}
-\mathrel{+}=
-K_{ab}^e,
-\qquad
-F_{I^e(a)}
-\mathrel{+}=
-F_a^e.
-$$ {#eq-c6-scalar-assembly}
-
-![Scatter-add assembly of a three-by-three element matrix into the rows and columns selected by its connectivity.](../figures/chapter06/assembly_scatter.svg){#fig-c6-assembly-scatter width="95%" fig-align="center"}
-
-The gather form of the same rule also carries over unchanged. Let
-$\mathcal E(i)$ now denote the set of cells incident on global vertex $i$, and
-let $J^e(i)$ be the local number of that vertex in cell $e$. The argument that
-led to @eq-c5-assembled-stiffness-entry gives
-
-$$
-K_{ij}
-=
-\sum_{e\in\mathcal E(i)\cap\mathcal E(j)}
-K_{J^e(i),J^e(j)}^e,
-\qquad
-F_i
-=
-\sum_{e\in\mathcal E(i)}F_{J^e(i)}^e
-$$ {#eq-c6-gather-assembly}
-
-for the cell contributions, with boundary-facet contributions added to $F_i$
-in the same way. The formulas are identical to those of Chapter 5; what
-changes is the size of the incident sets. In one dimension $\mathcal E(i)$
-contains at most two elements, whereas around an interior vertex of a
-triangular mesh it contains every triangle of the surrounding patch.
-
-For the two-triangle mesh of @exm-c6-two-triangle-solution, vertex 2 is local
-vertex 2 of $\mathcal K_1$ and local vertex 1 of $\mathcal K_2$, and vertex 3
-is local vertex 3 of both cells. Hence
-
-$$
-K_{22}=K_{22}^1+K_{11}^2=\tfrac12+\tfrac12=1,
-\qquad
-K_{23}=K_{23}^1+K_{13}^2=0+0=0,
-$$
-
-in agreement with @eq-c6-two-triangle-global-matrix. The second entry is zero
-even though vertices 2 and 3 share an edge. On each of these right triangles
-the gradients of the two corresponding basis functions are orthogonal. Mesh
-adjacency determines which entries can be nonzero, but an individual entry
-within that pattern may still vanish because of the cell geometry.
-
-For vector-valued elements, the element degree-of-freedom map replaces the
-vertex map in this rule. A vertex shared by several cells contributes the same
-global displacement components to each incident cell.
-
-The global stiffness matrix remains sparse because a basis function interacts
-only with basis functions supported on cells that overlap its support. In two
-and three dimensions, the sparsity pattern is no longer a simple narrow band
-under arbitrary numbering, but it still reflects mesh adjacency.
-
-Essential boundary conditions are imposed on global degrees of freedom
-associated with the prescribed boundary. The same partitioning from Chapter 5
-applies:
-
-$$
-\bK_{ff}\bU_f
-=
-\bF_f-\bK_{fp}\bU_p.
-$$ {#eq-c6-reduced-system}
-
-The geometric task is more involved because a boundary condition is usually
-specified on a boundary portion rather than at a single endpoint. The mesh
-must therefore identify the boundary facets belonging to $\Gam_D$ or
-$\Gam_u$, and the finite element software must identify the degrees of freedom
-attached to those facets.
-
-Natural boundary conditions require the same boundary-facet identification,
-but their contribution is assembled into the load vector through facet
-integrals rather than through prescribed coefficient values.
-
-After the solve, the prescribed values are inserted into $\bU$ and the
-residual vector $\bR=\bK\bU-\bF$ is formed exactly as in
-@eq-c5-residual-vector. Its free entries vanish up to rounding error, and its
-prescribed entries are the discrete reactions. For elasticity they are the
-nodal support forces. For scalar diffusion, the entry associated with a
-prescribed nodal degree of freedom $i$ is
-$R_i=a(u_h,\phi_i)-\ell(\phi_i)$. If $u_h$ is replaced by a sufficiently smooth
-exact solution, integration by parts shows that this quantity equals
-$\int_{\Gam_D}(k\grad u\cdot\bn)\,\phi_i\,\ds$. The reactions are discrete
-counterparts of these weighted boundary fluxes; they need not equal direct
-boundary integrals of the computed gradient. Their sum is also a useful check.
-The nodal basis functions sum to one, the free equations give
-$a(u_h,\phi_i)=\ell(\phi_i)$ for every free nodal degree of freedom, and
-$a(u_h,1)=0$. Together these facts give
-
-$$
-\sum_{i\text{ prescribed}}R_i
-=
--\ell(1)
-=
--\left(\int_\Om f\,\dx+\int_{\Gam_N}h\,\ds\right).
-$$
-
-The discrete reactions therefore balance the source and the prescribed
-boundary flux exactly. This is the multidimensional counterpart of the
-equilibrium check in @exm-c5-complete-bar.
-
-## Connection to FEniCSx {#sec-c6-fenicsx}
-
-The mathematical construction above corresponds closely to the objects used by
-FEniCSx. The software automates reference-cell evaluation, coordinate mapping,
-quadrature, degree-of-freedom maps, local element kernels, and sparse assembly,
-but the objects being manipulated are the same ones developed in this chapter.
-The theory in Chapters 5 and 6 uses one-based numbering. Python arrays and
-FEniCSx degree-of-freedom maps use zero-based indices, so mathematical index
-$i$ is represented by Python index `i - 1` when these objects are stored in
-code. Accordingly, `x[0]` in the example below denotes the first spatial
-coordinate.
-
-| Mathematical object | FEniCSx counterpart |
-|---|---|
-| mesh $\mathcal T_h$ | `dolfinx.mesh.Mesh` |
-| cell type and geometry | mesh topology and geometry |
-| finite element space $\mathcal V_h$ | `fem.functionspace(...)` |
-| trial and test functions | `ufl.TrialFunction`, `ufl.TestFunction` |
-| gradient and inner products | UFL `grad`, `inner` |
-| domain integral | `ufl.dx` |
-| boundary-facet integral | `ufl.ds` |
-| Dirichlet degrees of freedom | `fem.locate_dofs_*` |
-| essential boundary condition | `fem.dirichletbc` |
-| assembled linear problem | `dolfinx.fem.petsc.LinearProblem` |
-
-A minimal scalar-diffusion example on a triangular mesh is:
-
-```python
-import numpy as np
-import ufl
-from mpi4py import MPI
-from petsc4py import PETSc
-from dolfinx import fem, mesh
-from dolfinx.fem.petsc import LinearProblem
-
-domain = mesh.create_unit_square(
-    MPI.COMM_WORLD, 16, 16, cell_type=mesh.CellType.triangle
-)
-
-V = fem.functionspace(domain, ("Lagrange", 1))
-
-u = ufl.TrialFunction(V)
-v = ufl.TestFunction(V)
-
-k = fem.Constant(domain, PETSc.ScalarType(1.0))
-f = fem.Constant(domain, PETSc.ScalarType(1.0))
-
-a = k * ufl.inner(ufl.grad(u), ufl.grad(v)) * ufl.dx
-L = f * v * ufl.dx
-
-fdim = domain.topology.dim - 1
-left_facets = mesh.locate_entities_boundary(
-    domain, fdim, lambda x: np.isclose(x[0], 0.0)
-)
-left_dofs = fem.locate_dofs_topological(V, fdim, left_facets)
-
-bc = fem.dirichletbc(PETSc.ScalarType(0.0), left_dofs, V)
-
-problem = LinearProblem(
-    a,
-    L,
-    bcs=[bc],
-    petsc_options_prefix="diffusion_",
-    petsc_options={"ksp_type": "preonly", "pc_type": "lu"},
-)
-
-u_h = problem.solve()
-
-# The exact solution is u(x, y) = x - x^2/2.
-x = ufl.SpatialCoordinate(domain)
-u_exact = x[0] - 0.5 * x[0] ** 2
-error_form = fem.form((u_h - u_exact) ** 2 * ufl.dx)
-error_local = fem.assemble_scalar(error_form)
-error_L2 = np.sqrt(domain.comm.allreduce(error_local, op=MPI.SUM))
-
-if domain.comm.rank == 0:
-    print(f"L2 error: {error_L2:.6e}")
-```
-
-The exact solution satisfies
-
-$$
--\Delta u=1,
-\qquad
-u=0\text{ on }x=0,
-\qquad
-\grad u\cdot\bn=0
-\text{ on the remaining boundary}.
-$$
-
-The code therefore checks the computed field against the boundary-value
-problem it solves rather than reporting a solution with no verification.
-
-The UFL expression
-
-```python
-k * ufl.inner(ufl.grad(u), ufl.grad(v)) * ufl.dx
-```
-
-represents the same bilinear form as
-
-$$
-\int_\Om
-k\,\grad u_h\cdot\grad v_h\,\dx.
-$$
-
-FEniCSx evaluates this form cell by cell, transforms basis gradients from
-reference to physical coordinates, applies quadrature, and assembles the local
-contributions into a global PETSc matrix. The code does not replace the
-derivation; it implements it.
-
-Boundary integrals are introduced by adding terms with `ufl.ds`. Vector-valued
-elasticity uses a vector function space and the strain operator
-$\operatorname{sym}\grad\bu$ from Chapter 4. The same mesh, mapping, quadrature,
-and assembly concepts remain in place.
-
-::: {#exr-c6-fenicsx-correspondence}
-## Verifying the FEniCSx solution
-
-For the code above:
-
-1. Identify the mesh, finite element space, trial function, test function,
-   bilinear form, linear functional, and prescribed boundary condition in the
-   code.
-2. Run the calculation with $8\times8$, $16\times16$, and $32\times32$
-   subdivisions and record the $L^2$ error.
-3. Confirm that the error decreases as the mesh is refined.
-4. Change the finite element degree from one to two, which selects the $P_2$
-   triangle of @sec-c6-p2-triangle, repeat the calculation,
-   and compare the errors on the same meshes. Before running the code, predict
-   the result: $u=x-x^2/2$ belongs to the quadratic finite element space on
-   this affine triangular mesh. Relate the observed error to the exact
-   representation in @exm-c5-quadratic-exact.
-5. Explain which steps of the element loop in @sec-c6-procedure are carried
-   out internally by FEniCSx.
-:::
-
-## A complete multidimensional finite element procedure {#sec-c6-procedure}
-
-The multidimensional finite element method can now be organized as the same
-local-to-global procedure used in one dimension, with additional geometric
-transformations.
-
-```text
-read the mesh coordinates, cell connectivity, and boundary tags
-choose the finite element and quadrature rules
-initialize the global matrix K and vector F
-
-for each cell e:
-    read the cell coordinates and global degree-of-freedom map
-    initialize the element matrix K^e and domain-load vector F^e
-
-    for each cell quadrature point q:
-        evaluate reference basis functions and reference gradients
-        map the quadrature point to the physical cell
-        evaluate J_e, det(J_e), and J_e^{-T}
-        transform the basis gradients to physical coordinates
-        evaluate coefficients and source or body-force data
-        add the quadrature contribution to K^e and F^e
-
-    scatter-add K^e and F^e into K and F
-
-for each boundary facet carrying natural data:
-    read the facet degree-of-freedom map and geometry
-    initialize the facet load vector F^facet
-
-    for each facet quadrature point:
-        evaluate the restricted basis functions and facet Jacobian
-        evaluate the prescribed flux or traction
-        add the quadrature contribution to F^facet
-
-    scatter-add F^facet into F
-
-identify prescribed and free degrees of freedom
-solve K_ff U_f = F_f - K_fp U_p
-insert prescribed values into the global coefficient vector
-postprocess flux, strain, stress, and reactions as required
-```
-
-The outer algorithm is largely independent of whether the cell is a triangle,
-quadrilateral, tetrahedron, or hexahedron. What changes are the reference
-basis, geometry map, Jacobian, quadrature rule, and number of local degrees of
-freedom.
-
-::: {#exr-c6-trace-cell}
-## Trace one triangle through the complete algorithm
-
-Use cell $\mathcal K_1$ with connectivity $I^1=(1,2,3)$ in
-@exm-c6-two-triangle-solution.
-
-1. Write its coordinate array, reference basis, and reference gradients.
-2. Compute $\bm J_1$, $\det\bm J_1$, $\bm J_1^{-T}$, and the physical basis
-   gradients.
-3. Use one-point quadrature to recover $\bK^1$.
-4. List all nine global matrix entries that receive contributions from
-   $\bK^1$.
-5. Identify the boundary facet of $\mathcal K_2$ that produces the right-edge
-   flux vector and list the two global vector entries that receive it.
-6. Starting from the assembled system, reproduce the reduced two-by-two system
-   and solution reported in the example.
-:::
-
 ## Chapter summary {#sec-c6-summary}
 
 The finite element method in multiple dimensions uses the same Galerkin and
@@ -2567,8 +2641,10 @@ shared.
 For a $P_1$ triangle, the local scalar basis consists of three linear
 polynomials satisfying the nodal interpolation property. The gradients are
 constant on the physical cell, and neighboring triangles join continuously
-because they share the same nodal values along their common facet. Restricting
-the scalar-diffusion variational problem to the resulting global space produces
+because they share the same nodal values along their common facet. Each global
+basis function is supported only on the patch of cells incident to its node;
+this local support produces the sparse matrix pattern. Restricting the
+scalar-diffusion variational problem to the resulting global space produces
 element stiffness matrices, domain load vectors, and boundary-facet load
 vectors.
 

@@ -170,29 +170,28 @@ exactly one of the following conditions:
 $$
 \begin{aligned}
 T&=\overline T &&\text{on }\Gam_T,\\
-\bq\cdot\bn&=\overline q_n &&\text{on }\Gam_q,\\
+\bq\cdot\bn&=q &&\text{on }\Gam_q,\\
 \bq\cdot\bn&=h_c(T-T_\infty) &&\text{on }\Gam_R.
 \end{aligned}
 $$ {#eq-model-heat-boundary-conditions}
 
 Here $\overline T$ and $T_\infty$ are measured in kelvin,
-$\overline q_n$ is a prescribed **outward** heat flux in
+$q$ is the prescribed **outward** normal heat flux in
 $\mathrm{W}/\mathrm{m}^2$, and $h_c\geq0$ is a heat-transfer coefficient in
 $\mathrm{W}/(\mathrm{m}^2\,\mathrm{K})$. Thus
-$\overline q_n>0$ means that heat leaves the body. An insulated boundary is
-the special case $\overline q_n=0$. The condition on $\Gam_R$ is a convection,
+$q>0$ means that heat leaves the body. An insulated boundary is
+the special case $q=0$. The condition on $\Gam_R$ is a convection,
 or Robin, condition.
 
 Because $\bq=-k\grad T$, the prescribed-flux condition is
 
 $$
--k\grad T\cdot\bn=\overline q_n
+-k\grad T\cdot\bn=q
 \qquad\text{on }\Gam_q.
 $$ {#eq-model-heat-flux-gradient}
 
-This sign differs from the generic datum $h$ in Chapter 3, where
-$k\grad u\cdot\bn=h$. The two conventions are related by
-$h=-\overline q_n$.
+This is the normal-flux convention used throughout the book:
+$q=\bq\cdot\bn$ is positive when heat leaves the domain.
 
 A transient problem also requires
 
@@ -221,7 +220,7 @@ $$
 \begin{aligned}
 -\divg(k\grad T)&=r &&\text{in }\Om,\\
 T&=\overline T &&\text{on }\Gam_T,\\
--k\grad T\cdot\bn&=\overline q_n &&\text{on }\Gam_q,\\
+-k\grad T\cdot\bn&=q &&\text{on }\Gam_q,\\
 -k\grad T\cdot\bn&=h_c(T-T_\infty) &&\text{on }\Gam_R.
 \end{aligned}
 \right\}
@@ -230,7 +229,7 @@ $$ {#eq-model-steady-heat-strong}
 
 Assume $k\in L^\infty(\Om)$ with
 $0<k_0\leq k\leq k_1$ almost everywhere, $r\in L^2(\Om)$,
-$\overline q_n\in L^2(\Gam_q)$,
+$q\in L^2(\Gam_q)$,
 $h_c\in L^\infty(\Gam_R)$ with $h_c\geq0$, and
 $T_\infty\in L^2(\Gam_R)$. Assume also that $\overline T$ is the boundary
 value of a function in $H^1(\Om)$. Define
@@ -255,7 +254,7 @@ $$
 +\int_{\Gam_R}h_cTv\,\ds\\
 &\qquad
 =\int_{\Om}rv\,\dx
--\int_{\Gam_q}\overline q_n v\,\ds
+-\int_{\Gam_q}q v\,\ds
 +\int_{\Gam_R}h_cT_\infty v\,\ds
 \quad\forall v\in\mathcal V_0.
 \end{aligned}
@@ -263,7 +262,7 @@ $$
 \qquad\text{Variational form}
 $$ {#eq-model-steady-heat-weak}
 
-The negative sign multiplying $\overline q_n$ follows from defining it as an
+The negative sign multiplying $q$ follows from defining it as an
 outward flux. It also agrees with the global steady energy balance: internal
 heat generation must equal the net outward heat flow.
 
@@ -278,7 +277,7 @@ a_T(S,v)
 +\int_{\Gam_R}h_cSv\,\ds,\\
 \ell_T(v)
 &=\int_{\Om}rv\,\dx
--\int_{\Gam_q}\overline q_n v\,\ds
+-\int_{\Gam_q}q v\,\ds
 +\int_{\Gam_R}h_cT_\infty v\,\ds.
 \end{aligned}
 $$ {#eq-model-steady-heat-forms}
@@ -297,7 +296,7 @@ constant $C$. A solution can exist only if the total heat supplied is
 consistent with the prescribed outward flux:
 
 $$
-\int_{\Om}r\,\dx=\int_{\partial\Om}\overline q_n\,\ds.
+\int_{\Om}r\,\dx=\int_{\partial\Om}q\,\ds.
 $$
 
 The temperature becomes unique after fixing a reference value, such as its
@@ -311,25 +310,25 @@ boundary.
 ::: {#exm-model-one-dimensional-heat}
 ## Heat flux through a wall
 Let $\Om=(0,L)$, let $k$ be constant, and assume $r=0$. Prescribe
-$T(0)=T_0$ and a constant outward flux $\overline q_n$ at $x=L$. The strong
+$T(0)=T_0$ and a constant outward flux $q$ at $x=L$. The strong
 problem is
 
 $$
 -(kT')'=0,\qquad
 T(0)=T_0,\qquad
--kT'(L)=\overline q_n.
+-kT'(L)=q.
 $$
 
 Because $k$ is constant, the differential equation gives $T''=0$. Therefore
 $T(x)=A+Bx$. The condition at $x=0$ gives $A=T_0$, and the flux condition at
-$x=L$ gives $B=-\overline q_n/k$. The resulting classical solution is
+$x=L$ gives $B=-q/k$. The resulting classical solution is
 
 $$
-T(x)=T_0-\frac{\overline q_n}{k}x.
+T(x)=T_0-\frac{q}{k}x.
 $$
 
 Direct substitution shows that this function satisfies the differential
-equation and both boundary conditions. When $\overline q_n>0$, heat leaves
+equation and both boundary conditions. When $q>0$, heat leaves
 through $x=L$ and temperature decreases in the positive $x$ direction.
 :::
 
@@ -356,7 +355,7 @@ $$
 ={}&\frac12\int_{\Om}k|\grad S|^2\,\dx
 +\frac12\int_{\Gam_R}h_cS^2\,\ds
 -\int_{\Om}rS\,\dx\\
-&+\int_{\Gam_q}\overline q_nS\,\ds
+&+\int_{\Gam_q}qS\,\ds
 -\int_{\Gam_R}h_cT_\infty S\,\ds.
 \end{aligned}
 $$ {#eq-model-thermal-potential}

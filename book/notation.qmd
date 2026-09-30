@@ -119,11 +119,21 @@ $$
 
 The book uses *cell* for a geometric member of a mesh. 
 
+The unadorned symbol $h$ is reserved for the mesh-size parameter. For a
+diffusion or heat-conduction problem, $\bq$ denotes the flux vector and
+
+$$
+q=\bq\cdot\bn
+$$
+
+denotes its outward normal component on the boundary. Thus $q>0$ represents
+flux leaving the domain.
+
 ## Recurring physical fields
 
 | Symbol | Meaning | Symbol | Meaning |
 |---|---|---|---|
-| $T$ | Temperature | $\bq$ | Heat-flux vector |
+| $T$ | Temperature | $\bq$ | Flux vector |
 | $\bu$ | Displacement vector | $\beps$ | Infinitesimal strain tensor |
 | $\bsig$ | Cauchy stress tensor | $\bF$ | Deformation gradient |
 | $\bC=\bF^T\bF$ | Right Cauchy--Green tensor | $\bP$ | First Piola--Kirchhoff stress tensor |

@@ -173,7 +173,7 @@ def make_boundary_partition() -> None:
     ax.text(
         0.49,
         0.90,
-        r"$k\nabla u\cdot\mathbf{n}=h$ on $\Gamma_N$",
+        r"$\mathbf{q}\cdot\mathbf{n}=q$ on $\Gamma_N$",
         fontsize=15,
         color="#b65e18",
         **text_style,

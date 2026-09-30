@@ -1,0 +1,26 @@
+---
+title: "Assignment 4: Finite Element Computation in One and Two Dimensions"
+subtitle: "ME/BME 736 — Advanced Finite Element Methods"
+author: "Prashant K. Jha"
+date: "29 September, 2026"
+---
+
+## Submission
+
+Each problem has its own notebook in
+[`assignments/assignment-04/notebooks/`](https://github.com/CEADpx/finite-element-methods/tree/main/assignments/assignment-04/notebooks),
+which gives the detailed tasks. Set up the environment by following
+[`environment/README.md`](https://github.com/CEADpx/finite-element-methods/blob/main/environment/README.md)
+and use the kernel **Python (Finite Elements)**. Submit the two completed
+notebooks, renamed `lastname_assignment04_1d.ipynb` and
+`lastname_assignment04_2d.ipynb`. Each must run without an error after
+**Restart Kernel and Run All Cells**. No separate report is needed.
+
+# A linear finite element code for a one-dimensional bar {.problem marks="60"}
+
+Notebook: `problem1.ipynb`. Reading: Chapter 5.
+
+# Mixed-boundary diffusion with FEniCSx {.problem marks="40"}
+
+Notebook: `problem2.ipynb`. Reading: Chapter 6 and the lecture
+notebook `notebooks/diffusion/diffusion_2d_demo.ipynb`.

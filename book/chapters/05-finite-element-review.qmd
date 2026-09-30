@@ -2008,7 +2008,7 @@ Gauss--Legendre quadrature provides such a rule. It approximates
 $$
 \int_{-1}^{1}g(\xi)\,\dd\xi
 \approx
-\sum_{q=1}^{n_q}w_qg(\xi_q).
+\sum_{r=1}^{n_q}w_r g(\xi_r).
 $$ {#eq-c5-gauss-rule}
 
 The first three rules are
@@ -2024,12 +2024,12 @@ Thus
 $$
 K_{ab}^e
 \approx
-\sum_{q=1}^{n_q}
-w_q
-\frac{\dd\widehat\phi_b}{\dd\xi}(\xi_q)
-A(x_q)E(x_q)
-\frac{\dd\widehat\phi_a}{\dd\xi}(\xi_q)
-\frac{1}{J_e(\xi_q)},
+\sum_{r=1}^{n_q}
+w_r
+\frac{\dd\widehat\phi_b}{\dd\xi}(\xi_r)
+A(x_r)E(x_r)
+\frac{\dd\widehat\phi_a}{\dd\xi}(\xi_r)
+\frac{1}{J_e(\xi_r)},
 $$
 
 and
@@ -2037,13 +2037,13 @@ and
 $$
 F_a^e
 \approx
-\sum_{q=1}^{n_q}
-w_q
-\widehat\phi_a(\xi_q)
-f(x_q)
-J_e(\xi_q),
+\sum_{r=1}^{n_q}
+w_r
+\widehat\phi_a(\xi_r)
+f(x_r)
+J_e(\xi_r),
 \qquad
-x_q=F_e(\xi_q).
+x_r=F_e(\xi_r).
 $$ {#eq-c5-quadrature-entries}
 
 For affine geometry and constant $AE$, the linear-element stiffness integrand
