@@ -22,5 +22,7 @@ Notebook: `problem1.ipynb`. Reading: Chapter 5.
 
 # Mixed-boundary diffusion with FEniCSx {.problem marks="40"}
 
-Notebook: `problem2.ipynb`. Reading: Chapter 6 and the lecture
+Notebook: `problem2.ipynb`. 
+
+Reading: Chapter 6 and the lecture
 notebook `notebooks/diffusion/diffusion_2d_demo.ipynb`.
