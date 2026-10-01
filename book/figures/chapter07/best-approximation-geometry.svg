@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="390" viewBox="0 0 760 390">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#4f5963"/>
+    </marker>
+  </defs>
+  <rect width="760" height="390" fill="white"/>
+  <line x1="85" y1="315" x2="680" y2="145" stroke="#2f638f" stroke-width="5"/>
+  <text x="645" y="125" font-family="DejaVu Sans" font-size="27" font-style="italic" fill="#2f638f">V<tspan baseline-shift="sub" font-size="18">h</tspan></text>
+
+  <circle cx="388" cy="72" r="8" fill="#c65b2a"/>
+  <text x="405" y="66" font-family="DejaVu Sans" font-size="27" font-style="italic" fill="#733417">u</text>
+
+  <circle cx="449" cy="211" r="8" fill="#2f638f"/>
+  <text x="462" y="237" font-family="DejaVu Sans" font-size="25" font-style="italic" fill="#244a6b">u<tspan baseline-shift="sub" font-size="17">h</tspan></text>
+
+  <circle cx="260" cy="265" r="8" fill="#3b9665"/>
+  <text x="220" y="296" font-family="DejaVu Sans" font-size="25" font-style="italic" fill="#286746">v<tspan baseline-shift="sub" font-size="17">h</tspan></text>
+
+  <line x1="388" y1="81" x2="445" y2="202" stroke="#c65b2a" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#arrow)"/>
+  <line x1="380" y1="78" x2="267" y2="257" stroke="#3b9665" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#arrow)"/>
+
+  <polyline points="431,207 423,188 442,180" fill="none" stroke="#4f5963" stroke-width="2.5"/>
+  <text x="477" y="135" font-family="DejaVu Sans" font-size="23" fill="#733417">||u − u<tspan baseline-shift="sub" font-size="16">h</tspan>||<tspan baseline-shift="sub" font-size="16">a</tspan></text>
+  <text x="267" y="145" font-family="DejaVu Sans" font-size="23" fill="#286746">||u − v<tspan baseline-shift="sub" font-size="16">h</tspan>||<tspan baseline-shift="sub" font-size="16">a</tspan></text>
+</svg>

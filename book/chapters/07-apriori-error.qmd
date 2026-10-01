@@ -36,7 +36,7 @@ duality argument then gives the higher $L^2$ rate, and numerical experiments
 test the predictions. Scalar diffusion is the principal model throughout. The
 last section interprets the results for linear elasticity.
 
-## The discrete problem and measures of error {#sec-c7-setting}
+## The discrete problem and measures of error {#sec-c7-problem-setting}
 
 We use the scalar diffusion problem of @def-weak-diffusion-problem with
 homogeneous essential data. Let $\Om\subset\R^d$, $d\in\{1,2,3\}$, be a
@@ -59,10 +59,7 @@ a(u,v)=\ell(v)
 $$ {#eq-c7-continuous-problem}
 
 with $a$ and $\ell$ given by @eq-variational-forms. Here $q=\bq\cdot\bn$ is
-the prescribed outward normal flux, while $h$ denotes the mesh size. Chapter 3 verified that
-$a$ is continuous with constant $M=k_1$ and coercive with constant
-$\alpha=k_0/(1+C_P^2)$ in the $H^1(\Om)$ norm; see
-@eq-variational-continuity and @eq-variational-coercivity.
+the prescribed outward normal flux, while $h$ denotes the mesh size.
 
 For the discrete problem we make the following assumptions, which are those of
 Chapter 6.
@@ -97,12 +94,48 @@ are negligible compared with the errors being measured.
 
 ### Existence and stability of the discrete solution
 
+The two estimates used throughout this chapter are continuity,
+
+$$
+|a(w,v)|
+\leq
+M\norm{w}_{H^1(\Om)}\norm{v}_{H^1(\Om)}
+\qquad\forall w,v\in\Vzero,
+$$ {#eq-c7-continuity}
+
+and coercivity,
+
+$$
+a(v,v)
+\geq
+\alpha\norm{v}_{H^1(\Om)}^2
+\qquad\forall v\in\Vzero.
+$$ {#eq-c7-coercivity}
+
+For the diffusion form, Chapter 3 established these estimates in
+@eq-variational-continuity and @eq-variational-coercivity with
+
+$$
+M=k_1,
+\qquad
+\alpha=\frac{k_0}{1+C_P^2},
+\qquad
+\frac{M}{\alpha}
+=
+\frac{k_1}{k_0}(1+C_P^2).
+$$ {#eq-c7-diffusion-constants}
+
+The ratio $M/\alpha$ will appear in the $H^1$ error estimate. It depends on
+the coefficient contrast $k_1/k_0$ and the Poincare constant of the domain,
+but not on the mesh size or polynomial degree.
+
 Before estimating the error, we check that @eq-c7-discrete-problem has
 exactly one solution. The space $\Vhzero$ is a finite-dimensional subspace of
 $\Vzero$. A finite-dimensional subspace of a normed space is closed, so
 $\Vhzero$ is itself a Hilbert space with the $H^1(\Om)$ norm. The continuity
-and coercivity inequalities hold for all functions in $\Vzero$, and hence for
-all functions in $\Vhzero$, with the same constants $M$ and $\alpha$. The
+and coercivity inequalities @eq-c7-continuity and @eq-c7-coercivity hold for
+all functions in $\Vzero$, and hence for all functions in $\Vhzero$, with the
+same constants $M$ and $\alpha$. The
 Lax--Milgram theorem @thm-lax-milgram therefore gives a unique $u_h$ and the
 discrete stability estimate
 
@@ -193,9 +226,22 @@ $$ {#eq-c7-energy-seminorm-equivalence}
 and the upper bound holds for every $v\in H^1(\Om)$. Combined with the
 equivalence of the $H^1$ seminorm and norm on $\Vzero$ in
 @cor-foundations-h1-seminorm-equivalence, the energy norm is equivalent to the
-$H^1(\Om)$ norm on $\Vzero$. The equivalence constants, however, depend on
-$k_0$, $k_1$, and $C_P$, and the energy norm weights the gradient error by the
-material coefficient.
+$H^1(\Om)$ norm on $\Vzero$. More explicitly,
+
+$$
+\sqrt{\frac{k_0}{1+C_P^2}}\,
+\norm{v}_{H^1(\Om)}
+\leq
+\norm{v}_a
+\leq
+\sqrt{k_1}\,\norm{v}_{H^1(\Om)}
+\qquad\forall v\in\Vzero.
+$$ {#eq-c7-energy-h1-equivalence}
+
+Thus the two norms define the same notion of convergence on $\Vzero$, but
+their numerical values differ. The constants in
+@eq-c7-energy-h1-equivalence depend on $k_0$, $k_1$, and $C_P$, while the
+energy norm weights the gradient by the material coefficient $k$.
 
 The name reflects the energy functional $\Pi$ of @eq-variational-energy. The
 quantity $\tfrac12\norm{v}_a^2$ is the quadratic part of $\Pi(v)$. In heat
@@ -300,8 +346,10 @@ $$
 \qquad\forall v_h\in\Vhzero.
 $$ {#eq-c7-pythagoras}
 
-This is the Pythagorean theorem for the energy inner product. It will give the
-best-approximation property in @sec-c7-cea.
+Here $\norm{\cdot}_a$ is the energy norm defined in @def-c7-energy-norm.
+Equation @eq-c7-pythagoras is the Pythagorean theorem for the corresponding
+energy inner product. It will give the best-approximation property in
+@sec-c7-cea.
 
 The energy functional of Chapter 3 gives the same result a physical reading.
 With $g=0$, take $v=v_h-u\in\Vzero$ in
@@ -341,13 +389,81 @@ $g=0$.
    energy error.
 :::
 
-## Céa's lemma and best approximation {#sec-c7-cea}
+## Best approximation from a discrete space {#sec-c7-best-approximation}
+
+Let $V_h$ be a finite-dimensional subspace of a normed vector space $V$. For
+$u\in V$, define the best-approximation error in the $V$ norm by
+
+$$
+E_V(u;V_h)
+=
+\min_{v_h\in V_h}\norm{u-v_h}_V.
+$$ {#eq-c7-best-approximation-v}
+
+The minimum exists because $V_h$ is finite-dimensional. It is the smallest
+distance from $u$ to any point in $V_h$. A function attaining this minimum is
+called a best approximation. It need not be unique for a general norm, and it
+depends on the chosen norm. If $a$ is symmetric and coercive, the corresponding
+best-approximation error in the energy norm is
+
+$$
+E_a(u;V_h)
+=
+\min_{v_h\in V_h}\norm{u-v_h}_a.
+$$ {#eq-c7-best-approximation-a}
+
+The geometric picture is a point $u$ outside a line or plane representing
+$V_h$. The closest point is measured using the selected norm. For the energy
+inner product, Galerkin orthogonality makes $u_h$ the orthogonal projection of
+$u$ onto $V_h$, as illustrated in @fig-c7-best-approximation-geometry.
+
+![Best approximation in the energy inner product. The error $u-u_h$ is orthogonal to $V_h$, while another choice $v_h$ has a larger energy-norm error. Distances and the right angle are understood in the geometry defined by $a$.](../figures/chapter07/best-approximation-geometry.svg){#fig-c7-best-approximation-geometry width=72%}
+
+::: {#exm-c7-weighted-projection}
+## Best approximation depends on the norm
+
+Let $V=\R^2$, $V_h=\operatorname{span}\{(1,1)\}$, and $\bu=(1,0)$. Define
+
+$$
+a(\bx,\bm{y})=4x_1y_1+x_2y_2,
+\qquad
+\ell(\bm{y})=4y_1,
+\qquad
+\norm{\bx}_a=\sqrt{4x_1^2+x_2^2}.
+$$
+
+The vector $\bu$ solves the continuous problem because
+$a(\bu,\bm{y})=\ell(\bm{y})$ for every $\bm{y}\in\R^2$. The Galerkin problem restricts
+the trial and test vectors to $V_h$.
+
+Every vector in $V_h$ has the form $\bv_h=t(1,1)$. The energy-norm error is
+
+$$
+\norm{\bu-\bv_h}_a^2
+=
+4(1-t)^2+t^2.
+$$
+
+Differentiating this quadratic function of $t$ gives $-8(1-t)+2t=0$, so its
+minimum occurs at $t=4/5$. Therefore
+
+$$
+\bu_h=\left(\frac45,\frac45\right).
+$$
+
+The same result follows from the Galerkin condition
+$a(\bu-\bu_h,(1,1))=0$. In contrast, the closest point in the Euclidean norm is
+$\tfrac12(1,1)$. The discrete space is unchanged, but changing the norm changes
+which point in that space is the best approximation.
+:::
+
+## Céa's lemma {#sec-c7-cea}
 
 Galerkin orthogonality relates the error to the discrete space, but it does
 not yet say how large the error is. The next result shows that the finite
-element error is controlled by the best possible approximation of $u$ from
-the discrete space, multiplied by a constant that depends only on the
-continuity and coercivity constants.
+element error in the $V$ norm is controlled by @eq-c7-best-approximation-v,
+multiplied by a constant that depends only on the continuity and coercivity
+constants.
 
 ::: {#thm-c7-cea}
 ## Céa's lemma
@@ -367,22 +483,30 @@ $$
 $$ {#eq-c7-cea}
 :::
 
-**Proof.** The solutions $u$ and $u_h$ exist and are unique by the
-Lax--Milgram theorem, as discussed in @sec-c7-setting, and they satisfy
+**Proof.** The Lax--Milgram theorem @thm-lax-milgram gives unique solutions
+$u$ and $u_h$, and they satisfy
 Galerkin orthogonality @eq-c7-galerkin-orthogonality with $V$ and $V_h$ in
-place of $\Vzero$ and $\Vhzero$. Let $v_h\in V_h$ be arbitrary. Coercivity,
-followed by the decomposition $u-u_h=(u-v_h)+(v_h-u_h)$, gives
+place of $\Vzero$ and $\Vhzero$. Let $v_h\in V_h$ be arbitrary. Applying the
+abstract version of the coercivity relation @eq-c7-coercivity, with
+$\norm{\cdot}_V$ in place of $\norm{\cdot}_{H^1(\Om)}$, to the error gives
 
 $$
 \alpha\norm{u-u_h}_V^2
 \leq
+a(u-u_h,u-u_h).
+$$
+
+Use $u-u_h=(u-v_h)+(v_h-u_h)$ in the second argument:
+
+$$
 a(u-u_h,u-u_h)
 =
 a(u-u_h,u-v_h)+a(u-u_h,v_h-u_h).
 $$
 
 The last term is zero by Galerkin orthogonality because
-$v_h-u_h\in V_h$. Continuity bounds the remaining term:
+$v_h-u_h\in V_h$. Applying the corresponding abstract version of the
+continuity relation @eq-c7-continuity to the remaining term gives
 
 $$
 \alpha\norm{u-u_h}_V^2
@@ -394,16 +518,9 @@ If $u-u_h=0$, there is nothing to prove. Otherwise, divide by
 $\alpha\norm{u-u_h}_V$. The resulting inequality holds for every
 $v_h\in V_h$, so it also holds for the infimum over $V_h$. $\square$
 
-The quantity
-
-$$
-\inf_{v_h\in V_h}\norm{u-v_h}_V
-$$
-
-is the **best-approximation error** of $u$ in $V_h$. It depends only on the
-exact solution and on the discrete space, not on the discrete equations.
-Céa's lemma therefore separates the error analysis into two independent
-questions [@suli2012, pp. 40--42; @arnold2018, pp. 58--59]:
+Céa's lemma therefore compares the computed error with the best-approximation
+error @eq-c7-best-approximation-v. It separates the error analysis into two
+independent questions [@suli2012, pp. 40--42; @arnold2018, pp. 58--59]:
 
 1. a stability question, answered by the ratio $M/\alpha$; and
 2. an approximation question: how well can functions in the finite element
@@ -413,20 +530,15 @@ A method satisfying @eq-c7-cea is called **quasi-optimal**: its error is at
 most a fixed multiple of the smallest error attainable in $V_h$. The factor
 $M/\alpha$ does not depend on $h$ or on $p$.
 
-For the diffusion problem in the $H^1(\Om)$ norm,
-
-$$
-\frac{M}{\alpha}
-=
-\frac{k_1}{k_0}\,(1+C_P^2).
-$$ {#eq-c7-cea-diffusion-constant}
-
-The ratio $k_1/k_0$ is the contrast of the material coefficient. For a body
-made of materials whose conductivities differ by several orders of magnitude,
-the $H^1$ bound becomes pessimistic. When the form is symmetric, the next
-result shows that the constant in the energy norm is exactly one. The contrast
-reappears only when an energy-norm estimate is converted into an $H^1$-norm
-estimate.
+For the diffusion problem in the $H^1(\Om)$ norm, the constants collected in
+@eq-c7-diffusion-constants give
+$M/\alpha=(k_1/k_0)(1+C_P^2)$. The ratio $k_1/k_0$ is the contrast of the
+material coefficient. For a body made of materials whose conductivities
+differ by several orders of magnitude, the $H^1$ bound becomes pessimistic.
+When the form is symmetric, the next result shows that the constant in the
+energy norm is exactly one. The contrast reappears only when an energy-norm
+estimate is converted into an $H^1$-norm estimate using
+@eq-c7-energy-h1-equivalence.
 
 ::: {#cor-c7-best-approximation}
 ## Best approximation in the energy norm
@@ -441,11 +553,38 @@ $$
 $$ {#eq-c7-best-approximation}
 :::
 
-**Proof.** Replace $\Vzero$ and $\Vhzero$ by $V$ and $V_h$ in
-@eq-c7-pythagoras. The second term on its right-hand side is nonnegative, so
-$\norm{u-u_h}_a\leq\norm{u-v_h}_a$ for every $v_h\in V_h$. The choice
-$v_h=u_h$ gives equality, so the infimum is attained at $u_h$
-[@suli2012, pp. 44--45]. $\square$
+**Proof.** Let $v_h\in V_h$ be arbitrary. Since $u_h-v_h\in V_h$, Galerkin
+orthogonality gives
+
+$$
+a(u-u_h,u_h-v_h)=0.
+$$
+
+Decompose the error associated with $v_h$ as
+
+$$
+u-v_h=(u-u_h)+(u_h-v_h).
+$$
+
+Because $a$ is symmetric, it is the inner product associated with
+$\norm{\cdot}_a$. Expanding the squared energy norm and using the orthogonality
+relation therefore gives
+
+$$
+\begin{aligned}
+\norm{u-v_h}_a^2
+&=a(u-v_h,u-v_h)\\
+&=\norm{u-u_h}_a^2
+  +2a(u-u_h,u_h-v_h)
+  +\norm{u_h-v_h}_a^2\\
+&=\norm{u-u_h}_a^2+\norm{u_h-v_h}_a^2.
+\end{aligned}
+$$
+
+The last term is nonnegative. Hence
+$\norm{u-u_h}_a\leq\norm{u-v_h}_a$ for every $v_h\in V_h$. Choosing
+$v_h=u_h$ gives equality, so $u_h$ attains the minimum in
+@eq-c7-best-approximation-a [@suli2012, pp. 44--45]. $\square$
 
 In the energy norm, the finite element solution is therefore the best
 approximation available in the discrete space, with constant one. The error
@@ -456,13 +595,12 @@ finite element interpolant of $u$.
 ::: {#exr-c7-cea}
 ## Using Céa's lemma
 
-1. For the diffusion problem, derive @eq-c7-cea-diffusion-constant from
-   @eq-variational-continuity and @eq-variational-coercivity.
-2. Use @eq-c7-energy-seminorm-equivalence,
-   @cor-foundations-h1-seminorm-equivalence, and @eq-c7-best-approximation to
+1. For the diffusion problem, derive the ratio $M/\alpha$ in
+   @eq-c7-diffusion-constants from @eq-c7-continuity and @eq-c7-coercivity.
+2. Use @eq-c7-energy-h1-equivalence and @eq-c7-best-approximation to
    derive a bound of the form
    $\norm{u-u_h}_{H^1(\Om)}\leq C\inf_{v_h\in\Vhzero}\norm{u-v_h}_{H^1(\Om)}$.
-   Compare your constant with @eq-c7-cea-diffusion-constant.
+   Compare your constant with $M/\alpha$ in @eq-c7-diffusion-constants.
 3. Let $\Vh^{\mathrm{dc}}$ be the space of functions that are linear on each
    cell of a triangular mesh but may be discontinuous across cell edges.
    Explain why $\Vh^{\mathrm{dc}}\not\subset H^1(\Om)$, and identify the step
@@ -520,14 +658,56 @@ $$
 \mathcal I_e\bigl(u|_{\mathcal K_e}\bigr).
 $$
 
+@fig-c7-interpolation-2d makes this construction visible. On
+$\Om=(0,1)^2$, consider the positive function
+
+$$
+u(x_1,x_2)=1+x_1(1-x_1)+x_2(1-x_2).
+$$
+
+Its values at the vertices of the coarse triangular mesh determine the
+piecewise-planar $P_1$ interpolant. The exact function, interpolant, and error
+are evaluated at finer plotting points to display the surfaces clearly. These
+additional points are not finite element nodes and do not change
+$\mathcal I_hu$.
+
+![The square domain, its coarse triangular mesh, the piecewise-linear interpolant, the exact function, and the interpolation error.](../figures/chapter07/interpolation-2d.png){#fig-c7-interpolation-2d width=100%}
+
+The error is nonnegative for this particular concave function. Moreover, the
+Hessian of $u$ is the constant matrix $-2\bI$, and all triangles in this
+uniform mesh are congruent. Consequently, the error has the same shape and
+maximum value on every triangle, up to translation and reflection. Neither
+the sign nor this repeated error pattern holds for a general function on a
+general mesh.
+
+Now halve the grid spacing in both coordinate directions. The resulting mesh
+has $72$ triangles, compared with $18$ triangles in
+@fig-c7-interpolation-2d. The refined interpolant in
+@fig-c7-interpolation-2d-fine follows the exact surface more closely. Both
+figures use the same vertical scales, including the scale of the error plot.
+
+![The piecewise-linear interpolation calculation repeated after halving the grid spacing in both coordinate directions.](../figures/chapter07/interpolation-2d-fine.png){#fig-c7-interpolation-2d-fine width=100%}
+
+For this quadratic function, the maximum error decreases from $1/18$ on the
+coarse mesh to $1/72$ on the refined mesh. Thus halving the grid spacing
+reduces the maximum error by a factor of four. This example displays the
+$h^2$ behavior of the error in the function values that will be established
+later in the chapter.
+
 Three properties of the interpolant will be used repeatedly.
 
 1. **Locality.** The restriction of $\mathcal I_hu$ to $\mathcal K_e$ depends
    only on the values of $u$ at the nodes of $\mathcal K_e$.
-2. **Polynomial reproduction.** If $u|_{\mathcal K_e}$ is a polynomial in the
-   local space, then $\mathcal I_eu=u$ on $\mathcal K_e$. For Lagrange elements
-   of degree $p$ on simplices, every polynomial of degree at most $p$ is
-   reproduced exactly. This generalizes the affine reproduction in
+2. **Polynomial reproduction.** If $u|_{\mathcal K_e}$ belongs to the local
+   finite element space, then $\mathcal I_eu=u$ on $\mathcal K_e$. This does
+   not mean that a degree-$p$ element reproduces polynomials of arbitrary
+   degree. For an affine Lagrange simplex, the local space is
+   $\mathcal P_p(\mathcal K_e)$, so every polynomial of total degree at most
+   $p$ is reproduced exactly. For a tensor-product element, the corresponding
+   statement uses its local $\mathcal Q_p$ space. On a nonaffine
+   isoparametric cell, the local space is defined through the pullback from the
+   reference cell and need not consist of polynomials in the physical
+   coordinates. This property generalizes the affine reproduction in
    @exr-c5-affine-reproduction and @exr-c6-affine-reproduction.
 3. **Boundary values.** If $u=0$ on $\Gam_D$ and the mesh resolves $\Gam_D$,
    then every node on $\Gam_D$ has zero value. On each facet contained in
@@ -556,6 +736,46 @@ u(x_e)\,\phi_1^e+u(x_{e+1})\,\phi_2^e ,
 $$
 
 with the local shape functions @eq-c5-linear-shape-functions.
+
+@fig-c7-interpolation-1d shows the same construction for
+$u(x)=1+x(1-x)$ on a uniform mesh of four linear elements. Its five nodes are
+
+$$
+x_1=0,\qquad x_2=\frac14,\qquad x_3=\frac12,\qquad
+x_4=\frac34,\qquad x_5=1.
+$$
+
+The interpolant agrees with $u$ at every node and is linear between adjacent
+nodes. As in
+@fig-c7-interpolation-2d, the finer plotting points only reveal the shapes of
+the exact function and the error; they are not additional degrees of freedom.
+
+![Linear interpolation on a coarse one-dimensional partition, with the exact function and interpolation error shown separately.](../figures/chapter07/interpolation-1d.svg){#fig-c7-interpolation-1d width=100%}
+
+On an element $\mathcal K_e=[x_e,x_{e+1}]$, direct calculation gives
+
+$$
+u(x)-\mathcal I_eu(x)
+=
+(x-x_e)(x_{e+1}-x).
+$$
+
+Because every element has length $h=1/4$, this error has the same shape on
+every element and reaches the same maximum, $h^2/4=1/64$, at each element
+midpoint. This repeated pattern results from combining a uniform mesh with a
+quadratic function having constant second derivative.
+
+Refine the one-dimensional mesh by dividing every element in two. The refined
+mesh has eight linear elements and nine nodes,
+$x_i=(i-1)/8$ for $i=1,\ldots,9$. The plots in
+@fig-c7-interpolation-1d-fine use the same vertical scales as
+@fig-c7-interpolation-1d.
+
+![Linear interpolation after refining the four-element mesh to eight linear elements.](../figures/chapter07/interpolation-1d-fine.svg){#fig-c7-interpolation-1d-fine width=100%}
+
+On the refined mesh, $h=1/8$, so the maximum error is
+$h^2/4=1/256$. Halving the element length has again reduced the maximum error
+by a factor of four.
 
 ::: {#thm-c7-1d-interpolation}
 ## Linear interpolation on an interval
@@ -586,15 +806,31 @@ $$
 $$ {#eq-c7-1d-global-interpolation}
 :::
 
-**Proof.** Let $w=u-\mathcal I_eu$ on $\mathcal K_e$. Since $\mathcal I_eu$ is
-linear, $w\in H^2(\mathcal K_e)$ and $w''=u''$. In one dimension,
-$w'\in H^1(\mathcal K_e)$ has a continuous representative, so $w$ is
-continuously differentiable, and the fundamental theorem of calculus applies
-to both $w$ and $w'$.
+**Proof.** Let $w=u-\mathcal I_eu$ on $\mathcal K_e$. Since
+$\mathcal I_eu$ is linear, its second derivative is zero. Hence
 
-The interpolant agrees with $u$ at both endpoints, so
-$w(x_e)=w(x_{e+1})=0$. By Rolle's theorem there is a point
-$x_\ast\in\mathcal K_e$ with $w'(x_\ast)=0$. For $y\in\mathcal K_e$,
+$$
+w''=u''
+\qquad\text{on }\mathcal K_e.
+$$
+
+Moreover, $u\in H^2(\mathcal K_e)$ implies $u'\in H^1(\mathcal K_e)$. In one
+dimension, $H^1$ functions have continuous representatives. Thus $u'$ and
+$w'$ may be taken to be continuous, $w$ is continuously differentiable, and
+the classical fundamental theorem of calculus and Rolle's theorem can be
+used.
+
+By the definition of the nodal interpolant,
+
+$$
+(\mathcal I_eu)(x_e)=u(x_e),
+\qquad
+(\mathcal I_eu)(x_{e+1})=u(x_{e+1}).
+$$
+
+Therefore $w(x_e)=w(x_{e+1})=0$. Rolle's theorem then gives a point
+$x_\ast\in(x_e,x_{e+1})$ such that $w'(x_\ast)=0$. For any
+$y\in\mathcal K_e$, the fundamental theorem of calculus gives
 
 $$
 w'(y)
@@ -602,23 +838,57 @@ w'(y)
 \int_{x_\ast}^{y}w''(t)\,\dd t .
 $$
 
-The Cauchy--Schwarz inequality gives
+Applying the Cauchy--Schwarz inequality on the interval with endpoints
+$x_\ast$ and $y$ gives
 
 $$
 |w'(y)|^2
 \leq
-|y-x_\ast|\left|\int_{x_\ast}^y|w''(t)|^2\,\dd t\right|
+|y-x_\ast|\int_{\min\{x_\ast,y\}}^{\max\{x_\ast,y\}}|w''(t)|^2\,\dd t
 \leq
 h_e\norm{w''}_{L^2(\mathcal K_e)}^2 .
 $$
 
-Integrating over $\mathcal K_e$ gives
-$\norm{w'}_{L^2(\mathcal K_e)}^2\leq h_e^2\norm{u''}_{L^2(\mathcal K_e)}^2$,
-which is the first inequality. The same argument starting from
-$w(y)=\int_{x_e}^y w'(t)\,\dd t$ gives
-$\norm{w}_{L^2(\mathcal K_e)}\leq h_e\norm{w'}_{L^2(\mathcal K_e)}$, and
-combining the two estimates gives the second. Squaring the local estimates and summing over the elements
-gives @eq-c7-1d-global-interpolation. $\square$
+This pointwise bound holds for every $y$ in an interval of length $h_e$.
+Integrating it with respect to $y$ therefore gives
+
+$$
+\norm{w'}_{L^2(\mathcal K_e)}^2
+\leq
+h_e^2\norm{w''}_{L^2(\mathcal K_e)}^2
+=
+h_e^2\norm{u''}_{L^2(\mathcal K_e)}^2.
+$$
+
+Taking square roots proves the first local estimate. To estimate $w$ itself,
+use $w(x_e)=0$ and write
+
+$$
+w(y)=\int_{x_e}^{y}w'(t)\,\dd t.
+$$
+
+Another application of Cauchy--Schwarz gives
+
+$$
+|w(y)|^2
+\leq
+(y-x_e)\int_{x_e}^{y}|w'(t)|^2\,\dd t
+\leq
+h_e\norm{w'}_{L^2(\mathcal K_e)}^2.
+$$
+
+Integrating over $y\in\mathcal K_e$ and taking square roots yields
+
+$$
+\norm{w}_{L^2(\mathcal K_e)}
+\leq
+h_e\norm{w'}_{L^2(\mathcal K_e)}.
+$$
+
+Combining this inequality with the first local estimate proves the second.
+Finally, the elements have disjoint interiors, so the squared global norms are
+the sums of the squared element norms. Summing the local estimates gives
+@eq-c7-1d-global-interpolation. $\square$
 
 The proof follows @larson-bengzon2010 [pp. 5--7]. Sharper constants are
 available: a Fourier-series argument replaces $h_e$ by $h_e/\pi$ in both
@@ -700,7 +970,7 @@ $$
 \norm{e}_{L^2(0,1)}=\frac{h^2}{\sqrt{120}},
 \qquad
 \norm{e}_a=\seminorm{e}_{H^1(0,1)}=\frac{h}{\sqrt{12}} .
-$$ {#eq-c7-bar-exact-errors}
+$$ {#eq-c7-uniform-bar-errors}
 
 The maximum error $h^2/8$ is the value reported in the legend of
 @fig-c5-python-mesh-refinement. The displacement errors decrease like $h^2$,
@@ -733,7 +1003,7 @@ Let $u\in C^2(\overline{\mathcal K}_e)$ and $w=u-\mathcal I_eu$.
    $\max_{\overline{\mathcal K}_e}|w|\leq
    \tfrac18h_e^2\max_{\overline{\mathcal K}_e}|u''|$.
 3. Show that the bound in Part 2 is attained for $u(x)=x-x^2/2$, and compare
-   it with @eq-c7-bar-exact-errors.
+   it with the exact error expressions in @exm-c7-nodal-exactness.
 :::
 
 ### Mesh size and shape regularity
@@ -907,9 +1177,10 @@ estimate.
 ::: {#thm-c7-energy-convergence}
 ## Energy-norm and $H^1$-norm convergence
 
-Assume the setting of @sec-c7-setting with a shape-regular family of affine
-simplicial meshes and Lagrange elements of degree $p\geq1$. Let $u$ and $u_h$
-solve @eq-c7-continuous-problem and @eq-c7-discrete-problem. If
+Assume the diffusion problem and finite element spaces defined by
+@eq-c7-continuous-problem and @eq-c7-discrete-problem, with a shape-regular
+family of affine simplicial meshes and Lagrange elements of degree $p\geq1$.
+If
 $u\in H^s(\Om)$ for an integer $s$ with $2\leq s\leq p+1$, then
 
 $$
@@ -1044,7 +1315,8 @@ Assume the hypotheses of @thm-c7-energy-convergence.
 ## $L^2$ estimates by duality {#sec-c7-duality}
 
 The $L^2$ norm is bounded by the $H^1$ norm, so @eq-c7-h1-estimate already
-implies $\norm{u-u_h}_{L^2(\Om)}=O(h^{s-1})$. For the bar problem of Chapter 5, @eq-c7-bar-exact-errors shows an $L^2$
+implies $\norm{u-u_h}_{L^2(\Om)}=O(h^{s-1})$. For the bar problem of Chapter 5,
+the exact expressions in @exm-c7-nodal-exactness show an $L^2$
 error proportional to $h^2$ with linear elements, one power of $h$ faster. The interpolation estimate
 @eq-c7-global-interpolation also has one more power of $h$ in $L^2$ than in
 the $H^1$ seminorm. Céa's lemma cannot transfer that extra power because it
@@ -1199,7 +1471,7 @@ $\mathcal V_0=\{v\in H^1(0,L):v(0)=0\}$.
    $\norm{u-u_h}_{L^2(0,L)}\leq h\,\seminorm{u-u_h}_{H^1(0,L)}$ for linear
    elements. Note that $AE$ cancels.
 4. Check this inequality against the exact values in
-   @eq-c7-bar-exact-errors.
+   @exm-c7-nodal-exactness.
 :::
 
 ## Numerical verification of convergence rates {#sec-c7-verification}
@@ -1242,7 +1514,8 @@ A meaningful study requires the following:
 ::: {#exm-c7-bar-rate-table}
 ## Rates for the uniformly loaded bar
 
-For the problem of @exm-c5-python-assembly, @eq-c7-bar-exact-errors gives the
+For the problem of @exm-c5-python-assembly, the exact expressions in
+@exm-c7-nodal-exactness give the
 errors on uniform meshes exactly:
 
 | $N$ | $h$ | $\max_x\lvert e\rvert$ | $\norm{e}_{L^2(0,1)}$ | $\norm{e}_a$ |
@@ -1448,8 +1721,8 @@ Use the program in @exm-c7-python-rates.
    with the largest element size $h$.
 4. Replace the six-point quadrature rule by the one-point rule in the
    assembly of $\bF$ only, and describe the effect on the observed rates for
-   $p=2$. Explain the result in terms of the variational crimes discussed in
-   @sec-c7-setting.
+   $p=2$. Explain the result in terms of the variational crimes discussed
+   after @eq-c7-discrete-problem.
 :::
 
 ## Interpretation for linear elasticity {#sec-c7-elasticity}

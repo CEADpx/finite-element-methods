@@ -39,3 +39,19 @@ source, figures, and final PDF are retained in the topic directory and
 committed together. Shared notebooks remain under the repository-level
 `notebooks/` directory rather than being duplicated with individual slide
 decks.
+
+## `apriori-error/`
+
+Chapter 7 lecture covering the continuous and discrete problem, error norms,
+Galerkin orthogonality, best approximation, C\'ea's lemma, and finite element
+interpolation through the one-dimensional interpolation estimates of Section
+7.5.2.
+
+Build the slides from that directory with:
+
+```bash
+conda run -n finite-elements latexmk -pdf \
+  -interaction=nonstopmode -halt-on-error \
+  -outdir=build chapter07_apriori_error_lecture.tex
+cp build/chapter07_apriori_error_lecture.pdf chapter07_apriori_error_lecture.pdf
+```
