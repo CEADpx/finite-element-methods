@@ -55,7 +55,8 @@ with the exact weak solution $u$.
 \begin{enumerate}
   \item State the continuous and discrete variational problems.
   \item Introduce the $L^2$, $H^1$, and energy measures of error.
-  \item Derive Galerkin orthogonality and its best-approximation consequence.
+  \item Derive Galerkin orthogonality and show how it leads to best
+  approximation.
   \item Prove C\'ea's lemma.
   \item Construct the nodal interpolant and obtain the one-dimensional
   interpolation estimates.
@@ -105,9 +106,9 @@ We assume throughout this lecture that
 \end{itemize}
 
 \vspace{0.2cm}
-Approximating the forms by quadrature or approximating boundary data adds a
-consistency error. Such modifications are called \textbf{variational crimes}.
-They are outside today's analysis.
+If quadrature or boundary approximation changes the discrete forms, the
+orthogonality relation contains an additional consistency error. We do not
+consider that case in this lecture.
 \end{frame}
 
 \begin{frame}{Continuity and coercivity}
@@ -148,8 +149,8 @@ The Lax--Milgram theorem therefore gives a unique finite element solution and
   \frac{1}{\alpha}\norm[\Vzero^*]{\ell}.
 \]
 
-The same fact appears in the algebraic system. For any nonzero coefficient
-vector $\bV$ representing $v_h\in\Vhzero$,
+Coercivity also gives a positive-definite stiffness matrix. For any nonzero
+coefficient vector $\bV$ representing $v_h\in\Vhzero$,
 \[
   \bV^T\bK_{ff}\bV
   =a(v_h,v_h)
@@ -264,31 +265,28 @@ Subtracting the discrete equation from the continuous equation gives
   \qquad\forall v_h\in\Vhzero.}
 \]
 
-For symmetric $a$, this says that the error $u-u_h$ is orthogonal to the
-discrete space in the energy inner product.
+This conclusion uses conformity, $\Vhzero\subset\Vzero$, and the same forms
+$a$ and $\ell$ in the continuous and discrete problems. Symmetry of $a$ is
+not needed for this result.
 \end{frame}
 
-\begin{frame}{Conditions behind the orthogonality relation}
-The derivation uses two facts.
-
-\begin{enumerate}
-  \item \textbf{Conformity:} $\Vhzero\subset\Vzero$. Every discrete test
-  function can be inserted into the continuous problem.
-  \item \textbf{The same forms:} the continuous and discrete problems use
-  the same $a$ and $\ell$.
-\end{enumerate}
-
-Define the residual associated with $u_h$ by
+\begin{frame}{Orthogonality for a symmetric problem}
+If $a$ is also symmetric, then
 \[
-  R(v)=\ell(v)-a(u_h,v),
-  \qquad v\in\Vzero.
+  (w,v)_a:=a(w,v)
 \]
-Galerkin orthogonality is equivalent to
+is an inner product on $\Vzero$, with induced norm
 \[
-  R(v_h)=0\qquad\forall v_h\in\Vhzero.
+  \norm[a]{v}=a(v,v)^{1/2}.
 \]
-The residual generally does not vanish on test functions outside the discrete
-space.
+
+With $e=u-u_h$, Galerkin orthogonality becomes
+\[
+  (e,v_h)_a=0
+  \qquad\forall v_h\in\Vhzero.
+\]
+Thus the error is orthogonal to every function in the finite element space,
+where orthogonality is measured by the inner product $a$.
 \end{frame}
 
 \begin{frame}{Pythagorean identity in the energy norm}
@@ -300,39 +298,64 @@ The second term belongs to $\Vhzero$, so Galerkin orthogonality gives
 \[
   a(u-u_h,u_h-v_h)=0.
 \]
-For symmetric $a$,
+Using bilinearity and symmetry of $a$,
+\begin{align*}
+  \norm[a]{u-v_h}^2
+  &=a\bigl((u-u_h)+(u_h-v_h),(u-u_h)+(u_h-v_h)\bigr)\\
+  &=\norm[a]{u-u_h}^2
+    +2a(u-u_h,u_h-v_h)
+    +\norm[a]{u_h-v_h}^2.
+\end{align*}
+The middle term is zero by Galerkin orthogonality. Therefore,
 \[
   \boxed{
   \norm[a]{u-v_h}^2
   =\norm[a]{u-u_h}^2+\norm[a]{u_h-v_h}^2.}
 \]
-
-The same conclusion follows from the quadratic energy functional:
-\[
-  \Pi(v_h)-\Pi(u)=\frac12\norm[a]{u-v_h}^2.
-\]
-Thus the Galerkin solution is also the Ritz minimizer over $\Vhzero$.
 \end{frame}
 
-\begin{frame}{Best approximation from a discrete space}
+\begin{frame}{Best approximation in a selected norm}
 \begin{columns}[T,onlytextwidth]
   \begin{column}{0.42\textwidth}
-    For a finite-dimensional subspace $V_h\subset V$, define
+    Let $V_h$ be a finite-dimensional subspace of a normed vector space $V$.
+    The best-approximation error is
     \[
       E_V(u;V_h)=\min_{v_h\in V_h}\norm[V]{u-v_h}.
     \]
-    This is the smallest distance from $u$ to a point in $V_h$. The minimizing
-    function depends on the selected norm.
+    It is the shortest distance, measured with $\norm[V]{\cdot}$, from $u$ to
+    a function in $V_h$.
 
     \vspace{0.25cm}
-    For the energy inner product, Galerkin orthogonality identifies $u_h$ as
-    the orthogonal projection of $u$ onto $V_h$.
+    Changing the norm changes how distance is measured and can change which
+    function in $V_h$ is closest to $u$.
   \end{column}
   \begin{column}{0.55\textwidth}
     \centering
     \includegraphics[width=0.98\textwidth]{c7_best_approximation.pdf}
   \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{The Galerkin solution is the energy-norm best approximation}
+For any $v_h\in\Vhzero$, the Pythagorean identity gives
+\[
+  \norm[a]{u-v_h}^2
+  =\norm[a]{u-u_h}^2+\norm[a]{u_h-v_h}^2.
+\]
+Since the last term is nonnegative,
+\[
+  \norm[a]{u-v_h}\geq\norm[a]{u-u_h}
+  \qquad\forall v_h\in\Vhzero.
+\]
+Equality holds when $v_h=u_h$. Therefore,
+\[
+  \boxed{
+  \norm[a]{u-u_h}
+  =\min_{v_h\in\Vhzero}\norm[a]{u-v_h}.}
+\]
+
+The finite element solution is the function in $\Vhzero$ closest to $u$ in
+the energy norm.
 \end{frame}
 
 \begin{frame}{A weighted best-approximation example}
@@ -354,9 +377,10 @@ Every vector in $V_h$ has the form $\bv_h=t(1,1)$. Therefore
 \[
   \norm[a]{\bu-\bv_h}^2=4(1-t)^2+t^2.
 \]
-Minimizing this quadratic gives
+Differentiating this quadratic with respect to $t$ gives
 \[
-  t=\frac45,
+  -8(1-t)+2t=0,
+  \qquad t=\frac45,
   \qquad
   \bu_h=\left(\frac45,\frac45\right).
 \]
@@ -392,11 +416,11 @@ Let $e=u-u_h$ and choose any $v_h\in V_h$. Coercivity gives
 \[
   \alpha\norm[V]{e}^2\leq a(e,e).
 \]
-Insert
+Because
 \[
   e=(u-v_h)+(v_h-u_h)
 \]
-in the second argument:
+and $a$ is bilinear in its second argument,
 \[
   a(e,e)
   =a(e,u-v_h)+a(e,v_h-u_h).
@@ -435,44 +459,29 @@ For diffusion in the $H^1$ norm,
 This factor does not depend on $h$ or $p$.
 \end{frame}
 
-\begin{frame}{Best approximation in the energy norm}
-When $a$ is symmetric, the Pythagorean identity gives
-\[
-  \norm[a]{u-v_h}^2
-  =\norm[a]{u-u_h}^2+\norm[a]{u_h-v_h}^2.
-\]
-The final term is nonnegative, so
-\[
-  \boxed{
-  \norm[a]{u-u_h}
-  =\min_{v_h\in V_h}\norm[a]{u-v_h}.}
-\]
-
-Thus the constant in the energy norm is exactly one. To estimate the finite
-element error, it now suffices to choose one convenient $v_h\in V_h$ and
-estimate $\norm[a]{u-v_h}$. The nodal interpolant provides that choice.
-\end{frame}
-
 \section{Finite element interpolation}
 
 \begin{frame}{Finite element interpolant}
+To use C\'ea's lemma, we need a specific function $v_h\in V_h$ whose error
+can be estimated. We choose the nodal interpolant.
+
 Let $V_h$ be a Lagrange finite element space with global nodes $\bx_i$ and
 nodal basis functions $\phi_i$. For a continuous function $u$, define
 \[
   \boxed{
-  \mathcal I_hu
+  I_hu
   =\sum_{i=1}^{N_n}u(\bx_i)\phi_i.}
 \]
 The interpolant belongs to $V_h$ and satisfies
 \[
-  \mathcal I_hu(\bx_i)=u(\bx_i)
+  I_hu(\bx_i)=u(\bx_i)
   \qquad i=1,\ldots,N_n.
 \]
 
 On an element $\mathcal K_e$,
 \[
-  (\mathcal I_hu)|_{\mathcal K_e}
-  =\mathcal I_e(u|_{\mathcal K_e}).
+  (I_hu)|_{\mathcal K_e}
+  =I_e(u|_{\mathcal K_e}).
 \]
 Thus the global interpolant can be constructed cell by cell from the nodal
 values of $u$.
@@ -502,13 +511,13 @@ values of $u$.
 \begin{frame}{Properties and regularity of the interpolant}
 Three properties will be used in the error estimates.
 \begin{enumerate}
-  \item \textbf{Locality:} $(\mathcal I_hu)|_{\mathcal K_e}$ depends only on
+  \item \textbf{Locality:} $(I_hu)|_{\mathcal K_e}$ depends only on
   the degrees of freedom of $\mathcal K_e$.
   \item \textbf{Polynomial reproduction:} if
   $u|_{\mathcal K_e}$ belongs to the local finite element space, then
-  $\mathcal I_eu=u$ on $\mathcal K_e$.
+  $I_eu=u$ on $\mathcal K_e$.
   \item \textbf{Boundary values:} if $u=0$ on $\Gam_D$ and the mesh resolves
-  $\Gam_D$, then $\mathcal I_hu\in\Vhzero$.
+  $\Gam_D$, then $I_hu\in\Vhzero$.
 \end{enumerate}
 
 \vspace{0.2cm}
@@ -533,7 +542,7 @@ five nodes:
 
 On $\mathcal K_e=[x_e,x_{e+1}]$,
 \[
-  \mathcal I_eu
+  I_eu
   =u(x_e)\phi_1^e+u(x_{e+1})\phi_2^e.
 \]
 
@@ -549,7 +558,7 @@ so the global interpolant is continuous.
   \vspace{0.08cm}
   On every element,
   \[
-    u(x)-\mathcal I_eu(x)
+    u(x)-I_eu(x)
     =(x-x_e)(x_{e+1}-x).
   \]
   Since $h=1/4$ on each element, the error reaches the same maximum
@@ -571,14 +580,14 @@ Let $\mathcal K_e=(x_e,x_{e+1})$, $h_e=x_{e+1}-x_e$, and
 $u\in H^2(\mathcal K_e)$. Then
 \[
   \boxed{
-  \norm[L^2(\mathcal K_e)]{(u-\mathcal I_eu)'}
+  \norm[L^2(\mathcal K_e)]{(u-I_eu)'}
   \leq
   h_e\norm[L^2(\mathcal K_e)]{u''}}
 \]
 and
 \[
   \boxed{
-  \norm[L^2(\mathcal K_e)]{u-\mathcal I_eu}
+  \norm[L^2(\mathcal K_e)]{u-I_eu}
   \leq
   h_e^2\norm[L^2(\mathcal K_e)]{u''}.}
 \]
@@ -590,9 +599,9 @@ values contains two powers of $h_e$.
 \begin{frame}{Derivative estimate on one element}
 Set
 \[
-  w=u-\mathcal I_eu.
+  w=u-I_eu.
 \]
-Because $\mathcal I_eu$ is linear, $w''=u''$. Also,
+Because $I_eu$ is linear, $w''=u''$. Also,
 \[
   w(x_e)=w(x_{e+1})=0.
 \]
@@ -624,7 +633,7 @@ Cauchy--Schwarz and integration over $\mathcal K_e$ give
 \]
 Combining this relation with the derivative estimate gives
 \[
-  \norm[L^2(\mathcal K_e)]{u-\mathcal I_eu}
+  \norm[L^2(\mathcal K_e)]{u-I_eu}
   \leq h_e^2\norm[L^2(\mathcal K_e)]{u''}.
 \]
 
@@ -635,24 +644,24 @@ theorem of calculus and the Cauchy--Schwarz inequality.
 \begin{frame}{From local estimates to global estimates}
 Because the elements have disjoint interiors,
 \[
-  \seminorm[H^1(0,L)]{u-\mathcal I_hu}^2
+  \seminorm[H^1(0,L)]{u-I_hu}^2
   =\sum_{e=1}^{N}
-  \norm[L^2(\mathcal K_e)]{(u-\mathcal I_eu)'}^2,
+  \norm[L^2(\mathcal K_e)]{(u-I_eu)'}^2,
 \]
 and
 \[
-  \norm[L^2(0,L)]{u-\mathcal I_hu}^2
+  \norm[L^2(0,L)]{u-I_hu}^2
   =\sum_{e=1}^{N}
-  \norm[L^2(\mathcal K_e)]{u-\mathcal I_eu}^2.
+  \norm[L^2(\mathcal K_e)]{u-I_eu}^2.
 \]
 Applying the local bounds gives
 \[
-  \seminorm[H^1(0,L)]{u-\mathcal I_hu}^2
+  \seminorm[H^1(0,L)]{u-I_hu}^2
   \leq\sum_{e=1}^{N}h_e^2
   \norm[L^2(\mathcal K_e)]{u''}^2,
 \]
 \[
-  \norm[L^2(0,L)]{u-\mathcal I_hu}^2
+  \norm[L^2(0,L)]{u-I_hu}^2
   \leq\sum_{e=1}^{N}h_e^4
   \norm[L^2(\mathcal K_e)]{u''}^2.
 \]
@@ -662,8 +671,8 @@ Applying the local bounds gives
 \begin{itemize}
   \item Continuity and coercivity provide a stable continuous and discrete
   problem.
-  \item Galerkin orthogonality compares the finite element error with every
-  function in the discrete space.
+  \item Galerkin orthogonality states that
+  $a(u-u_h,v_h)=0$ for every $v_h\in V_h$.
   \item C\'ea's lemma bounds the error by the best approximation available in
   that space.
   \item For symmetric problems, the finite element solution is the best
