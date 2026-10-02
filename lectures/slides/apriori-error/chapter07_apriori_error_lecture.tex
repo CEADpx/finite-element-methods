@@ -24,6 +24,8 @@
 \newcommand{\Th}{\mathcal T_h}
 \newcommand{\Vzero}{\mathcal V_0}
 \newcommand{\Vhzero}{\mathcal V_{h,0}}
+\newcommand{\Ih}{\mathcal I_h}
+\newcommand{\Ie}{\mathcal I_e}
 \newcommand{\norm}[2][]{\left\lVert#2\right\rVert_{#1}}
 \newcommand{\seminorm}[2][]{\left\lvert#2\right\rvert_{#1}}
 \newcommand{\bx}{\bm x}
@@ -469,19 +471,19 @@ Let $V_h$ be a Lagrange finite element space with global nodes $\bx_i$ and
 nodal basis functions $\phi_i$. For a continuous function $u$, define
 \[
   \boxed{
-  I_hu
+  \Ih u
   =\sum_{i=1}^{N_n}u(\bx_i)\phi_i.}
 \]
 The interpolant belongs to $V_h$ and satisfies
 \[
-  I_hu(\bx_i)=u(\bx_i)
+  \Ih u(\bx_i)=u(\bx_i)
   \qquad i=1,\ldots,N_n.
 \]
 
 On an element $\mathcal K_e$,
 \[
-  (I_hu)|_{\mathcal K_e}
-  =I_e(u|_{\mathcal K_e}).
+  (\Ih u)|_{\mathcal K_e}
+  =\Ie(u|_{\mathcal K_e}).
 \]
 Thus the global interpolant can be constructed cell by cell from the nodal
 values of $u$.
@@ -511,13 +513,13 @@ values of $u$.
 \begin{frame}{Properties and regularity of the interpolant}
 Three properties will be used in the error estimates.
 \begin{enumerate}
-  \item \textbf{Locality:} $(I_hu)|_{\mathcal K_e}$ depends only on
+  \item \textbf{Locality:} $(\Ih u)|_{\mathcal K_e}$ depends only on
   the degrees of freedom of $\mathcal K_e$.
   \item \textbf{Polynomial reproduction:} if
   $u|_{\mathcal K_e}$ belongs to the local finite element space, then
-  $I_eu=u$ on $\mathcal K_e$.
+  $\Ie u=u$ on $\mathcal K_e$.
   \item \textbf{Boundary values:} if $u=0$ on $\Gam_D$ and the mesh resolves
-  $\Gam_D$, then $I_hu\in\Vhzero$.
+  $\Gam_D$, then $\Ih u\in\Vhzero$.
 \end{enumerate}
 
 \vspace{0.2cm}
@@ -542,7 +544,7 @@ five nodes:
 
 On $\mathcal K_e=[x_e,x_{e+1}]$,
 \[
-  I_eu
+  \Ie u
   =u(x_e)\phi_1^e+u(x_{e+1})\phi_2^e.
 \]
 
@@ -558,7 +560,7 @@ so the global interpolant is continuous.
   \vspace{0.08cm}
   On every element,
   \[
-    u(x)-I_eu(x)
+    u(x)-\Ie u(x)
     =(x-x_e)(x_{e+1}-x).
   \]
   Since $h=1/4$ on each element, the error reaches the same maximum
@@ -580,14 +582,14 @@ Let $\mathcal K_e=(x_e,x_{e+1})$, $h_e=x_{e+1}-x_e$, and
 $u\in H^2(\mathcal K_e)$. Then
 \[
   \boxed{
-  \norm[L^2(\mathcal K_e)]{(u-I_eu)'}
+  \norm[L^2(\mathcal K_e)]{(u-\Ie u)'}
   \leq
   h_e\norm[L^2(\mathcal K_e)]{u''}}
 \]
 and
 \[
   \boxed{
-  \norm[L^2(\mathcal K_e)]{u-I_eu}
+  \norm[L^2(\mathcal K_e)]{u-\Ie u}
   \leq
   h_e^2\norm[L^2(\mathcal K_e)]{u''}.}
 \]
@@ -599,9 +601,9 @@ values contains two powers of $h_e$.
 \begin{frame}{Derivative estimate on one element}
 Set
 \[
-  w=u-I_eu.
+  w=u-\Ie u.
 \]
-Because $I_eu$ is linear, $w''=u''$. Also,
+Because $\Ie u$ is linear, $w''=u''$. Also,
 \[
   w(x_e)=w(x_{e+1})=0.
 \]
@@ -633,7 +635,7 @@ Cauchy--Schwarz and integration over $\mathcal K_e$ give
 \]
 Combining this relation with the derivative estimate gives
 \[
-  \norm[L^2(\mathcal K_e)]{u-I_eu}
+  \norm[L^2(\mathcal K_e)]{u-\Ie u}
   \leq h_e^2\norm[L^2(\mathcal K_e)]{u''}.
 \]
 
@@ -644,24 +646,24 @@ theorem of calculus and the Cauchy--Schwarz inequality.
 \begin{frame}{From local estimates to global estimates}
 Because the elements have disjoint interiors,
 \[
-  \seminorm[H^1(0,L)]{u-I_hu}^2
+  \seminorm[H^1(0,L)]{u-\Ih u}^2
   =\sum_{e=1}^{N}
-  \norm[L^2(\mathcal K_e)]{(u-I_eu)'}^2,
+  \norm[L^2(\mathcal K_e)]{(u-\Ie u)'}^2,
 \]
 and
 \[
-  \norm[L^2(0,L)]{u-I_hu}^2
+  \norm[L^2(0,L)]{u-\Ih u}^2
   =\sum_{e=1}^{N}
-  \norm[L^2(\mathcal K_e)]{u-I_eu}^2.
+  \norm[L^2(\mathcal K_e)]{u-\Ie u}^2.
 \]
 Applying the local bounds gives
 \[
-  \seminorm[H^1(0,L)]{u-I_hu}^2
+  \seminorm[H^1(0,L)]{u-\Ih u}^2
   \leq\sum_{e=1}^{N}h_e^2
   \norm[L^2(\mathcal K_e)]{u''}^2,
 \]
 \[
-  \norm[L^2(0,L)]{u-I_hu}^2
+  \norm[L^2(0,L)]{u-\Ih u}^2
   \leq\sum_{e=1}^{N}h_e^4
   \norm[L^2(\mathcal K_e)]{u''}^2.
 \]

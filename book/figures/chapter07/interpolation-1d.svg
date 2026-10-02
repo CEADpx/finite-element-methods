@@ -575,7 +575,7 @@ z
     </g>
    </g>
    <g id="text_14">
-    <!-- (a) Interpolant $I_h u$ -->
+    <!-- (a) Interpolant $\mathcal{I}_h u$ -->
     <g transform="translate(92.966094 12.12024) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-b" d="M 1984 4856 
@@ -2775,7 +2775,7 @@ L 792.266948 18.12024
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_43">
-    <!-- (c) Error $u-I_h u$ -->
+    <!-- (c) Error $u-\mathcal{I}_h u$ -->
     <g transform="translate(642.4275 12.12024) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-c9c" d="M 678 2272 

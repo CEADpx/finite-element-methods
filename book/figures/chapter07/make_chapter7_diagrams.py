@@ -103,7 +103,7 @@ def make_two_dimensional_figure(cells_per_side, filename):
         linewidth=0.65 if cells_per_side == 3 else 0.35,
         antialiased=True,
     )
-    axes[0].set_title(r"Interpolant $I_h u$", pad=9)
+    axes[0].set_title(r"Interpolant $\mathcal{I}_h u$", pad=9)
 
     axes[1].plot_surface(
         x_plot,
@@ -125,7 +125,7 @@ def make_two_dimensional_figure(cells_per_side, filename):
         linewidth=0,
         antialiased=True,
     )
-    axes[2].set_title(r"Error $u-I_h u$", pad=9)
+    axes[2].set_title(r"Error $u-\mathcal{I}_h u$", pad=9)
 
     for index, axis in enumerate(axes):
         axis.set_xlabel(r"$x_1$", labelpad=2)
@@ -168,7 +168,7 @@ def make_one_dimensional_figure(number_of_elements, filename):
         markersize=5,
         zorder=3,
     )
-    axes[0].set_title(r"(a) Interpolant $I_h u$")
+    axes[0].set_title(r"(a) Interpolant $\mathcal{I}_h u$")
 
     axes[1].plot(x_plot, exact, color="#9a4d16", linewidth=2.2)
     axes[1].set_title(r"(b) Exact function $u$")
@@ -176,7 +176,7 @@ def make_one_dimensional_figure(number_of_elements, filename):
     axes[2].plot(x_plot, error, color="#8c2d64", linewidth=2.2)
     axes[2].fill_between(x_plot, 0.0, error, color="#8c2d64", alpha=0.18)
     axes[2].axhline(0.0, color="#4f5964", linewidth=0.8)
-    axes[2].set_title(r"(c) Error $u-I_h u$")
+    axes[2].set_title(r"(c) Error $u-\mathcal{I}_h u$")
 
     value_limits = (0.98, 1.28)
     for index, axis in enumerate(axes):

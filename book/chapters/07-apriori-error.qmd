@@ -627,15 +627,15 @@ function $u$ continuous on $\overline\Om$, the **finite element interpolant**
 is
 
 $$
-I_hu
+\Ih u
 =
 \sum_{i=1}^{N_n}u(\bx_i)\,\phi_i .
 $$ {#eq-c7-global-interpolant}
 :::
 
-The subscripted symbol $I_h$ denotes the interpolation operator, while the
-superscripted symbol $I^e$ denotes the connectivity map. For linear elements,
-the nodes are the mesh vertices. For higher-degree Lagrange elements they also include
+The calligraphic symbol $\Ih$ denotes the interpolation operator and
+distinguishes it from the connectivity map $I^e$. For linear elements, the
+nodes are the mesh vertices. For higher-degree Lagrange elements they also include
 additional nodes, such as the element midpoints of the quadratic interval in
 Chapter 5 and the edge midpoints of the $P_2$ triangle in Chapter 6.
 
@@ -643,7 +643,7 @@ The interpolant can also be built cell by cell. In the terminology of
 @def-c5-finite-element, the **local interpolant** on $\mathcal K_e$ is
 
 $$
-I_ew
+\Ie w
 =
 \sum_{a}N_a(w)\,\phi_a^e ,
 $$
@@ -653,9 +653,9 @@ $N_a(w)=w(\bx_a^e)$. The local-global relation
 @eq-c6-local-global-restriction and the nodal property give
 
 $$
-(I_hu)|_{\mathcal K_e}
+(\Ih u)|_{\mathcal K_e}
 =
-I_e\bigl(u|_{\mathcal K_e}\bigr).
+\Ie\bigl(u|_{\mathcal K_e}\bigr).
 $$
 
 @fig-c7-interpolation-2d makes this construction visible. On
@@ -669,7 +669,7 @@ Its values at the vertices of the coarse triangular mesh determine the
 piecewise-planar $P_1$ interpolant. The exact function, interpolant, and error
 are evaluated at finer plotting points to display the surfaces clearly. These
 additional points are not finite element nodes and do not change
-$I_hu$.
+$\Ih u$.
 
 ![The square domain, its coarse triangular mesh, the piecewise-linear interpolant, the exact function, and the interpolation error.](../figures/chapter07/interpolation-2d.png){#fig-c7-interpolation-2d width=100%}
 
@@ -696,10 +696,10 @@ later in the chapter.
 
 Three properties of the interpolant will be used repeatedly.
 
-1. **Locality.** The restriction of $I_hu$ to $\mathcal K_e$ depends
+1. **Locality.** The restriction of $\Ih u$ to $\mathcal K_e$ depends
    only on the values of $u$ at the nodes of $\mathcal K_e$.
 2. **Polynomial reproduction.** If $u|_{\mathcal K_e}$ belongs to the local
-   finite element space, then $I_eu=u$ on $\mathcal K_e$. This does
+   finite element space, then $\Ie u=u$ on $\mathcal K_e$. This does
    not mean that a degree-$p$ element reproduces polynomials of arbitrary
    degree. For an affine Lagrange simplex, the local space is
    $\mathcal P_p(\mathcal K_e)$, so every polynomial of total degree at most
@@ -711,9 +711,9 @@ Three properties of the interpolant will be used repeatedly.
    @exr-c5-affine-reproduction and @exr-c6-affine-reproduction.
 3. **Boundary values.** If $u=0$ on $\Gam_D$ and the mesh resolves $\Gam_D$,
    then every node on $\Gam_D$ has zero value. On each facet contained in
-   $\Gam_D$, the restriction of $I_hu$ is determined by the nodal
-   values on that facet, so $I_hu=0$ on $\Gam_D$ and
-   $I_hu\in\Vhzero$.
+   $\Gam_D$, the restriction of $\Ih u$ is determined by the nodal
+   values on that facet, so $\Ih u=0$ on $\Gam_D$ and
+   $\Ih u\in\Vhzero$.
 
 The interpolant requires point values. For $d\leq3$ and a bounded Lipschitz
 domain, every function in $H^2(\Om)$ has a continuous representative on
@@ -730,7 +730,7 @@ $\mathcal K_e=(x_e,x_{e+1})$ and a function $u$ continuous on
 $\overline{\mathcal K}_e$, the linear interpolant is
 
 $$
-I_eu
+\Ie u
 =
 u(x_e)\,\phi_1^e+u(x_{e+1})\,\phi_2^e ,
 $$
@@ -755,7 +755,7 @@ the exact function and the error; they are not additional degrees of freedom.
 On an element $\mathcal K_e=[x_e,x_{e+1}]$, direct calculation gives
 
 $$
-u(x)-I_eu(x)
+u(x)-\Ie u(x)
 =
 (x-x_e)(x_{e+1}-x).
 $$
@@ -783,11 +783,11 @@ by a factor of four.
 Let $u\in H^2(\mathcal K_e)$. Then
 
 $$
-\norm{(u-I_eu)'}_{L^2(\mathcal K_e)}
+\norm{(u-\Ie u)'}_{L^2(\mathcal K_e)}
 \leq
 h_e\norm{u''}_{L^2(\mathcal K_e)},
 \qquad
-\norm{u-I_eu}_{L^2(\mathcal K_e)}
+\norm{u-\Ie u}_{L^2(\mathcal K_e)}
 \leq
 h_e^2\norm{u''}_{L^2(\mathcal K_e)} .
 $$ {#eq-c7-1d-local-interpolation}
@@ -796,18 +796,18 @@ If $u\in H^1(0,L)$ and $u|_{\mathcal K_e}\in H^2(\mathcal K_e)$ for every
 element, then
 
 $$
-\seminorm{u-I_hu}_{H^1(0,L)}^2
+\seminorm{u-\Ih u}_{H^1(0,L)}^2
 \leq
 \sum_{e=1}^{N}h_e^2\norm{u''}_{L^2(\mathcal K_e)}^2,
 \qquad
-\norm{u-I_hu}_{L^2(0,L)}^2
+\norm{u-\Ih u}_{L^2(0,L)}^2
 \leq
 \sum_{e=1}^{N}h_e^4\norm{u''}_{L^2(\mathcal K_e)}^2 .
 $$ {#eq-c7-1d-global-interpolation}
 :::
 
-**Proof.** Let $w=u-I_eu$ on $\mathcal K_e$. Since
-$I_eu$ is linear, its second derivative is zero. Hence
+**Proof.** Let $w=u-\Ie u$ on $\mathcal K_e$. Since
+$\Ie u$ is linear, its second derivative is zero. Hence
 
 $$
 w''=u''
@@ -823,9 +823,9 @@ used.
 By the definition of the nodal interpolant,
 
 $$
-(I_eu)(x_e)=u(x_e),
+(\Ie u)(x_e)=u(x_e),
 \qquad
-(I_eu)(x_{e+1})=u(x_{e+1}).
+(\Ie u)(x_{e+1})=u(x_{e+1}).
 $$
 
 Therefore $w(x_e)=w(x_{e+1})=0$. Rolle's theorem then gives a point
@@ -896,11 +896,11 @@ estimates [@suli2012, pp. 46--47]. The powers of $h_e$ are what matter for
 convergence rates. Using $h_e\leq h$ in @eq-c7-1d-global-interpolation gives
 
 $$
-\seminorm{u-I_hu}_{H^1(0,L)}
+\seminorm{u-\Ih u}_{H^1(0,L)}
 \leq
 h\norm{u''}_{L^2(0,L)},
 \qquad
-\norm{u-I_hu}_{L^2(0,L)}
+\norm{u-\Ih u}_{L^2(0,L)}
 \leq
 h^2\norm{u''}_{L^2(0,L)}
 $$
@@ -919,20 +919,20 @@ Consider the bar problem @eq-c5-discrete-variational with linear elements, and
 assume that $AE$ is constant on each element, with value $(AE)_e$ on
 $\mathcal K_e$. The load $f\in L^2(0,L)$ and the end force $\overline P$ are
 arbitrary. The exact solution $u$ belongs to $H^1(0,L)$ and is therefore
-continuous, so $I_hu$ is defined; it belongs to $\Vhzero$ because
+continuous, so $\Ih u$ is defined; it belongs to $\Vhzero$ because
 $u(0)=0$.
 
 Let $v_h\in\Vhzero$. Its derivative is a constant $v_h'|_e$ on each element,
 so
 
 $$
-a(u-I_hu,v_h)
+a(u-\Ih u,v_h)
 =
 \sum_{e=1}^{N}(AE)_e\,v_h'|_e
-\int_{x_e}^{x_{e+1}}(u-I_hu)'\,\dd x
+\int_{x_e}^{x_{e+1}}(u-\Ih u)'\,\dd x
 =
 \sum_{e=1}^{N}(AE)_e\,v_h'|_e
-\Bigl[(u-I_hu)(x)\Bigr]_{x_e}^{x_{e+1}}
+\Bigl[(u-\Ih u)(x)\Bigr]_{x_e}^{x_{e+1}}
 =0,
 $$
 
@@ -940,12 +940,12 @@ because the interpolation error vanishes at every node. Galerkin orthogonality
 @eq-c7-galerkin-orthogonality gives $a(u-u_h,v_h)=0$ as well. Subtracting,
 
 $$
-a(u_h-I_hu,v_h)=0
+a(u_h-\Ih u,v_h)=0
 \qquad\forall v_h\in\Vhzero .
 $$
 
-Choosing $v_h=u_h-I_hu$ and using coercivity gives
-$u_h=I_hu$. The finite element solution is the interpolant of the
+Choosing $v_h=u_h-\Ih u$ and using coercivity gives
+$u_h=\Ih u$. The finite element solution is the interpolant of the
 exact solution, so its nodal values are exact and its whole error is
 interpolation error.
 
@@ -988,7 +988,7 @@ at the nodes.
 ::: {#exr-c7-pointwise-interpolation}
 ## A pointwise interpolation estimate
 
-Let $u\in C^2(\overline{\mathcal K}_e)$ and $w=u-I_eu$.
+Let $u\in C^2(\overline{\mathcal K}_e)$ and $w=u-\Ie u$.
 
 1. For a fixed $y$ in the interior of $\mathcal K_e$, define
    $$
@@ -1041,7 +1041,7 @@ dimension, $\rho_e=h_e$ and every family of meshes is shape regular.
 The role of $\rho_e$ becomes clear from the reference-cell construction of
 Chapter 6. For an affine simplex, $\phi_a^e=\widehat\phi_a\circ F_e^{-1}$ and
 the interpolant commutes with the mapping: the pullback
-$(I_eu)\circ F_e$ is the reference interpolant of $u\circ F_e$,
+$(\Ie u)\circ F_e$ is the reference interpolant of $u\circ F_e$,
 because the nodes of $\mathcal K_e$ are the images of the reference nodes. An
 interpolation estimate can therefore be proved once on the reference cell
 $\widehat{\mathcal K}$ and transferred to every physical cell. On the
@@ -1063,11 +1063,11 @@ on $d$. Combining these factors for linear triangles gives
 [@arnold2018, pp. 62--64]
 
 $$
-\norm{u-I_eu}_{L^2(\mathcal K_e)}
+\norm{u-\Ie u}_{L^2(\mathcal K_e)}
 \leq
 Ch_e^2\seminorm{u}_{H^2(\mathcal K_e)},
 \qquad
-\seminorm{u-I_eu}_{H^1(\mathcal K_e)}
+\seminorm{u-\Ie u}_{H^1(\mathcal K_e)}
 \leq
 C\,\frac{h_e}{\rho_e}\,h_e\,\seminorm{u}_{H^2(\mathcal K_e)} .
 $$ {#eq-c7-triangle-scaling}
@@ -1099,11 +1099,11 @@ depending only on $d$, $p$, $s$, and $\sigma$, such that for every
 $u\in H^s(\Om)$ and every cell $\mathcal K_e\in\Th$,
 
 $$
-\norm{u-I_hu}_{L^2(\mathcal K_e)}
+\norm{u-\Ih u}_{L^2(\mathcal K_e)}
 \leq
 C_Ih_e^s\seminorm{u}_{H^s(\mathcal K_e)},
 \qquad
-\seminorm{u-I_hu}_{H^1(\mathcal K_e)}
+\seminorm{u-\Ih u}_{H^1(\mathcal K_e)}
 \leq
 C_Ih_e^{s-1}\seminorm{u}_{H^s(\mathcal K_e)} .
 $$ {#eq-c7-local-interpolation}
@@ -1111,11 +1111,11 @@ $$ {#eq-c7-local-interpolation}
 Consequently,
 
 $$
-\norm{u-I_hu}_{L^2(\Om)}
+\norm{u-\Ih u}_{L^2(\Om)}
 \leq
 C_Ih^s\seminorm{u}_{H^s(\Om)},
 \qquad
-\seminorm{u-I_hu}_{H^1(\Om)}
+\seminorm{u-\Ih u}_{H^1(\Om)}
 \leq
 C_Ih^{s-1}\seminorm{u}_{H^s(\Om)} .
 $$ {#eq-c7-global-interpolation}
@@ -1159,11 +1159,11 @@ vertices $(-1,0)$, $(1,0)$, and $(0,\epsilon)$, and let $u(x,y)=x^2$.
    semiperimeter. Show that $h_e/\rho_e$ grows like $1/\epsilon$ as
    $\epsilon\to0$.
 2. Show that the linear interpolant of $u$ on $\mathcal K_\epsilon$ is
-   $I_eu=1-y/\epsilon$.
+   $\Ie u=1-y/\epsilon$.
 3. Compute $\seminorm{u}_{H^2(\mathcal K_\epsilon)}^2$ and
-   $\seminorm{u-I_eu}_{H^1(\mathcal K_\epsilon)}^2$.
+   $\seminorm{u-\Ie u}_{H^1(\mathcal K_\epsilon)}^2$.
 4. Explain why no estimate of the form
-   $\seminorm{u-I_eu}_{H^1(\mathcal K_e)}\leq
+   $\seminorm{u-\Ie u}_{H^1(\mathcal K_e)}\leq
    Ch_e\seminorm{u}_{H^2(\mathcal K_e)}$ can hold with a constant $C$
    independent of $\epsilon$. Relate the result to the shape parameter in
    @eq-c7-triangle-scaling.
@@ -1201,17 +1201,17 @@ where $C_I$ is the constant of @thm-c7-interpolation.
 :::
 
 **Proof.** Since $u\in H^s(\Om)$ with $s\geq2$, the interpolant
-$I_hu$ is defined, and it belongs to $\Vhzero$ by the boundary-value
+$\Ih u$ is defined, and it belongs to $\Vhzero$ by the boundary-value
 property of @sec-c7-interpolation. The diffusion form is symmetric, so
-@cor-c7-best-approximation applies with $v_h=I_hu$. The upper bound in
+@cor-c7-best-approximation applies with $v_h=\Ih u$. The upper bound in
 @eq-c7-energy-seminorm-equivalence and @eq-c7-global-interpolation then give
 
 $$
 \norm{u-u_h}_a
 \leq
-\norm{u-I_hu}_a
+\norm{u-\Ih u}_a
 \leq
-\sqrt{k_1}\,\seminorm{u-I_hu}_{H^1(\Om)}
+\sqrt{k_1}\,\seminorm{u-\Ih u}_{H^1(\Om)}
 \leq
 C_I\sqrt{k_1}\,h^{s-1}\seminorm{u}_{H^s(\Om)} .
 $$
@@ -1401,14 +1401,14 @@ $$
 a(e,z).
 $$
 
-The dual solution $z$ belongs to $H^2(\Om)\cap\Vzero$, so $I_hz$ is
+The dual solution $z$ belongs to $H^2(\Om)\cap\Vzero$, so $\Ih z$ is
 defined and lies in $\Vhzero$. Galerkin orthogonality
 @eq-c7-galerkin-orthogonality allows us to subtract it:
 
 $$
 \norm{e}_{L^2(\Om)}^2
 =
-a(e,z-I_hz).
+a(e,z-\Ih z).
 $$
 
 The diffusion form satisfies
@@ -1433,7 +1433,7 @@ C_I\sqrt{k_1/k_0}\,h^{s-1}\seminorm{u}_{H^s(\Om)}$, and substitution gives
 
 The proof follows @arnold2018 [pp. 66--67]. The extra power of $h$ comes from
 the interpolation error of the dual solution: Galerkin orthogonality lets us
-replace $z$ by $z-I_hz$, which is small because $z$ is smooth. For
+replace $z$ by $z-\Ih z$, which is small because $z$ is smooth. For
 smooth solutions with $s=p+1$, the result is
 
 $$
@@ -1445,7 +1445,7 @@ second-order $L^2$ convergence seen in Chapter 5.
 
 The same argument estimates the error in other linear quantities of interest.
 If $Q(v)=\inner{q}{v}_{L^2(\Om)}$ for a fixed $q\in L^2(\Om)$, solving the dual
-problem with $r=q$ gives $Q(u)-Q(u_h)=a(e,z-I_hz)$ and hence a bound
+problem with $r=q$ gives $Q(u)-Q(u_h)=a(e,z-\Ih z)$ and hence a bound
 of order $h\,\seminorm{e}_{H^1(\Om)}$ [@arnold2018, pp. 66--67]. Chapter 8
 returns to this goal-oriented use of duality.
 
