@@ -42,10 +42,14 @@ decks.
 
 ## `apriori-error/`
 
-Chapter 7 lecture covering the continuous and discrete problem, error norms,
-Galerkin orthogonality, best approximation, C\'ea's lemma, and finite element
-interpolation through the one-dimensional interpolation estimates of Section
-7.5.2.
+The first Chapter 7 lecture covers the continuous and discrete problem, error
+norms, Galerkin orthogonality, best approximation, and C\'ea's lemma. The
+second deck, `chapter07_convergence_lecture.tex`, introduces finite element
+interpolation and continues through shape regularity and the energy- and
+$H^1$-norm estimates. The third
+deck, `chapter07_duality_verification_lecture.tex`, covers predicted rates,
+the duality argument for the $L^2$ rate, numerical verification, and
+elasticity.
 
 Build the slides from that directory with:
 
@@ -54,4 +58,29 @@ conda run -n finite-elements latexmk -pdf \
   -interaction=nonstopmode -halt-on-error \
   -outdir=build chapter07_apriori_error_lecture.tex
 cp build/chapter07_apriori_error_lecture.pdf chapter07_apriori_error_lecture.pdf
+
+conda run -n finite-elements latexmk -pdf \
+  -interaction=nonstopmode -halt-on-error \
+  -outdir=build chapter07_convergence_lecture.tex
+cp build/chapter07_convergence_lecture.pdf chapter07_convergence_lecture.pdf
+
+conda run -n finite-elements latexmk -pdf \
+  -interaction=nonstopmode -halt-on-error \
+  -outdir=build chapter07_duality_verification_lecture.tex
+cp build/chapter07_duality_verification_lecture.pdf chapter07_duality_verification_lecture.pdf
+```
+
+## `aposteriori-error/`
+
+Opening Chapter 8 lecture on the residual functional, localization into cell
+and facet defects, residual indicators, and the reliability argument. The
+first lecture stops before marking and refinement.
+
+Build the slides from that directory with:
+
+```bash
+conda run -n finite-elements latexmk -pdf \
+  -interaction=nonstopmode -halt-on-error \
+  -outdir=build chapter08_residual_estimation_lecture.tex
+cp build/chapter08_residual_estimation_lecture.pdf chapter08_residual_estimation_lecture.pdf
 ```

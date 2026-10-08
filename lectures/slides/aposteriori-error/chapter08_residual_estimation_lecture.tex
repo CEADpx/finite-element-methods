@@ -1,0 +1,442 @@
+\documentclass[11pt,aspectratio=169]{beamer}
+
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{}
+\setbeamertemplate{frametitle}{%
+  \vspace{0.25cm}%
+  \insertframetitle\par
+  \vspace{0.08cm}%
+  \hrule
+}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{frametitle}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=black}
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
+
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\Om}{\Omega}
+\newcommand{\GamD}{\Gamma_D}
+\newcommand{\GamN}{\Gamma_N}
+\newcommand{\Th}{\mathcal T_h}
+\newcommand{\Fh}{\mathcal F_h}
+\newcommand{\Vzero}{\mathcal V_0}
+\newcommand{\Vhzero}{\mathcal V_{h,0}}
+\newcommand{\norm}[2][]{\left\lVert#2\right\rVert_{#1}}
+\newcommand{\seminorm}[2][]{\left\lvert#2\right\rvert_{#1}}
+\newcommand{\grad}{\nabla}
+\newcommand{\divg}{\operatorname{div}}
+\newcommand{\bn}{\bm n}
+\newcommand{\bq}{\bm q}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \centering
+  \vfill
+  {\LARGE\bfseries A Posteriori Error Estimation\par}
+  \vspace{0.45cm}
+  {\large Residuals, local indicators, and reliability\par}
+  \vfill
+\end{frame}
+
+\begin{frame}{From a rate to an error estimate}
+Chapter 7 ended with an a priori statement such as
+\[
+  \norm[a]{u-u_h}\leq C_I\sqrt{k_1}\,h^{s-1}
+  \seminorm[H^s(\Om)]{u}.
+\]
+It predicts a rate, but it does not answer two questions after a computation:
+\begin{enumerate}
+  \item Is the error on this mesh small enough?
+  \item Which cells should be refined?
+\end{enumerate}
+
+\vspace{0.25cm}
+Chapter 8 replaces the unknown derivative of $u$ by defects computed from
+$u_h$:
+\[
+  \boxed{\text{solve}\ \longrightarrow\ \text{estimate}\ \longrightarrow\
+  \text{mark}\ \longrightarrow\ \text{refine}.}
+\]
+Today: derive the residual, localize it to cells and facets, and build the
+estimator. Marking and refinement follow in the next class.
+\end{frame}
+
+\begin{frame}{The residual is what the discrete solution leaves unsatisfied}
+For the diffusion problem, let
+\[
+  a(w,v)=\int_\Om k\grad w\cdot\grad v\,\dd x,
+  \qquad
+  \ell(v)=\int_\Om fv\,\dd x-\int_{\GamN}qv\,\dd s.
+\]
+The exact and discrete problems are
+\[
+  a(u,v)=\ell(v)\quad\forall v\in\Vzero,
+  \qquad
+  a(u_h,v_h)=\ell(v_h)\quad\forall v_h\in\Vhzero.
+\]
+Define the residual functional
+\[
+  \boxed{R(u_h;v)=\ell(v)-a(u_h,v),\qquad v\in\Vzero.}
+\]
+With $e=u-u_h$,
+\[
+  \boxed{R(u_h;v)=a(e,v).}
+\]
+Therefore $R(u_h;v_h)=0$ for every $v_h\in\Vhzero$: the residual vanishes on
+the test space used to compute $u_h$, but generally not on all of $\Vzero$.
+\end{frame}
+
+\begin{frame}{In the energy norm, residual size equals error size}
+Because $a(\cdot,\cdot)$ is an inner product,
+\[
+  |R(u_h;v)|=|a(e,v)|\leq\norm[a]{e}\,\norm[a]{v}.
+\]
+Taking the supremum gives one inequality. Taking $v=e$ gives equality:
+\[
+  \boxed{
+  \norm[a]{e}
+  =\sup_{0\neq v\in\Vzero}
+  \frac{|R(u_h;v)|}{\norm[a]{v}}.}
+\]
+
+\vspace{0.25cm}
+This identity is exact, but it is not yet computable:
+\begin{itemize}
+  \item the maximizing direction is $v=e$, which is unknown;
+  \item the supremum ranges over the infinite-dimensional space $\Vzero$;
+  \item the single number does not yet say where the error is located.
+\end{itemize}
+
+\vspace{0.18cm}
+The next step rewrites $R(u_h;v)$ as cell and facet contributions.
+\end{frame}
+
+\begin{frame}{A conforming mesh has three facet classes}
+\begin{columns}[c,onlytextwidth]
+  \begin{column}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1.15]
+      \coordinate (A) at (0,0);
+      \coordinate (B) at (3,0);
+      \coordinate (C) at (3,2);
+      \coordinate (D) at (0,2);
+      \coordinate (E) at (1.5,1);
+      \fill[blue!6] (A)--(B)--(E)--cycle;
+      \fill[orange!10] (B)--(C)--(E)--cycle;
+      \fill[green!10] (C)--(D)--(E)--cycle;
+      \fill[gray!10] (D)--(A)--(E)--cycle;
+      \draw[thick] (A)--(B)--(C)--(D)--cycle;
+      \draw[thick] (A)--(E)--(B) (C)--(E)--(D);
+      \draw[very thick,blue!70!black] (A)--(D);
+      \draw[very thick,red!70!black] (B)--(C);
+      \draw[-{Stealth},thick] (1.45,0.9)--(2.05,1.3);
+      \node[font=\footnotesize] at (0.25,1) {$\GamD$};
+      \node[font=\footnotesize] at (2.75,1) {$\GamN$};
+      \node[font=\footnotesize] at (2.05,1.55) {$\bn_{\mathcal F}$};
+      \node[font=\footnotesize] at (1.05,0.45) {$\mathcal K^+$};
+      \node[font=\footnotesize] at (1.85,1.45) {$\mathcal K^-$};
+    \end{tikzpicture}
+  \end{column}
+  \begin{column}{0.50\textwidth}
+    \begin{itemize}
+      \item $\Fh^{\mathrm{int}}$: shared by two cells $\mathcal K^+$ and
+      $\mathcal K^-$;
+      \item $\Fh^D$: boundary facets on $\GamD$;
+      \item $\Fh^N$: boundary facets on $\GamN$.
+    \end{itemize}
+    Choose $\bn_{\mathcal F}$ from $\mathcal K^+$ to $\mathcal K^-$. For a
+    piecewise quantity $w$,
+    \[
+      [\![w]\!]_{\mathcal F}=w^+-w^-.
+    \]
+    Reversing the cell labels reverses both the jump and the normal, so the
+    normal-flux jump used below is unchanged.
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Cellwise integration by parts exposes the strong defect}
+Start from
+\[
+  R(u_h;v)=\int_\Om fv\,\dd x-\int_{\GamN}qv\,\dd s
+  -\int_\Om k\grad u_h\cdot\grad v\,\dd x.
+\]
+On one cell $\mathcal K_e$,
+\[
+  \int_{\mathcal K_e}k\grad u_h\cdot\grad v\,\dd x
+  =-\int_{\mathcal K_e}\divg(k\grad u_h)v\,\dd x
+  +\int_{\partial\mathcal K_e}(k\grad u_h\cdot\bn_e)v\,\dd s.
+\]
+After summing over cells,
+\[
+\begin{aligned}
+  R(u_h;v)
+  ={}&\sum_e\int_{\mathcal K_e}
+  \bigl(f+\divg(k\grad u_h)\bigr)v\,\dd x\\
+  &-\sum_e\int_{\partial\mathcal K_e}
+  (k\grad u_h\cdot\bn_e)v\,\dd s
+  -\int_{\GamN}qv\,\dd s.
+\end{aligned}
+\]
+The first line is the elementwise balance defect. The second line must be
+regrouped facet by facet.
+\end{frame}
+
+\begin{frame}{Facet regrouping gives two flux defects}
+\small
+Define the computed flux $\bq_h=-k\grad u_h$. On an interior facet,
+the two cell-boundary terms combine into
+\[
+  j_{\mathcal F}
+  =-[\![k\grad u_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F}
+  =[\![\bq_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F}.
+\]
+On a Neumann facet,
+\[
+  j_{\mathcal F}
+  =-\bigl(q+k\grad u_h\cdot\bn\bigr)
+  =\bq_h\cdot\bn-q.
+\]
+On $\GamD$, $v=0$, so there is no residual term. With
+\[
+  r_e=f+\divg(k\grad u_h)=f-\divg\bq_h,
+\]
+the exact representation is
+\[
+  \boxed{
+  R(u_h;v)=
+  \sum_e\int_{\mathcal K_e}r_e v\,\dd x
+  +\sum_{\mathcal F\in\Fh^{\mathrm{int}}\cup\Fh^N}
+  \int_{\mathcal F}j_{\mathcal F}v\,\dd s.}
+\]
+\end{frame}
+
+\begin{frame}{What the residuals measure}
+\begin{center}
+\begin{tikzpicture}[
+  box/.style={draw,rounded corners=2pt,align=center,text width=3.15cm,
+    minimum height=1.25cm,inner sep=5pt},
+  >=Stealth]
+  \node[box,fill=blue!6] (cell) {\textbf{Cell residual}\\
+    $r_e=f-\divg\bq_h$\\balance defect inside a cell};
+  \node[box,fill=orange!9,right=0.45cm of cell] (int) {\textbf{Interior facet}\\
+    $j_{\mathcal F}=[\![\bq_h\cdot\bn_{\mathcal F}]\!]$\\flux leaving one cell does not enter the next};
+  \node[box,fill=green!9,right=0.45cm of int] (neu) {\textbf{Neumann facet}\\
+    $j_{\mathcal F}=\bq_h\cdot\bn-q$\\computed flux misses prescribed flux};
+\end{tikzpicture}
+\end{center}
+
+For $p=1$ and cellwise-constant $k$, $\grad u_h$ is constant on each cell,
+so $\divg(k\grad u_h)=0$ and $r_e=f$. The computed gradient information then
+appears in the facet jumps.
+
+\vspace{0.2cm}
+Galerkin orthogonality balances the two kinds of defects on every free basis
+function $\phi_i$:
+\[
+  \sum_e\int_{\mathcal K_e}r_e\phi_i\,\dd x
+  +\sum_{\mathcal F}\int_{\mathcal F}j_{\mathcal F}\phi_i\,\dd s=0.
+\]
+Neither residual must vanish separately.
+\end{frame}
+
+\begin{frame}{Activity: residuals for the uniformly loaded bar}
+Let $L=AE=f=1$, $\overline P=0$, and use a uniform mesh of size $h$ with
+linear elements. The exact solution is
+\[
+  u(x)=x-\frac{x^2}{2},
+\]
+and Chapter 7 showed $u_h=\mathcal I_hu$.
+
+\vspace{0.2cm}
+Work with a neighbor. For element $\mathcal K_e=(x_e,x_{e+1})$:
+\begin{enumerate}
+  \item Find $u_h'|_{\mathcal K_e}$ using the chord slope of $u$.
+  \item Compute
+  \[
+    r_e=f+(AEu_h')',\quad
+    j_i=(AEu_h')(x_i^+)-(AEu_h')(x_i^-),\quad
+    j_{N+1}=\overline P-(AEu_h')(L^-).
+  \]
+  \item For an interior hat function $\phi_i$, verify that its element and
+  facet residual contributions cancel.
+\end{enumerate}
+
+\vspace{0.15cm}
+The nodal values are exact. Predict: do all residuals vanish?
+\end{frame}
+
+\begin{frame}{Activity debrief: exact nodes do not imply zero residual}
+The chord slope equals the exact derivative at the midpoint $\bar x_e$:
+\[
+  u_h'|_{\mathcal K_e}=u'(\bar x_e)=1-\bar x_e.
+\]
+Therefore
+\[
+  \boxed{r_e=1,\qquad j_i=-h,\qquad j_{N+1}=-\frac h2.}
+\]
+Every residual is nonzero, although $u_h(x_i)=u(x_i)$ at every node.
+
+\vspace{0.25cm}
+For an interior hat function,
+\[
+  \int_0^1 r\phi_i\,\dd x=h,
+  \qquad
+  j_i\phi_i(x_i)=-h.
+\]
+At the last node, the two terms are $h/2$ and $-h/2$. This is residual
+orthogonality in local form: the discrete equations balance cell and facet
+defects, but the defects still detect the error between nodes.
+\end{frame}
+
+\begin{frame}{Galerkin orthogonality supplies the powers of $h$}
+The residual representation alone contains $\norm[L^2(\mathcal K_e)]{e}$,
+which gives no local mesh-size weight. For any $v_h\in\Vhzero$,
+\[
+  R(u_h;v)=R(u_h;v-v_h).
+\]
+Choose a local approximation $v_h=\mathcal Q_hv$. Hypothesis (Q) requires
+\[
+\begin{aligned}
+  \norm[L^2(\mathcal K_e)]{v-\mathcal Q_hv}
+  &\leq C_Qh_e\seminorm[H^1(\omega_e)]{v},\\
+  \norm[L^2(\mathcal F)]{v-\mathcal Q_hv}
+  &\leq C_Qh_{\mathcal F}^{1/2}
+  \seminorm[H^1(\omega_{\mathcal F})]{v}.
+\end{aligned}
+\]
+Here $\omega_e$ and $\omega_{\mathcal F}$ are fixed-size patches. The
+operator maps $\Vzero$ into $\Vhzero$ and uses local averages, so it is
+defined for $H^1$ functions even when nodal interpolation is not.
+
+\vspace{0.15cm}
+The factors $h_e$ and $h_{\mathcal F}^{1/2}$ become the estimator weights.
+\end{frame}
+
+\begin{frame}{Local indicators assign a computable number to each cell}
+\small
+For each cell $\mathcal K_e$, define
+\[
+\boxed{
+\begin{aligned}
+\eta_e^2={}&h_e^2\norm[L^2(\mathcal K_e)]{r_e}^2
++\frac12\sum_{\substack{\mathcal F\subset\partial\mathcal K_e\\
+\mathcal F\in\Fh^{\mathrm{int}}}}
+h_{\mathcal F}\norm[L^2(\mathcal F)]{j_{\mathcal F}}^2\\
+&+\sum_{\substack{\mathcal F\subset\partial\mathcal K_e\\
+\mathcal F\in\Fh^N}}
+h_{\mathcal F}\norm[L^2(\mathcal F)]{j_{\mathcal F}}^2.
+\end{aligned}}
+\]
+The global estimator is
+\[
+  \boxed{\eta=\left(\sum_e\eta_e^2\right)^{1/2}.}
+\]
+The factor $1/2$ assigns half of an interior facet to each adjacent cell.
+After summing over cells, every facet is counted exactly once. A Neumann
+facet belongs to only one cell, so it receives no factor $1/2$.
+\end{frame}
+
+\begin{frame}{In one dimension, reliability has an explicit constant}
+For the bar with variable $AE(x)\geq(AE)_0>0$, nodal interpolation is defined
+for every $H^1$ error. The nodal terms vanish for
+$w=e-\mathcal I_he$, leaving only element residuals. The interpolation bound
+and Cauchy--Schwarz give
+\[
+  \boxed{
+  \norm[a]{u-u_h}
+  \leq\frac{1}{\sqrt{(AE)_0}}
+  \left(\sum_eh_e^2\norm[L^2(\mathcal K_e)]{r_e}^2\right)^{1/2}.}
+\]
+
+For the activity, $(AE)_0=1$, $r_e=1$, $N=1/h$, and
+\[
+  \eta_{\mathrm{1D}}^2=Nh^3=h^2,
+  \qquad \eta_{\mathrm{1D}}=h.
+\]
+Chapter 7 gave $\norm[a]{e}=h/\sqrt{12}$, so
+\[
+  I_{\mathrm{eff}}
+  =\frac{\eta_{\mathrm{1D}}}{\norm[a]{e}}=\sqrt{12}\approx3.46.
+\]
+The estimator decreases at the correct rate but overestimates by a fixed
+factor on this mesh sequence.
+\end{frame}
+
+\begin{frame}{Multidimensional reliability: statement and proof route}
+Assume Hypothesis (Q), shape regularity, and $k\geq k_0>0$. Then
+\[
+  \boxed{\norm[a]{u-u_h}\leq C_{\mathrm{rel}}\eta,
+  \qquad C_{\mathrm{rel}}
+  =C_Q\sqrt{\frac{N_{\mathrm{ov}}}{k_0}}.}
+\]
+The proof uses four steps:
+\begin{enumerate}
+  \item $\norm[a]{e}^2=R(u_h;e)=R(u_h;e-\mathcal Q_he)$;
+  \item insert the cell-and-facet residual representation;
+  \item apply Hypothesis (Q), then Cauchy--Schwarz to the combined sums;
+  \item use finite patch overlap and
+  $\seminorm[H^1(\Om)]{e}\leq\norm[a]{e}/\sqrt{k_0}$.
+\end{enumerate}
+The constants are independent of $h$, but $C_Q$ and $N_{\mathrm{ov}}$ are
+not normally computed. Thus $\eta$ controls the error up to a fixed factor;
+its displayed value is not automatically a certified numerical upper bound.
+\end{frame}
+
+\begin{frame}{Definition, reliability, efficiency, and effectivity differ}
+\renewcommand{\arraystretch}{1.28}
+\begin{tabular}{p{0.18\linewidth}p{0.75\linewidth}}
+\toprule
+\textbf{Term} & \textbf{Claim} \\
+\midrule
+Estimator & $\eta$ and $\eta_e$ are computable definitions; a definition alone
+does not compare them with the error. \\
+Reliability & $\norm[a]{e}\leq C_{\mathrm{rel}}\eta$. A small estimator implies
+a small error. \\
+Local efficiency & $\eta_e\leq C_{\mathrm{eff}}
+(\norm[a,\omega_e]{e}+\mathrm{osc}_e)$. A large indicator should correspond
+to error on a nearby patch, up to data oscillation. \\
+Effectivity & $I_{\mathrm{eff}}=\eta/\norm[a]{e}$, evaluated when the exact
+error is known, measures the numerical scale of the estimator. \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.25cm}
+Today we proved the one-dimensional reliability result and stated the
+multidimensional result under Hypothesis (Q). Efficiency is a desired
+property and a definition here; no efficiency theorem is being claimed for
+this candidate estimator without a matching source and precise oscillation
+definition.
+\end{frame}
+
+\begin{frame}{What to retain and what comes next}
+\begin{itemize}
+  \item The residual is the error measured through the bilinear form:
+  $R(u_h;v)=a(u-u_h,v)$.
+  \item Cellwise integration by parts separates element balance defects from
+  interior and Neumann flux defects.
+  \item Galerkin orthogonality allows subtraction of a local approximation;
+  this produces the powers of the local mesh size.
+  \item $\eta_e$ localizes the estimator and $\eta$ combines the cells.
+  Reliability means the estimator controls the energy error up to a
+  mesh-independent constant.
+\end{itemize}
+
+\vspace{0.22cm}
+\textbf{Exit question.} For linear elements with constant $k$ and $f=0$ on
+every cell, can the estimator still be nonzero? Identify the term that remains.
+
+\vspace{0.22cm}
+\textbf{Next class.} Complete the multidimensional proof, compare marking
+strategies, and connect the indicators to conforming local refinement.
+\end{frame}
+
+\end{document}

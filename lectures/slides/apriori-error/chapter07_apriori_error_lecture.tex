@@ -60,12 +60,11 @@ with the exact weak solution $u$.
   \item Derive Galerkin orthogonality and show how it leads to best
   approximation.
   \item Prove C\'ea's lemma.
-  \item Construct the nodal interpolant and obtain the one-dimensional
-  interpolation estimates.
 \end{enumerate}
 
 \vspace{0.2cm}
-The lecture ends with linear interpolation in one dimension, Section 7.5.2.
+The next lecture introduces finite element interpolation and uses it to obtain
+error estimates in terms of the mesh size $h$.
 \end{frame}
 
 \begin{frame}{Continuous and discrete problems}
@@ -674,18 +673,17 @@ Applying the local bounds gives
   \item Continuity and coercivity provide a stable continuous and discrete
   problem.
   \item Galerkin orthogonality states that
-  $a(u-u_h,v_h)=0$ for every $v_h\in V_h$.
+  $a(u-u_h,v_h)=0$ for every $v_h\in\Vhzero$.
   \item C\'ea's lemma bounds the error by the best approximation available in
   that space.
   \item For symmetric problems, the finite element solution is the best
   approximation in the energy norm.
-  \item The nodal interpolant gives a specific finite element function whose
-  error can be bounded in terms of $h$ and derivatives of $u$.
 \end{itemize}
 
 \vspace{0.2cm}
-The next part of Chapter 7 extends the interpolation estimate to
-multidimensional elements and then combines it with C\'ea's lemma.
+The next lecture constructs the nodal interpolant, derives interpolation
+estimates, and combines them with C\'ea's lemma to obtain finite element error
+estimates.
 \end{frame}
 
 \end{document}

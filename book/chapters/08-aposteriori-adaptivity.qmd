@@ -4,4 +4,1105 @@
 \chaptershorttitle{Adaptivity}
 ```
 
-*Chapter placeholder. Content will be developed from the finalized course notes and references.*
+<!--
+DRAFT CHAPTER, integrated 2026-10-05 for continued development.
+This draft covers the chapter opening through the residual estimator,
+reliability under the stated quasi-interpolation hypothesis, and the
+distinction among estimator definition, reliability, and efficiency.
+Marking, refinement, the adaptive loop, FEniCSx, elasticity, and
+goal-oriented estimation remain to be written. New notation is still inline;
+see .agent/CHAPTER8_DEVELOPMENT_HANDOFF.md before revising this chapter.
+-->
+
+Chapter 7 explained how the finite element error depends on the mesh size, the
+polynomial degree, and the smoothness of the exact solution. Its estimates
+predict convergence rates, but they do not supply the size of the error in a
+particular computation. The bound @eq-c7-energy-estimate contains the seminorm
+$\seminorm{u}_{H^s(\Om)}$ of the unknown solution and an interpolation constant
+$C_I$ that is rarely known sharply. Chapter 7 also showed that the guaranteed
+rate depends on the smoothness of $u$. On a polygon with a reentrant corner the
+solution may fail to belong to $H^2(\Om)$, so the rate guaranteed for a smooth
+solution need not be attained by uniform refinement.
+
+This chapter uses the computed solution $u_h$ to obtain information about the
+error $u-u_h$. An **a posteriori error estimator** is a quantity computed from
+$u_h$, the data, and the mesh that is used to bound or approximate the error.
+Such an estimator has two uses. Its global value indicates whether the
+computation is accurate enough to stop. Its distribution over the cells
+indicates where the mesh should be refined. The second use leads to adaptive
+finite element methods, in which the mesh is refined only where the estimated
+error is large.
+
+The chapter develops the residual-based estimator for scalar diffusion. The
+starting point is the residual of the variational equation, which Chapter 7
+introduced in the discussion of Galerkin orthogonality. We first show that the
+energy-norm error is determined exactly by this residual. Integration by parts
+on each cell then splits the residual into contributions from the cell
+interiors, from the facets shared by neighboring cells, and from the Neumann
+boundary. Weighting these contributions by the local mesh size gives local
+error indicators and a global estimator. We then distinguish three different
+statements about the estimator: its definition, its reliability, and its
+efficiency. The later sections use the indicators to mark cells, refine the
+mesh, and repeat the computation.
+
+## Why estimate the error after the computation {#sec-c8-motivation}
+
+The elementwise interpolation estimate @eq-c7-1d-global-interpolation already
+suggests where a mesh should be fine. On an interval, it bounds the squared
+gradient error by
+
+$$
+\sum_{e=1}^{N}h_e^2\norm{u''}_{L^2(\mathcal K_e)}^2 .
+$$
+
+A cell contributes much to this sum when it is large or when $|u''|$ is large
+on it. To reduce the bound with the fewest additional cells, one should make
+the cells small where $|u''|$ is large and leave them large elsewhere. The
+difficulty is that $u''$ is a property of the unknown exact solution. A mesh
+designed from this bound would require the answer before the computation.
+
+The same difficulty appears in two and three dimensions. As Chapter 7 noted,
+the solution of a Laplace problem on a polygon with a reentrant corner may fail
+to belong to $H^2(\Om)$. The reduced regularity is localized near the corner,
+where the derivatives may be large. Uniform refinement reduces the cell size
+everywhere, including the large region in which the solution is smooth and the
+error is already small. Most of the additional unknowns are therefore spent
+where they reduce the error least.
+
+An a posteriori estimator replaces the unknown quantities in such bounds by
+quantities that can be evaluated once $u_h$ has been computed. This chapter
+uses the estimator in an iterative procedure:
+
+1. solve the discrete problem on the current mesh;
+2. estimate the error from the computed solution;
+3. mark the cells with the largest estimated contributions; and
+4. refine the marked cells and repeat.
+
+This is the **solve--estimate--mark--refine** loop. Each step requires
+mathematical justification. This section and the next two develop the
+estimate. The marking and refinement steps are developed in later sections.
+
+## The residual and the error {#sec-c8-residual}
+
+### Setting
+
+We use the scalar diffusion problem and the finite element discretization of
+@sec-c7-problem-setting. Thus $\Om\subset\R^d$, $d\in\{2,3\}$, is a bounded
+polygonal or polyhedral domain, $\Gam_D$ has positive boundary measure, the
+coefficient satisfies @eq-variational-coefficient-bounds, $f\in L^2(\Om)$,
+$q\in L^2(\Gam_N)$, and $g=0$. The exact solution $u\in\Vzero$ satisfies
+@eq-c7-continuous-problem, and the finite element solution $u_h\in\Vhzero$
+satisfies @eq-c7-discrete-problem. We retain the three assumptions stated after
+@eq-c7-continuous-problem: the mesh is conforming and boundary fitted and
+resolves the partition into $\Gam_D$ and $\Gam_N$, $\Vh$ is the continuous
+Lagrange space of degree $p\geq1$, and the forms are evaluated exactly. In
+addition, we assume that
+
+4. $\Th$ belongs to a shape-regular family of affine simplicial meshes in the
+   sense of @def-c7-shape-regular, with shape bound $\sigma$; and
+5. the coefficient is smooth on each cell, in the sense that
+   $k|_{\mathcal K_e}\in C^1(\overline{\mathcal K_e})$ for every
+   $\mathcal K_e\in\Th$.
+
+The fifth assumption allows $k$ to jump across facets, as it does at an
+interface between two materials, provided that the mesh is aligned with the
+interface. It is needed because the estimator below contains
+$\divg(k\grad u_h)$ on each cell and the normal component of $k\grad u_h$ on
+each facet. In the most common case, $k$ is constant on each cell.
+
+### The residual functional
+
+Chapter 7 observed that, for any $w\in\Vzero$, the linear functional
+$v\mapsto\ell(v)-a(w,v)$ measures how far $w$ is from satisfying the
+variational equation. We now give this functional a name for $w=u_h$.
+
+::: {#def-c8-residual}
+## Residual of the finite element solution
+
+The **residual** of $u_h$ is the linear functional
+$R(u_h;\cdot):\Vzero\to\R$ defined by
+
+$$
+R(u_h;v)
+=
+\ell(v)-a(u_h,v)
+\qquad\forall v\in\Vzero .
+$$ {#eq-c8-residual}
+:::
+
+For a given test function $v$, the number $R(u_h;v)$ can be computed. It
+requires only the data $f$, $q$, and $k$ and the computed solution $u_h$; the
+exact solution does not appear. The residual is also continuous on $\Vzero$.
+The bound @eq-variational-load-continuity shows that $\ell$ is continuous, and
+@eq-variational-continuity shows that $v\mapsto a(u_h,v)$ is continuous. Hence
+$R(u_h;\cdot)$ belongs to the dual space $\Vzero^*$ of @def-dual-space.
+
+### The error--residual relation
+
+The exact solution satisfies $a(u,v)=\ell(v)$ for every $v\in\Vzero$.
+Substituting $\ell(v)=a(u,v)$ into @eq-c8-residual and using linearity of $a$
+in its first argument gives
+
+$$
+R(u_h;v)
+=
+a(u,v)-a(u_h,v)
+=
+a(e,v)
+\qquad\forall v\in\Vzero,
+$$ {#eq-c8-error-residual}
+
+where $e=u-u_h$. This identity connects a computable functional with the
+unknown error. It has two immediate consequences.
+
+First, every discrete test function is also an admissible test function in
+@eq-c8-error-residual. Galerkin orthogonality @eq-c7-galerkin-orthogonality
+therefore states that the residual vanishes on the discrete test space:
+
+$$
+R(u_h;v_h)=0
+\qquad\forall v_h\in\Vhzero .
+$$ {#eq-c8-residual-orthogonality}
+
+The discrete equations are exactly the statement that the residual vanishes on
+every free basis function $\phi_i$. They say nothing about the residual on
+functions outside $\Vhzero$. In general, $R(u_h;v)\neq0$ for such functions,
+and the residual vanishes on all of $\Vzero$ only when $u_h=u$.
+
+Second, the energy norm of the error is the dual norm of the residual when
+test functions are measured in the energy norm. Since the diffusion form is
+symmetric and coercive, $a$ is an inner product on $\Vzero$ with associated
+norm $\norm{\cdot}_a$ from @def-c7-energy-norm. The Cauchy--Schwarz inequality
+for this inner product and @eq-c8-error-residual give
+
+$$
+|R(u_h;v)|
+=
+|a(e,v)|
+\leq
+\norm{e}_a\norm{v}_a
+\qquad\forall v\in\Vzero .
+$$
+
+If $e\neq0$, the choice $v=e$ gives equality, because
+$R(u_h;e)=a(e,e)=\norm{e}_a^2$. Therefore
+
+$$
+\norm{u-u_h}_a
+=
+\sup_{v\in\Vzero,\,v\neq0}
+\frac{|R(u_h;v)|}{\norm{v}_a}.
+$$ {#eq-c8-error-dual-norm}
+
+If $e=0$, the residual vanishes on all of $\Vzero$, and both sides are zero.
+
+Equation @eq-c8-error-dual-norm is exact, but it is not yet an estimate that
+can be evaluated. The supremum is taken over the infinite-dimensional space
+$\Vzero$, and the maximizing test function is the unknown error itself. The
+remainder of the derivation replaces this supremum by an upper bound built from
+local, computable quantities.
+
+The same idea can be expressed in the $H^1(\Om)$ norm. With the continuity and
+coercivity constants $M$ and $\alpha$ of @eq-c7-continuity and
+@eq-c7-coercivity, and the dual norm @eq-foundations-dual-norm taken with
+respect to $\norm{\cdot}_{H^1(\Om)}$,
+
+$$
+\frac{1}{M}\norm{R(u_h;\cdot)}_{\Vzero^*}
+\leq
+\norm{u-u_h}_{H^1(\Om)}
+\leq
+\frac{1}{\alpha}\norm{R(u_h;\cdot)}_{\Vzero^*}
+$$ {#eq-c8-error-dual-norm-h1}
+
+[@arnold2018, p. 71]. The energy norm gives equality because it is the norm
+defined by the bilinear form. We work with the energy norm in what follows.
+
+::: {#exr-c8-error-dual-norm-h1}
+## The residual in the $H^1$ norm
+
+1. Use @eq-c8-error-residual and @eq-c7-continuity to prove the lower bound
+   in @eq-c8-error-dual-norm-h1.
+2. Take $v=e$ in @eq-c8-error-residual and use @eq-c7-coercivity to prove the
+   upper bound.
+3. For the diffusion problem, use @eq-c7-diffusion-constants to write the
+   ratio of the two constants in @eq-c8-error-dual-norm-h1. Explain why
+   @eq-c8-error-dual-norm contains no such ratio.
+:::
+
+## Element and facet residuals {#sec-c8-localization}
+
+The residual @eq-c8-residual is a single functional on the whole domain. To
+identify where the error originates, we rewrite it as a sum of contributions
+from individual cells and facets. The rewriting uses integration by parts on
+each cell. It requires notation for the facets of the mesh.
+
+### Facets, normals, and jumps
+
+Recall from @sec-c6-meshes that the boundary of a cell consists of facets:
+edges in two dimensions and faces in three dimensions. Let $\mathcal F_h$
+denote the set of all facets of $\Th$. Because the mesh is conforming and
+resolves the boundary partition, each facet belongs to exactly one of three
+classes:
+
+- $\mathcal F_h^{\mathrm{int}}$, the **interior facets**, each shared by two
+  cells;
+- $\mathcal F_h^{D}$, the boundary facets contained in $\overline{\Gam_D}$;
+  and
+- $\mathcal F_h^{N}$, the boundary facets contained in $\overline{\Gam_N}$.
+
+For a facet $\mathcal F$, let $h_{\mathcal F}=\operatorname{diam}(\mathcal F)$.
+On a shape-regular mesh, $h_{\mathcal F}$ and the diameter $h_e$ of a cell
+containing $\mathcal F$ are comparable, with constants depending only on
+$\sigma$ and $d$.
+
+An interior facet $\mathcal F$ is shared by two cells, which we label
+$\mathcal K^+$ and $\mathcal K^-$. Let $\bn_{\mathcal F}$ be the unit normal
+to $\mathcal F$ pointing from $\mathcal K^+$ into $\mathcal K^-$. Thus
+$\bn_{\mathcal F}$ is the outward normal of $\mathcal K^+$ on $\mathcal F$, and
+$-\bn_{\mathcal F}$ is the outward normal of $\mathcal K^-$. For a boundary
+facet, $\bn_{\mathcal F}=\bn$ is the outward unit normal of $\Om$.
+
+A finite element function is a polynomial on each cell, but its gradient is
+generally discontinuous across facets. For a function $w$ whose restrictions
+to $\mathcal K^+$ and $\mathcal K^-$ have traces $w^+$ and $w^-$ on
+$\mathcal F$, the **jump** across $\mathcal F$ is
+
+$$
+[\![w]\!]_{\mathcal F}
+=
+w^+-w^-
+\qquad\text{on }\mathcal F .
+$$ {#eq-c8-jump}
+
+The labels $\mathcal K^+$ and $\mathcal K^-$ are arbitrary. Exchanging them
+changes the sign of the jump, but it also reverses $\bn_{\mathcal F}$. The
+quantity used below, $[\![k\grad u_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F}$,
+contains both factors and is therefore unchanged by the choice of labels.
+
+Following @eq-variational-flux-definition, define the **discrete flux**
+
+$$
+\bq_h=-k\grad u_h
+\qquad\text{on each cell }\mathcal K_e .
+$$ {#eq-c8-discrete-flux}
+
+It is defined cell by cell. Under assumption 5 and because $u_h$ is a
+polynomial on each affine cell, $\bq_h|_{\mathcal K_e}$ is continuously
+differentiable on $\overline{\mathcal K_e}$. Its normal component on a facet is
+therefore defined from each side.
+
+### Integration by parts on each cell
+
+Start from the residual @eq-c8-residual with the diffusion forms
+@eq-variational-forms:
+
+$$
+R(u_h;v)
+=
+\int_\Om fv\,\dx
+-\int_{\Gam_N}qv\,\ds
+-\int_\Om k\grad u_h\cdot\grad v\,\dx
+\qquad\forall v\in\Vzero .
+$$
+
+The cells have disjoint interiors, so the last integral is the sum of the
+integrals over the cells. On one cell, apply Green's formula
+@eq-foundations-green-scalar with $\Om$ replaced by $\mathcal K_e$, the scalar
+field $v$, and the vector field $k\grad u_h$. With $\bn_e$ the outward unit
+normal of $\mathcal K_e$,
+
+$$
+\int_{\mathcal K_e}k\grad u_h\cdot\grad v\,\dx
+=
+-\int_{\mathcal K_e}\divg(k\grad u_h)\,v\,\dx
++\int_{\partial\mathcal K_e}(k\grad u_h\cdot\bn_e)\,v\,\ds .
+$$
+
+Chapter 2 stated Green's formula for smooth fields. Here the vector field is
+continuously differentiable on $\overline{\mathcal K_e}$, while
+$v\in H^1(\mathcal K_e)$ is used through its weak derivatives and its trace on
+$\partial\mathcal K_e$, as in the derivation of the weak form in Chapter 3.
+Summing over the cells gives
+
+$$
+R(u_h;v)
+=
+\sum_{e=1}^{N_c}\int_{\mathcal K_e}
+\bigl(f+\divg(k\grad u_h)\bigr)v\,\dx
+-\sum_{e=1}^{N_c}\int_{\partial\mathcal K_e}
+(k\grad u_h\cdot\bn_e)\,v\,\ds
+-\int_{\Gam_N}qv\,\ds .
+$$ {#eq-c8-residual-cellwise}
+
+The cell boundary integrals are now regrouped facet by facet. Every facet of
+every cell belongs to exactly one of the three classes above.
+
+*Facets on $\Gam_D$.* Every $v\in\Vzero$ vanishes on $\Gam_D$, so these facets
+contribute nothing.
+
+*Facets on $\Gam_N$.* Such a facet belongs to one cell, whose outward normal is
+$\bn$. Its contribution from the middle sum in @eq-c8-residual-cellwise
+combines with the part of the last integral over the same facet:
+
+$$
+-\int_{\mathcal F}(k\grad u_h\cdot\bn)\,v\,\ds
+-\int_{\mathcal F}qv\,\ds
+=
+-\int_{\mathcal F}\bigl(q+k\grad u_h\cdot\bn\bigr)v\,\ds .
+$$
+
+*Interior facets.* An interior facet appears twice in the middle sum: once
+from $\mathcal K^+$, with outward normal $\bn_{\mathcal F}$, and once from
+$\mathcal K^-$, with outward normal $-\bn_{\mathcal F}$. A function
+$v\in H^1(\Om)$ has the same trace on $\mathcal F$ from both cells. This is a
+standard property of $H^1$ functions on a conforming mesh, which we use without
+proof. The two contributions therefore combine into
+
+$$
+-\int_{\mathcal F}
+\bigl(k\grad u_h^+\cdot\bn_{\mathcal F}
+-k\grad u_h^-\cdot\bn_{\mathcal F}\bigr)v\,\ds
+=
+-\int_{\mathcal F}
+[\![k\grad u_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F}\,v\,\ds .
+$$
+
+The surviving terms define the residuals that appear in the estimator.
+
+::: {#def-c8-element-facet-residuals}
+## Element and facet residuals
+
+The **element residual** on $\mathcal K_e\in\Th$ is
+
+$$
+r_e
+=
+f+\divg(k\grad u_h)
+=
+f-\divg\bq_h
+\qquad\text{on }\mathcal K_e .
+$$ {#eq-c8-element-residual}
+
+The **facet residual** on $\mathcal F\in
+\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}$ is
+
+$$
+j_{\mathcal F}
+=
+\begin{cases}
+-[\![k\grad u_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F}
+=[\![\bq_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F},
+& \mathcal F\in\mathcal F_h^{\mathrm{int}},\\[0.4em]
+-\bigl(q+k\grad u_h\cdot\bn\bigr)
+=\bq_h\cdot\bn-q,
+& \mathcal F\in\mathcal F_h^{N}.
+\end{cases}
+$$ {#eq-c8-facet-residual}
+:::
+
+With these definitions, the facet-by-facet regrouping of
+@eq-c8-residual-cellwise gives the **residual representation**
+
+$$
+R(u_h;v)
+=
+\sum_{e=1}^{N_c}\int_{\mathcal K_e}r_e\,v\,\dx
++\sum_{\mathcal F\in\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}}
+\int_{\mathcal F}j_{\mathcal F}\,v\,\ds
+\qquad\forall v\in\Vzero .
+$$ {#eq-c8-residual-representation}
+
+This identity is exact. It holds for every admissible test function and makes
+no approximation of the data or of $u_h$.
+
+### Interpretation of the residuals
+
+Each residual measures a failure of $u_h$ to satisfy one part of the strong
+problem of Chapter 3. The element residual is the defect in the balance
+equation $-\divg(k\grad u)=f$ of @eq-variational-strong-pde, evaluated in
+the interior of a cell. In heat conduction it is the difference between the
+prescribed heat source and the net outflow of the computed flux per unit
+volume.
+
+The interior facet residual is the jump in the normal component of the
+computed flux. If the exact solution is regular enough on each cell for the
+corresponding quantities to be defined, its normal flux is continuous across
+interior facets: the heat leaving one cell through a facet enters its
+neighbor. The computed flux does not have this property, because $\grad u_h$
+is discontinuous across facets. The Neumann residual is the difference between
+the computed normal flux $\bq_h\cdot\bn$ and the prescribed normal flux $q$.
+The Galerkin method satisfies both flux conditions only in the weak sense of
+@eq-c8-residual-orthogonality.
+
+The two kinds of residual are not independent. Taking $v=\phi_i$ for a free
+basis function in @eq-c8-residual-representation and using
+@eq-c8-residual-orthogonality gives
+
+$$
+\sum_{e=1}^{N_c}\int_{\mathcal K_e}r_e\,\phi_i\,\dx
++\sum_{\mathcal F\in\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}}
+\int_{\mathcal F}j_{\mathcal F}\,\phi_i\,\ds
+=0 .
+$$
+
+The discrete equations therefore balance the element and facet residuals
+against each other on every basis function. Neither kind of residual vanishes
+separately in general.
+
+For linear elements, one simplification occurs often enough to state
+explicitly. If $p=1$ and $k$ is constant on each cell, then $\grad u_h$ and
+$k\grad u_h$ are constant on each cell, $\divg(k\grad u_h)=0$, and the element
+residual reduces to $r_e=f|_{\mathcal K_e}$. All information about the
+computed gradient then enters through the facet residuals.
+
+::: {#exm-c8-bar-residuals}
+## Residuals for the axial bar
+
+Consider the bar of @eq-c5-bar-forms with linear elements on
+$\mathcal K_e=(x_e,x_{e+1})$, $e=1,\ldots,N$, and assume that $AE$ is smooth
+on each element. In one dimension, a cell is an interval and its facets are its
+two endpoints. The interior facets are the interior nodes
+$x_2,\ldots,x_N$, the facet at $x_1=0$ carries the essential condition, and the
+facet at $x_{N+1}=L$ carries the applied force $\overline P$. A facet integral
+is the value of the integrand at the point.
+
+Integrating by parts on each element in
+$R(u_h;v)=\ell(v)-a(u_h,v)$ and using $v(0)=0$ gives
+
+$$
+R(u_h;v)
+=
+\sum_{e=1}^{N}\int_{x_e}^{x_{e+1}}r_e\,v\,\dd x
++\sum_{i=2}^{N}j_i\,v(x_i)
++j_{N+1}\,v(L),
+$$
+
+with
+
+$$
+r_e=f+(AE\,u_h')',
+\qquad
+j_i=(AE\,u_h')(x_i^+)-(AE\,u_h')(x_i^-),
+\qquad
+j_{N+1}=\overline P-(AE\,u_h')(L^-),
+$$
+
+where $x_i^-$ and $x_i^+$ denote limits from the left and right. Here $AE\,u_h'$
+is the computed axial force. The interior residual $j_i$ is its jump at node
+$x_i$, which would have to be balanced by a concentrated nodal force that is not
+present in the loading. The boundary residual $j_{N+1}$ is the mismatch between
+the applied end force and the computed end force. These expressions agree with
+@eq-c8-element-residual and @eq-c8-facet-residual: with $\mathcal K^+$ the
+element to the left of a node, $\bn_{\mathcal F}=+1$, and the bar's natural
+condition $AE\,u'(L)=\overline P$ corresponds to the outward normal flux
+$q=-\overline P$ at $x=L$.
+
+Now take the uniformly loaded bar of @exm-c5-python-assembly, with
+$L=AE=f=1$, $\overline P=0$, a uniform mesh of size $h$, and exact solution
+$u(x)=x-x^2/2$. By @exm-c7-nodal-exactness, $u_h=\Ih u$. The slope of $u_h$ on
+$\mathcal K_e$ is the slope of the chord of a quadratic, which equals $u'$ at
+the element midpoint $\bar x_e$:
+
+$$
+u_h'|_{\mathcal K_e}=u'(\bar x_e)=1-\bar x_e .
+$$
+
+Since $u_h''=0$ on each element and $f=1$,
+
+$$
+r_e=1,
+\qquad
+j_i=\bigl(1-(x_i+\tfrac h2)\bigr)-\bigl(1-(x_i-\tfrac h2)\bigr)=-h,
+\qquad
+j_{N+1}=0-\bigl(1-(1-\tfrac h2)\bigr)=-\frac h2 .
+$$
+
+Every residual is nonzero, even though every nodal value of $u_h$ is exact.
+The residuals detect the error between the nodes.
+
+The balance on a basis function can be checked directly. For an interior node,
+$\int_0^1 r\,\phi_i\,\dd x=h$, because $r=1$ and the hat function has integral
+$h$. The facet term is $j_i\phi_i(x_i)=-h$, and the two cancel. For the last
+node, $\int_0^1 r\,\phi_{N+1}\,\dd x=h/2$ and $j_{N+1}=-h/2$. Both results
+agree with @eq-c8-residual-orthogonality.
+:::
+
+::: {#exr-c8-two-triangle-jump}
+## A flux jump on two triangles
+
+Let $k=1$, and let $\mathcal K^+$ and $\mathcal K^-$ be the triangles with
+vertices $(0,0)$, $(1,0)$, $(1,1)$ and $(0,0)$, $(1,1)$, $(0,1)$,
+respectively. A continuous piecewise-linear function $u_h$ has vertex values
+$u_h(0,0)=0$, $u_h(1,0)=1$, $u_h(1,1)=1$, and $u_h(0,1)=1$.
+
+1. Find $u_h$ on each triangle and compute $\grad u_h^+$ and $\grad u_h^-$.
+2. Determine $\bn_{\mathcal F}$ on the shared diagonal $\mathcal F$, and
+   compute $j_{\mathcal F}$ from @eq-c8-facet-residual.
+3. Exchange the labels $\mathcal K^+$ and $\mathcal K^-$ and recompute
+   $j_{\mathcal F}$. Explain the result using @eq-c8-jump.
+4. Compute $h_{\mathcal F}\norm{j_{\mathcal F}}_{L^2(\mathcal F)}^2$.
+5. Explain why the element residuals are $r^\pm=f$ for any source $f$.
+:::
+
+## The residual estimator {#sec-c8-estimator}
+
+### Why an approximation operator is needed
+
+The representation @eq-c8-residual-representation suggests bounding
+$R(u_h;e)=\norm{e}_a^2$ term by term. Applying the Cauchy--Schwarz inequality
+directly to $\int_{\mathcal K_e}r_e\,e\,\dx$ would produce
+$\norm{r_e}_{L^2(\mathcal K_e)}\norm{e}_{L^2(\mathcal K_e)}$. Such a bound does
+not contain a power of the cell size, so it gives no information about how the
+error is distributed relative to the mesh.
+
+Galerkin orthogonality supplies the missing factor. By
+@eq-c8-residual-orthogonality, for every $v\in\Vzero$ and every
+$v_h\in\Vhzero$,
+
+$$
+R(u_h;v)=R(u_h;v-v_h).
+$$ {#eq-c8-residual-subtract}
+
+If $v_h$ is chosen as a good local approximation of $v$, the difference
+$v-v_h$ is small on each cell, with a size proportional to the local mesh
+size. This is where an interpolation estimate enters.
+
+The nodal interpolant of Chapter 7 cannot be used for this purpose in two and
+three dimensions. The function to be approximated will be the error $e$, which
+is known only to belong to $\Vzero\subset H^1(\Om)$. As explained in
+@sec-c7-interpolation, a general $H^1$ function need not have point values
+when $d\geq2$, so $\Ih e$ need not be defined. Operators that avoid point
+values, for example by averaging over a neighborhood of each node, are called
+**quasi-interpolation operators**. The Clément interpolant is the classical
+example [@arnold2018, pp. 67--70].
+
+### The quasi-interpolation hypothesis
+
+For a cell $\mathcal K_e$, let the **patch** $\omega_e$ be the union of the
+closed cells that share at least one vertex with $\mathcal K_e$. For a facet
+$\mathcal F$, let $\omega_{\mathcal F}$ be the union of the closed cells that
+share at least one vertex with $\mathcal F$. The seminorms
+$\seminorm{\cdot}_{H^1(\omega_e)}$ and
+$\seminorm{\cdot}_{H^1(\omega_{\mathcal F})}$ are defined by integrating over
+these patches.
+
+We use the following property and do not prove it in this book.
+
+**Hypothesis (Q).** There are a linear operator
+$\mathcal Q_h:\Vzero\to\Vhzero$ and a constant $C_Q$, depending only on $d$, $p$,
+and $\sigma$, such that for every $w\in\Vzero$, every cell
+$\mathcal K_e\in\Th$, and every facet
+$\mathcal F\in\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}$,
+
+$$
+\norm{w-\mathcal Q_hw}_{L^2(\mathcal K_e)}
+\leq
+C_Q\,h_e\,\seminorm{w}_{H^1(\omega_e)},
+$$ {#eq-c8-quasi-interp-cell}
+
+$$
+\norm{w-\mathcal Q_hw}_{L^2(\mathcal F)}
+\leq
+C_Q\,h_{\mathcal F}^{1/2}\,\seminorm{w}_{H^1(\omega_{\mathcal F})}.
+$$ {#eq-c8-quasi-interp-facet}
+
+The operator must map $\Vzero$ into $\Vhzero$, so that
+@eq-c8-residual-subtract can be applied with $v_h=\mathcal Q_hw$. The powers of $h$
+match those of the interpolation estimate @eq-c7-local-interpolation with
+$s=1$: one power of $h$ for the $L^2$ norm on a cell, and one half power on a
+facet. The half power follows from a scaled trace inequality on a cell
+[@arnold2018, p. 70]. The price for requiring only $H^1$ regularity is that
+the right-hand sides involve patches rather than single cells.
+
+<!--
+SOURCE CHECK: arnold2018 pp. 67-70 (printed) constructs the Clément
+interpolant for the pure Dirichlet case and states (4.16)-(4.18) with the full
+H^1 norm on the patch. Hypothesis (Q) is stated with the H^1 seminorm and
+with preservation of zero values on Gamma_D. Both modifications are standard
+but are not proved in arnold2018. A source key is needed if the book is to
+cite a construction satisfying (Q) exactly. See SOURCE_AND_OPEN_ISSUES.md.
+-->
+
+We also use one geometric consequence of shape regularity. On a shape-regular
+family, the number of cells that share a vertex is bounded by a constant
+depending only on $\sigma$ and $d$. Consequently, there is an integer
+$N_{\mathrm{ov}}$, depending only on $\sigma$ and $d$, such that every cell
+belongs to at most $N_{\mathrm{ov}}$ of the patches
+$\{\omega_e\}_{e=1}^{N_c}\cup\{\omega_{\mathcal F}\}_{\mathcal F\in
+\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}}$. We use this bound without
+proof. It implies that, for every $w\in H^1(\Om)$,
+
+$$
+\sum_{e=1}^{N_c}\seminorm{w}_{H^1(\omega_e)}^2
++\sum_{\mathcal F\in\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}}
+\seminorm{w}_{H^1(\omega_{\mathcal F})}^2
+\leq
+N_{\mathrm{ov}}\,\seminorm{w}_{H^1(\Om)}^2 ,
+$$ {#eq-c8-finite-overlap}
+
+because each patch seminorm is a sum of cell contributions
+$\seminorm{w}_{H^1(\mathcal K)}^2$, and each cell contribution is counted at
+most $N_{\mathrm{ov}}$ times.
+
+### Local indicators and the global estimator
+
+The derivation below combines each residual with the power of the mesh size
+that appears in Hypothesis (Q). This motivates the following definition.
+
+::: {#def-c8-residual-estimator}
+## Residual error indicators and estimator
+
+For each cell $\mathcal K_e\in\Th$, the **local error indicator** is
+
+$$
+\eta_e^2
+=
+h_e^2\norm{r_e}_{L^2(\mathcal K_e)}^2
++\frac12\sum_{\substack{\mathcal F\subset\partial\mathcal K_e\\
+\mathcal F\in\mathcal F_h^{\mathrm{int}}}}
+h_{\mathcal F}\norm{j_{\mathcal F}}_{L^2(\mathcal F)}^2
++\sum_{\substack{\mathcal F\subset\partial\mathcal K_e\\
+\mathcal F\in\mathcal F_h^{N}}}
+h_{\mathcal F}\norm{j_{\mathcal F}}_{L^2(\mathcal F)}^2 ,
+$$ {#eq-c8-local-indicator}
+
+with $r_e$ and $j_{\mathcal F}$ from @def-c8-element-facet-residuals. The
+**global residual estimator** is
+
+$$
+\eta
+=
+\left(\sum_{e=1}^{N_c}\eta_e^2\right)^{1/2}.
+$$ {#eq-c8-global-estimator}
+:::
+
+The factor $\tfrac12$ divides each interior facet's contribution equally
+between the two cells that share it [@arnold2018, p. 73]. A Neumann facet
+belongs to only one cell and receives no such factor. Summing
+@eq-c8-local-indicator over the cells therefore counts every facet exactly
+once:
+
+$$
+\eta^2
+=
+\sum_{e=1}^{N_c}h_e^2\norm{r_e}_{L^2(\mathcal K_e)}^2
++\sum_{\mathcal F\in\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}}
+h_{\mathcal F}\norm{j_{\mathcal F}}_{L^2(\mathcal F)}^2 .
+$$ {#eq-c8-estimator-facet-sum}
+
+@def-c8-residual-estimator defines a number. It makes no claim about how that
+number compares with the error. Every quantity in it can be evaluated from the
+mesh, the data $f$, $q$, and $k$, and the computed solution $u_h$. In practice
+the integrals are evaluated by quadrature, which introduces a further
+approximation when $f$, $q$, or $k$ is not a polynomial of suitable degree.
+
+The weights also make the two kinds of terms dimensionally consistent. The
+element residual has the units of a source per unit volume, and the facet
+residual has the units of a flux. Multiplying a source by a length gives a
+flux, so $h_e\norm{r_e}_{L^2(\mathcal K_e)}$ and
+$h_{\mathcal F}^{1/2}\norm{j_{\mathcal F}}_{L^2(\mathcal F)}$ have the same
+units. Both differ from the units of $\norm{e}_a$ by a factor of
+$\sqrt{k}$, which is why the coefficient bound $k_0$ appears in the next
+theorem.
+
+### Reliability
+
+The next theorem compares the estimator with the error. It is an upper bound.
+
+::: {#thm-c8-reliability}
+## Reliability of the residual estimator
+
+Assume the setting of @sec-c8-residual and Hypothesis (Q). Then
+
+$$
+\norm{u-u_h}_a
+\leq
+C_{\mathrm{rel}}\,\eta,
+\qquad
+C_{\mathrm{rel}}
+=
+C_Q\sqrt{\frac{N_{\mathrm{ov}}}{k_0}} .
+$$ {#eq-c8-reliability}
+
+The constant $C_{\mathrm{rel}}$ depends on $d$, $p$, $\sigma$, and $k_0$. It
+does not depend on the mesh size, on $u$, or on $u_h$.
+:::
+
+**Proof.** Let $e=u-u_h$. By @eq-c8-error-residual with $v=e$, and by
+@eq-c8-residual-subtract with $v_h=\mathcal Q_he\in\Vhzero$,
+
+$$
+\norm{e}_a^2
+=
+R(u_h;e)
+=
+R(u_h;e-\mathcal Q_he).
+$$
+
+The function $w=e-\mathcal Q_he$ belongs to $\Vzero$, so the residual representation
+@eq-c8-residual-representation applies:
+
+$$
+\norm{e}_a^2
+=
+\sum_{e'=1}^{N_c}\int_{\mathcal K_{e'}}r_{e'}\,w\,\dx
++\sum_{\mathcal F\in\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}}
+\int_{\mathcal F}j_{\mathcal F}\,w\,\ds .
+$$
+
+Here the cell index is written $e'$ to distinguish it from the error $e$.
+Apply the Cauchy--Schwarz inequality to each integral and then the estimates
+@eq-c8-quasi-interp-cell and @eq-c8-quasi-interp-facet with $w$ replaced by
+$e$:
+
+$$
+\norm{e}_a^2
+\leq
+C_Q\left(
+\sum_{e'=1}^{N_c}h_{e'}\norm{r_{e'}}_{L^2(\mathcal K_{e'})}
+\seminorm{e}_{H^1(\omega_{e'})}
++\sum_{\mathcal F\in\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}}
+h_{\mathcal F}^{1/2}\norm{j_{\mathcal F}}_{L^2(\mathcal F)}
+\seminorm{e}_{H^1(\omega_{\mathcal F})}
+\right).
+$$
+
+The right-hand side is a sum of products. The Cauchy--Schwarz inequality for
+finite sums, applied to the combined list of cell and facet terms, gives
+
+$$
+\norm{e}_a^2
+\leq
+C_Q
+\left(
+\sum_{e'=1}^{N_c}h_{e'}^2\norm{r_{e'}}_{L^2(\mathcal K_{e'})}^2
++\sum_{\mathcal F}h_{\mathcal F}\norm{j_{\mathcal F}}_{L^2(\mathcal F)}^2
+\right)^{1/2}
+\left(
+\sum_{e'=1}^{N_c}\seminorm{e}_{H^1(\omega_{e'})}^2
++\sum_{\mathcal F}\seminorm{e}_{H^1(\omega_{\mathcal F})}^2
+\right)^{1/2},
+$$
+
+where both facet sums run over
+$\mathcal F_h^{\mathrm{int}}\cup\mathcal F_h^{N}$. By
+@eq-c8-estimator-facet-sum, the first factor is $\eta$. By
+@eq-c8-finite-overlap, the second factor is at most
+$\sqrt{N_{\mathrm{ov}}}\,\seminorm{e}_{H^1(\Om)}$. The lower bound in
+@eq-c7-energy-seminorm-equivalence gives
+$\seminorm{e}_{H^1(\Om)}\leq\norm{e}_a/\sqrt{k_0}$. Combining these three
+facts,
+
+$$
+\norm{e}_a^2
+\leq
+C_Q\sqrt{\frac{N_{\mathrm{ov}}}{k_0}}\;\eta\;\norm{e}_a .
+$$
+
+If $e=0$, there is nothing to prove. Otherwise, dividing by $\norm{e}_a$ gives
+@eq-c8-reliability. $\square$
+
+The argument follows @arnold2018 [pp. 71--73] and @larson-bengzon2010
+[pp. 88--89], which treat a homogeneous Dirichlet condition on the whole
+boundary. The Neumann facets enter here through the facet residual
+@eq-c8-facet-residual and require no additional step, because the
+representation @eq-c8-residual-representation already contains them.
+
+The proof uses Galerkin orthogonality in an essential way. Without
+@eq-c8-residual-subtract, the residuals could not be multiplied by
+$e-\mathcal Q_he$, and the powers of the mesh size in @eq-c8-local-indicator would
+have no justification. It also uses the exact discrete solution and exact
+evaluation of the forms. If the linear system is solved only approximately, or
+if $a$ and $\ell$ are evaluated with inexact quadrature,
+@eq-c8-residual-orthogonality holds only approximately and the bound acquires
+an additional term.
+
+Three limitations of @thm-c8-reliability should be stated plainly. First,
+$C_Q$ and $N_{\mathrm{ov}}$ are not computed in practice. The theorem
+guarantees that $\eta$ controls the error up to a fixed factor on a
+shape-regular family, but the computed value of $\eta$ is not a guaranteed
+numerical upper bound for $\norm{u-u_h}_a$. Second, $C_{\mathrm{rel}}$
+contains $k_0$ but not $k_1$, while the estimator itself contains $k$ through
+$r_e$ and $j_{\mathcal F}$. The theorem does not show that the ratio of
+$\eta$ to the error is insensitive to large coefficient contrast. Third, the
+theorem concerns the energy norm. It gives no direct information about the
+$L^2$ error or about the error in a particular quantity of interest.
+
+### A fully explicit bound in one dimension
+
+In one dimension the nodal interpolant is defined for every $H^1$ function,
+and the facet terms disappear from the proof. This gives a bound with a known
+constant.
+
+::: {#thm-c8-1d-reliability}
+## Explicit reliability for linear bar elements
+
+For the bar problem @eq-c5-bar-forms with $0<(AE)_0\leq AE(x)$, $AE$ smooth on
+each element, $f\in L^2(0,L)$, and linear elements, let $r_e=f+(AE\,u_h')'$ on
+$\mathcal K_e$. Then
+
+$$
+\norm{u-u_h}_a
+\leq
+\frac{1}{\sqrt{(AE)_0}}
+\left(\sum_{e=1}^{N}h_e^2\norm{r_e}_{L^2(\mathcal K_e)}^2\right)^{1/2}.
+$$ {#eq-c8-1d-reliability}
+:::
+
+**Proof.** Let $e=u-u_h$ and $w=e-\Ih e$. Since $e\in H^1(0,L)$ is
+continuous and $e(0)=0$, the interpolant $\Ih e$ is defined and belongs to
+$\Vhzero$. By @eq-c8-error-residual and @eq-c8-residual-orthogonality,
+$\norm{e}_a^2=R(u_h;w)$. In the residual representation of
+@exm-c8-bar-residuals, every nodal term is multiplied by a value $w(x_i)$, and
+$w$ vanishes at every node. Hence
+
+$$
+\norm{e}_a^2
+=
+\sum_{e'=1}^{N}\int_{\mathcal K_{e'}}r_{e'}\,w\,\dd x
+\leq
+\sum_{e'=1}^{N}\norm{r_{e'}}_{L^2(\mathcal K_{e'})}
+\norm{w}_{L^2(\mathcal K_{e'})}.
+$$
+
+Because $w(x_{e'})=0$, the second half of the proof of
+@thm-c7-1d-interpolation gives
+$\norm{w}_{L^2(\mathcal K_{e'})}\leq h_{e'}\norm{w'}_{L^2(\mathcal K_{e'})}$.
+On $\mathcal K_{e'}$, the derivative of the linear interpolant is the mean
+value
+$\bar c=h_{e'}^{-1}\int_{\mathcal K_{e'}}e'\,\dd x$. Therefore
+
+$$
+\norm{w'}_{L^2(\mathcal K_{e'})}^2
+=
+\int_{\mathcal K_{e'}}(e'-\bar c)^2\,\dd x
+=
+\norm{e'}_{L^2(\mathcal K_{e'})}^2-h_{e'}\bar c^{\,2}
+\leq
+\norm{e'}_{L^2(\mathcal K_{e'})}^2 .
+$$
+
+Combining these bounds and applying the Cauchy--Schwarz inequality for sums,
+
+$$
+\norm{e}_a^2
+\leq
+\left(\sum_{e'=1}^{N}h_{e'}^2\norm{r_{e'}}_{L^2(\mathcal K_{e'})}^2\right)^{1/2}
+\norm{e'}_{L^2(0,L)} .
+$$
+
+Finally, $\norm{e'}_{L^2(0,L)}\leq\norm{e}_a/\sqrt{(AE)_0}$. Dividing by
+$\norm{e}_a$, when it is nonzero, completes the proof. $\square$
+
+This is the argument of @larson-bengzon2010 [pp. 38--39], with the
+interpolation constant taken from @thm-c7-1d-interpolation. The facet
+residuals in @exm-c8-bar-residuals are generally nonzero, but in one
+dimension they are multiplied by $w(x_i)=0$ and do not enter the bound. In two
+and three dimensions, $e-\mathcal Q_he$ does not vanish on the facets, and the facet
+residuals remain.
+
+The ratio of an estimator to the error it estimates is called the
+**effectivity index**,
+
+$$
+I_{\mathrm{eff}}
+=
+\frac{\eta}{\norm{u-u_h}_a},
+\qquad u_h\neq u .
+$$ {#eq-c8-effectivity-index}
+
+A reliability bound $\norm{u-u_h}_a\leq C_{\mathrm{rel}}\eta$ is equivalent to
+$I_{\mathrm{eff}}\geq1/C_{\mathrm{rel}}$. An estimator with $I_{\mathrm{eff}}$ close to one
+estimates the size of the error accurately, not merely its distribution.
+
+::: {#exm-c8-bar-effectivity}
+## Effectivity for the uniformly loaded bar
+
+Return to the uniformly loaded bar of @exm-c8-bar-residuals, with a uniform
+mesh of $N=1/h$ elements. The element residual is $r_e=1$, so
+$h_e^2\norm{r_e}_{L^2(\mathcal K_e)}^2=h^2\cdot h=h^3$. The one-dimensional
+estimator of @thm-c8-1d-reliability is therefore
+
+$$
+\eta_{\mathrm{1D}}
+=
+\left(N h^3\right)^{1/2}
+=
+h .
+$$
+
+By @eq-c7-uniform-bar-errors, the energy error is $\norm{e}_a=h/\sqrt{12}$.
+The bound @eq-c8-1d-reliability, with $(AE)_0=1$, states
+$h/\sqrt{12}\leq h$, which is true. The effectivity index is
+
+$$
+I_{\mathrm{eff}}=\frac{h}{h/\sqrt{12}}=\sqrt{12}\approx3.46
+$$
+
+on every uniform mesh. The estimator overestimates the energy error by a fixed
+factor, but it decreases at the same rate $O(h)$ as the error. The fixed
+factor comes from the inequalities in the proof, not from the mesh. A sharper
+interpolation constant would reduce it; for example, replacing $h_e$ by
+$h_e/\pi$ as in @suli2012 [pp. 46--47] would give $I_{\mathrm{eff}}=\sqrt{12}/\pi
+\approx1.10$ for this problem.
+:::
+
+::: {#exr-c8-bar-estimator}
+## The estimator for quadratic bar elements
+
+Consider the uniformly loaded bar of @exm-c8-bar-residuals with quadratic
+elements.
+
+1. Use @exm-c5-quadratic-exact to determine $u_h$, and compute every element
+   and facet residual.
+2. Explain why $\eta=0$, and state what @thm-c8-reliability then implies about
+   $u-u_h$.
+3. Replace the load by $f(x)=x$. Without solving, explain why the element
+   residual of a quadratic approximation cannot vanish identically on every
+   element. Identify the term in $r_e$ that prevents this.
+:::
+
+## Estimator, reliability, and efficiency {#sec-c8-reliability-efficiency}
+
+Three statements about a residual estimator are easily confused. They make
+different claims and require different arguments.
+
+1. **Definition.** @def-c8-residual-estimator states how to compute $\eta_e$
+   and $\eta$. It makes no claim about the error.
+2. **Reliability.** @thm-c8-reliability states that the error is bounded
+   above by a fixed multiple of $\eta$. It ensures that a small estimator
+   implies a small error. It does not exclude an estimator much larger than
+   the error.
+3. **Efficiency.** An efficiency bound states the reverse inequality: the
+   estimator is bounded above by a fixed multiple of the error, apart from a
+   term that depends only on the data. It ensures that a large indicator
+   corresponds to a large error.
+
+Reliability alone is not sufficient for adaptivity. Suppose that a term
+unrelated to the error is added to every indicator, for example
+$\tilde\eta_e^2=\eta_e^2+h_e^d$. The modified estimator is still reliable,
+because $\tilde\eta\geq\eta$, and a small value of $\tilde\eta$ still implies
+a small error. The added term, however, does not decrease when the error
+decreases. The modified indicators would mark cells where the error is already
+small, and the computation would stop later than necessary. Efficiency
+excludes this behavior.
+
+Neither property measures how large the constants are. A constant multiple
+such as $1000\,\eta$ is reliable and efficient whenever $\eta$ is, with
+$C_{\mathrm{eff}}$ multiplied by $1000$, and it marks exactly the same cells.
+Its value, however, overstates the error by a large factor. The size of the
+constants is measured separately by the effectivity index
+@eq-c8-effectivity-index.
+
+Efficiency is normally stated locally, because the marking step compares
+individual indicators. For a cell $\mathcal K_e$, let
+$\norm{v}_{a,\omega_e}=\bigl(\int_{\omega_e}k|\grad v|^2\,\dx\bigr)^{1/2}$
+denote the energy norm restricted to the patch $\omega_e$.
+
+::: {#def-c8-reliability-efficiency}
+## Reliable and efficient estimators
+
+Let $\eta_e$ and $\eta$ be computed from $u_h$ on each mesh of a
+shape-regular family. The estimator is **reliable** if there is a constant
+$C_{\mathrm{rel}}$ such that
+
+$$
+\norm{u-u_h}_a\leq C_{\mathrm{rel}}\,\eta
+$$
+
+on every mesh of the family. It is **locally efficient** if there is a
+constant $C_{\mathrm{eff}}$ such that
+
+$$
+\eta_e
+\leq
+C_{\mathrm{eff}}\bigl(\norm{u-u_h}_{a,\omega_e}+\mathrm{osc}_e\bigr)
+\qquad\text{for every }\mathcal K_e\in\Th
+$$ {#eq-c8-local-efficiency}
+
+on every mesh of the family. Here $\mathrm{osc}_e$ is a data-oscillation term
+that depends on $f$, $q$, and the mesh near $\mathcal K_e$, but not on $u$ or
+$u_h$. In both inequalities the constants may depend on $d$, $p$, $\sigma$,
+and the coefficient, but not on the mesh size, $u$, or $u_h$.
+:::
+
+The oscillation term accounts for variation in $f$ and $q$ that a chosen
+low-degree polynomial data representation does not resolve. Its precise
+definition and asymptotic order depend on the efficiency theorem adopted for
+this problem, so they are intentionally left open in the current draft.
+
+<!--
+SOURCE NEEDED before claiming local efficiency: the residual estimator of
+def-c8-residual-estimator is locally efficient for this problem (at least
+for k piecewise constant), with data oscillation, under shape regularity. The
+standard proof uses cell and facet bubble functions. None of the local
+references with keys in book/references.bib (arnold2018, larson-bengzon2010,
+suli2012) states or proves this bound. Do not integrate the next paragraph's
+claim without a verified source and key. The precise definition of osc_e
+(projection degree, Neumann-data term) must be fixed from that source. The
+claim in the paragraph above that osc_e is of higher order for smooth data
+must be checked against the same source.
+-->
+
+Equation @eq-c8-local-efficiency is a definition, not a theorem proved for the
+estimator in @def-c8-residual-estimator. Establishing it requires a precise
+definition of data oscillation and a source whose hypotheses match the
+coefficient and boundary conditions used here. Until that source is added,
+the chapter uses efficiency only to explain the property that a useful local
+indicator should have.
+
+When an estimator is both reliable and efficient, and the oscillation is
+negligible, the effectivity index @eq-c8-effectivity-index remains between
+fixed positive bounds as the mesh is refined. @exm-c8-bar-effectivity
+illustrates this behavior on one sequence of meshes, where $I_{\mathrm{eff}}=\sqrt{12}$
+for every $h$. A single example does not prove efficiency, but a computed
+effectivity index that grows or decays steadily under refinement is a warning
+that one of the hypotheses has failed or that the implementation is
+incorrect.
+
+The terms *reliability* and *efficiency* are also used for adaptive
+algorithms rather than estimators. In that usage, an algorithm is reliable if
+it controls the error to a prescribed tolerance and efficient if it does so
+with nearly minimal computational effort [@suli2012, p. 94]. This chapter uses
+the terms for estimators, as defined in @def-c8-reliability-efficiency, unless
+the algorithmic meaning is stated explicitly.
+
+::: {#exr-c8-reliability-efficiency}
+## Distinguishing the three statements
+
+1. Let $\eta$ be the estimator of @def-c8-residual-estimator, and define
+   $\tilde\eta_e^2=\eta_e^2+h_e^{d}$.
+   a. Show that $\tilde\eta$ is reliable under the hypotheses of @thm-c8-reliability.
+   b. Every cell lies in a ball of radius $h_e$. Let $\beta_d$ denote the
+      volume of the unit ball in $\R^d$, and show that
+      $\sum_{e}h_e^d\geq|\Om|/\beta_d$. Conclude that $\tilde\eta$ does not
+      tend to zero under refinement, even when $u_h=u$.
+   c. Suppose that the exact solution belongs to $\Vhzero$ on every mesh of a
+      family and that $\mathrm{osc}_e=0$ for every cell. Explain why
+      $\tilde\eta$ is not locally efficient on that family.
+2. For the uniformly loaded bar of @exm-c8-bar-effectivity, compute the
+   effectivity index of $\eta_{\mathrm{1D}}$ and of $1000\,\eta_{\mathrm{1D}}$.
+   Show that both satisfy the reliability inequality and a global analogue of
+   @eq-c8-local-efficiency on this sequence of meshes, and explain what
+   distinguishes them.
+3. Explain why a computed effectivity index can be evaluated only for a
+   problem whose exact solution is known, and describe how the method of
+   manufactured solutions from @sec-c7-verification can be used to test an
+   implementation of @eq-c8-local-indicator.
+:::
+
+<!--
+Sections required to complete this draft:
+- sec-c8-marking: maximum strategy, Doerfler (bulk) marking, equidistribution.
+- sec-c8-refinement: conforming refinement of simplices without hanging nodes,
+  preservation of shape regularity, nested spaces and exr-c7-pythagoras part 4.
+- sec-c8-adaptive-loop: solve-estimate-mark-refine algorithm, stopping
+  criteria, L-shaped domain, error versus number of degrees of freedom.
+- sec-c8-fenicsx: indicator assembly into a DG0 space, interior-facet
+  measure dS, jump and average operators, mesh refinement with marked cells.
+- sec-c8-elasticity: traction residuals and stress jumps.
+- sec-c8-goal-oriented: required by the forward reference in Chapter 7,
+  sec-c7-duality ("Chapter 8 returns to this goal-oriented use of duality").
+- sec-c8-summary.
+-->

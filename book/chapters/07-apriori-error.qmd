@@ -1260,18 +1260,6 @@ the strains in @exm-c5-complete-bar suggest.
 
 Several practical consequences follow from the hypotheses of the theorem.
 
-*The rate is limited by the smaller of $p$ and $s-1$.* If the solution belongs
-to $H^s(\Om)$ but not to $H^{s+1}(\Om)$, then elements of degree higher than
-$s-1$ do not improve the guaranteed rate on quasi-uniform meshes. The
-smoothness of $u$ depends on the data and on the geometry. For the Laplace
-equation on a polygon with a reentrant corner, such as an L-shaped domain,
-the solution generally behaves near the corner like $r^{\pi/\omega}$, where
-$r$ is the distance from the corner and $\omega>\pi$ is the interior angle.
-This function does not belong to $H^2$ near the corner, and uniform refinement
-then converges more slowly than $O(h)$ in the energy norm, whatever the degree.
-Recovering the optimal rate for such problems requires locally refined meshes,
-which is one motivation for Chapter 8.
-
 *Mesh size and degrees of freedom.* A family of meshes is called
 quasi-uniform if, in addition to shape regularity, there is a constant $c>0$
 with $h_e\geq ch$ for every cell. On such meshes the number of cells, and
@@ -1280,6 +1268,17 @@ proportional to $h^{-d}$. An energy-norm rate $h^{p}$ therefore corresponds
 to $N_{\mathrm{dof}}^{-p/d}$. In three dimensions, halving $h$ multiplies the
 number of unknowns by about eight but reduces the energy error of linear
 elements by only a factor of about two.
+
+*The rate is limited by the smaller of $p$ and the available regularity.* If
+the solution belongs to $H^s(\Om)$ but not to $H^{s+1}(\Om)$, then elements of
+degree higher than $s-1$ do not improve the guaranteed rate on quasi-uniform
+meshes. The smoothness of $u$ depends on the data and on the geometry. For
+example, on a polygon with a reentrant corner, the solution of the Laplace
+problem may fail to belong to $H^2(\Om)$. In that case the hypotheses needed
+for the linear-element $O(h)$ energy-norm estimate are not available, and
+raising the polynomial degree does not restore that guarantee. Locally refined
+meshes can resolve such localized loss of regularity more economically than
+uniform refinement, which is one motivation for Chapter 8.
 
 *$h$-refinement and $p$-refinement.* The estimate describes $h$-refinement
 with a fixed degree $p$: the constant $C_I$ depends on $p$. It does not by
@@ -1365,6 +1364,14 @@ domain with $\Gam_D=\partial\Om$ and a constant or smooth coefficient
 the boundary condition changes type, and across jumps in $k$. In those cases
 the duality argument yields less than a full additional power of $h$.
 
+The proof below has three steps. First, choose the right-hand side of the dual
+problem to be the finite element error $e=u-u_h$; this expresses
+$\norm{e}_{L^2(\Om)}^2$ as $a(e,z)$. Second, use Galerkin orthogonality to
+replace $z$ by its interpolation error $z-\Ih z$. Third, use the $H^2$
+regularity of $z$ to bound this interpolation error by
+$Ch\norm{e}_{L^2(\Om)}$. This last factor of $h$ produces the improved
+$L^2$ rate.
+
 ::: {#thm-c7-l2-convergence}
 ## $L^2$ convergence by duality
 
@@ -1444,8 +1451,8 @@ one order higher than the energy-norm rate. For linear elements this is the
 second-order $L^2$ convergence seen in Chapter 5.
 
 The same argument estimates the error in other linear quantities of interest.
-If $Q(v)=\inner{q}{v}_{L^2(\Om)}$ for a fixed $q\in L^2(\Om)$, solving the dual
-problem with $r=q$ gives $Q(u)-Q(u_h)=a(e,z-\Ih z)$ and hence a bound
+If $Q(v)=\inner{w_Q}{v}_{L^2(\Om)}$ for a fixed $w_Q\in L^2(\Om)$, solving the
+dual problem with $r=w_Q$ gives $Q(u)-Q(u_h)=a(e,z-\Ih z)$ and hence a bound
 of order $h\,\seminorm{e}_{H^1(\Om)}$ [@arnold2018, pp. 66--67]. Chapter 8
 returns to this goal-oriented use of duality.
 
@@ -1773,7 +1780,19 @@ by @eq-c7-energy-excess applied to @eq-model-linear-elasticity-potential it
 minimizes the total potential energy over the discrete space.
 
 Galerkin orthogonality also gives a statement familiar from structural
-analysis. Taking $v_h=0$ in @eq-c7-pythagoras shows
+analysis. The elasticity analogue of @eq-c7-pythagoras follows from the same
+expansion with $a_{\mathrm{el}}$ in place of $a$:
+
+$$
+\norm{\bu-\bv_h}_{a_{\mathrm{el}}}^2
+=
+\norm{\bu-\bu_h}_{a_{\mathrm{el}}}^2
++
+\norm{\bu_h-\bv_h}_{a_{\mathrm{el}}}^2
+\qquad\forall\bv_h\in\mathcal V_{h,0}.
+$$
+
+Taking $\bv_h=\bm 0$ in this identity shows
 $\norm{\bu_h}_{a_{\mathrm{el}}}\leq\norm{\bu}_{a_{\mathrm{el}}}$. Taking the
 test function equal to the solution in the continuous and discrete problems
 gives $\ell_{\mathrm{el}}(\bu)=\norm{\bu}_{a_{\mathrm{el}}}^2$ and
@@ -1795,7 +1814,7 @@ that every displacement component is underestimated at every point.
 
 Each displacement component of the vector Lagrange space is interpolated by the
 scalar interpolant. On a shape-regular family of affine simplicial meshes,
-apply @thm-c7-interpolation componentwise, assuming
+applying @thm-c7-interpolation componentwise, under the assumption
 $\bu\in H^s(\Om;\R^d)$ with $2\leq s\leq p+1$, gives
 
 $$
@@ -1805,8 +1824,10 @@ C\,\frac{C_{\mathbb C}C_K^2}{c_{\mathbb C}}\;h^{s-1}
 \seminorm{\bu}_{H^s(\Om;\R^d)},
 $$
 
-where $C$ depends on $C_I$ and on an upper bound for $h$. Since the strain is
-the symmetric part of the displacement gradient,
+where $C$ depends on $C_I$ and on an upper bound for $h$. The upper bound
+enters because the full $H^1$ norm combines an $L^2$ interpolation term of
+order $h^s$ with a gradient term of order $h^{s-1}$. Since the strain is the
+symmetric part of the displacement gradient,
 $\norm{\beps(\bv)}_{L^2}\leq\norm{\grad\bv}_{L^2}$. The stress error therefore
 satisfies
 
@@ -1885,7 +1906,9 @@ interpolation errors of order $h^2$ in $L^2$ and $h$ in the $H^1$ seminorm for
 linear elements. In several dimensions, the corresponding estimates hold on
 shape-regular families of meshes, with rates $h^{s}$ and $h^{s-1}$ for
 $u\in H^s(\Om)$ and $2\leq s\leq p+1$. Combining the two steps gives
-energy-norm and $H^1$-norm convergence of order $h^{\min(p,s-1)}$. A duality
+energy-norm and $H^1$-norm convergence of order $h^{s-1}$ in this range. If
+$s_u$ denotes the largest integer for which $u\in H^{s_u}(\Om)$, the attainable
+rate may equivalently be summarized as $h^{\min(p,s_u-1)}$. A duality
 argument, which requires $H^2$ regularity of the dual problem, gives one
 additional power of $h$ in $L^2$.
 
