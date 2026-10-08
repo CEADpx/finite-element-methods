@@ -44,6 +44,26 @@
 
 \section{From interpolation to convergence}
 
+\begin{frame}{Lecture outline}
+\begin{enumerate}
+  \item Identify how polynomial degree and solution regularity limit the
+  predicted convergence rates.
+  \item Derive the optimal $L^2$ estimate using a dual problem.
+  \item Compare predicted rates with errors computed on a mesh sequence.
+  \item State the corresponding conclusions for linear elasticity.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[plain]
+  \centering
+  \vfill
+  {\LARGE\bfseries Convergence rates and solution regularity\par}
+  \vspace{0.45cm}
+  {\large Determine how the polynomial degree and the smoothness of the exact
+  solution limit the predicted rate.\par}
+  \vfill
+\end{frame}
+
 \begin{frame}{Starting point from the previous lecture}
 For $u\in H^s(\Om)$ with $2\leq s\leq p+1$, the previous lecture established
 \[
@@ -64,16 +84,6 @@ The interpolation error is one order smaller in $L^2$:
 \]
 The first goal of this lecture is to determine when the finite element
 solution has this higher $L^2$ rate.
-\end{frame}
-
-\begin{frame}{Lecture outline}
-\begin{enumerate}
-  \item Identify how polynomial degree and solution regularity limit the
-  predicted convergence rates.
-  \item Derive the optimal $L^2$ estimate using a dual problem.
-  \item Compare predicted rates with errors computed on a mesh sequence.
-  \item State the corresponding conclusions for linear elasticity.
-\end{enumerate}
 \end{frame}
 
 \section{Energy and \texorpdfstring{$H^1$}{H1} convergence}
@@ -132,10 +142,13 @@ The exponent $r$ is the convergence rate in the selected norm.
 \end{frame}
 
 \begin{frame}{In-class calculation: predict the energy rate}
-Assume the hypotheses of the energy-error theorem. Complete the table using
-$r=\min(p,s_u-1)$.
+Assume the hypotheses of the energy-error theorem. Let $s_u$ be the largest
+integer for which $u\in H^{s_u}(\Om)$ is known. Complete the table using
+\[
+  r=\min(p,s_u-1).
+\]
 \par
-\vspace{0.25cm}
+\vspace{0.1cm}
 \centering
 \renewcommand{\arraystretch}{1.55}
 \begin{tabular}{c|ccc}
@@ -254,30 +267,50 @@ This factor $h$ produces the additional order in the $L^2$ error.
   &\leq k_1C_IC_{\mathrm{reg}}h
     \seminorm[H^1(\Om)]{e}\norm[L^2(\Om)]{e}.
 \end{align*}
-Dividing by $\norm[L^2(\Om)]{e}$ gives
+If $e=0$, the desired estimate is immediate. Otherwise, divide by
+$\norm[L^2(\Om)]{e}$ to obtain
 \[
   \norm[L^2(\Om)]{e}
   \leq k_1C_IC_{\mathrm{reg}}h\seminorm[H^1(\Om)]{e}.
 \]
-Combining this with the $H^1$ estimate gives
+The dual problem, Galerkin orthogonality, interpolation, and dual regularity
+have supplied one factor of $h$.
+\end{frame}
+
+\begin{frame}{Step 4: insert the \texorpdfstring{$H^1$}{H1} estimate}
+The $H^1$ estimate from the previous lecture implies
+\[
+  \seminorm[H^1(\Om)]{e}
+  \leq\norm[H^1(\Om)]{e}
+  \leq C_Eh^{s-1}\seminorm[H^s(\Om)]{u}.
+\]
+Substitute this result into the estimate from Step 3:
+\begin{align*}
+  \norm[L^2(\Om)]{e}
+  &\leq Ch\seminorm[H^1(\Om)]{e}\\
+  &\leq Ch\left(C_Eh^{s-1}\seminorm[H^s(\Om)]{u}\right)\\
+  &=CC_Eh^s\seminorm[H^s(\Om)]{u}.
+\end{align*}
+Therefore
 \[
   \boxed{\norm[L^2(\Om)]{u-u_h}=O(h^s).}
 \]
 For a smooth degree-$p$ approximation, this is $O(h^{p+1})$.
 \end{frame}
 
-\begin{frame}{What the duality argument used}
+\begin{frame}{Duality argument: four steps}
 \begin{enumerate}
   \item Choose the dual right-hand side to be $e=u-u_h$.
   \item Use the dual equation to write $\norm[L^2]{e}^2=a(e,z)$.
   \item Use Galerkin orthogonality to replace $z$ by $z-\Ih z$.
-  \item Use $H^2$ regularity to bound the dual interpolation error by
-  $O(h)\norm[L^2]{e}$.
+  \item Use interpolation and $H^2$ regularity to obtain
+  $\norm[L^2(\Om)]{e}\leq Ch\seminorm[H^1(\Om)]{e}$, then insert the
+  $H^1$ finite element estimate to obtain the rate $h^s$.
 \end{enumerate}
-\vspace{0.35cm}
+\vspace{0.2cm}
 
-Without the additional regularity of $z$, Step 4 does not give a full factor
-of $h$. The improved $L^2$ rate is conditional, not automatic.
+Without the additional $H^2$ regularity of $z$, Step 3 does not supply a full
+factor of $h$. The improved $L^2$ rate is conditional, not automatic.
 \end{frame}
 
 \section{Numerical verification}
@@ -436,6 +469,16 @@ following integrated $L^2$ errors:
 
 \section{Linear elasticity}
 
+\begin{frame}[plain]
+  \centering
+  \vfill
+  {\LARGE\bfseries Extension to linear elasticity\par}
+  \vspace{0.45cm}
+  {\large Apply the same approximation argument to a vector-valued
+  problem.\par}
+  \vfill
+\end{frame}
+
 \begin{frame}{The same argument applies to linear elasticity}
 For homogeneous prescribed displacement data,
 \[
@@ -454,8 +497,24 @@ Applying the interpolation estimate componentwise gives
   \norm[H^1(\Om;\R^d)]{\bu-\bu_h}=O(h^{s-1}),
   \qquad 2\leq s\leq p+1.
 \]
+\end{frame}
+
+\begin{frame}{Displacement, strain, and stress convergence}
+If $\bu\in H^{p+1}(\Om;\R^d)$, the componentwise interpolation estimate gives
+\[
+  \norm[H^1(\Om;\R^d)]{\bu-\bu_h}=O(h^p).
+\]
 The strain and stress errors have the same order because they depend on the
 first derivatives of displacement.
+
+\vspace{0.25cm}
+If the elasticity dual problem satisfies the corresponding $H^2$ regularity
+estimate, the duality argument also gives
+\[
+  \boxed{\norm[L^2(\Om;\R^d)]{\bu-\bu_h}=O(h^{p+1}).}
+\]
+This improved displacement estimate requires the additional dual-regularity
+assumption, just as it does for the diffusion problem.
 \end{frame}
 
 \begin{frame}{Energy best approximation and compliance}
@@ -483,8 +542,8 @@ This does not order every displacement component at every point.
 
 \begin{frame}{Material dependence of the elasticity estimate}
 \small
-For a homogeneous isotropic material, the continuity and coercivity estimates
-allow us to take
+For a homogeneous isotropic material with $\lambda\geq0$ and $\mu>0$, the
+continuity and coercivity estimates allow us to take
 \[
   C_{\mathbb C}=d\lambda+2\mu,
   \qquad c_{\mathbb C}=2\mu,
@@ -494,8 +553,9 @@ so
   \frac{C_{\mathbb C}}{c_{\mathbb C}}
   =1+\frac{d\lambda}{2\mu}.
 \]
-As $\nu\to1/2$, $\lambda/\mu$ grows. The estimate remains valid for every
-$\nu<1/2$, but its constant is not uniform in the material parameters.
+For $0\leq\nu<1/2$, $\lambda/\mu$ grows without bound as $\nu\to1/2$. The
+estimate remains valid, but its constant is not uniform in the material
+parameters.
 \vspace{0.25cm}
 
 Low-order displacement elements may then become excessively stiff, a behavior
