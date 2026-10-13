@@ -5,6 +5,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
 import numpy as np
+from matplotlib.patches import Circle, Polygon
 
 OUTPUT_DIR = Path(__file__).resolve().parent
 
@@ -194,8 +195,85 @@ def make_one_dimensional_figure(number_of_elements, filename):
     plt.close(figure)
 
 
+def make_shape_regularity_figure(filename):
+    """Compare cells with the same diameter but different shape parameters."""
+    figure, axes = plt.subplots(1, 2, figsize=(10.8, 3.45), constrained_layout=True)
+
+    triangle_data = (
+        {
+            "vertices": np.array(((-1.0, 0.0), (1.0, 0.0), (0.0, np.sqrt(3.0)))),
+            "center": (0.0, 1.0 / np.sqrt(3.0)),
+            "radius": 1.0 / np.sqrt(3.0),
+            "facecolor": "#dbeaf3",
+            "edgecolor": "#2f628d",
+            "title": "Well-shaped triangle",
+        },
+        {
+            "vertices": np.array(((-1.0, 0.0), (1.0, 0.0), (0.0, 0.25))),
+            "center": (0.0, 0.25 / (1.0 + np.sqrt(1.0 + 0.25**2))),
+            "radius": 0.25 / (1.0 + np.sqrt(1.0 + 0.25**2)),
+            "facecolor": "#f4e3d1",
+            "edgecolor": "#9a5a22",
+            "title": "Flat triangle",
+        },
+    )
+
+    for axis, data in zip(axes, triangle_data):
+        vertices = data["vertices"]
+        radius = data["radius"]
+        axis.add_patch(
+            Polygon(
+                vertices,
+                closed=True,
+                facecolor=data["facecolor"],
+                edgecolor=data["edgecolor"],
+                linewidth=2.0,
+            )
+        )
+        axis.add_patch(
+            Circle(
+                data["center"],
+                radius,
+                facecolor="none",
+                edgecolor=data["edgecolor"],
+                linewidth=1.8,
+            )
+        )
+        axis.annotate(
+            "",
+            xy=(-1.0, -0.12),
+            xytext=(1.0, -0.12),
+            arrowprops={"arrowstyle": "<->", "color": "#253746", "lw": 1.2},
+        )
+        axis.text(0.0, -0.22, r"$h_e=2$", ha="center", va="top", fontsize=12)
+        axis.plot(
+            (data["center"][0] - radius, data["center"][0] + radius),
+            (data["center"][1], data["center"][1]),
+            color=data["edgecolor"],
+            linewidth=1.25,
+        )
+        axis.text(
+            data["center"][0],
+            data["center"][1] + 0.08,
+            r"$\rho_e$",
+            ha="center",
+            va="bottom",
+            fontsize=12,
+            color=data["edgecolor"],
+        )
+        axis.set_title(data["title"], fontsize=14, pad=6)
+        axis.set_xlim(-1.18, 1.18)
+        axis.set_ylim(-0.34, 1.88)
+        axis.set_aspect("equal")
+        axis.axis("off")
+
+    figure.savefig(OUTPUT_DIR / filename, bbox_inches="tight")
+    plt.close(figure)
+
+
 if __name__ == "__main__":
     make_two_dimensional_figure(3, "interpolation-2d.png")
     make_two_dimensional_figure(6, "interpolation-2d-fine.png")
     make_one_dimensional_figure(4, "interpolation-1d.svg")
     make_one_dimensional_figure(8, "interpolation-1d-fine.svg")
+    make_shape_regularity_figure("shape-regularity-comparison.svg")

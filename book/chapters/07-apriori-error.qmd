@@ -1013,6 +1013,8 @@ quantity that affects interpolation. A long thin triangle and an equilateral
 triangle can have the same diameter but very different interpolation
 properties. We therefore measure the shape of each cell.
 
+![Both triangles have diameter $h_e=2$. The diameter $\rho_e$ of the largest disk contained in the cell is much smaller for the flat triangle, so its shape parameter $h_e/\rho_e$ is much larger.](../figures/chapter07/shape-regularity-comparison.svg){#fig-c7-shape-regularity-comparison width=88%}
+
 ::: {#def-c7-shape-regular}
 ## Shape-regular family of meshes
 
@@ -1038,44 +1040,6 @@ on the interior angles, and interpolation constants for linear triangles grow
 as the smallest angle decreases [@larson-bengzon2010, p. 52]. In one
 dimension, $\rho_e=h_e$ and every family of meshes is shape regular.
 
-The role of $\rho_e$ becomes clear from the reference-cell construction of
-Chapter 6. For an affine simplex, $\phi_a^e=\widehat\phi_a\circ F_e^{-1}$ and
-the interpolant commutes with the mapping: the pullback
-$(\Ie u)\circ F_e$ is the reference interpolant of $u\circ F_e$,
-because the nodes of $\mathcal K_e$ are the images of the reference nodes. An
-interpolation estimate can therefore be proved once on the reference cell
-$\widehat{\mathcal K}$ and transferred to every physical cell. On the
-reference cell, the Bramble--Hilbert lemma gives a bound of the reference
-interpolation error by second derivatives, with a constant that depends only
-on $\widehat{\mathcal K}$ and $p$ [@arnold2018, pp. 61--62]. Transferring the
-bound to $\mathcal K_e$ involves three factors:
-
-1. by @eq-c6-reference-integration, $L^2$ norms change by the factor
-   $|\det\bm J_e|^{1/2}$;
-2. by @eq-c6-gradient-transform, first derivatives on $\mathcal K_e$ are
-   bounded by $\norm{\bm J_e^{-1}}$ times reference first derivatives, and
-   $\norm{\bm J_e^{-1}}\leq C/\rho_e$; and
-3. second reference derivatives involve two factors of $\bm J_e$, whose columns
-   are edge vectors of length at most $h_e$, so $\norm{\bm J_e}\leq Ch_e$.
-
-Here $\norm{\cdot}$ denotes the spectral norm of a matrix, and $C$ depends only
-on $d$. Combining these factors for linear triangles gives
-[@arnold2018, pp. 62--64]
-
-$$
-\norm{u-\Ie u}_{L^2(\mathcal K_e)}
-\leq
-Ch_e^2\seminorm{u}_{H^2(\mathcal K_e)},
-\qquad
-\seminorm{u-\Ie u}_{H^1(\mathcal K_e)}
-\leq
-C\,\frac{h_e}{\rho_e}\,h_e\,\seminorm{u}_{H^2(\mathcal K_e)} .
-$$ {#eq-c7-triangle-scaling}
-
-The gradient estimate contains the shape parameter, whereas the $L^2$
-estimate does not. On a shape-regular family, $h_e/\rho_e\leq\sigma$, and the
-gradient error is bounded by $C\sigma h_e\seminorm{u}_{H^2(\mathcal K_e)}$.
-
 For general degree, we use the $H^s$ seminorm of an integer order $s\geq1$,
 
 $$
@@ -1087,6 +1051,11 @@ $$ {#eq-c7-hs-seminorm}
 which extends @eq-foundations-h2-seminorm with the multi-index notation of
 @def-sobolev-space. The elementwise seminorm $\seminorm{v}_{H^s(\mathcal K_e)}$
 is defined in the same way with $\Om$ replaced by $\mathcal K_e$.
+
+The role of $\rho_e$ becomes clear when an interpolation estimate is
+transferred from the reference cell to a physical cell. The details of this
+step are included in the proof below because they explain why a bound on cell
+diameters alone is insufficient.
 
 ::: {#thm-c7-interpolation}
 ## Interpolation estimate for Lagrange elements
@@ -1121,10 +1090,130 @@ C_Ih^{s-1}\seminorm{u}_{H^s(\Om)} .
 $$ {#eq-c7-global-interpolation}
 :::
 
-The proof combines the Bramble--Hilbert lemma on the reference cell with the
-scaling argument sketched above [@arnold2018, p. 65, Theorem 4.6;
-@suli2012, pp. 80--83]. The global estimate follows by squaring
-@eq-c7-local-interpolation, summing over the cells, and using $h_e\leq h$.
+**Proof.** Let $\widehat{\mathcal K}$ be the fixed reference simplex, and let
+$\widehat{\mathcal I}$ denote its degree-$p$ nodal interpolation operator. The
+Bramble--Hilbert lemma, together with the fact that
+$\widehat{\mathcal I}$ reproduces every polynomial in
+$\mathbb P_p(\widehat{\mathcal K})$, gives
+
+$$
+\norm{\widehat{u}-\widehat{\mathcal I}\widehat{u}}_{L^2(\widehat{\mathcal K})}
+\leq
+C_{\mathrm{ref}}\seminorm{\widehat{u}}_{H^s(\widehat{\mathcal K})},
+\qquad
+\seminorm{\widehat{u}-\widehat{\mathcal I}\widehat{u}}_{H^1(\widehat{\mathcal K})}
+\leq
+C_{\mathrm{ref}}\seminorm{\widehat{u}}_{H^s(\widehat{\mathcal K})},
+$$ {#eq-c7-reference-interpolation}
+
+for $2\leq s\leq p+1$. The constant $C_{\mathrm{ref}}$ depends on the fixed
+reference cell, $p$, and $s$, but not on a physical cell or its size. For
+$d\leq3$ and $s\geq2$, the functions have well-defined nodal values, so the
+nodal interpolants in @eq-c7-reference-interpolation are defined.
+
+Let the affine map from the reference cell to $\mathcal K_e$ be
+
+$$
+\bx=F_e(\widehat{\bx})=\bx_1^e+\bm J_e\widehat{\bx},
+\qquad
+\widehat{u}=u\circ F_e .
+$$
+
+Because the physical interpolation nodes are the images of the reference
+nodes, interpolation commutes with this map:
+
+$$
+(\Ie u)\circ F_e=\widehat{\mathcal I}\widehat{u} .
+$$ {#eq-c7-interpolation-commutes}
+
+For any $v$ on $\mathcal K_e$, let $\widehat{v}=v\circ F_e$. The change of
+variables formula and the gradient transformation of
+@eq-c6-gradient-transform give
+
+$$
+\norm{v}_{L^2(\mathcal K_e)}
+=
+|\det\bm J_e|^{1/2}
+\norm{\widehat{v}}_{L^2(\widehat{\mathcal K})},
+\qquad
+\seminorm{v}_{H^1(\mathcal K_e)}
+\leq
+C|\det\bm J_e|^{1/2}\norm{\bm J_e^{-1}}
+\seminorm{\widehat{v}}_{H^1(\widehat{\mathcal K})}.
+$$ {#eq-c7-scaling-to-physical}
+
+Applying the chain rule $s$ times to $\widehat{u}=u\circ F_e$ gives the
+corresponding bound for its derivatives,
+
+$$
+\seminorm{\widehat{u}}_{H^s(\widehat{\mathcal K})}
+\leq
+C|\det\bm J_e|^{-1/2}\norm{\bm J_e}^{s}
+\seminorm{u}_{H^s(\mathcal K_e)} .
+$$ {#eq-c7-scaling-to-reference}
+
+The determinant factors cancel when
+@eq-c7-reference-interpolation--@eq-c7-scaling-to-reference are combined with
+$v=u-\Ie u$. The geometry of an affine simplex gives
+
+$$
+\norm{\bm J_e}\leq C h_e,
+\qquad
+\norm{\bm J_e^{-1}}\leq \frac{C}{\rho_e}.
+$$ {#eq-c7-jacobian-geometry}
+
+We therefore obtain the estimates before imposing shape regularity:
+
+$$
+\norm{u-\Ie u}_{L^2(\mathcal K_e)}
+\leq
+Ch_e^s\seminorm{u}_{H^s(\mathcal K_e)},
+\qquad
+\seminorm{u-\Ie u}_{H^1(\mathcal K_e)}
+\leq
+C\frac{h_e}{\rho_e}h_e^{s-1}
+\seminorm{u}_{H^s(\mathcal K_e)} .
+$$ {#eq-c7-local-scaling}
+
+The second estimate shows explicitly where cell shape enters. Shape regularity
+replaces $h_e/\rho_e$ by the mesh-independent bound $\sigma$, which proves
+@eq-c7-local-interpolation.
+
+It remains to pass from the cell estimates to the whole domain. Since the cell
+interiors are disjoint and $h_e\leq h$,
+
+$$
+\begin{aligned}
+\norm{u-\Ih u}_{L^2(\Om)}^2
+&=
+\sum_{\mathcal K_e\in\Th}
+\norm{u-\Ie u}_{L^2(\mathcal K_e)}^2 \\
+&\leq
+C_I^2\sum_{\mathcal K_e\in\Th}
+h_e^{2s}\seminorm{u}_{H^s(\mathcal K_e)}^2 \\
+&\leq
+C_I^2h^{2s}\seminorm{u}_{H^s(\Om)}^2,
+\end{aligned}
+$$
+
+and, in the same way,
+
+$$
+\seminorm{u-\Ih u}_{H^1(\Om)}^2
+\leq
+C_I^2h^{2(s-1)}\seminorm{u}_{H^s(\Om)}^2.
+$$
+
+Taking square roots gives @eq-c7-global-interpolation. The same argument
+applies for every degree $p$: polynomial reproduction on the reference cell
+allows the Bramble--Hilbert estimate through derivative order $s\leq p+1$,
+and the affine scaling is unchanged. $\square$
+
+Arnold gives a constructive proof of the Bramble--Hilbert lemma and then uses
+it in this scaling argument [@arnold2018, pp. 61--65, Theorems 4.2--4.6]. A
+more general treatment appears in [@suli2012, pp. 75--83, Lemma 12, Theorem 9,
+and Equations (3.4)--(3.6)].
+
 Four features of the theorem deserve emphasis.
 
 First, the general estimate guarantees at most order $p$ in the $H^1$ seminorm
@@ -1166,7 +1255,7 @@ vertices $(-1,0)$, $(1,0)$, and $(0,\epsilon)$, and let $u(x,y)=x^2$.
    $\seminorm{u-\Ie u}_{H^1(\mathcal K_e)}\leq
    Ch_e\seminorm{u}_{H^2(\mathcal K_e)}$ can hold with a constant $C$
    independent of $\epsilon$. Relate the result to the shape parameter in
-   @eq-c7-triangle-scaling.
+   @eq-c7-local-scaling.
 :::
 
 ## Convergence in the energy and $H^1$ norms {#sec-c7-energy-estimates}

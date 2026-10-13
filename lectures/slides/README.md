@@ -47,9 +47,11 @@ norms, Galerkin orthogonality, best approximation, and C\'ea's lemma. The
 second deck, `chapter07_convergence_lecture.tex`, introduces finite element
 interpolation and continues through shape regularity and the energy- and
 $H^1$-norm estimates. The third
-deck, `chapter07_duality_verification_lecture.tex`, covers predicted rates,
-the duality argument for the $L^2$ rate, numerical verification, and
-elasticity.
+deck, `chapter07_duality_verification_lecture.tex`, summarizes the duality
+argument for the $L^2$ rate and emphasizes numerical verification using a
+smooth linear-elasticity problem and an L-shaped body with a reentrant corner.
+Its FEniCSx notebook is maintained at
+[`notebooks/error-analysis/elasticity_convergence.ipynb`](../../notebooks/error-analysis/elasticity_convergence.ipynb).
 
 Build the slides from that directory with:
 

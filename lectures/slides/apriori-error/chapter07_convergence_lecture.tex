@@ -6,7 +6,14 @@
 \usetheme{default}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
-\setbeamertemplate{footline}{}
+\setbeamertemplate{footline}{%
+  \leavevmode
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.6ex,dp=1.1ex,right]{page number in head/foot}%
+      \insertframenumber/\inserttotalframenumber\hspace{0.35cm}
+    \end{beamercolorbox}%
+  }%
+}
 \setbeamertemplate{frametitle}{\vspace{0.25cm}\insertframetitle\par\vspace{0.08cm}\hrule}
 \setbeamercolor{normal text}{fg=black,bg=white}
 \setbeamercolor{frametitle}{fg=black,bg=white}
@@ -216,7 +223,7 @@ The derivative error contains one power of $h_e$. The error in the function
 values contains two powers of $h_e$.
 \end{frame}
 
-\begin{frame}{Derivative estimate on one element}
+\begin{frame}{Why the derivative error vanishes at one point}
 Set
 \[
   w=u-\Ie u.
@@ -225,40 +232,87 @@ Because $\Ie u$ is linear, $w''=u''$. Also,
 \[
   w(x_e)=w(x_{e+1})=0.
 \]
-Rolle's theorem gives $x_*\in(x_e,x_{e+1})$ such that $w'(x_*)=0$. Hence
+
+\textbf{Rolle's theorem.} If a function is continuous on $[a,b]$,
+differentiable on $(a,b)$, and has equal endpoint values, then its derivative
+is zero at some point in $(a,b)$.
+
+In one dimension, an $H^2$ function has a continuously differentiable
+representative. Rolle's theorem therefore gives
 \[
+  x_*\in(x_e,x_{e+1})
+  \qquad\text{such that}\qquad
+  w'(x_*)=0.
+\]
+The fundamental theorem of calculus, applied to $w'$, now gives
+\[
+  w'(y)-w'(x_*)=\int_{x_*}^{y}w''(t)\,\dd t,
+  \qquad
   w'(y)=\int_{x_*}^{y}w''(t)\,\dd t.
-\]
-Cauchy--Schwarz gives
-\[
-  |w'(y)|^2
-  \leq h_e\norm[L^2(\mathcal K_e)]{w''}^2.
-\]
-Integrating over an interval of length $h_e$ yields
-\[
-  \norm[L^2(\mathcal K_e)]{w'}
-  \leq h_e\norm[L^2(\mathcal K_e)]{u''}.
 \]
 \end{frame}
 
-\begin{frame}{$L^2$ estimate on one element}
-Use $w(x_e)=0$ and write
+\begin{frame}{The pointwise derivative bound}
+For $y\in\mathcal K_e$, let $I_y$ be the interval with endpoints $x_*$ and
+$y$. Its length satisfies $|I_y|\leq h_e$. Therefore
+\begin{align*}
+  |w'(y)|^2
+  &=
+  \left|\int_{I_y}1\,w''(t)\,\dd t\right|^2\\
+  &\leq
+  \left(\int_{I_y}1^2\,\dd t\right)
+  \left(\int_{I_y}|w''(t)|^2\,\dd t\right)\\
+  &\leq
+  h_e\norm[L^2(\mathcal K_e)]{w''}^2.
+\end{align*}
+This is a pointwise estimate: it bounds $|w'(y)|$ for each
+$y\in\mathcal K_e$ using one element norm of $w''$.
+\end{frame}
+
+\begin{frame}{The local derivative estimate}
+Integrate the pointwise bound with respect to $y$ over the element:
+\begin{align*}
+  \norm[L^2(\mathcal K_e)]{w'}^2
+  &=\int_{x_e}^{x_{e+1}}|w'(y)|^2\,\dd y\\
+  &\leq
+  \int_{x_e}^{x_{e+1}}
+  h_e\norm[L^2(\mathcal K_e)]{w''}^2\,\dd y\\
+  &=h_e^2\norm[L^2(\mathcal K_e)]{w''}^2.
+\end{align*}
+Since $w''=u''$, taking square roots gives
 \[
+  \boxed{\norm[L^2(\mathcal K_e)]{(u-\Ie u)'}
+  \leq h_e\norm[L^2(\mathcal K_e)]{u''}.
+  }
+\]
+\end{frame}
+
+\begin{frame}{The function-value estimate}
+Use $w(x_e)=0$. The fundamental theorem of calculus gives
+\[
+  w(y)-w(x_e)=\int_{x_e}^{y}w'(t)\,\dd t,
+  \qquad
   w(y)=\int_{x_e}^{y}w'(t)\,\dd t.
 \]
-Cauchy--Schwarz and integration over $\mathcal K_e$ give
+For each $y\in\mathcal K_e$, Cauchy--Schwarz gives
+\begin{align*}
+  |w(y)|^2
+  &\leq
+  \left(\int_{x_e}^{y}1^2\,\dd t\right)
+  \left(\int_{x_e}^{y}|w'(t)|^2\,\dd t\right)\\
+  &\leq h_e\norm[L^2(\mathcal K_e)]{w'}^2.
+\end{align*}
+Integrating over $y\in\mathcal K_e$ and taking square roots gives
 \[
   \norm[L^2(\mathcal K_e)]{w}
   \leq h_e\norm[L^2(\mathcal K_e)]{w'}.
 \]
-Combining this relation with the derivative estimate gives
+Combining this bound with the derivative estimate gives
 \[
-  \norm[L^2(\mathcal K_e)]{u-\Ie u}
+  \boxed{\norm[L^2(\mathcal K_e)]{u-\Ie u}
   \leq h_e^2\norm[L^2(\mathcal K_e)]{u''}.
+  }
 \]
-
-The two powers of $h_e$ arise from two applications of the fundamental
-theorem of calculus and the Cauchy--Schwarz inequality.
 \end{frame}
 
 \begin{frame}{From local estimates to global estimates}
@@ -363,6 +417,8 @@ Thus the full $H^1$-norm interpolation error is also of order $h$.
     \begin{tikzpicture}[scale=1.45]
       \draw[thick,fill=blue!7] (-1,0)--(1,0)--(0,1.73)--cycle;
       \draw[blue!65!black] (0,0.577) circle[radius=0.577];
+      \draw[blue!65!black] (-0.577,0.577)--(0.577,0.577);
+      \node[font=\small,blue!65!black,above] at (0,0.577) {$\rho_e$};
       \node[font=\small] at (0,-0.35) {well-shaped triangle};
       \node[font=\small] at (0,1.95) {$h_e=2$};
     \end{tikzpicture}
@@ -372,20 +428,108 @@ Thus the full $H^1$-norm interpolation error is also of order $h$.
     \begin{tikzpicture}[scale=1.45]
       \draw[thick,fill=red!6] (-1,0)--(1,0)--(0,0.25)--cycle;
       \draw[red!70!black] (0,0.123) circle[radius=0.123];
+      \draw[red!70!black] (-0.123,0.123)--(0.123,0.123);
+      \node[font=\small,red!70!black,above] at (0,0.123) {$\rho_e$};
       \node[font=\small] at (0,-0.35) {flat triangle};
       \node[font=\small] at (0,0.55) {$h_e=2$};
     \end{tikzpicture}
   \end{column}
 \end{columns}
 \vspace{0.2cm}
-For the affine element map with Jacobian $\bm J_e$, the gradient transformation
-from Chapter 6 is
+Both cells have the same diameter, but the diameter $\rho_e$ of the largest
+inscribed disk is much smaller for the flat cell. The next two slides show
+how this difference enters the affine element map and the basis-function
+gradients.
+\end{frame}
+
+\begin{frame}{A family of affine triangles with the same diameter}
+Let the reference triangle have vertices
 \[
-  \nabla_{\bx}v=\bm J_e^{-T}\nabla_{\widehat\bx}\widehat v.
+  \widehat\bx_1=(0,0),
+  \qquad
+  \widehat\bx_2=(1,0),
+  \qquad
+  \widehat\bx_3=(0,1).
 \]
-Both cells have the same diameter $h_e$, but
-$\norm{\bm J_e^{-1}}$ is much larger for the flat cell. We therefore need a
-measure of both cell size and cell shape.
+Map it to the physical triangle $\mathcal K_\varepsilon$ with vertices
+\[
+  \bx_1=(-1,0),
+  \qquad
+  \bx_2=(1,0),
+  \qquad
+  \bx_3=(0,\varepsilon),
+\]
+using
+\[
+  \bx=F_\varepsilon(\widehat\bx)
+  =\bx_1+\bm J_\varepsilon\widehat\bx,
+  \qquad
+  \bm J_\varepsilon
+  =
+  \begin{bmatrix}
+    2&1\\
+    0&\varepsilon
+  \end{bmatrix}.
+\]
+For $0<\varepsilon\leq\sqrt3$, the longest side is the base from $\bx_1$ to
+$\bx_2$, so every triangle in this family has $h_e=2$. Decreasing
+$\varepsilon$ changes the cell shape without changing its diameter.
+\end{frame}
+
+\begin{frame}{The inverse Jacobian amplifies a basis gradient}
+The inverse transpose of the Jacobian is
+\[
+  \bm J_\varepsilon^{-T}
+  =
+  \begin{bmatrix}
+    \tfrac12&0\\[2pt]
+    -\tfrac{1}{2\varepsilon}&\tfrac{1}{\varepsilon}
+  \end{bmatrix}.
+\]
+Choose the reference $P_1$ basis function associated with the third vertex:
+\[
+  \widehat v(\xi,\eta)=\eta,
+  \qquad
+  \nabla_{\widehat\bx}\widehat v=
+  \begin{bmatrix}0\\1\end{bmatrix}.
+\]
+The gradient transformation from Chapter 6 gives
+\[
+  \nabla_{\bx}v
+  =\bm J_\varepsilon^{-T}\nabla_{\widehat\bx}\widehat v
+  =
+  \begin{bmatrix}0\\1/\varepsilon\end{bmatrix},
+  \qquad
+  \norm{\nabla_{\bx}v}=\frac1\varepsilon.
+\]
+Thus $\norm{\bm J_\varepsilon^{-1}}\geq1/\varepsilon$. The basis gradient
+remains moderate for $\varepsilon=\sqrt3$, but has magnitude $4$ when
+$\varepsilon=1/4$.
+\end{frame}
+
+\begin{frame}{The same example gives the shape parameter}
+The area of $\mathcal K_\varepsilon$ is $\varepsilon$, and its semiperimeter is
+\[
+  1+\sqrt{1+\varepsilon^2}.
+\]
+The radius of the inscribed disk is area divided by semiperimeter. Since
+$\rho_e$ is the disk diameter,
+\[
+  \rho_e
+  =\frac{2\varepsilon}{1+\sqrt{1+\varepsilon^2}},
+  \qquad
+  \frac{h_e}{\rho_e}
+  =\frac{1+\sqrt{1+\varepsilon^2}}{\varepsilon}.
+\]
+As $\varepsilon\to0$,
+\[
+  \norm{\bm J_\varepsilon^{-1}}
+  \text{ grows at least like }\frac1\varepsilon,
+  \qquad
+  \frac{h_e}{\rho_e}\text{ grows like }\frac2\varepsilon.
+\]
+The inverse-Jacobian factor is therefore controlled only when the cell-shape
+ratio is controlled.
 \end{frame}
 
 \begin{frame}{Shape regularity}

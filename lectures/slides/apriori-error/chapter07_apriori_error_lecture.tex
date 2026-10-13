@@ -6,7 +6,14 @@
 \usetheme{default}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
-\setbeamertemplate{footline}{}
+\setbeamertemplate{footline}{%
+  \leavevmode
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.6ex,dp=1.1ex,right]{page number in head/foot}%
+      \insertframenumber/\inserttotalframenumber\hspace{0.35cm}
+    \end{beamercolorbox}%
+  }%
+}
 \setbeamertemplate{frametitle}{%
   \vspace{0.25cm}%
   \insertframetitle\par

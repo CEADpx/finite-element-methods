@@ -1,12 +1,18 @@
 \documentclass[11pt,aspectratio=169]{beamer}
-\usepackage{amsmath,amssymb,bm,graphicx,booktabs,tikz,pgfplots}
-\pgfplotsset{compat=1.17}
+\usepackage{amsmath,amssymb,bm,graphicx,booktabs,tikz}
 \usetikzlibrary{arrows.meta,positioning}
 
 \usetheme{default}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
-\setbeamertemplate{footline}{}
+\setbeamertemplate{footline}{%
+  \leavevmode
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.6ex,dp=1.1ex,right]{page number in head/foot}%
+      \insertframenumber/\inserttotalframenumber\hspace{0.35cm}
+    \end{beamercolorbox}%
+  }%
+}
 \setbeamertemplate{frametitle}{\vspace{0.25cm}\insertframetitle\par\vspace{0.08cm}\hrule}
 \setbeamercolor{normal text}{fg=black,bg=white}
 \setbeamercolor{frametitle}{fg=black,bg=white}
@@ -15,22 +21,19 @@
 
 \newcommand{\dd}{\,\mathrm{d}}
 \newcommand{\Om}{\Omega}
-\newcommand{\Gam}{\Gamma}
 \newcommand{\R}{\mathbb R}
-\newcommand{\Th}{\mathcal T_h}
 \newcommand{\Vzero}{\mathcal V_0}
 \newcommand{\Vhzero}{\mathcal V_{h,0}}
 \newcommand{\Ih}{\mathcal I_h}
-\newcommand{\Ie}{\mathcal I_e}
 \newcommand{\norm}[2][]{\left\lVert#2\right\rVert_{#1}}
 \newcommand{\seminorm}[2][]{\left\lvert#2\right\rvert_{#1}}
 \newcommand{\bx}{\bm x}
 \newcommand{\bu}{\bm u}
 \newcommand{\bv}{\bm v}
 \newcommand{\beps}{\bm\varepsilon}
+\newcommand{\bsig}{\bm\sigma}
 
-% Frozen output of Chapter 7, Example 7.5, copied here for reproducibility.
-\graphicspath{{figures/}}
+\graphicspath{{figures/}{../../../notebooks/error-analysis/figures/}}
 
 \begin{document}
 
@@ -38,59 +41,153 @@
   \centering\vfill
   {\LARGE\bfseries A Priori Error Analysis\par}
   \vspace{0.45cm}
-  {\large Convergence rates, duality, and numerical verification\par}
+  {\large The $L^2$ result and numerical verification with linear elasticity\par}
   \vfill
 \end{frame}
-
-\section{From interpolation to convergence}
 
 \begin{frame}{Lecture outline}
 \begin{enumerate}
-  \item Identify how polynomial degree and solution regularity limit the
-  predicted convergence rates.
-  \item Derive the optimal $L^2$ estimate using a dual problem.
-  \item Compare predicted rates with errors computed on a mesh sequence.
-  \item State the corresponding conclusions for linear elasticity.
+  \item State the predicted convergence rates and the regularity assumptions
+  behind them.
+  \item Trace the main steps that give the improved $L^2$ estimate.
+  \item Verify the predicted rates for a smooth elasticity problem in a
+  Jupyter notebook.
+  \item Examine what changes when an elastic body has a reentrant corner.
 \end{enumerate}
+\vspace{0.35cm}
+
+The emphasis today is on interpreting and testing the error estimates. The
+duality argument is included so that the additional $L^2$ order is not used as
+an unexplained rule.
 \end{frame}
+
+\section{Review}
+
+\begin{frame}{Review: diffusion problem and variational form}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{0.43\textwidth}
+    With homogeneous Dirichlet data, the strong problem is
+    \[
+      \begin{aligned}
+      -\nabla\cdot(k\nabla u)&=f &&\text{in }\Om,\\
+      u&=0 &&\text{on }\Gamma_D,\\
+      -k\nabla u\cdot\bm n&=q &&\text{on }\Gamma_N.
+      \end{aligned}
+    \]
+    The test and trial space is
+    \[
+      \Vzero=H^1_{0,\Gamma_D}(\Om).
+    \]
+  \end{column}
+  \begin{column}{0.54\textwidth}
+    Define the bilinear and linear forms
+    \[
+      a(w,v)=\int_\Om k\nabla w\cdot\nabla v\,\dd\bx,
+    \]
+    \[
+      \ell(v)=\int_\Om fv\,\dd\bx
+      -\int_{\Gamma_N}qv\,\dd s.
+    \]
+    The variational problem is
+    \[
+      \boxed{\text{find }u\in\Vzero:
+      \quad a(u,v)=\ell(v)
+      \quad\forall v\in\Vzero.}
+    \]
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Review: finite element problem and stability estimates}
+Let $\Vhzero\subset\Vzero$ be the continuous Lagrange finite element space of
+polynomial degree $p\geq1$. The finite element problem is
+\[
+  \boxed{\text{find }u_h\in\Vhzero:
+  \quad a(u_h,v_h)=\ell(v_h)
+  \quad\forall v_h\in\Vhzero.}
+\]
+If $0<k_0\leq k(\bx)\leq k_1$, then
+\[
+  |a(w,v)|\leq
+  M\norm[H^1(\Om)]{w}\norm[H^1(\Om)]{v},
+  \qquad M=k_1,
+\]
+\[
+  a(v,v)\geq
+  \alpha\norm[H^1(\Om)]{v}^2,
+  \qquad \alpha=\frac{k_0}{1+C_P^2}.
+\]
+Here $M$ is the continuity constant and $\alpha$ is the coercivity constant.
+Since $a$ is symmetric,
+\[
+  \norm[a]{v}=\sqrt{a(v,v)}
+\]
+defines the energy norm.
+\end{frame}
+
+\begin{frame}{Review: orthogonality, C\'ea's lemma, and interpolation}
+Let $e=u-u_h$. For any $v_h\in\Vhzero$,
+\[
+  a(e,v_h)=a(u,v_h)-a(u_h,v_h)
+  =\ell(v_h)-\ell(v_h)=0.
+\]
+This is Galerkin orthogonality. C\'ea's lemma gives
+\[
+  \norm[H^1(\Om)]{e}
+  \leq\frac{M}{\alpha}
+  \inf_{w_h\in\Vhzero}\norm[H^1(\Om)]{u-w_h}.
+\]
+For degree-$p$ interpolation on a shape-regular mesh, if
+$u\in H^s(\Om)$ and $2\leq s\leq p+1$,
+\[
+  \norm[L^2(\Om)]{u-\Ih u}
+  \leq C_Ih^s\seminorm[H^s(\Om)]{u},
+\]
+\[
+  \seminorm[H^1(\Om)]{u-\Ih u}
+  \leq C_Ih^{s-1}\seminorm[H^s(\Om)]{u}.
+\]
+\end{frame}
+
+\begin{frame}{Review: a priori estimates obtained previously}
+Combining best approximation with the interpolation estimate gives
+\[
+  \norm[a]{e}
+  \leq C_I\sqrt{k_1}\,h^{s-1}\seminorm[H^s(\Om)]{u}.
+\]
+The coefficient bounds give the $H^1$-seminorm estimate
+\[
+  \boxed{\seminorm[H^1(\Om)]{e}
+  \leq C_I\sqrt{\frac{k_1}{k_0}}\,
+  h^{s-1}\seminorm[H^s(\Om)]{u}.}
+\]
+Using Poincar\'e's inequality gives
+\[
+  \norm[H^1(\Om)]{e}
+  \leq C_I\sqrt{\frac{k_1(1+C_P^2)}{k_0}}\,
+  h^{s-1}\seminorm[H^s(\Om)]{u}.
+\]
+Therefore, the direct $L^2$ estimate is only
+\[
+  \norm[L^2(\Om)]{e}
+  \leq\norm[H^1(\Om)]{e}
+  \leq C h^{s-1}\seminorm[H^s(\Om)]{u}.
+\]
+\end{frame}
+
+\section{Predicted rates}
 
 \begin{frame}[plain]
-  \centering
-  \vfill
-  {\LARGE\bfseries Convergence rates and solution regularity\par}
+  \centering\vfill
+  {\LARGE\bfseries What rates should we expect?\par}
   \vspace{0.45cm}
-  {\large Determine how the polynomial degree and the smoothness of the exact
-  solution limit the predicted rate.\par}
+  {\large Polynomial degree and solution regularity both limit the answer.\par}
   \vfill
 \end{frame}
 
-\begin{frame}{Starting point from the previous lecture}
-For $u\in H^s(\Om)$ with $2\leq s\leq p+1$, the previous lecture established
-\[
-  \norm[a]{u-u_h}=O(h^{s-1}),
-  \qquad
-  \norm[H^1(\Om)]{u-u_h}=O(h^{s-1}).
-\]
-The immediate consequence
-\[
-  \norm[L^2(\Om)]{u-u_h}
-  \leq\norm[H^1(\Om)]{u-u_h}
-\]
-also gives an $L^2$ bound of order $h^{s-1}$.
-
-The interpolation error is one order smaller in $L^2$:
-\[
-  \norm[L^2(\Om)]{u-\Ih u}=O(h^s).
-\]
-The first goal of this lecture is to determine when the finite element
-solution has this higher $L^2$ rate.
-\end{frame}
-
-\section{Energy and \texorpdfstring{$H^1$}{H1} convergence}
-
-\begin{frame}{Predicted rates for smooth solutions}
-Assume $u\in H^{p+1}(\Om)$. The $L^2$ rates shown in the last column also
-require the dual-regularity assumption introduced later.
+\begin{frame}{Predicted rates for a smooth solution}
+Assume $u\in H^{p+1}(\Om)$. The $L^2$ column also requires the dual-regularity
+assumption introduced next.
 \par
 \vspace{0.2cm}
 \centering
@@ -106,230 +203,162 @@ require the dual-regularity assumption introduced later.
 \end{tabular}
 \par
 \vspace{0.4cm}
-$E(h)=O(h^r)$ means $E(h)\leq Ch^r$ with a constant $C$ independent of $h$.
-The exponent $r$ is the convergence rate in the selected norm.
+$E(h)=O(h^r)$ means $E(h)\leq Ch^r$, where $C$ is independent of $h$.
+The exponent $r$ is the convergence rate in the stated norm.
 \end{frame}
 
-\begin{frame}{Regularity of the exact solution also matters}
+\section{The improved \texorpdfstring{$L^2$}{L2} estimate}
+
+\begin{frame}[plain]
+  \centering\vfill
+  {\LARGE\bfseries Why can the $L^2$ error converge faster?\par}
+  \vspace{0.45cm}
+  {\large A dual problem supplies one additional factor of $h$.\par}
+  \vfill
+\end{frame}
+
+\begin{frame}{The dual problem associated with the error}
+Let $e=u-u_h$. Using the same diffusion bilinear form
+\[
+  a(w,v)=\int_\Om k\nabla w\cdot\nabla v\,\dd\bx,
+\]
+the \textbf{dual problem} is to find $z\in\Vzero$ such that
+\[
+  a(v,z)=(e,v)_{L^2(\Om)}
+  \qquad\forall v\in\Vzero.
+\]
+Because $a$ is symmetric, this is the variational form of
+\[
+  \begin{aligned}
+  -\nabla\cdot(k\nabla z)&=e &&\text{in }\Om,\\
+  z&=0 &&\text{on }\Gamma_D,\\
+  k\nabla z\cdot\bm n&=0 &&\text{on }\Gamma_N.
+  \end{aligned}
+\]
+We assume that $z\in H^2(\Om)$ and
+\[
+  \seminorm[H^2(\Om)]{z}
+  \leq C_{\mathrm{reg}}\norm[L^2(\Om)]{e}.
+\]
+\end{frame}
+
+\begin{frame}{The error identity}
+Choose $v=e$ in the dual problem:
+\[
+  \norm[L^2(\Om)]{e}^{2}=a(e,z).
+\]
+The $H^2$ regularity of $z$ ensures that its interpolant is defined, and
+$\Ih z\in\Vhzero$. Galerkin orthogonality states
+\[
+  a(e,v_h)=0\qquad\forall v_h\in\Vhzero.
+\]
+Use the particular test function $v_h=\Ih z$:
+\[
+  a(e,\Ih z)=0.
+\]
+By bilinearity in the second argument,
+\[
+  \boxed{\norm[L^2(\Om)]{e}^{2}
+  =a(e,z)-a(e,\Ih z)
+  =a(e,z-\Ih z).}
+\]
+The right-hand side now contains the interpolation error of the dual
+solution.
+\end{frame}
+
+\begin{frame}{Obtain the additional factor of \texorpdfstring{$h$}{h}}
+For the diffusion form, the coefficient bound and Cauchy--Schwarz inequality
+give
+\[
+  |a(w,v)|
+  \leq k_1\seminorm[H^1(\Om)]{w}
+  \seminorm[H^1(\Om)]{v}.
+\]
+Use this continuity estimate, interpolation with $s=2$, and dual regularity:
+\begin{align*}
+  \norm[L^2(\Om)]{e}^{2}
+  &=a(e,z-\Ih z)\\
+  &\leq k_1\seminorm[H^1(\Om)]{e}
+       \seminorm[H^1(\Om)]{z-\Ih z}\\
+  &\leq k_1C_Ih\seminorm[H^1(\Om)]{e}
+       \seminorm[H^2(\Om)]{z}\\
+  &\leq k_1C_IC_{\mathrm{reg}}h\seminorm[H^1(\Om)]{e}
+       \norm[L^2(\Om)]{e}.
+\end{align*}
+\end{frame}
+
+\begin{frame}{Combine with the \texorpdfstring{$H^1$}{H1} estimate}
+If $\norm[L^2(\Om)]{e}\ne0$, cancel one error factor to obtain
+\[
+  \norm[L^2(\Om)]{e}
+  \leq k_1C_IC_{\mathrm{reg}}h
+  \seminorm[H^1(\Om)]{e}.
+\]
+The recalled $H^1$-seminorm estimate is
+\[
+  \seminorm[H^1(\Om)]{e}
+  \leq C_I\sqrt{\frac{k_1}{k_0}}\,
+  h^{s-1}\seminorm[H^s(\Om)]{u}.
+\]
+Combining the two estimates gives
+\begin{align*}
+  \norm[L^2(\Om)]{e}
+  &\leq C_I^2C_{\mathrm{reg}}k_1
+  \sqrt{\frac{k_1}{k_0}}\,
+  h^s\seminorm[H^s(\Om)]{u}.
+\end{align*}
+For degree-$p$ elements, provided the exact solution belongs to
+$H^{p+1}(\Om)$ and the dual problem is $H^2$-regular, choose $s=p+1$:
+\[
+  \boxed{\norm[L^2(\Om)]{u-u_h}\leq
+  C h^{p+1}\seminorm[H^{p+1}(\Om)]{u}.}
+\]
+\end{frame}
+
+\begin{frame}{A corner can limit the available regularity}
 \begin{columns}[T,onlytextwidth]
   \begin{column}{0.34\textwidth}
     \centering
     \begin{tikzpicture}[scale=1.45]
       \draw[thick,fill=blue!6]
         (0,0)--(2,0)--(2,1)--(1,1)--(1,2)--(0,2)--cycle;
-      \draw[red!70!black,thick]
-        (1,1) ++(90:0.3) arc[start angle=90,end angle=360,radius=0.3];
       \fill[red!70!black] (1,1) circle[radius=0.035];
-      \node[font=\small,red!70!black] at (0.58,0.58) {$\omega=3\pi/2$};
+      \draw[-{Latex[length=2mm]},red!70!black]
+        (1.38,1.42)--(1.06,1.06);
+      \node[font=\scriptsize,red!70!black,anchor=west,align=left]
+        at (1.15,1.62) {reentrant\\corner};
       \node[font=\small] at (0.45,1.68) {$\Om$};
     \end{tikzpicture}
   \end{column}
   \begin{column}{0.62\textwidth}
-    On a polygon with a reentrant corner, the solution of a smooth-data
-    Laplace problem may fail to belong to $H^2(\Om)$.
+    A reentrant corner can produce a solution that is less regular even when
+    the data are smooth.
+    \vspace{0.1cm}
+
+    If the exact solution does not belong to $H^2(\Om)$, the usual
+    first-order $H^1$ estimate for linear elements does not follow from the
+    theorem.
     \vspace{0.25cm}
 
-    The linear-element estimate requires $u\in H^2(\Om)$. If this regularity
-    is unavailable, the theorem does not guarantee the usual first-order
-    energy convergence.
-    \vspace{0.25cm}
-
-    Raising the polynomial degree does not repair missing solution
-    regularity. Local refinement near the corner is often more useful;
-    Chapter 8 develops a way to decide where refinement is needed.
+    The dual solution may also fail to belong to $H^2(\Om)$. In that case the
+    duality argument does not supply a full additional power of $h$ in the
+    $L^2$ estimate. Increasing $p$ does not restore missing regularity.
   \end{column}
 \end{columns}
-\end{frame}
-
-\begin{frame}{In-class calculation: predict the energy rate}
-Assume the hypotheses of the energy-error theorem. Let $s_u$ be the largest
-integer for which $u\in H^{s_u}(\Om)$ is known. Complete the table using
-\[
-  r=\min(p,s_u-1).
-\]
-\par
-\vspace{0.1cm}
-\centering
-\renewcommand{\arraystretch}{1.55}
-\begin{tabular}{c|ccc}
-  \toprule
-  & $s_u=2$ & $s_u=3$ & $s_u=4$\\
-  \midrule
-  $p=1$ & & & \\
-  $p=2$ & & & \\
-  $p=3$ & & & \\
-  \bottomrule
-\end{tabular}
-\par
-\vspace{0.4cm}
-
-Why does changing from $p=1$ to $p=3$ not improve the guaranteed rate when
-$u\in H^2(\Om)$ but no additional regularity is known?
-\end{frame}
-
-\section{\texorpdfstring{$L^2$}{L2} convergence by duality}
-
-\begin{frame}[plain]
-  \centering
-  \vfill
-  {\LARGE\bfseries The optimal $L^2$ estimate\par}
-  \vspace{0.45cm}
-  {\large A dual problem supplies the additional power of $h$.\par}
-  \vfill
-\end{frame}
-
-\begin{frame}{Why C\'ea's lemma does not give the optimal $L^2$ rate}
-The $H^1$ estimate gives the valid bound
-\[
-  \norm[L^2(\Om)]{u-u_h}
-  \leq\norm[H^1(\Om)]{u-u_h}=O(h^{s-1}).
-\]
-But one-dimensional examples and the interpolation estimate suggest one
-additional power of $h$ in $L^2$.
-\vspace{0.25cm}
-
-C\'ea's lemma controls the error in a norm in which the bilinear form is
-coercive. For diffusion, that is the energy norm, not the $L^2$ norm.
-\vspace{0.25cm}
-
-We therefore introduce an auxiliary problem that converts the squared
-$L^2$ error into a bilinear form involving the finite element error.
-\end{frame}
-
-\begin{frame}{Step 1: choose the dual problem from the error}
-Let $e=u-u_h$. Define the dual solution $z\in\Vzero$ by
-\[
-  \boxed{a(v,z)=(e,v)_{L^2(\Om)}
-  \qquad\forall v\in\Vzero.}
-\]
-For symmetric diffusion, this is the weak form of
-\[
-  -\nabla\cdot(k\nabla z)=e\quad\text{in }\Om,
-\]
-with homogeneous Dirichlet data on $\Gam_D$ and homogeneous flux on
-$\Gam_N$.
-\vspace{0.2cm}
-
-Taking $v=e$ gives
-\[
-  \boxed{\norm[L^2(\Om)]{e}^2=a(e,z).}
-\]
-This identity is the reason for introducing the dual problem.
-\end{frame}
-
-\begin{frame}{The extra assumption: dual regularity}
-Lax--Milgram gives $z\in\Vzero$, but the interpolation estimate used next
-requires $z\in H^2(\Om)$.
-\vspace{0.2cm}
-
-We assume
-\[
-  \boxed{z\in H^2(\Om),
-  \qquad
-  \seminorm[H^2(\Om)]{z}
-  \leq C_{\mathrm{reg}}\norm[L^2(\Om)]{e}.}
-\]
-This is a property of the domain, coefficient, and boundary partition, not of
-the mesh. It holds for many smooth or convex problems, but it can fail at
-reentrant corners, across coefficient jumps, or where the boundary-condition
-type changes.
-\end{frame}
-
-\begin{frame}{Step 2: use Galerkin orthogonality}
-Since $z\in H^2(\Om)$, $\Ih z$ is defined and belongs to $\Vhzero$.
-Galerkin orthogonality gives
-\[
-  a(e,\Ih z)=0.
-\]
-Therefore
-\[
-  \norm[L^2(\Om)]{e}^2
-  =a(e,z)=a(e,z-\Ih z).
-\]
-\vspace{0.25cm}
-
-The dual solution itself is not small, but its interpolation error is:
-\[
-  \seminorm[H^1(\Om)]{z-\Ih z}
-  \leq C_Ih\seminorm[H^2(\Om)]{z}.
-\]
-This factor $h$ produces the additional order in the $L^2$ error.
-\end{frame}
-
-\begin{frame}{Step 3: bound the two factors}
-\begin{align*}
-  \norm[L^2(\Om)]{e}^2
-  &=a(e,z-\Ih z)\\
-  &\leq k_1\seminorm[H^1(\Om)]{e}
-    \seminorm[H^1(\Om)]{z-\Ih z}\\
-  &\leq k_1C_Ih\seminorm[H^1(\Om)]{e}
-    \seminorm[H^2(\Om)]{z}\\
-  &\leq k_1C_IC_{\mathrm{reg}}h
-    \seminorm[H^1(\Om)]{e}\norm[L^2(\Om)]{e}.
-\end{align*}
-If $e=0$, the desired estimate is immediate. Otherwise, divide by
-$\norm[L^2(\Om)]{e}$ to obtain
-\[
-  \norm[L^2(\Om)]{e}
-  \leq k_1C_IC_{\mathrm{reg}}h\seminorm[H^1(\Om)]{e}.
-\]
-The dual problem, Galerkin orthogonality, interpolation, and dual regularity
-have supplied one factor of $h$.
-\end{frame}
-
-\begin{frame}{Step 4: insert the \texorpdfstring{$H^1$}{H1} estimate}
-The $H^1$ estimate from the previous lecture implies
-\[
-  \seminorm[H^1(\Om)]{e}
-  \leq\norm[H^1(\Om)]{e}
-  \leq C_Eh^{s-1}\seminorm[H^s(\Om)]{u}.
-\]
-Substitute this result into the estimate from Step 3:
-\begin{align*}
-  \norm[L^2(\Om)]{e}
-  &\leq Ch\seminorm[H^1(\Om)]{e}\\
-  &\leq Ch\left(C_Eh^{s-1}\seminorm[H^s(\Om)]{u}\right)\\
-  &=CC_Eh^s\seminorm[H^s(\Om)]{u}.
-\end{align*}
-Therefore
-\[
-  \boxed{\norm[L^2(\Om)]{u-u_h}=O(h^s).}
-\]
-For a smooth degree-$p$ approximation, this is $O(h^{p+1})$.
-\end{frame}
-
-\begin{frame}{Duality argument: four steps}
-\begin{enumerate}
-  \item Choose the dual right-hand side to be $e=u-u_h$.
-  \item Use the dual equation to write $\norm[L^2]{e}^2=a(e,z)$.
-  \item Use Galerkin orthogonality to replace $z$ by $z-\Ih z$.
-  \item Use interpolation and $H^2$ regularity to obtain
-  $\norm[L^2(\Om)]{e}\leq Ch\seminorm[H^1(\Om)]{e}$, then insert the
-  $H^1$ finite element estimate to obtain the rate $h^s$.
-\end{enumerate}
-\vspace{0.2cm}
-
-Without the additional $H^2$ regularity of $z$, Step 3 does not supply a full
-factor of $h$. The improved $L^2$ rate is conditional, not automatic.
 \end{frame}
 
 \section{Numerical verification}
 
 \begin{frame}[plain]
-  \centering
-  \vfill
+  \centering\vfill
   {\LARGE\bfseries Numerical verification\par}
   \vspace{0.45cm}
-  {\large Compare predicted rates with errors computed during mesh refinement.\par}
+  {\large Test the predicted rates for a smooth elasticity problem.\par}
   \vfill
 \end{frame}
 
 \begin{frame}{Observed convergence rate}
-Suppose $E(h)\approx Ch^r$. For two mesh sizes $h_1>h_2$,
-\[
-  \frac{E(h_1)}{E(h_2)}\approx\left(\frac{h_1}{h_2}\right)^r.
-\]
-Solving for $r$ gives
+If $E(h)\approx Ch^r$, two consecutive meshes give
 \[
   \boxed{r_{\mathrm{obs}}
   =\frac{\log(E(h_1)/E(h_2))}{\log(h_1/h_2)}.}
@@ -338,244 +367,264 @@ For uniform refinement with $h_2=h_1/2$,
 \[
   r_{\mathrm{obs}}=\log_2\!\left(\frac{E(h)}{E(h/2)}\right).
 \]
-An error reduction by factors $2$, $4$, and $8$ corresponds to observed
-rates $1$, $2$, and $3$, respectively.
+Therefore:
+\[
+\begin{array}{c|ccc}
+  \text{error reduction after halving }h & 2 & 4 & 8\\ \hline
+  r_{\mathrm{obs}} & 1 & 2 & 3
+\end{array}
+\]
+We look for stabilization of $r_{\mathrm{obs}}$ over several refinements,
+not agreement from a single pair of meshes.
 \end{frame}
 
-\begin{frame}{A convergence study tests a specific prediction}
-A meaningful verification study requires:
+\begin{frame}{What a verification study requires}
+To compare a theorem with a computation, we need:
 \begin{enumerate}
-  \item a known smooth solution, often obtained by the method of manufactured
-  solutions;
-  \item a mesh sequence satisfying the assumptions of the estimate;
-  \item the error measured in the norm for which a rate is predicted;
+  \item an exact solution with the regularity assumed by the theorem;
+  \item data chosen so that this exact solution satisfies the boundary-value
+  problem;
+  \item a mesh sequence that preserves element quality;
+  \item the error evaluated in each norm for which a rate is predicted;
   \item sufficiently accurate quadrature for the error integrals; and
-  \item several refinements in the asymptotic range.
+  \item enough refinements to reach the asymptotic range.
+\end{enumerate}
+\vspace{0.25cm}
+
+An attractive solution plot is not a convergence test. Nodal errors alone are
+also insufficient because the error between nodes may be nonzero.
+\end{frame}
+
+\begin{frame}{Linear elasticity problem used in the notebook}
+For plane strain, with $\lambda=\mu=1$,
+\[
+  \beps(\bu)=\tfrac12\left(\nabla\bu+\nabla\bu^T\right),
+  \qquad
+  \bsig(\bu)=2\mu\beps(\bu)
+  +\lambda\operatorname{tr}(\beps(\bu))\bm I.
+\]
+The finite element problem is
+\[
+  \int_\Om \bsig(\bu_h):\beps(\bv_h)\dd\bx
+  =\int_\Om \bm b\cdot\bv_h\dd\bx
+  \qquad\forall\bv_h\in\mathcal V_{h,0}.
+\]
+For a smooth exact displacement and $P_1$ triangles, the predictions are
+\[
+  \norm[L^2(\Om;\R^2)]{\bu-\bu_h}=O(h^2),
+\]
+\[
+  \seminorm[H^1(\Om;\R^2)]{\bu-\bu_h}=O(h),
+  \qquad
+  \norm[a_{\mathrm{el}}]{\bu-\bu_h}=O(h).
+\]
+\end{frame}
+
+\begin{frame}{Manufactured smooth displacement}
+Let $\Om=(0,1)^2$ and prescribe $\bu=\bm 0$ on $\partial\Om$. Choose
+\[
+  \bu_\star(x,y)=
+  \begin{bmatrix}
+    \sin(\pi x)\sin(\pi y)\\
+    \sin(2\pi x)\sin(\pi y)
+  \end{bmatrix}.
+\]
+The body force is then defined by
+\[
+  \bm b=-\operatorname{div}\bsig(\bu_\star).
+\]
+This construction guarantees that $\bu_\star$ solves the strong problem. It
+is smooth and is not contained in the $P_1$ finite element space.
+\vspace{0.2cm}
+
+We can therefore compute the $L^2$, $H^1$-seminorm, and energy errors directly
+and compare their observed rates with the predicted rates.
+\end{frame}
+
+\begin{frame}{Notebook workflow}
+For each subdivision count $n=4,8,16,32$:
+\begin{enumerate}
+  \item construct a triangular mesh of the unit square;
+  \item define the vector-valued $P_1$ space;
+  \item form $\bm b=-\operatorname{div}\bsig(\bu_\star)$;
+  \item assemble and solve the elasticity problem;
+  \item integrate the three error norms; and
+  \item compute the observed rates between successive meshes.
 \end{enumerate}
 \vspace{0.3cm}
 
-Errors sampled only at the nodes are not sufficient. In some one-dimensional
-problems, the finite element nodal values are exact even though the error
-between nodes is nonzero.
+The notebook follows this sequence explicitly. Plotting helpers are kept
+separate so that the finite element algorithm remains visible during the
+demonstration.
 \end{frame}
 
-\begin{frame}{Uniformly loaded bar: exact error rates}
-\begin{columns}[T,onlytextwidth]
-  \begin{column}{0.53\textwidth}
-    \centering
-    \begin{tikzpicture}
-      \begin{axis}[width=7.4cm,height=6.0cm,xmode=log,ymode=log,
-        log basis x={2},xmin=0.045,xmax=0.7,ymin=1e-4,ymax=2,
-        xtick={0.0625,0.125,0.25,0.5},
-        xticklabels={$1/16$,$1/8$,$1/4$,$1/2$},
-        xlabel={mesh size $h$},ylabel={error},
-        tick label style={font=\footnotesize},label style={font=\small},
-        legend pos=north west,
-        legend style={font=\footnotesize,draw=none,fill=none},
-        legend cell align=left]
-        \addplot[thick,mark=*,color=black] coordinates {
-          (0.5,1.443e-1)(0.25,7.217e-2)(0.125,3.608e-2)(0.0625,1.804e-2)};
-        \addlegendentry{$\norm[a]{e}$}
-        \addplot[thick,mark=square*,color=blue!70!black] coordinates {
-          (0.5,3.125e-2)(0.25,7.813e-3)(0.125,1.953e-3)(0.0625,4.883e-4)};
-        \addlegendentry{$\max_x|e|$}
-        \addplot[thick,dashed,mark=triangle*,color=red!70!black] coordinates {
-          (0.5,2.282e-2)(0.25,5.705e-3)(0.125,1.426e-3)(0.0625,3.566e-4)};
-        \addlegendentry{$\norm[L^2(0,1)]{e}$}
-      \end{axis}
-    \end{tikzpicture}
-  \end{column}
-  \begin{column}{0.44\textwidth}
-    For $L=AE=f_0=1$,
-    \[
-      u(x)=x-\frac{x^2}{2},\qquad u_h=\Ih u.
-    \]
-    The errors are
-    \[
-      \max_x|e|=\frac{h^2}{8},\qquad
-      \norm[L^2(0,1)]{e}=\frac{h^2}{\sqrt{120}},
-    \]
-    \[
-      \norm[a]{e}=\frac{h}{\sqrt{12}}.
-    \]
-    Halving $h$ divides the energy error by $2$ and the other errors by $4$.
-    The observed rates are $1$, $2$, and $2$.
-  \end{column}
-\end{columns}
+\begin{frame}{Computed errors and observed rates}
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{rccc|ccc}
+  \toprule
+  $n$ & $L^2$ error & $H^1$ error & energy error
+      & $L^2$ rate & $H^1$ rate & energy rate\\
+  \midrule
+   4 & $1.931\!\times\!10^{-1}$ & $2.088$ & $2.588$ & -- & -- & --\\
+   8 & $5.798\!\times\!10^{-2}$ & $1.097$ & $1.378$ & $1.74$ & $0.93$ & $0.91$\\
+  16 & $1.545\!\times\!10^{-2}$ & $5.543\!\times\!10^{-1}$ & $7.020\!\times\!10^{-1}$
+     & $1.91$ & $0.98$ & $0.97$\\
+  32 & $3.933\!\times\!10^{-3}$ & $2.778\!\times\!10^{-1}$ & $3.527\!\times\!10^{-1}$
+     & $1.97$ & $1.00$ & $0.99$\\
+  \bottomrule
+\end{tabular}
+\vspace{0.45cm}
+
+\raggedright
+The rates approach $2$ in $L^2$ and $1$ in both derivative-based norms.
+The coarsest pair is not yet fully in the asymptotic range.
 \end{frame}
 
-\begin{frame}{Manufactured solution: linear and quadratic elements}
+\begin{frame}{The log--log plot shows the same rates}
 \begin{columns}[T,onlytextwidth]
-  \begin{column}{0.60\textwidth}
+  \begin{column}{0.63\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{fig-c7-convergence-rates-output-2.pdf}
+    \includegraphics[width=\textwidth]{elasticity-smooth-convergence.png}
   \end{column}
-  \begin{column}{0.37\textwidth}
+  \begin{column}{0.34\textwidth}
     \small
-    The manufactured solution is
-    \[
-      u(x)=\sin\frac{\pi x}{2}\quad\text{on }(0,1).
-    \]
-    It is smooth and is not reproduced exactly by either approximation.
-    \vspace{0.2cm}
+    A curve parallel to a reference line of slope $r$ behaves like $h^r$.
+    \vspace{0.3cm}
 
-    \centering
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{c|cc}
-      \toprule
-      & $L^2$ & energy\\
-      \midrule
-      $p=1$ & $2.00$ & $1.00$\\
-      $p=2$ & $3.00$ & $2.00$\\
-      \bottomrule
-    \end{tabular}
+    The $L^2$ curve approaches slope $2$.
     \vspace{0.25cm}
 
-    \raggedright These are the predicted rates $p+1$ and $p$.
+    The $H^1$-seminorm and energy-error curves approach slope $1$.
+    \vspace{0.3cm}
+
+    The table is still needed: a plot alone makes precise rate differences
+    difficult to judge.
   \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}{In-class calculation: read a two-dimensional study}
-The Chapter 6 diffusion example used $P_1$ triangles and produced the
-following integrated $L^2$ errors:
-\vspace{0.15cm}
-
-\begin{columns}[T,onlytextwidth]
-  \begin{column}{0.42\textwidth}
-    \centering
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{rcc}
-      \toprule
-      triangles & $h$ & $L^2$ error\\
-      \midrule
-      $4$  & $1.118$ & $1.291\times10^{-1}$\\
-      $16$ & $0.559$ & $3.870\times10^{-2}$\\
-      $64$ & $0.280$ & $1.079\times10^{-2}$\\
-      \bottomrule
-    \end{tabular}
-  \end{column}
-  \begin{column}{0.55\textwidth}
-    \begin{enumerate}
-      \item Compute $r_{\mathrm{obs}}$ for each refinement.
-      \item What rate is predicted for a smooth solution with linear
-      elements?
-      \item Do two observed rates provide convincing verification? What
-      additional information or computations would you request?
-    \end{enumerate}
-  \end{column}
-\end{columns}
-\end{frame}
-
-\section{Linear elasticity}
+\section{Reentrant corner}
 
 \begin{frame}[plain]
-  \centering
-  \vfill
-  {\LARGE\bfseries Extension to linear elasticity\par}
+  \centering\vfill
+  {\LARGE\bfseries An elastic body with a reentrant corner\par}
   \vspace{0.45cm}
-  {\large Apply the same approximation argument to a vector-valued
-  problem.\par}
+  {\large Separate numerical verification from a study without a known exact solution.\par}
   \vfill
 \end{frame}
 
-\begin{frame}{The same argument applies to linear elasticity}
-For homogeneous prescribed displacement data,
-\[
-  a_{\mathrm{el}}(\bu-\bu_h,\bv_h)=0
-  \qquad\forall\bv_h\in\mathcal V_{h,0}.
-\]
-Continuity, Korn's inequality, and C\'ea's lemma give
-\[
-  \norm[H^1(\Om;\R^d)]{\bu-\bu_h}
-  \leq\frac{C_{\mathbb C}C_K^2}{c_{\mathbb C}}
-  \inf_{\bv_h\in\mathcal V_{h,0}}
-  \norm[H^1(\Om;\R^d)]{\bu-\bv_h}.
-\]
-Applying the interpolation estimate componentwise gives
-\[
-  \norm[H^1(\Om;\R^d)]{\bu-\bu_h}=O(h^{s-1}),
-  \qquad 2\leq s\leq p+1.
-\]
+\begin{frame}{Geometry and boundary conditions}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{0.46\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1.65]
+      \draw[thick,fill=blue!6]
+        (-1,-1)--(0,-1)--(0,0)--(1,0)--(1,1)--(-1,1)--cycle;
+      \draw[very thick,blue!70!black] (-1,-1)--(-1,1);
+      \foreach \y in {0.2,0.45,0.7,0.95}
+        \draw[-{Latex[length=2mm]},red!75!black,thick]
+          (1.12,\y)--(1.12,\y-0.22);
+      \fill[red!75!black] (0,0) circle[radius=0.035];
+      \draw[-{Latex[length=2mm]},red!75!black]
+        (0.58,-0.43)--(0.06,-0.06);
+      \node[font=\small,red!75!black,anchor=west] at (0.6,-0.45)
+        {reentrant corner};
+      \node[font=\small,blue!70!black,rotate=90] at (-1.15,0) {clamped};
+      \node[font=\small,red!75!black,right] at (1.18,0.5) {$\bm t=(0,-1)$};
+      \node[font=\small] at (-0.55,0.55) {$\Om$};
+    \end{tikzpicture}
+  \end{column}
+  \begin{column}{0.51\textwidth}
+    Remove the lower-right quadrant from $(-1,1)^2$.
+    \vspace{0.2cm}
+
+    \begin{itemize}
+      \item Prescribe $\bu=\bm0$ on $x=-1$.
+      \item Apply $\bm t=(0,-1)$ on the segment $x=1$, $0\leq y\leq1$.
+      \item Use zero traction on the remaining boundary.
+    \end{itemize}
+    \vspace{0.2cm}
+
+    We do not know an exact displacement for this problem. It is therefore
+    not used to calculate an exact-error convergence rate.
+  \end{column}
+\end{columns}
 \end{frame}
 
-\begin{frame}{Displacement, strain, and stress convergence}
-If $\bu\in H^{p+1}(\Om;\R^d)$, the componentwise interpolation estimate gives
-\[
-  \norm[H^1(\Om;\R^d)]{\bu-\bu_h}=O(h^p).
-\]
-The strain and stress errors have the same order because they depend on the
-first derivatives of displacement.
+\begin{frame}{The corner produces a localized field}
+\centering
+\includegraphics[width=0.90\textwidth]{elasticity-corner-fields.png}
+\vspace{-0.1cm}
 
-\vspace{0.25cm}
-If the elasticity dual problem satisfies the corresponding $H^2$ regularity
-estimate, the duality argument also gives
-\[
-  \boxed{\norm[L^2(\Om;\R^d)]{\bu-\bu_h}=O(h^{p+1}).}
-\]
-This improved displacement estimate requires the additional dual-regularity
-assumption, just as it does for the diffusion problem.
+\small The displacement varies across the body, while the strain-energy
+density is strongly concentrated near the origin. The energy density is shown
+on a logarithmic color scale.
 \end{frame}
 
-\begin{frame}{Energy best approximation and compliance}
-When the elasticity tensor has the major symmetry,
-\[
-  \norm[a_{\mathrm{el}}]{\bv}^2
-  =\int_\Om\beps(\bv):\mathbb C:\beps(\bv)\dd\bx
-\]
-defines the elastic energy norm. The finite element solution is the best
-approximation in this norm.
+\begin{frame}{What changes under uniform refinement?}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{0.66\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{elasticity-corner-refinement.png}
+  \end{column}
+  \begin{column}{0.31\textwidth}
+    \footnotesize
+    For these nested meshes, define
+    \[
+      d_h=\norm[a_{\mathrm{el}}]{\bu_h-\bu_{2h}}.
+    \]
+    Galerkin orthogonality gives
+    \[
+      d_h^2=\ell(\bu_h)-\ell(\bu_{2h}).
+    \]
+    The earlier rate formula,
+    $r_h=\log(d_h/d_{h/2})/\log 2$, gives approximately $0.65$ and $0.69$,
+    below the smooth-solution rate $1$.
+    \vspace{0.1cm}
 
-For the continuous and discrete solutions,
-\[
-  \ell_{\mathrm{el}}(\bu)=\norm[a_{\mathrm{el}}]{\bu}^2,
-  \qquad
-  \ell_{\mathrm{el}}(\bu_h)=\norm[a_{\mathrm{el}}]{\bu_h}^2.
-\]
-The Pythagorean identity gives
-\[
-  \boxed{\ell_{\mathrm{el}}(\bu_h)\leq\ell_{\mathrm{el}}(\bu).}
-\]
-Thus a conforming displacement approximation underestimates the compliance.
-This does not order every displacement component at every point.
+    The largest cellwise strain-energy density increases under refinement,
+    showing stronger localization near the corner.
+  \end{column}
+\end{columns}
 \end{frame}
 
-\begin{frame}{Material dependence of the elasticity estimate}
-\small
-For a homogeneous isotropic material with $\lambda\geq0$ and $\mu>0$, the
-continuity and coercivity estimates allow us to take
+\begin{frame}{The corner limits the observed convergence rate}
+For linear elements, the estimate derived earlier gives
 \[
-  C_{\mathbb C}=d\lambda+2\mu,
-  \qquad c_{\mathbb C}=2\mu,
+  \norm[a_{\mathrm{el}}]{\bu-\bu_h}
+  \leq C h\seminorm[H^2(\Om)]{\bu}
 \]
-so
-\[
-  \frac{C_{\mathbb C}}{c_{\mathbb C}}
-  =1+\frac{d\lambda}{2\mu}.
-\]
-For $0\leq\nu<1/2$, $\lambda/\mu$ grows without bound as $\nu\to1/2$. The
-estimate remains valid, but its constant is not uniform in the material
-parameters.
-\vspace{0.25cm}
+provided the exact displacement belongs to $[H^2(\Om)]^2$.
+\vspace{0.2cm}
 
-Low-order displacement elements may then become excessively stiff, a behavior
-called \textbf{volumetric locking}. Chapter 10 develops mixed formulations
-for nearly incompressible problems.
+The successive-mesh energy differences, rather than exact errors, decrease and
+provide numerical evidence of global energy convergence. Their observed rates,
+approximately $0.65$ and $0.69$, are nevertheless below the smooth-solution
+rate $1$. This is consistent with the reentrant corner reducing the regularity
+of the exact displacement.
+\vspace{0.2cm}
+
+At the same time, the largest cellwise strain-energy density increases near the
+corner. Global energy convergence therefore does not prevent a local strain and
+stress concentration. Chapter 8 uses residual indicators to identify where
+local refinement is needed.
 \end{frame}
 
 \begin{frame}{Summary}
 \begin{itemize}
-  \item Shape regularity prevents element geometry from degrading the
-  interpolation constant during refinement.
-  \item Best approximation plus interpolation gives energy and $H^1$ errors
-  of order $h^{s-1}$.
-  \item The rate is limited by both polynomial degree and solution regularity.
-  \item Duality gives one additional power of $h$ in $L^2$ when the dual
-  solution satisfies the required $H^2$ estimate.
-  \item A convergence study compares predicted and observed rates using
-  integrated error norms over several refinements.
-  \item The same approximation argument applies to conforming linear
-  elasticity, with constants set by Korn's inequality and the material.
+  \item C\'ea's lemma and interpolation give energy-, $H^1$-seminorm, and
+  $H^1$-norm estimates proportional to $h^{s-1}$.
+  \item If the dual problem is $H^2$-regular, Galerkin orthogonality introduces
+  the interpolation error $z-\Ih z$ and supplies one additional power of $h$
+  in the $L^2$ estimate.
+  \item The smooth $P_1$ elasticity example exhibits rates $2$ in $L^2$ and
+  $1$ in the $H^1$ seminorm and energy norm.
+  \item For the L-shaped example, successive-mesh energy differences converge
+  at rates near $0.7$, below the smooth $P_1$ energy rate $1$.
+  \item The reentrant corner reduces regularity and produces a local
+  strain-energy concentration, motivating local refinement.
 \end{itemize}
 \end{frame}
 
