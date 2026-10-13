@@ -357,7 +357,7 @@ Let $\bm{u}=(x_1^2x_2,\,x_1x_2^2)^T$ in $\mathbb{R}^2$.
 
 4.  Let $\bm{A}=x_1\bm{I}$. Compute $\nabla\cdot\bm{A}$.
 
-5.  Write the strong equilibrium equation $-\nabla\cdot\bm{\sigma}=\bm{b}$ in index notation.
+5.  Write the strong equilibrium equation $-\nabla\cdot\bm{\sigma}=\rho\bm{b}$ in index notation, where $\bm b$ is body force per unit mass.
 
 6.  Starting from $\int_\Omega v_i\sigma_{ij,j}\,\mathrm{d}x$, derive the integration-by-parts identity used in the weak form of linear elasticity.
 :::

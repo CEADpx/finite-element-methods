@@ -17,11 +17,11 @@ When components are useful, Latin indices range over the spatial dimensions and
 repeated indices are summed unless stated otherwise. Thus
 
 $$
-\boldsymbol{a}\cdot\boldsymbol{b}=a_i b_i,
+\bm{a}\cdot\bm{b}=a_i b_i,
 \qquad
-(\boldsymbol{A}\boldsymbol{a})_i=A_{ij}a_j,
+(\bm{A}\bm{a})_i=A_{ij}a_j,
 \qquad
-\boldsymbol{A}:\boldsymbol{B}=A_{ij}B_{ij}.
+\bm{A}:\bm{B}=A_{ij}B_{ij}.
 $$
 
 
@@ -63,7 +63,7 @@ $$
 and the divergence of a second-order tensor follows
 
 $$
-(\divg\boldsymbol{A})_i
+(\divg\bm{A})_i
 =
 \frac{\partial A_{ij}}{\partial x_j}.
 $$
@@ -113,27 +113,34 @@ $$
 | $\mathcal K_e\in\Th$ | Cell $e$ in the mesh |
 | $h_e$ | Diameter or characteristic size of cell $\mathcal K_e$ |
 | $h=\max_{\mathcal K_e\in\Th}h_e$ | Global mesh-size parameter |
+| $\rho_e$ | Inradius of cell $\mathcal K_e$ in shape-regularity estimates |
 | $p$ | Polynomial degree of the finite element approximation |
 | $(K,\mathcal P,\mathcal N)$ | Cell, local function space, and degrees of freedom defining a finite element |
 | $\mathbb P_p$, $\mathbb Q_p$ | Polynomial spaces of degree $p$ on simplex and tensor-product cells, respectively |
+| $N$ | Number of elements in the one-dimensional meshes of Chapter 5 |
 | $N_c$, $N_v$, $N_n$ | Numbers of cells, mesh vertices, and finite element nodes, respectively |
 | $\Uh$, $\Vh$ | Discrete trial and test spaces |
+| $\Vhzero$ | Discrete test space satisfying homogeneous Dirichlet data |
 | $\uh$, $\vh$ | Discrete trial and test functions |
-| $\phi_i$ | Finite element basis function |
+| $\phi_i$, $\phi_a^e$, $\widehat\phi_a$ | Global, cell-local, and reference-cell basis functions |
+| $U_i$, $U_a^e$ | Global and cell-local coefficients |
 | $I^e(a)$ | Global number of local degree of freedom $a$ on cell $e$ |
 | $J^e(i)$ | Local number of global degree of freedom $i$ on cell $e$, when $i$ belongs to that cell |
 | $F_e$ | Map from the reference cell $\widehat{\mathcal K}$ to $\mathcal K_e$ |
 | $J_e$, $\bm J_e$ | Jacobian of $F_e$ in one and several dimensions, respectively |
 | $\Ie$ | Interpolation operator on cell $\mathcal K_e$ |
+| $\widehat{\mathcal I}$ | Interpolation operator on the reference cell |
 | $\Ih$ | Global finite element interpolation operator |
 | $\mathcal F_h$ | Set of mesh facets |
 | $\mathcal Q_h$ | Local averaging or quasi-interpolation operator used in residual estimates |
 | $r_e$, $j_{\mathcal F}$ | Cell and facet residuals |
 | $\eta_e$ | Local a posteriori error indicator |
 | $\bK\bU=\bF$ | Representative assembled algebraic system |
+| $\bR=\bK\bU-\bF$ | Algebraic residual vector, including reactions at prescribed degrees of freedom |
 
 The book uses *cell* for a geometric member of a mesh. The calligraphic
-symbols $\Ie$ and $\Ih$ denote interpolation operators. They are distinct
+symbols $\widehat{\mathcal I}$, $\Ie$, and $\Ih$ denote interpolation
+operators. They are distinct
 from the connectivity maps $I^e$ and $J^e$ and from the geometric Jacobians
 $J_e$ and $\bm J_e$.
 
@@ -162,6 +169,8 @@ flux leaving the domain.
 | Symbol | Meaning | Symbol | Meaning |
 |---|---|---|---|
 | $T$ | Temperature | $\bq$ | Flux vector |
+| $\bb$ | Body force per unit mass | $\rho\bb$ | Body force per unit current volume |
+| $\bb_0$ | Body force per unit reference volume | $\rho$ | Mass density |
 | $\bu$ | Displacement vector | $\beps$ | Infinitesimal strain tensor |
 | $\bsig$ | Cauchy stress tensor | $\bF$ | Deformation gradient |
 | $\bC=\bF^T\bF$ | Right Cauchy--Green tensor | $\bP$ | First Piola--Kirchhoff stress tensor |

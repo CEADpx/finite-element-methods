@@ -2303,11 +2303,12 @@ distributive property of the dot product.
 ## Body-force and traction functionals
 Let $\Om$ be a bounded Lipschitz domain and let
 $\bm{v}\in V=H^1(\Om;\R^d)$ be a displacement field. A body force
-$\bm{b}\in L^2(\Om;\R^d)$ defines the functional
+$\rho\bm{b}\in L^2(\Om;\R^d)$, where $\bm b$ is the body force per unit mass,
+defines the functional
 
 $$
 \ell_b(\bm{v})
-=\int_{\Om}\bm{b}\cdot\bm{v}\,\dx.
+=\int_{\Om}\rho\bm{b}\cdot\bm{v}\,\dx.
 $$
 
 Let $\Gam_t\subset\partial\Om$ be a measurable boundary portion on which a

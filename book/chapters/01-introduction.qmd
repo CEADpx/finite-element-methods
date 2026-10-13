@@ -61,12 +61,13 @@ position. For small quasistatic deformations, the balance of linear momentum may
 be written schematically as
 
 $$
--\divg\bsig=\bb
+-\divg\bsig=\rho\bb
 \qquad\text{in }\Om,
 $$ {#eq-intro-elasticity}
 
-where $\bsig$ is the Cauchy stress tensor and $\bb$ is the body force per unit
-volume. Kinematics relate the displacement gradient to strain. For example,
+where $\bsig$ is the Cauchy stress tensor, $\rho$ is the mass density, and
+$\bb$ is the body force per unit mass. Thus $\rho\bb$ is the body force per
+unit volume. Kinematics relate the displacement gradient to strain. For example,
 small-deformation theory uses $\beps = (\grad\bu + (\grad\bu)^T)/2$. A
 constitutive law then relates strain to stress; linear elasticity, for example,
 uses the linear relation $\bsig = \mathbb{C} \beps$. Displacements may be

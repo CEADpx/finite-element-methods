@@ -1211,11 +1211,11 @@ because a constant nodal field has zero gradient.
 Let a boundary edge of a $P_1$ triangle have length $L_{\mathcal F}$ and let
 the prescribed outward normal flux be the constant $q_0$. Only the two vertex basis
 functions associated with the edge are nonzero on that facet. Their
-restrictions are $(1-\zeta)/2$ and $(1+\zeta)/2$. Using
-@eq-c6-edge-integral-transform gives
+restrictions are $(1-\zeta)/2$ and $(1+\zeta)/2$. For the endpoint whose
+restriction is $(1-\zeta)/2$, @eq-c6-edge-integral-transform gives
 
 $$
--\int_{\mathcal F}q_0\phi_i^e\,\ds
+-\int_{\mathcal F}q_0\phi_a^e\,\ds
 =
 -\frac{q_0L_{\mathcal F}}{2}
 \int_{-1}^{1}\frac{1-\zeta}{2}\,\dd\zeta
