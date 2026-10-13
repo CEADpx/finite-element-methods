@@ -557,19 +557,19 @@ The estimate is first obtained on the reference simplex and transferred to
 $\mathcal K_e$ by the affine element map. Shape regularity keeps the
 transformation constants independent of $h_e$.
 
-Let $\Ih u$ be the degree-$p$ Lagrange interpolant. If
+Let $\Ie u$ be the degree-$p$ Lagrange interpolant on $\mathcal K_e$. If
 \[
   u\in H^s(\mathcal K_e),
   \qquad 2\leq s\leq p+1,
 \]
 then
 \[
-  \boxed{\norm[L^2(\mathcal K_e)]{u-\Ih u}
+  \boxed{\norm[L^2(\mathcal K_e)]{u-\Ie u}
   \leq C_I h_e^s\seminorm[H^s(\mathcal K_e)]{u}}
 \]
 and
 \[
-  \boxed{\seminorm[H^1(\mathcal K_e)]{u-\Ih u}
+  \boxed{\seminorm[H^1(\mathcal K_e)]{u-\Ie u}
   \leq C_I h_e^{s-1}\seminorm[H^s(\mathcal K_e)]{u}.}
 \]
 The constant $C_I$ is independent of $h_e$. It may depend on the polynomial
@@ -590,12 +590,12 @@ Using the local estimate and $h_e\leq h:=\max_eh_e$,
 \end{align*}
 Therefore
 \[
-  \norm[L^2(\Om)]{u-\Ih u}\leq C_Ih^s\seminorm[H^s(\Om)]{u},
+  \norm[L^2(\Om)]{u-\Ih u}\leq C_I\,h^s\seminorm[H^s(\Om)]{u},
 \]
 and the same calculation gives
 \[
   \seminorm[H^1(\Om)]{u-\Ih u}
-  \leq C_Ih^{s-1}\seminorm[H^s(\Om)]{u}.
+  \leq C_I\,h^{s-1}\seminorm[H^s(\Om)]{u}.
 \]
 \end{frame}
 
@@ -610,17 +610,17 @@ the global estimates are
 \[
   \boxed{
   \norm[L^2(\Om)]{u-\Ih u}
-  \leq C_Ih^s\seminorm[H^s(\Om)]{u},}
+  \leq C_I\,h^s\seminorm[H^s(\Om)]{u},}
 \]
 \[
   \boxed{
   \seminorm[H^1(\Om)]{u-\Ih u}
-  \leq C_Ih^{s-1}\seminorm[H^s(\Om)]{u}.}
+  \leq C_I\,h^{s-1}\seminorm[H^s(\Om)]{u}.}
 \]
 For $h\leq1$, these two bounds also give
 \[
   \norm[H^1(\Om)]{u-\Ih u}
-  \leq \sqrt{2}\,C_Ih^{s-1}\seminorm[H^s(\Om)]{u}.
+  \leq \sqrt{2}\,C_I\,h^{s-1}\seminorm[H^s(\Om)]{u}.
 \]
 The constant $C_I$ is independent of $h$.
 \end{frame}
@@ -663,7 +663,7 @@ $v_h=\Ih u$:
 The coefficient bound $k(\bx)\leq k_1$ gives, for any $w\in\Vzero$,
 \[
   \norm[a]{w}^2
-  =\int_\Om k|\nabla w|^2\,\dd\bx
+  =\int_\Om k|\nabla w|^2\,\dd x
   \leq k_1\seminorm[H^1(\Om)]{w}^2.
 \]
 Set $w=u-\Ih u$ and use the two results in sequence:
@@ -693,7 +693,7 @@ For $v\in\Vzero$, Poincar\'e's inequality gives
 The lower coefficient bound gives
 \[
   \norm[a]{v}^2
-  =\int_\Om k|\nabla v|^2\,\dd\bx
+  =\int_\Om k|\nabla v|^2\,\dd x
   \geq k_0\seminorm[H^1(\Om)]{v}^2.
 \]
 Consequently,

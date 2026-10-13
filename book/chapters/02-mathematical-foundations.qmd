@@ -580,7 +580,7 @@ do not, identify at least one vector-space requirement that fails.
    with operations defined pointwise;
 7. $\{u\in C(\overline{\Om}):u(\bx_0)=1\}$, where
    $\bx_0\in\overline{\Om}$ is fixed;
-8. $\mathcal{P}_p$, the real polynomials of degree at most $p$, where
+8. $\mathbb{P}_p$, the real polynomials of degree at most $p$, where
    $p\geq0$;
 9. $\{(x,y)\in\R^2:y=x\}$;
 10. $\{(x,y)\in\R^2:y=x+1\}$.
@@ -662,8 +662,8 @@ and $\dim\R^2=2$.
 
 ::: {#exm-foundations-polynomial-dimension}
 ## Dimension of a polynomial space
-Let $\mathcal{P}_p$ denote the polynomials of degree at most $p$. Every
-$q\in\mathcal{P}_p$ has the form
+Let $\mathbb{P}_p$ denote the polynomials of degree at most $p$. Every
+$q\in\mathbb{P}_p$ has the form
 
 $$
 q(x)=c_0+c_1x+\cdots+c_px^p
@@ -676,11 +676,11 @@ $$
 \{1,x,x^2,\ldots,x^p\}
 $$
 
-span $\mathcal{P}_p$. They are also linearly independent: the zero polynomial
+span $\mathbb{P}_p$. They are also linearly independent: the zero polynomial
 has all coefficients equal to zero. They therefore form a basis, and
 
 $$
-\dim\mathcal{P}_p=p+1.
+\dim\mathbb{P}_p=p+1.
 $$
 
 Once this basis is fixed, the polynomial is determined by the $p+1$ numbers
@@ -691,7 +691,7 @@ the basis functions remain fixed.
 
 ::: {#exr-foundations-polynomial-coordinates}
 ## Representing a polynomial in two bases
-Consider $\mathcal{P}_2$.
+Consider $\mathbb{P}_2$.
 
 1. Show that $\{1,x,x^2\}$ is a basis.
 2. Show that $\{1,x-1,(x-1)^2\}$ is also a basis.
@@ -1028,7 +1028,7 @@ however, need not have a norm induced by an inner product.
 2. On $\R^{m\times n}$, the Frobenius norm
    $\norm{\bm{A}}_F=(\bm{A}:\bm{A})^{1/2}$ is induced by the inner product
    $\inner{\bm{A}}{\bm{B}}_F=\bm{A}:\bm{B}$.
-3. On $\mathcal{P}_p$, the formula
+3. On $\mathbb{P}_p$, the formula
 
    $$
    \norm{q}_{\mathrm{int}}
@@ -1040,7 +1040,7 @@ however, need not have a norm induced by an inner product.
    if the integral of the continuous, nonnegative function $q^2$ is zero,
    then $q=0$ on $[0,1]$. The supremum norm
    $\norm{q}_\infty=\max_{0\leq x\leq1}|q(x)|$ is another norm on
-   $\mathcal{P}_p$.
+   $\mathbb{P}_p$.
 4. On $C([0,1])$, the supremum norm
    $\norm{u}_\infty=\max_{0\leq x\leq1}|u(x)|$ is a norm, but it is not
    induced by an inner product.
@@ -1066,7 +1066,7 @@ Every finite-dimensional normed vector space is complete. After a basis is
 chosen, the space can be identified with $\R^n$, and every norm on it is
 equivalent to the Euclidean norm. A Cauchy sequence therefore has convergent
 coordinate sequences and a limit in the original space. In particular,
-$\mathcal{P}_p$ is complete under either norm given in
+$\mathbb{P}_p$ is complete under either norm given in
 @exm-foundations-norms-on-examples.
 :::
 
@@ -2310,14 +2310,14 @@ $$
 =\int_{\Om}\bm{b}\cdot\bm{v}\,\dx.
 $$
 
-Let $\Gamma_t\subset\partial\Om$ be a measurable boundary portion on which a
-traction $\bm{t}\in L^2(\Gamma_t;\R^d)$ is prescribed. The field $\bm{v}$ has a
-well-defined boundary value on $\Gamma_t$, and the traction defines the
+Let $\Gam_t\subset\partial\Om$ be a measurable boundary portion on which a
+traction $\bm{t}\in L^2(\Gam_t;\R^d)$ is prescribed. The field $\bm{v}$ has a
+well-defined boundary value on $\Gam_t$, and the traction defines the
 functional
 
 $$
 \ell_t(\bm{v})
-=\int_{\Gamma_t}\bm{t}\cdot\bm{v}\,\ds.
+=\int_{\Gam_t}\bm{t}\cdot\bm{v}\,\ds.
 $$
 
 The total external-load functional is
@@ -2366,7 +2366,7 @@ For the loads in @exm-foundations-linear-functional-loads, use the
 Cauchy--Schwarz inequality and the trace estimate
 
 $$
-\norm{\bm{v}}_{L^2(\Gamma_t;\R^d)}
+\norm{\bm{v}}_{L^2(\Gam_t;\R^d)}
 \leq C_{\mathrm{tr}}\norm{\bm{v}}_{H^1(\Om;\R^d)}
 $$
 
@@ -2377,7 +2377,7 @@ $$
 \leq
 \left(
 \norm{\bm{b}}_{L^2(\Om;\R^d)}
-+C_{\mathrm{tr}}\norm{\bm{t}}_{L^2(\Gamma_t;\R^d)}
++C_{\mathrm{tr}}\norm{\bm{t}}_{L^2(\Gam_t;\R^d)}
 \right)
 \norm{\bm{v}}_{H^1(\Om;\R^d)}.
 $$

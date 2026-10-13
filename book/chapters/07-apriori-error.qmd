@@ -702,9 +702,9 @@ Three properties of the interpolant will be used repeatedly.
    finite element space, then $\Ie u=u$ on $\mathcal K_e$. This does
    not mean that a degree-$p$ element reproduces polynomials of arbitrary
    degree. For an affine Lagrange simplex, the local space is
-   $\mathcal P_p(\mathcal K_e)$, so every polynomial of total degree at most
+   $\mathbb P_p(\mathcal K_e)$, so every polynomial of total degree at most
    $p$ is reproduced exactly. For a tensor-product element, the corresponding
-   statement uses its local $\mathcal Q_p$ space. On a nonaffine
+   statement uses its local $\mathbb Q_p$ space. On a nonaffine
    isoparametric cell, the local space is defined through the pullback from the
    reference cell and need not consist of polynomials in the physical
    coordinates. This property generalizes the affine reproduction in
@@ -1068,13 +1068,13 @@ depending only on $d$, $p$, $s$, and $\sigma$, such that for every
 $u\in H^s(\Om)$ and every cell $\mathcal K_e\in\Th$,
 
 $$
-\norm{u-\Ih u}_{L^2(\mathcal K_e)}
+\norm{u-\Ie u}_{L^2(\mathcal K_e)}
 \leq
-C_Ih_e^s\seminorm{u}_{H^s(\mathcal K_e)},
+C_I\,h_e^s\seminorm{u}_{H^s(\mathcal K_e)},
 \qquad
-\seminorm{u-\Ih u}_{H^1(\mathcal K_e)}
+\seminorm{u-\Ie u}_{H^1(\mathcal K_e)}
 \leq
-C_Ih_e^{s-1}\seminorm{u}_{H^s(\mathcal K_e)} .
+C_I\,h_e^{s-1}\seminorm{u}_{H^s(\mathcal K_e)} .
 $$ {#eq-c7-local-interpolation}
 
 Consequently,
@@ -1082,11 +1082,11 @@ Consequently,
 $$
 \norm{u-\Ih u}_{L^2(\Om)}
 \leq
-C_Ih^s\seminorm{u}_{H^s(\Om)},
+C_I\,h^s\seminorm{u}_{H^s(\Om)},
 \qquad
 \seminorm{u-\Ih u}_{H^1(\Om)}
 \leq
-C_Ih^{s-1}\seminorm{u}_{H^s(\Om)} .
+C_I\,h^{s-1}\seminorm{u}_{H^s(\Om)} .
 $$ {#eq-c7-global-interpolation}
 :::
 
@@ -1515,7 +1515,7 @@ $s=2$, and the regularity estimate @eq-c7-dual-regularity with $r=e$,
 $$
 \norm{e}_{L^2(\Om)}^2
 \leq
-k_1\seminorm{e}_{H^1(\Om)}\,C_Ih\seminorm{z}_{H^2(\Om)}
+k_1\seminorm{e}_{H^1(\Om)}\,C_I\,h\seminorm{z}_{H^2(\Om)}
 \leq
 k_1C_IC_{\mathrm{reg}}\,h\,\seminorm{e}_{H^1(\Om)}\norm{e}_{L^2(\Om)} .
 $$

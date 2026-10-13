@@ -1060,7 +1060,7 @@ $$
 \qquad\text{in }(0,L).
 $$ {#eq-model-bar-strong-equation}
 
-Let $\Gamma_u$ and $\Gamma_t$ be disjoint subsets of the two endpoints
+Let $\Gam_u$ and $\Gam_t$ be disjoint subsets of the two endpoints
 $\partial\Om=\{0,L\}$. The complete boundary-value problem is
 
 $$
@@ -1069,9 +1069,9 @@ $$
 -\frac{\dd}{\dd x}\left(AE\frac{\dd u}{\dd x}\right)&=f
 &&\text{in }(0,L),\\
 u&=\overline u
-&&\text{on }\Gamma_u,\\
+&&\text{on }\Gam_u,\\
 Nn&=\overline P
-&&\text{on }\Gamma_t,
+&&\text{on }\Gam_t,
 \end{aligned}
 \right.
 $$ {#eq-model-bar-strong}
@@ -1084,10 +1084,10 @@ The trial and test spaces are
 
 $$
 \mathcal U_{\overline u}
-=\{w\in H^1(0,L):w=\overline u\text{ on }\Gamma_u\},
+=\{w\in H^1(0,L):w=\overline u\text{ on }\Gam_u\},
 \qquad
 \mathcal V_0
-=\{v\in H^1(0,L):v=0\text{ on }\Gamma_u\}.
+=\{v\in H^1(0,L):v=0\text{ on }\Gam_u\}.
 $$ {#eq-model-bar-spaces}
 
 Multiplying @eq-model-bar-strong-equation by $v\in\mathcal V_0$, integrating
@@ -1096,7 +1096,7 @@ over $(0,L)$, and applying one-dimensional integration by parts gives
 $$
 \int_0^L AE\,u'v'\,\dd x
 =\int_0^L fv\,\dd x
-+\sum_{x\in\Gamma_t}\overline P(x)v(x).
++\sum_{x\in\Gam_t}\overline P(x)v(x).
 $$ {#eq-model-bar-weak}
 
 Accordingly, the variational problem is
@@ -1115,7 +1115,7 @@ $$
 a_{\mathrm{bar}}(u,v)=\int_0^L AE\,u'v'\,\dd x,
 \qquad
 \ell_{\mathrm{bar}}(v)=\int_0^L fv\,\dd x
-+\sum_{x\in\Gamma_t}\overline P(x)v(x).
++\sum_{x\in\Gam_t}\overline P(x)v(x).
 $$ {#eq-model-bar-forms}
 
 ::: {#exr-model-bar-variational-form}
@@ -1127,8 +1127,8 @@ Starting from @eq-model-bar-strong:
    over $(0,L)$;
 2. apply integration by parts and write the endpoint term using the outward
    normal $n$;
-3. use the prescribed-force condition on $\Gamma_t$ and $v=0$ on
-   $\Gamma_u$; and
+3. use the prescribed-force condition on $\Gam_t$ and $v=0$ on
+   $\Gam_u$; and
 4. obtain @eq-model-bar-variational and identify its trial and test spaces.
 :::
 

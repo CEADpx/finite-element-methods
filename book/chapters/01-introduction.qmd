@@ -67,7 +67,7 @@ $$ {#eq-intro-elasticity}
 
 where $\bsig$ is the Cauchy stress tensor and $\bb$ is the body force per unit
 volume. Kinematics relate the displacement gradient to strain. For example,
-small-deformation theory uses $\beps = (\nabla \bu + \nabla \bu^T)/2$. A
+small-deformation theory uses $\beps = (\grad\bu + (\grad\bu)^T)/2$. A
 constitutive law then relates strain to stress; linear elasticity, for example,
 uses the linear relation $\bsig = \mathbb{C} \beps$. Displacements may be
 prescribed on one portion of the boundary and tractions on another.
@@ -202,10 +202,10 @@ algebraic equations for the coefficients associated with the finite element
 degrees of freedom. A linear scalar PDE may produce
 
 $$
-\mathbf K\mathbf U=\mathbf F,
+\bK\bU=\bF,
 $$ {#eq-intro-algebraic}
 
-where $\mathbf U$ contains coefficients of the finite element field. Nonlinear,
+where $\bU$ contains coefficients of the finite element field. Nonlinear,
 mixed, constrained, or transient formulations lead to different algebraic
 structures. The coefficient vector is a representation of the discrete field;
 it is not the continuum solution itself.
@@ -235,7 +235,7 @@ enters and justify the classification in one sentence:
 1. a prescribed traction;
 2. a test function;
 3. a quadratic triangular element;
-4. a coefficient vector $\mathbf U$;
+4. a coefficient vector $\bU$;
 5. a Krylov-method stopping tolerance;
 6. a constitutive tensor $\mathbb C$.
 :::

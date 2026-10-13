@@ -216,15 +216,15 @@ t_i=\sigma_{ij}n_j.$$
 
 ### Integration by parts in index notation
 
-The divergence theorem applied to $v_iA_{ij}$ gives $$\int_\Omega v_iA_{ij,j}\,dx
+The divergence theorem applied to $v_iA_{ij}$ gives $$\int_\Omega v_iA_{ij,j}\,\mathrm{d}x
 =
-\int_{\partial\Omega}v_iA_{ij}n_j\,ds
+\int_{\partial\Omega}v_iA_{ij}n_j\,\mathrm{d}s
 -
-\int_\Omega v_{i,j}A_{ij}\,dx.$$ In tensor notation, $$\int_\Omega \bm{v}\cdot(\nabla\cdot\bm{A})\,dx
+\int_\Omega v_{i,j}A_{ij}\,\mathrm{d}x.$$ In tensor notation, $$\int_\Omega \bm{v}\cdot(\nabla\cdot\bm{A})\,\mathrm{d}x
 =
-\int_{\partial\Omega}\bm{v}\cdot(\bm{A}\bm{n})\,ds
+\int_{\partial\Omega}\bm{v}\cdot(\bm{A}\bm{n})\,\mathrm{d}s
 -
-\int_\Omega \nabla\bm{v}:\bm{A}\,dx.$$ If $\bm{A}$ is symmetric, then $$\nabla\bm{v}:\bm{A}=\bm{\varepsilon}(\bm{v}):\bm{A},$$ because the skew part of $\nabla\bm{v}$ is orthogonal to a symmetric tensor. This is the component identity behind the standard weak form of linear elasticity.
+\int_\Omega \nabla\bm{v}:\bm{A}\,\mathrm{d}x.$$ If $\bm{A}$ is symmetric, then $$\nabla\bm{v}:\bm{A}=\bm{\varepsilon}(\bm{v}):\bm{A},$$ because the skew part of $\nabla\bm{v}$ is orthogonal to a symmetric tensor. This is the component identity behind the standard weak form of linear elasticity.
 
 ## Reference and spatial coordinates
 
@@ -359,7 +359,7 @@ Let $\bm{u}=(x_1^2x_2,\,x_1x_2^2)^T$ in $\mathbb{R}^2$.
 
 5.  Write the strong equilibrium equation $-\nabla\cdot\bm{\sigma}=\bm{b}$ in index notation.
 
-6.  Starting from $\int_\Omega v_i\sigma_{ij,j}\,dx$, derive the integration-by-parts identity used in the weak form of linear elasticity.
+6.  Starting from $\int_\Omega v_i\sigma_{ij,j}\,\mathrm{d}x$, derive the integration-by-parts identity used in the weak form of linear elasticity.
 :::
 
 ::: {#exr-appendix-tensor-mixed-indices}

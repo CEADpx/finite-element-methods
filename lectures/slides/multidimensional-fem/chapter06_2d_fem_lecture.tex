@@ -175,9 +175,9 @@ Define
 The variational problem is
 \[
   \text{find }u\in\mathcal U_g:\qquad
-  \int_\Om\nabla u\cdot\nabla v\,\dd\bx
+  \int_\Om\nabla u\cdot\nabla v\,\dd x
   =
-  \int_\Om f v\,\dd\bx
+  \int_\Om f v\,\dd x
   -\int_{\Gam_N}qv\,\dd s
   \quad\forall v\in\mathcal V_0.
 \]
@@ -202,9 +202,9 @@ Testing with the free nodal basis functions gives
 \]
 with entries
 \[
-  K_{ij}=\int_\Om\nabla\phi_j\cdot\nabla\phi_i\,\dd\bx,
+  K_{ij}=\int_\Om\nabla\phi_j\cdot\nabla\phi_i\,\dd x,
   \qquad
-  F_i=\int_\Om f\phi_i\,\dd\bx
+  F_i=\int_\Om f\phi_i\,\dd x
       -\int_{\Gam_N}q\phi_i\,\dd s.
 \]
 
@@ -252,7 +252,7 @@ zero, so the linear function is zero throughout that triangle.
 \begin{frame}{Support and the stiffness matrix}
 The stiffness entry
 \[
-  K_{ij}=\int_\Om\nabla\phi_j\cdot\nabla\phi_i\,\dd\bx
+  K_{ij}=\int_\Om\nabla\phi_j\cdot\nabla\phi_i\,\dd x
 \]
 can be nonzero only where the supports of $\phi_i$ and $\phi_j$ overlap.
 Therefore,

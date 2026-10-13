@@ -22,9 +22,12 @@
 \newcommand{\dd}{\,\mathrm{d}}
 \newcommand{\Om}{\Omega}
 \newcommand{\R}{\mathbb R}
+\newcommand{\GamD}{\Gamma_D}
+\newcommand{\GamN}{\Gamma_N}
 \newcommand{\Vzero}{\mathcal V_0}
 \newcommand{\Vhzero}{\mathcal V_{h,0}}
 \newcommand{\Ih}{\mathcal I_h}
+\newcommand{\divg}{\nabla\!\cdot}
 \newcommand{\norm}[2][]{\left\lVert#2\right\rVert_{#1}}
 \newcommand{\seminorm}[2][]{\left\lvert#2\right\rvert_{#1}}
 \newcommand{\bx}{\bm x}
@@ -70,23 +73,23 @@ an unexplained rule.
     \[
       \begin{aligned}
       -\nabla\cdot(k\nabla u)&=f &&\text{in }\Om,\\
-      u&=0 &&\text{on }\Gamma_D,\\
-      -k\nabla u\cdot\bm n&=q &&\text{on }\Gamma_N.
+      u&=0 &&\text{on }\GamD,\\
+      -k\nabla u\cdot\bm n&=q &&\text{on }\GamN.
       \end{aligned}
     \]
     The test and trial space is
     \[
-      \Vzero=H^1_{0,\Gamma_D}(\Om).
+      \Vzero=H^1_{0,\GamD}(\Om).
     \]
   \end{column}
   \begin{column}{0.54\textwidth}
     Define the bilinear and linear forms
     \[
-      a(w,v)=\int_\Om k\nabla w\cdot\nabla v\,\dd\bx,
+      a(w,v)=\int_\Om k\nabla w\cdot\nabla v\,\dd x,
     \]
     \[
-      \ell(v)=\int_\Om fv\,\dd\bx
-      -\int_{\Gamma_N}qv\,\dd s.
+      \ell(v)=\int_\Om fv\,\dd x
+      -\int_{\GamN}qv\,\dd s.
     \]
     The variational problem is
     \[
@@ -141,11 +144,11 @@ For degree-$p$ interpolation on a shape-regular mesh, if
 $u\in H^s(\Om)$ and $2\leq s\leq p+1$,
 \[
   \norm[L^2(\Om)]{u-\Ih u}
-  \leq C_Ih^s\seminorm[H^s(\Om)]{u},
+  \leq C_I\,h^s\seminorm[H^s(\Om)]{u},
 \]
 \[
   \seminorm[H^1(\Om)]{u-\Ih u}
-  \leq C_Ih^{s-1}\seminorm[H^s(\Om)]{u}.
+  \leq C_I\,h^{s-1}\seminorm[H^s(\Om)]{u}.
 \]
 \end{frame}
 
@@ -220,7 +223,7 @@ The exponent $r$ is the convergence rate in the stated norm.
 \begin{frame}{The dual problem associated with the error}
 Let $e=u-u_h$. Using the same diffusion bilinear form
 \[
-  a(w,v)=\int_\Om k\nabla w\cdot\nabla v\,\dd\bx,
+  a(w,v)=\int_\Om k\nabla w\cdot\nabla v\,\dd x,
 \]
 the \textbf{dual problem} is to find $z\in\Vzero$ such that
 \[
@@ -231,8 +234,8 @@ Because $a$ is symmetric, this is the variational form of
 \[
   \begin{aligned}
   -\nabla\cdot(k\nabla z)&=e &&\text{in }\Om,\\
-  z&=0 &&\text{on }\Gamma_D,\\
-  k\nabla z\cdot\bm n&=0 &&\text{on }\Gamma_N.
+  z&=0 &&\text{on }\GamD,\\
+  k\nabla z\cdot\bm n&=0 &&\text{on }\GamN.
   \end{aligned}
 \]
 We assume that $z\in H^2(\Om)$ and
@@ -280,7 +283,7 @@ Use this continuity estimate, interpolation with $s=2$, and dual regularity:
   &=a(e,z-\Ih z)\\
   &\leq k_1\seminorm[H^1(\Om)]{e}
        \seminorm[H^1(\Om)]{z-\Ih z}\\
-  &\leq k_1C_Ih\seminorm[H^1(\Om)]{e}
+  &\leq k_1C_I\,h\seminorm[H^1(\Om)]{e}
        \seminorm[H^2(\Om)]{z}\\
   &\leq k_1C_IC_{\mathrm{reg}}h\seminorm[H^1(\Om)]{e}
        \norm[L^2(\Om)]{e}.
@@ -405,8 +408,8 @@ For plane strain, with $\lambda=\mu=1$,
 \]
 The finite element problem is
 \[
-  \int_\Om \bsig(\bu_h):\beps(\bv_h)\dd\bx
-  =\int_\Om \bm b\cdot\bv_h\dd\bx
+  \int_\Om \bsig(\bu_h):\beps(\bv_h)\dd x
+  =\int_\Om \bm b\cdot\bv_h\dd x
   \qquad\forall\bv_h\in\mathcal V_{h,0}.
 \]
 For a smooth exact displacement and $P_1$ triangles, the predictions are
@@ -431,7 +434,7 @@ Let $\Om=(0,1)^2$ and prescribe $\bu=\bm 0$ on $\partial\Om$. Choose
 \]
 The body force is then defined by
 \[
-  \bm b=-\operatorname{div}\bsig(\bu_\star).
+  \bm b=-\divg\bsig(\bu_\star).
 \]
 This construction guarantees that $\bu_\star$ solves the strong problem. It
 is smooth and is not contained in the $P_1$ finite element space.
@@ -446,7 +449,7 @@ For each subdivision count $n=4,8,16,32$:
 \begin{enumerate}
   \item construct a triangular mesh of the unit square;
   \item define the vector-valued $P_1$ space;
-  \item form $\bm b=-\operatorname{div}\bsig(\bu_\star)$;
+  \item form $\bm b=-\divg\bsig(\bu_\star)$;
   \item assemble and solve the elasticity problem;
   \item integrate the three error norms; and
   \item compute the observed rates between successive meshes.

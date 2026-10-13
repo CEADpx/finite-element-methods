@@ -52,7 +52,7 @@ $$
 $$
 
 In the equations above, $\Delta$ is the Laplacian and is defined by
-$\Delta u(\bx)=\nabla\cdot(\nabla u(\bx))$.
+$\Delta u(\bx)=\divg(\grad u(\bx))$.
 
 Suppose $\partial\Om$ is divided into two portions, $\Gam_D$ and $\Gam_N$,
 and let $\bq(u)$ denote the flux vector associated with the differential

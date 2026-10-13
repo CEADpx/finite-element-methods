@@ -11,7 +11,7 @@ This section records notation used throughout the book.
 | Second-order tensor | bold uppercase or bold Greek letter | $\bF$, $\bC$, $\bsig$ |
 | Fourth-order tensor | blackboard-bold uppercase letter | $\mathbb{C}$ |
 | Set or function space | calligraphic or standard space symbol | $\Th$, $\V$, $H^1(\Om)$ |
-| Matrix and coefficient vector | bold uppercase letter | $\mathbf{K}$, $\mathbf{U}$ |
+| Matrix and coefficient vector | bold uppercase letter | $\bK$, $\bU$ |
 
 When components are useful, Latin indices range over the spatial dimensions and
 repeated indices are summed unless stated otherwise. Thus
@@ -50,7 +50,7 @@ $$
 | $\grad u = \nabla_{\bx} u$ | Spatial gradient of a scalar field |
 | $\grad\bu = \nabla_{\bx} \bu$ | Spatial gradient of a vector field |
 | $\divg\bq = \nabla_{\bx}\cdot \bq$ | Spatial divergence of a vector field |
-| $\divg\bsig = \nabla_{\bx} \bsig$ | Spatial divergence of a second-order tensor field |
+| $\divg\bsig = \nabla_{\bx}\cdot\bsig$ | Spatial divergence of a second-order tensor field |
 | $\Grad\bu = \nabla_{\bX} \bu$ | Gradient with respect to reference coordinates |
 | $\Div\bP = \nabla_{\bX} \cdot \bP$ | Divergence with respect to reference coordinates |
 
@@ -80,6 +80,7 @@ Uppercase operators distinguish differentiation with respect to reference coordi
 | $H^m(\Om)$ | Functions with square-integrable weak derivatives through order $m$ |
 | $H^m(\Om;\R^d)$ | Vector fields whose components belong to $H^m(\Om)$ |
 | $H_0^1(\Om)$ | $H^1$ functions with zero prescribed boundary value |
+| $V$ | Generic vector, normed, Banach, or Hilbert space |
 | $\U$ | Generic trial space |
 | $\V$ | Generic test or variational space |
 | $\Ug$ | Trial space satisfying prescribed Dirichlet data $g$ |
@@ -90,6 +91,7 @@ Uppercase operators distinguish differentiation with respect to reference coordi
 | $R(u;v)$ | Residual evaluated in direction $v$ |
 | $\Pi(u)$ | Energy or potential functional |
 | $\delta\Pi(u;v)$ | First variation of $\Pi$ at $u$ in direction $v$ |
+| $\norm{v}_a=a(v,v)^{1/2}$ | Energy norm induced by a symmetric, coercive bilinear form |
 
 The norm, seminorm, inner product, and duality pairing are written as
 
@@ -108,16 +110,42 @@ $$
 | Symbol | Meaning |
 |---|---|
 | $\Th$ | Mesh of the domain |
-| $K\in\Th$ | A mesh cell |
-| $h_K$ | Diameter or characteristic size of cell $K$ |
-| $h=\max_{K\in\Th}h_K$ | Global mesh-size parameter |
+| $\mathcal K_e\in\Th$ | Cell $e$ in the mesh |
+| $h_e$ | Diameter or characteristic size of cell $\mathcal K_e$ |
+| $h=\max_{\mathcal K_e\in\Th}h_e$ | Global mesh-size parameter |
+| $p$ | Polynomial degree of the finite element approximation |
 | $(K,\mathcal P,\mathcal N)$ | Cell, local function space, and degrees of freedom defining a finite element |
+| $\mathbb P_p$, $\mathbb Q_p$ | Polynomial spaces of degree $p$ on simplex and tensor-product cells, respectively |
+| $N_c$, $N_v$, $N_n$ | Numbers of cells, mesh vertices, and finite element nodes, respectively |
 | $\Uh$, $\Vh$ | Discrete trial and test spaces |
 | $\uh$, $\vh$ | Discrete trial and test functions |
 | $\phi_i$ | Finite element basis function |
-| $\mathbf K\mathbf U=\mathbf F$ | Representative assembled algebraic system |
+| $I^e(a)$ | Global number of local degree of freedom $a$ on cell $e$ |
+| $J^e(i)$ | Local number of global degree of freedom $i$ on cell $e$, when $i$ belongs to that cell |
+| $F_e$ | Map from the reference cell $\widehat{\mathcal K}$ to $\mathcal K_e$ |
+| $J_e$, $\bm J_e$ | Jacobian of $F_e$ in one and several dimensions, respectively |
+| $\Ie$ | Interpolation operator on cell $\mathcal K_e$ |
+| $\Ih$ | Global finite element interpolation operator |
+| $\mathcal F_h$ | Set of mesh facets |
+| $\mathcal Q_h$ | Local averaging or quasi-interpolation operator used in residual estimates |
+| $r_e$, $j_{\mathcal F}$ | Cell and facet residuals |
+| $\eta_e$ | Local a posteriori error indicator |
+| $\bK\bU=\bF$ | Representative assembled algebraic system |
 
-The book uses *cell* for a geometric member of a mesh. 
+The book uses *cell* for a geometric member of a mesh. The calligraphic
+symbols $\Ie$ and $\Ih$ denote interpolation operators. They are distinct
+from the connectivity maps $I^e$ and $J^e$ and from the geometric Jacobians
+$J_e$ and $\bm J_e$.
+
+The symbols $\mathbb P_p$ and $\mathbb Q_p$ denote polynomial spaces. Phrases
+such as “$P_1$ triangle,” “$P_2$ triangle,” and “$Q_1$ quadrilateral” are the
+customary names of the corresponding element families.
+
+In finite element formulas, $e$ indexes cells, $a,b$ index local degrees of
+freedom, and $i,j$ index global degrees of freedom. In continuum component
+notation, lowercase indices $i,j,k$ denote spatial components, while uppercase
+indices $I,J,K$ denote material components when reference and current
+configurations must be distinguished.
 
 The unadorned symbol $h$ is reserved for the mesh-size parameter. For a
 diffusion or heat-conduction problem, $\bq$ denotes the flux vector and
@@ -138,3 +166,13 @@ flux leaving the domain.
 | $\bsig$ | Cauchy stress tensor | $\bF$ | Deformation gradient |
 | $\bC=\bF^T\bF$ | Right Cauchy--Green tensor | $\bP$ | First Piola--Kirchhoff stress tensor |
 | $J = \mathrm{det}(\bF)$ | Jacobian (determinant of $\bF$) | $I_1 = \mathrm{tr}(\bC)$ | First invariant of $\bC$ (trace) |
+
+Some standard symbols recur in different settings. In finite-deformation
+mechanics, $\bF$ is the deformation gradient and $J=\det\bF$. In the assembled
+finite element system, $\bF$ is the load vector. These objects do not occur in
+the same derivation. Similarly, $\bm K$ is a conductivity tensor in the heat
+equation and $\bK$ is a stiffness matrix in the algebraic system, while
+$\bm N$ is a reference-configuration unit normal and $\bN^e$ is an element
+shape-function matrix. Their meaning is stated when each setting is
+introduced, and the element superscript distinguishes $\bN^e$ from the unit
+normal.

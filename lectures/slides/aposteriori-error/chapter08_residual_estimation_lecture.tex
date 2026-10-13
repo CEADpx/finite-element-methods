@@ -31,7 +31,7 @@
 \newcommand{\norm}[2][]{\left\lVert#2\right\rVert_{#1}}
 \newcommand{\seminorm}[2][]{\left\lvert#2\right\rvert_{#1}}
 \newcommand{\grad}{\nabla}
-\newcommand{\divg}{\operatorname{div}}
+\newcommand{\divg}{\nabla\!\cdot}
 \newcommand{\bn}{\bm n}
 \newcommand{\bq}{\bm q}
 
@@ -307,9 +307,9 @@ Choose a local approximation $v_h=\mathcal Q_hv$. Hypothesis (Q) requires
 \[
 \begin{aligned}
   \norm[L^2(\mathcal K_e)]{v-\mathcal Q_hv}
-  &\leq C_Qh_e\seminorm[H^1(\omega_e)]{v},\\
+  &\leq C_Q\,h_e\seminorm[H^1(\omega_e)]{v},\\
   \norm[L^2(\mathcal F)]{v-\mathcal Q_hv}
-  &\leq C_Qh_{\mathcal F}^{1/2}
+  &\leq C_Q\,h_{\mathcal F}^{1/2}
   \seminorm[H^1(\omega_{\mathcal F})]{v}.
 \end{aligned}
 \]
