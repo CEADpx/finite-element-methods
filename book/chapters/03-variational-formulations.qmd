@@ -972,7 +972,7 @@ applied. Chapter 5 constructs the finite-dimensional spaces, explains how
 homogeneous and nonhomogeneous boundary data are represented, and derives the
 corresponding algebraic systems.
 
-## Chapter summary {#sec-variational-key-ideas}
+## Chapter summary {#sec-variational-summary}
 
 - A boundary-value problem specifies the differential equation, coefficients,
   sources, and boundary conditions on a stated domain.

@@ -592,7 +592,19 @@ Across all these topics, the same questions recur:
 The chapters return to these questions when introducing each formulation and its
 computational implementation.
 
-## Chapter summary {#sec-intro-key-ideas}
+## Further reading {#sec-intro-further-reading}
+
+Broad treatments of the mathematical and variational foundations of FEM are
+available in [@oden-reddy-fem; @suli2012]. Mechanics-oriented developments and
+computational constructions can be found in [@jog; @becker-carey-oden1981],
+while [@larson-bengzon2010; @arnold2018] provide further perspectives on
+approximation, implementation, stability, and error assessment. Oden and
+Demkowicz provide the functional-analysis background used in this book
+[@oden-demkowicz]. Discontinuous Galerkin methods are outside the present scope;
+Arnold et al. provide a unified analysis of these methods for elliptic problems
+[@arnold-brezzi-cockburn-marini2002].
+
+## Chapter summary {#sec-intro-summary}
 
 - A continuum model, its strong PDE, its variational formulation, its finite
   element approximation, and its algebraic system are distinct mathematical
@@ -608,15 +620,3 @@ computational implementation.
   implementation, and interpretation errors are considered separately.
 - Computation should follow the mathematical formulation and include explicit
   verification evidence.
-
-## Further reading {#sec-intro-further-reading}
-
-Broad treatments of the mathematical and variational foundations of FEM are
-available in [@oden-reddy-fem; @suli2012]. Mechanics-oriented developments and
-computational constructions can be found in [@jog; @becker-carey-oden1981],
-while [@larson-bengzon2010; @arnold2018] provide further perspectives on
-approximation, implementation, stability, and error assessment. Oden and
-Demkowicz provide the functional-analysis background used in this book
-[@oden-demkowicz]. Discontinuous Galerkin methods are outside the present scope;
-Arnold et al. provide a unified analysis of these methods for elliptic problems
-[@arnold-brezzi-cockburn-marini2002].

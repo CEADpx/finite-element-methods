@@ -2633,45 +2633,30 @@ Assume two displacement components per vertex.
 
 ## Chapter summary {#sec-c6-summary}
 
-The finite element method in multiple dimensions uses the same Galerkin and
-local-to-global structure developed in Chapter 5. A multidimensional mesh
-partitions the domain into elements. Shared vertices, edges, and facets determine
-how local polynomial pieces are connected and how degrees of freedom are
-shared.
-
-For a $P_1$ triangle, the local scalar basis consists of three linear
-polynomials satisfying the nodal interpolation property. The gradients are
-constant on the physical element, and neighboring triangles join continuously
-because they share the same nodal values along their common facet. Each global
-basis function is supported only on the patch of elements incident to its node;
-this local support produces the sparse matrix pattern. Restricting the
-scalar-diffusion variational problem to the resulting global space produces
-element stiffness matrices, domain load vectors, and boundary-facet load
-vectors.
-
-Reference elements make the construction reusable. The Jacobian matrix maps
-reference coordinates to physical coordinates, its determinant transforms
-volume or area, and its inverse transpose transforms gradients. Quadrature is
-then performed on fixed reference elements, and boundary facets use an edge or
-surface Jacobian in the same way. The six-node $P_2$ triangle raises the
-polynomial degree by adding edge-midpoint degrees of freedom, which are shared
-only by the elements containing the edge. A straight-sided $P_2$ triangle may use
-either a lower-order affine geometry map or a quadratic isoparametric map whose
-edge nodes lie at the midpoints. Quadrilateral and hexahedral elements use
-tensor-product basis functions and generally nonconstant isoparametric
-mappings; tetrahedra extend the affine simplex construction to three dimensions.
-
-Vector-valued elasticity uses the same scalar basis to interpolate each
-displacement component. The strain-displacement matrix collects basis
-derivatives, and the element stiffness matrix has the familiar form
-$\int(\bB^e)^T\bm C_{\mathrm V}\bB^e$. Assembly, essential boundary
-conditions, and the recovery of reactions from the residual vector follow the
-same connectivity-based rules as in one dimension; only the incident sets of
-elements around a vertex become larger.
-
-FEniCSx automates these local evaluations and global assembly operations, but
-its mesh, function-space, variational-form, boundary-condition, and solve
-objects correspond directly to the mathematical construction developed here.
-Chapter 7 turns from construction to approximation theory and asks how the
-finite element solution converges as the mesh is refined or the polynomial
-degree is increased.
+- A multidimensional mesh partitions the domain into elements. Shared vertices,
+  edges, and facets determine how local polynomial pieces and their degrees of
+  freedom are connected.
+- The scalar $P_1$ triangle has three nodal basis functions with constant
+  physical gradients. Neighboring triangles join continuously because their
+  restrictions to a common facet are determined by the same nodal values.
+- A global basis function is supported on the patch of elements incident to its
+  node. This local support produces sparse global matrices and permits assembly
+  from element stiffness matrices, domain load vectors, and boundary-facet load
+  vectors.
+- The reference-to-physical map transforms coordinates, measures, and
+  gradients through its Jacobian matrix, determinant, and inverse transpose.
+  Quadrature and boundary-facet integration can therefore be performed on fixed
+  reference entities.
+- The six-node $P_2$ triangle adds edge-midpoint degrees of freedom. Its field
+  interpolation may be combined with either an affine geometry map or a
+  quadratic isoparametric map.
+- Tetrahedra extend the simplex construction to three dimensions, while
+  quadrilateral and hexahedral elements use tensor-product basis functions and
+  generally nonconstant isoparametric mappings.
+- Vector-valued elasticity interpolates each displacement component with the
+  scalar basis. The strain-displacement matrix collects the required basis
+  derivatives, and assembly and boundary conditions use the same connectivity
+  rules as in the scalar problem.
+- FEniCSx automates element evaluation, assembly, boundary-condition treatment,
+  and solution, but its objects correspond directly to the mesh, spaces,
+  variational forms, and algebraic system developed in the chapter.

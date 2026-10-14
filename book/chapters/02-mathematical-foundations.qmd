@@ -2824,7 +2824,7 @@ Thus the $H^1$ seminorm is a norm equivalent to the full $H^1$ norm on this
 homogeneous boundary-value space, but not on all of $H^1(\Om)$.
 :::
 
-## Chapter summary {#sec-foundations-key-ideas}
+## Chapter summary {#sec-foundations-summary}
 
 - Vector and tensor operations can be written in basis-independent or
   component form. The component form fixes the meaning of contractions,

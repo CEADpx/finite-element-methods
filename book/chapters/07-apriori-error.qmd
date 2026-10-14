@@ -1883,13 +1883,21 @@ Use the program in @exm-c7-python-rates.
    @eq-c7-discrete-problem.
 :::
 
-## Interpretation for linear elasticity {#sec-c7-elasticity}
+## Example of linear elasticity {#sec-c7-elasticity}
 
-The arguments of this chapter used only the abstract structure of the
-diffusion problem: a Hilbert space, a continuous and coercive bilinear form, a
-conforming finite element space, and an interpolation estimate. Linear
-elasticity has the same structure, so the results carry over with the
-constants of Chapter 4.
+Linear elasticity provides a vector-valued example of the analysis developed
+in this chapter. We first identify the continuity and coercivity constants in
+Céa's lemma. We then examine two computations with linear triangular
+elements. A manufactured solution on a square verifies the rates predicted
+for a smooth displacement, whereas an L-shaped domain shows what changes when
+a reentrant corner limits the regularity of the solution.
+
+### Error estimates and their constants
+
+The arguments used for the diffusion problem require a Hilbert space, a
+continuous and coercive bilinear form, a conforming finite element space, and
+an interpolation estimate. Linear elasticity has the same abstract structure,
+with constants determined by the elasticity tensor and Korn's inequality.
 
 Take homogeneous displacement data on $\Gam_u$, so that the trial and test
 spaces coincide with $\mathcal V_0$ in @eq-model-elasticity-spaces, and let
@@ -2040,36 +2048,211 @@ $\lambda\geq0$ and $\mu>0$.
    is.
 :::
 
+### A smooth manufactured-solution example {#sec-c7-smooth-elasticity}
+
+We now verify the estimates with a problem for which the exact displacement is
+known. Let
+
+$$
+\Om=(0,1)^2,
+\qquad
+\Gam_u=\partial\Om,
+$$
+
+and consider plane strain with Lamé parameters $\lambda=\mu=1$. The stress is
+
+$$
+\bsig(\bu)
+=2\mu\beps(\bu)
++\lambda\tr\!\left(\beps(\bu)\right)\bm I.
+$$
+
+We prescribe $\bu=\bm 0$ on $\partial\Om$, take $\rho=1$, and choose the exact
+displacement
+
+$$
+\bu_\star(x_1,x_2)
+=
+\begin{bmatrix}
+\sin(\pi x_1)\sin(\pi x_2)\\
+\sin(2\pi x_1)\sin(\pi x_2)
+\end{bmatrix}.
+$$ {#eq-c7-elasticity-manufactured-solution}
+
+Both components vanish on the boundary. Defining the body force by
+
+$$
+\bb=-\divg\bsig(\bu_\star)
+$$ {#eq-c7-elasticity-manufactured-force}
+
+ensures that $\bu_\star$ satisfies the strong equilibrium equation. For the
+chosen Lamé parameters, the two components of this force are
+
+$$
+\begin{aligned}
+b_1
+&=4\pi^2\left[
+\sin(\pi x_1)\sin(\pi x_2)
+-\cos(2\pi x_1)\cos(\pi x_2)
+\right],\\
+b_2
+&=\pi^2\left[
+7\sin(2\pi x_1)\sin(\pi x_2)
+-2\cos(\pi x_1)\cos(\pi x_2)
+\right].
+\end{aligned}
+$$
+
+The variational problem is to find
+$\bu\in\mathcal V_0=H^1_0(\Om;\R^2)$ such that
+
+$$
+a_{\mathrm{el}}(\bu,\bv)
+=\int_\Om\bsig(\bu):\beps(\bv)\,\dx
+=\int_\Om\bb\cdot\bv\,\dx
+\qquad\forall\bv\in\mathcal V_0.
+$$ {#eq-c7-manufactured-elasticity-weak}
+
+The domain is divided into a uniform triangular mesh, and $\bu_h$ is computed
+in the vector-valued $P_1$ space. Since $\bu_\star$ is smooth but is not a
+piecewise-linear function, the three errors
+
+$$
+\norm{\bu_\star-\bu_h}_{L^2(\Om;\R^2)},
+\qquad
+\seminorm{\bu_\star-\bu_h}_{H^1(\Om;\R^2)},
+\qquad
+\norm{\bu_\star-\bu_h}_{a_{\mathrm{el}}}
+$$
+
+are nonzero and can be evaluated directly. For $P_1$ elements,
+@thm-c7-energy-convergence predicts first-order convergence in the $H^1$
+seminorm and energy norm. The duality estimate predicts second-order
+convergence in the $L^2$ norm, provided the elasticity dual problem has the
+required $H^2$ regularity. In the table below, these three errors are denoted
+by $E_0$, $E_1$, and $E_a$, respectively.
+
+| $n$ | $h$ | $E_0$ | Rate | $E_1$ | Rate | $E_a$ | Rate |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 4  | $0.353553$ | $0.193111$ | --   | $2.087641$ | --   | $2.587643$ | --   |
+| 8  | $0.176777$ | $0.057978$ | 1.74 | $1.096998$ | 0.93 | $1.378080$ | 0.91 |
+| 16 | $0.088388$ | $0.015447$ | 1.91 | $0.554348$ | 0.98 | $0.701988$ | 0.97 |
+| 32 | $0.044194$ | $0.003933$ | 1.97 | $0.277811$ | 1.00 | $0.352746$ | 0.99 |
+
+: Errors and observed rates for the smooth manufactured elasticity problem. {#tbl-c7-smooth-elasticity-rates}
+
+The observed rate is computed with @eq-c7-observed-rate. The rates approach
+$2$ in the $L^2$ norm and $1$ in both derivative-based norms. The first pair
+of meshes has not yet reached the asymptotic range, which is why its rates are
+farther from the predicted values. The log--log curves in
+@fig-c7-elasticity-smooth-convergence show the same behavior.
+
+![Errors for the manufactured linear-elasticity problem computed with $P_1$ triangular elements. The reference lines have slopes one and two.](../figures/chapter07/elasticity-smooth-convergence.png){#fig-c7-elasticity-smooth-convergence width="78%" fig-align="center"}
+
+### An L-shaped domain with a reentrant corner {#sec-c7-corner-elasticity}
+
+The preceding example was designed to satisfy the regularity assumptions of
+the estimates. We next keep the same material model and linear triangular
+elements but change the geometry. Let
+
+$$
+\Om=(-1,1)^2\setminus\bigl([0,1]\times[-1,0]\bigr).
+$$
+
+This L-shaped domain has a reentrant corner at the origin. The displacement is
+fixed on the left boundary,
+
+$$
+\bu=\bm 0
+\qquad\text{on }\{(x_1,x_2)\in\partial\Om:x_1=-1\},
+$$
+
+and the downward traction $\overline{\bt}=(0,-1)$ is prescribed on the
+right-hand segment $x_1=1$, $0\leq x_2\leq1$. The remaining boundary is
+traction free, and no body force is applied.
+
+An exact displacement is not known for this problem, so the difference
+$\bu-\bu_h$ cannot be evaluated. The computation instead compares solutions
+on nested meshes. The displacement magnitude and strain-energy density on the
+finest mesh are shown in @fig-c7-elasticity-corner-fields. The energy density
+is strongly concentrated near the reentrant corner.
+
+![Displacement magnitude and strain-energy density for the L-shaped elasticity problem. A logarithmic scale is used for the strain-energy density so that its concentration near the reentrant corner remains visible.](../figures/chapter07/elasticity-corner-fields.png){#fig-c7-elasticity-corner-fields width="95%" fig-align="center"}
+
+Let $\bu_{2h}$ be the solution on a coarse mesh and let $\bu_h$ be the
+solution after uniform refinement. Because the meshes are nested,
+$\bu_{2h}\in\mathcal V_{h,0}$. Testing the fine-mesh problem with
+$\bu_{2h}$ gives
+$a_{\mathrm{el}}(\bu_h,\bu_{2h})=\ell_{\mathrm{el}}(\bu_{2h})$.
+Using the discrete problem on the coarse mesh then yields
+
+$$
+\begin{aligned}
+d_h^2
+:=\norm{\bu_h-\bu_{2h}}_{a_{\mathrm{el}}}^2
+&=a_{\mathrm{el}}(\bu_h-\bu_{2h},\bu_h-\bu_{2h})\\
+&=\ell_{\mathrm{el}}(\bu_h)-\ell_{\mathrm{el}}(\bu_{2h}).
+\end{aligned}
+$$ {#eq-c7-elasticity-successive-energy-difference}
+
+Thus $d_h$ can be computed without knowing the exact solution. It is a
+successive-mesh difference, not the exact energy error. If the computation is
+in an asymptotic range and the exact error behaves like $Ch^r$, the successive
+differences are expected to exhibit the same rate $r$.
+
+| Fine-mesh size $h$ | Successive-mesh difference $d_h$ | Observed rate |
+|---:|---:|---:|
+| $0.176777$ | $0.848985$ | --   |
+| $0.088388$ | $0.542757$ | 0.65 |
+| $0.044194$ | $0.337519$ | 0.69 |
+
+: Successive-mesh energy differences for the L-shaped elasticity problem. {#tbl-c7-corner-elasticity-rates}
+
+For a displacement in $H^2(\Om;\R^2)$, the $P_1$ estimate obtained above
+would give
+
+$$
+\norm{\bu-\bu_h}_{a_{\mathrm{el}}}
+\leq Ch\seminorm{\bu}_{H^2(\Om;\R^2)}.
+$$
+
+The rates in the table are below the smooth-solution rate $1$. This result is
+consistent with the loss of regularity caused by the reentrant corner; it is
+not an exact-error study because $\bu$ is unknown. At the same time, the
+largest elementwise strain-energy density increases under refinement. The two
+trends are shown together in @fig-c7-elasticity-corner-refinement.
+
+![Successive-mesh energy differences and the largest elementwise strain-energy density for the L-shaped problem. Uniform refinement reduces the global energy difference at a rate below one while resolving an increasingly concentrated field near the corner.](../figures/chapter07/elasticity-corner-refinement.png){#fig-c7-elasticity-corner-refinement width="95%" fig-align="center"}
+
+The example distinguishes global convergence from local field behavior. The
+decreasing successive-mesh differences provide evidence of global energy
+convergence, but a stress or strain quantity near the corner can remain poorly
+resolved on a uniform mesh. Chapter 8 develops residual error indicators and
+local mesh refinement for problems with this type of localized behavior.
+
 ## Chapter summary {#sec-c7-summary}
 
-A priori error analysis explains how the finite element error depends on the
-mesh, the polynomial degree, the material, and the smoothness of the exact
-solution. For a conforming discretization of a coercive problem, Galerkin
-orthogonality states that the error is orthogonal to the discrete test space
-in the bilinear form. Céa's lemma turns this into quasi-optimality: the error
-is at most $M/\alpha$ times the best approximation error. When the form is
-symmetric, the finite element solution is the best approximation in the energy
-norm and the minimizer of the energy over the discrete space.
-
-The best approximation is bounded by choosing the finite element interpolant.
-In one dimension, Rolle's theorem and the Cauchy--Schwarz inequality give
-interpolation errors of order $h^2$ in $L^2$ and $h$ in the $H^1$ seminorm for
-linear elements. In several dimensions, the corresponding estimates hold on
-shape-regular families of meshes, with rates $h^{s}$ and $h^{s-1}$ for
-$u\in H^s(\Om)$ and $2\leq s\leq p+1$. Combining the two steps gives
-energy-norm and $H^1$-norm convergence of order $h^{s-1}$ in this range. If
-$s_u$ denotes the largest integer for which $u\in H^{s_u}(\Om)$, the attainable
-rate may equivalently be summarized as $h^{\min(p,s_u-1)}$. A duality
-argument, which requires $H^2$ regularity of the dual problem, gives one
-additional power of $h$ in $L^2$.
-
-These estimates predict rates, not error values. Numerical verification tests
-the predictions with manufactured solutions, integrated error norms, and
-observed rates on refined meshes. For linear elasticity, the same theory
-applies with constants from the elastic moduli and Korn's inequality. It
-shows that conforming displacement models underestimate the compliance and
-that the estimate degenerates as the material becomes nearly incompressible.
-
-Chapter 8 turns from estimates available before the computation to estimates
-computed from $u_h$, and uses them to refine the mesh where the error is
-largest.
+- Galerkin orthogonality states that the error is orthogonal to the conforming
+  discrete test space in the bilinear form. Céa's lemma then bounds the error
+  by $M/\alpha$ times the best approximation error.
+- When the bilinear form is symmetric, the finite element solution is the best
+  approximation in the energy norm and minimizes the energy over the discrete
+  space.
+- For linear elements in one dimension, interpolation errors are of order
+  $h^2$ in $L^2$ and $h$ in the $H^1$ seminorm. In several dimensions,
+  analogous estimates require a shape-regular mesh family.
+- For degree-$p$ elements and $u\in H^s(\Om)$ with
+  $2\leq s\leq p+1$, the energy and $H^1$ errors are of order $h^{s-1}$.
+  The attainable rate is limited by both the polynomial degree and the
+  available regularity of the exact solution.
+- The Aubin--Nitsche duality argument gives one additional power of $h$ in the
+  $L^2$ estimate when the associated dual problem has $H^2$ regularity.
+- A convergence study requires integrated error norms and several mesh
+  refinements. The smooth manufactured elasticity problem recovers the
+  predicted $P_1$ rates of two in $L^2$ and one in the $H^1$ seminorm and
+  energy norm.
+- For linear elasticity, the constants depend on the elastic moduli and Korn's
+  inequality. A reentrant corner can reduce the observed convergence rate and
+  produce a localized strain-energy concentration. Near incompressibility
+  increases the continuity-to-coercivity ratio and can cause volumetric locking
+  in low-order displacement elements.

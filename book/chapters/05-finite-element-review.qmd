@@ -2249,44 +2249,27 @@ For the first element in @exm-c5-complete-bar, state
 
 ## Chapter summary {#sec-c5-summary}
 
-A Galerkin approximation replaces the infinite-dimensional variational problem
-by a finite-dimensional one. The finite element method obtains that
-finite-dimensional space from a mesh. For the nodal $H^1$-conforming Lagrange
-elements used here, the basis functions are polynomial on each element,
-continuous across shared endpoints, and satisfy the nodal interpolation
-property.
-
-Those properties give the basis functions local support. The global
-coefficients are nodal values, and only basis functions with overlapping
-support contribute to the same stiffness entries. The local-global relation
-
-$$
-\phi_{I^e(a)}|_{\mathcal{K}_e}=\phi_a^e
-$$
-
-allows the global variational equations to be evaluated through element
-matrices and vectors. Connectivity then works in both directions: it gathers
-the local coefficient vector $\bU^e$ from $\bU$, and it scatter-adds element
-contributions into the global algebraic system. A global entry $K_{ij}$ or
-$F_i$ receives contributions only from the elements incident on the
-corresponding nodes.
-
-Essential boundary conditions prescribe selected coefficients and lead to a
-reduced system for the free degrees of freedom; a nonzero prescribed value
-contributes a known term to the right-hand side. Natural boundary data enter the
-load functional. After the free coefficients have been found, reactions are
-read from the prescribed entries of the residual vector, and derived fields
-are recovered element by element.
-
-Quadratic and higher-order Lagrange elements use the same construction with
-richer local polynomial spaces. The reference interval allows the basis,
-coordinate mapping, and quadrature to be organized uniformly across elements.
-Geometry and field interpolation need not have the same polynomial degree;
-subparametric, isoparametric, and superparametric descriptions distinguish the
-three possible relationships.
-The formal triple $(K,\mathcal P,\mathcal N)$ expresses the local finite
-element construction independently of a particular polynomial degree.
-
-Chapter 6 extends these ideas to multidimensional elements, vector-valued fields,
-multidimensional coordinate mappings, boundary integrals, and finite element
-software.
+- A Galerkin approximation replaces an infinite-dimensional variational
+  problem by a finite-dimensional problem. The finite element method constructs
+  the approximation space from a mesh and local polynomial spaces.
+- Nodal $H^1$-conforming Lagrange basis functions are polynomial on each
+  element, continuous across shared endpoints, and satisfy the nodal
+  interpolation property.
+- Each global basis function has local support. Only basis functions with
+  overlapping support contribute to the same matrix entry, which produces a
+  sparse global system.
+- The local-to-global connectivity map identifies the restriction of a global
+  basis function with a local basis function. It gathers local coefficients
+  from $\bU$ and scatter-adds element matrices and vectors into $\bK$ and
+  $\bF$.
+- Essential boundary conditions prescribe selected coefficients and produce a
+  reduced system for the free degrees of freedom. Natural boundary data enter
+  the load vector, and reactions are obtained from the prescribed entries of
+  the residual after the solution is known.
+- Quadratic and higher-order Lagrange elements follow the same construction
+  with richer local polynomial spaces. The reference element makes the basis,
+  coordinate mapping, and quadrature reusable across physical elements.
+- Subparametric, isoparametric, and superparametric descriptions distinguish
+  the polynomial degrees used for geometry and field interpolation. The
+  triple $(K,\mathcal P,\mathcal N)$ describes the local finite element
+  independently of a particular degree.
