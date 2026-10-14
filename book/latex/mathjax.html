@@ -1,6 +1,13 @@
 <!-- Keep these MathJax definitions synchronized with macros.tex. -->
 <script>
 window.MathJax = {
+  output: {
+    // Match the standard TeX math design used by the LaTeX lecture slides.
+    font: "mathjax-tex",
+    // Preserve the normal equation layout and allow wide displays to scroll
+    // inside the reading column instead of overlapping the page navigation.
+    displayOverflow: "scroll"
+  },
   tex: {
     macros: {
       R: "\\mathbb{R}",

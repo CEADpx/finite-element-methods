@@ -48,6 +48,15 @@ $line-height-base: 1.55;
   margin-bottom: 1.2rem;
 }
 
+/* Keep wide display equations inside the main reading column without changing
+   their TeX layout or shrinking their symbols. */
+.math.display,
+mjx-container[jax="CHTML"][display="true"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 figure.quarto-float img {
   box-sizing: border-box;
   padding: 0.3rem;
