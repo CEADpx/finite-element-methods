@@ -385,7 +385,7 @@ $g=0$.
    finite element spaces, and let $u_h^{(1)}$ and $u_h^{(2)}$ be the
    corresponding Galerkin solutions. Prove
    $\norm{u-u_h^{(2)}}_a\leq\norm{u-u_h^{(1)}}_a$, and explain why this
-   guarantees that refinement by subdividing cells never increases the
+   guarantees that refinement by subdividing elements never increases the
    energy error.
 :::
 
@@ -602,7 +602,7 @@ finite element interpolant of $u$.
    $\norm{u-u_h}_{H^1(\Om)}\leq C\inf_{v_h\in\Vhzero}\norm{u-v_h}_{H^1(\Om)}$.
    Compare your constant with $M/\alpha$ in @eq-c7-diffusion-constants.
 3. Let $\Vh^{\mathrm{dc}}$ be the space of functions that are linear on each
-   cell of a triangular mesh but may be discontinuous across cell edges.
+   element of a triangular mesh but may be discontinuous across element edges.
    Explain why $\Vh^{\mathrm{dc}}\not\subset H^1(\Om)$, and identify the step
    of the derivation of @eq-c7-galerkin-orthogonality that fails if this
    space is used in @eq-c7-discrete-problem.
@@ -639,7 +639,7 @@ nodes are the mesh vertices. For higher-degree Lagrange elements they also inclu
 additional nodes, such as the element midpoints of the quadratic interval in
 Chapter 5 and the edge midpoints of the $P_2$ triangle in Chapter 6.
 
-The interpolant can also be built cell by cell. In the terminology of
+The interpolant can also be built element by element. In the terminology of
 @def-c5-finite-element, the **local interpolant** on $\mathcal K_e$ is
 
 $$
@@ -705,8 +705,8 @@ Three properties of the interpolant will be used repeatedly.
    $\mathbb P_p(\mathcal K_e)$, so every polynomial of total degree at most
    $p$ is reproduced exactly. For a tensor-product element, the corresponding
    statement uses its local $\mathbb Q_p$ space. On a nonaffine
-   isoparametric cell, the local space is defined through the pullback from the
-   reference cell and need not consist of polynomials in the physical
+   isoparametric element, the local space is defined through the pullback from the
+   reference element and need not consist of polynomials in the physical
    coordinates. This property generalizes the affine reproduction in
    @exr-c5-affine-reproduction and @exr-c6-affine-reproduction.
 3. **Boundary values.** If $u=0$ on $\Gam_D$ and the mesh resolves $\Gam_D$,
@@ -1008,33 +1008,33 @@ Let $u\in C^2(\overline{\mathcal K}_e)$ and $w=u-\Ie u$.
 
 ### Mesh size and shape regularity
 
-In two and three dimensions, the size of a cell is not the only geometric
+In two and three dimensions, the size of an element is not the only geometric
 quantity that affects interpolation. A long thin triangle and an equilateral
 triangle can have the same diameter but very different interpolation
-properties. We therefore measure the shape of each cell.
+properties. We therefore measure the shape of each element.
 
-![Both triangles have diameter $h_e=2$. The diameter $\rho_e$ of the largest disk contained in the cell is much smaller for the flat triangle, so its shape parameter $h_e/\rho_e$ is much larger.](../figures/chapter07/shape-regularity-comparison.svg){#fig-c7-shape-regularity-comparison width=88%}
+![Both triangles have diameter $h_e=2$. The diameter $\rho_e$ of the largest disk contained in the element is much smaller for the flat triangle, so its shape parameter $h_e/\rho_e$ is much larger.](../figures/chapter07/shape-regularity-comparison.svg){#fig-c7-shape-regularity-comparison width=88%}
 
 ::: {#def-c7-shape-regular}
 ## Shape-regular family of meshes
 
-For a cell $\mathcal K_e$, let $h_e=\operatorname{diam}(\mathcal K_e)$ as in
+For an element $\mathcal K_e$, let $h_e=\operatorname{diam}(\mathcal K_e)$ as in
 @eq-c6-mesh-size, and let $\rho_e$ be the diameter of the largest ball
 contained in $\mathcal K_e$. The ratio $h_e/\rho_e\geq1$ is the **shape
-parameter** of the cell. A family of meshes $\{\Th\}_{h>0}$ is
+parameter** of the element. A family of meshes $\{\Th\}_{h>0}$ is
 **shape regular** if there is a constant $\sigma\geq1$ such that
 
 $$
 \frac{h_e}{\rho_e}\leq\sigma
 \qquad
-\text{for every cell }\mathcal K_e\in\Th\text{ and every mesh in the family.}
+\text{for every element }\mathcal K_e\in\Th\text{ and every mesh in the family.}
 $$ {#eq-c7-shape-regularity}
 :::
 
 The definition concerns a family of meshes rather than a single mesh because
 convergence is a statement about a sequence of refinements. Every single mesh
 has some finite bound $\sigma$; shape regularity requires that repeated
-refinement does not make the cells progressively flatter. For triangles, a
+refinement does not make the elements progressively flatter. For triangles, a
 uniform bound on $h_e/\rho_e$ is equivalent to a uniform positive lower bound
 on the interior angles, and interpolation constants for linear triangles grow
 as the smallest angle decreases [@larson-bengzon2010, p. 52]. In one
@@ -1053,8 +1053,8 @@ which extends @eq-foundations-h2-seminorm with the multi-index notation of
 is defined in the same way with $\Om$ replaced by $\mathcal K_e$.
 
 The role of $\rho_e$ becomes clear when an interpolation estimate is
-transferred from the reference cell to a physical cell. The details of this
-step are included in the proof below because they explain why a bound on cell
+transferred from the reference element to a physical element. The details of this
+step are included in the proof below because they explain why a bound on element
 diameters alone is insufficient.
 
 ::: {#thm-c7-interpolation}
@@ -1065,7 +1065,7 @@ simplicial meshes of a polygonal or polyhedral domain $\Om$, with shape bound
 $\sigma$. Let $\Vh$ be the continuous Lagrange space of degree $p\geq1$, and
 let $s$ be an integer with $2\leq s\leq p+1$. There is a constant $C_I$,
 depending only on $d$, $p$, $s$, and $\sigma$, such that for every
-$u\in H^s(\Om)$ and every cell $\mathcal K_e\in\Th$,
+$u\in H^s(\Om)$ and every element $\mathcal K_e\in\Th$,
 
 $$
 \norm{u-\Ie u}_{L^2(\mathcal K_e)}
@@ -1091,42 +1091,42 @@ $$ {#eq-c7-global-interpolation}
 :::
 
 **Proof.** Let $\widehat{\mathcal K}$ be the fixed reference simplex, and let
-$\widehat{\mathcal I}$ denote its degree-$p$ nodal interpolation operator. The
+$\Iref$ denote its degree-$p$ nodal interpolation operator. The
 Bramble--Hilbert lemma, together with the fact that
-$\widehat{\mathcal I}$ reproduces every polynomial in
+$\Iref$ reproduces every polynomial in
 $\mathbb P_p(\widehat{\mathcal K})$, gives
 
 $$
-\norm{\widehat{u}-\widehat{\mathcal I}\widehat{u}}_{L^2(\widehat{\mathcal K})}
+\norm{\widehat{u}-\Iref\widehat{u}}_{L^2(\widehat{\mathcal K})}
 \leq
 C_{\mathrm{ref}}\seminorm{\widehat{u}}_{H^s(\widehat{\mathcal K})},
 \qquad
-\seminorm{\widehat{u}-\widehat{\mathcal I}\widehat{u}}_{H^1(\widehat{\mathcal K})}
+\seminorm{\widehat{u}-\Iref\widehat{u}}_{H^1(\widehat{\mathcal K})}
 \leq
 C_{\mathrm{ref}}\seminorm{\widehat{u}}_{H^s(\widehat{\mathcal K})},
 $$ {#eq-c7-reference-interpolation}
 
 for $2\leq s\leq p+1$. The constant $C_{\mathrm{ref}}$ depends on the fixed
-reference cell, $p$, and $s$, but not on a physical cell or its size. For
+reference element, $p$, and $s$, but not on a physical element or its size. For
 $d\leq3$ and $s\geq2$, the functions have well-defined nodal values, so the
 nodal interpolants in @eq-c7-reference-interpolation are defined.
 
-Let the affine map from the reference cell to $\mathcal K_e$ be
+Let the affine map from the reference element to $\mathcal K_e$ be
 
 $$
-\bx=F_e(\widehat{\bx})=\bx_1^e+\bm J_e\widehat{\bx},
+\bx=\bx^e(\widehat{\bx})=\bx_1^e+\bm J_e\widehat{\bx},
 \qquad
-\widehat{u}=u\circ F_e .
+\widehat{u}=u\circ \bx^e .
 $$
 
 Because the physical interpolation nodes are the images of the reference
 nodes, interpolation commutes with this map:
 
 $$
-(\Ie u)\circ F_e=\widehat{\mathcal I}\widehat{u} .
+(\Ie u)\circ \bx^e=\Iref\widehat{u} .
 $$ {#eq-c7-interpolation-commutes}
 
-For any $v$ on $\mathcal K_e$, let $\widehat{v}=v\circ F_e$. The change of
+For any $v$ on $\mathcal K_e$, let $\widehat{v}=v\circ \bx^e$. The change of
 variables formula and the gradient transformation of
 @eq-c6-gradient-transform give
 
@@ -1142,7 +1142,7 @@ C|\det\bm J_e|^{1/2}\norm{\bm J_e^{-1}}
 \seminorm{\widehat{v}}_{H^1(\widehat{\mathcal K})}.
 $$ {#eq-c7-scaling-to-physical}
 
-Applying the chain rule $s$ times to $\widehat{u}=u\circ F_e$ gives the
+Applying the chain rule $s$ times to $\widehat{u}=u\circ \bx^e$ gives the
 corresponding bound for its derivatives,
 
 $$
@@ -1175,11 +1175,11 @@ C\frac{h_e}{\rho_e}h_e^{s-1}
 \seminorm{u}_{H^s(\mathcal K_e)} .
 $$ {#eq-c7-local-scaling}
 
-The second estimate shows explicitly where cell shape enters. Shape regularity
+The second estimate shows explicitly where element shape enters. Shape regularity
 replaces $h_e/\rho_e$ by the mesh-independent bound $\sigma$, which proves
 @eq-c7-local-interpolation.
 
-It remains to pass from the cell estimates to the whole domain. Since the cell
+It remains to pass from the element estimates to the whole domain. Since the element
 interiors are disjoint and $h_e\leq h$,
 
 $$
@@ -1205,7 +1205,7 @@ C_I^2h^{2(s-1)}\seminorm{u}_{H^s(\Om)}^2.
 $$
 
 Taking square roots gives @eq-c7-global-interpolation. The same argument
-applies for every degree $p$: polynomial reproduction on the reference cell
+applies for every degree $p$: polynomial reproduction on the reference element
 allows the Bramble--Hilbert estimate through derivative order $s\leq p+1$,
 and the affine scaling is unchanged. $\square$
 
@@ -1231,10 +1231,10 @@ less regular functions require a different quasi-interpolation operator; such
 operators are used in the a posteriori analysis of Chapter 8
 [@arnold2018, pp. 67--68].
 
-Fourth, the theorem is stated for affine simplicial cells. For quadrilateral
-and hexahedral cells, the reference space $\mathbb Q_p$ contains
+Fourth, the theorem is stated for affine simplicial elements. For quadrilateral
+and hexahedral elements, the reference space $\mathbb Q_p$ contains
 $\mathbb P_p$, and estimates of the same form hold on meshes of
-parallelograms and parallelepipeds. Nonaffine isoparametric cells require
+parallelograms and parallelepipeds. Nonaffine isoparametric elements require
 additional conditions on the geometry map, which we do not develop.
 
 ::: {#exr-c7-flat-triangle}
@@ -1343,7 +1343,7 @@ $$
 $$
 
 so the flux error converges at the same rate as the energy error. For affine linear elements the computed gradient is piecewise constant.
-The flux is piecewise constant only when $k$ is also constant on each cell.
+The flux is piecewise constant only when $k$ is also constant on each element.
 Under the stated regularity assumptions its error is bounded by $O(h)$, as
 the strains in @exm-c5-complete-bar suggest.
 
@@ -1351,7 +1351,7 @@ Several practical consequences follow from the hypotheses of the theorem.
 
 *Mesh size and degrees of freedom.* A family of meshes is called
 quasi-uniform if, in addition to shape regularity, there is a constant $c>0$
-with $h_e\geq ch$ for every cell. On such meshes the number of cells, and
+with $h_e\geq ch$ for every element. On such meshes the number of elements, and
 hence for fixed $p$ the number of degrees of freedom $N_{\mathrm{dof}}$, is
 proportional to $h^{-d}$. An energy-norm rate $h^{p}$ therefore corresponds
 to $N_{\mathrm{dof}}^{-p/d}$. In three dimensions, halving $h$ multiplies the
@@ -1413,6 +1413,12 @@ uses an auxiliary problem, called the dual problem, whose solution converts
 the $L^2$ error into an energy product to which Galerkin orthogonality
 applies. The argument is known as the **Aubin--Nitsche duality argument**.
 
+Recall that the diffusion bilinear form is
+
+$$
+a(w,v)=\int_\Om k\grad w\cdot\grad v\,\dx.
+$$
+
 For a given $r\in L^2(\Om)$, the **dual problem** is
 
 $$
@@ -1422,11 +1428,21 @@ a(v,z)=\inner{r}{v}_{L^2(\Om)}
 $$ {#eq-c7-dual-problem}
 
 The unknown $z$ appears in the second argument of $a$. For the symmetric
-diffusion form this makes no difference, and @eq-c7-dual-problem is the weak
-form of $-\divg(k\grad z)=r$ with $z=0$ on $\Gam_D$ and $k\grad z\cdot\bn=0$ on
-$\Gam_N$. For a nonsymmetric form, the dual problem involves the adjoint
-operator. Since $v\mapsto\inner{r}{v}_{L^2(\Om)}$ is a continuous linear
-functional on $\Vzero$, the Lax--Milgram theorem gives a unique $z$.
+diffusion form this makes no difference. Using the flux convention of
+@eq-variational-flux-definition, @eq-c7-dual-problem is the variational form
+of
+
+$$
+\begin{aligned}
+-\divg(k\grad z)&=r &&\text{in }\Om,\\
+z&=0 &&\text{on }\Gam_D,\\
+-k\grad z\cdot\bn&=0 &&\text{on }\Gam_N.
+\end{aligned}
+$$ {#eq-c7-dual-strong-problem}
+
+For a nonsymmetric form, placing $z$ in the second argument produces the
+adjoint problem. Since $v\mapsto\inner{r}{v}_{L^2(\Om)}$ is a continuous
+linear functional on $\Vzero$, the Lax--Milgram theorem gives a unique $z$.
 
 The duality argument needs more smoothness of $z$ than the Lax--Milgram theorem
 provides.
@@ -1498,33 +1514,65 @@ a(e,z).
 $$
 
 The dual solution $z$ belongs to $H^2(\Om)\cap\Vzero$, so $\Ih z$ is
-defined and lies in $\Vhzero$. Galerkin orthogonality
-@eq-c7-galerkin-orthogonality allows us to subtract it:
+defined and lies in $\Vhzero$. Choose $v_h=\Ih z$ in Galerkin orthogonality
+@eq-c7-galerkin-orthogonality. This gives
+
+$$
+a(e,\Ih z)=0.
+$$
+
+Therefore, bilinearity in the second argument gives
 
 $$
 \norm{e}_{L^2(\Om)}^2
 =
+a(e,z)-a(e,\Ih z)
+=
 a(e,z-\Ih z).
 $$
 
-The diffusion form satisfies
-$|a(w,v)|\leq k_1\seminorm{w}_{H^1(\Om)}\seminorm{v}_{H^1(\Om)}$ by the
-Cauchy--Schwarz inequality. Using this bound, the interpolation estimate with
-$s=2$, and the regularity estimate @eq-c7-dual-regularity with $r=e$,
+The coefficient bound $k\leq k_1$ and the Cauchy--Schwarz inequality give
 
 $$
+|a(w,v)|
+\leq
+k_1\seminorm{w}_{H^1(\Om)}\seminorm{v}_{H^1(\Om)}.
+$$
+
+Apply this estimate to $a(e,z-\Ih z)$, then use the interpolation estimate
+@eq-c7-global-interpolation with $s=2$ and the regularity estimate
+@eq-c7-dual-regularity with $r=e$:
+
+$$
+\begin{aligned}
 \norm{e}_{L^2(\Om)}^2
-\leq
-k_1\seminorm{e}_{H^1(\Om)}\,C_I\,h\seminorm{z}_{H^2(\Om)}
-\leq
-k_1C_IC_{\mathrm{reg}}\,h\,\seminorm{e}_{H^1(\Om)}\norm{e}_{L^2(\Om)} .
+&=a(e,z-\Ih z)\\
+&\leq
+k_1\seminorm{e}_{H^1(\Om)}
+\seminorm{z-\Ih z}_{H^1(\Om)}\\
+&\leq
+k_1C_I\,h\seminorm{e}_{H^1(\Om)}\seminorm{z}_{H^2(\Om)}\\
+&\leq
+k_1C_IC_{\mathrm{reg}}\,h\seminorm{e}_{H^1(\Om)}
+\norm{e}_{L^2(\Om)}.
+\end{aligned}
 $$
 
 Dividing by $\norm{e}_{L^2(\Om)}$, when it is nonzero, gives
-@eq-c7-aubin-nitsche. By the lower bound in
-@eq-c7-energy-seminorm-equivalence and @eq-c7-energy-estimate,
-$\seminorm{e}_{H^1(\Om)}\leq\norm{e}_a/\sqrt{k_0}\leq
-C_I\sqrt{k_1/k_0}\,h^{s-1}\seminorm{u}_{H^s(\Om)}$, and substitution gives
+@eq-c7-aubin-nitsche. The lower bound in
+@eq-c7-energy-seminorm-equivalence and the energy estimate
+@eq-c7-energy-estimate give
+
+$$
+\seminorm{e}_{H^1(\Om)}
+\leq
+\frac{1}{\sqrt{k_0}}\norm{e}_a
+\leq
+C_I\sqrt{\frac{k_1}{k_0}}\,h^{s-1}
+\seminorm{u}_{H^s(\Om)}.
+$$
+
+Substituting this estimate into @eq-c7-aubin-nitsche gives
 @eq-c7-l2-estimate. $\square$
 
 The proof follows @arnold2018 [pp. 66--67]. The extra power of $h$ comes from
@@ -1538,6 +1586,19 @@ $$
 
 one order higher than the energy-norm rate. For linear elements this is the
 second-order $L^2$ convergence seen in Chapter 5.
+
+For a solution smooth enough that $u\in H^{p+1}(\Om)$, the estimates predict
+the following rates:
+
+| Polynomial degree $p$ | Energy and $H^1$ errors | $L^2$ error |
+|---:|---:|---:|
+| 1 | $O(h)$ | $O(h^2)$ |
+| 2 | $O(h^2)$ | $O(h^3)$ |
+| 3 | $O(h^3)$ | $O(h^4)$ |
+
+The $L^2$ column additionally requires $H^2$ regularity of the dual problem.
+If either the exact solution lacks $H^{p+1}$ regularity or the dual solution
+lacks $H^2$ regularity, the corresponding rate is not guaranteed.
 
 The same argument estimates the error in other linear quantities of interest.
 If $Q(v)=\inner{w_Q}{v}_{L^2(\Om)}$ for a fixed $w_Q\in L^2(\Om)$, solving the
@@ -1601,7 +1662,7 @@ A meaningful study requires the following:
 2. a sequence of meshes, typically obtained by uniform refinement, that
    satisfies the hypotheses of the theorem being tested;
 3. an error computed by integrating $u-u_h$ and its derivatives with a
-   quadrature rule of sufficiently high order on every cell, rather than by
+   quadrature rule of sufficiently high order on every element, rather than by
    sampling at the nodes alone; and
 4. meshes fine enough to be in the asymptotic range, where
    @eq-c7-observed-rate has stabilized, but not so fine that rounding error
@@ -1811,14 +1872,15 @@ Use the program in @exm-c7-python-rates.
 3. Replace the uniform nodes by nonuniform nodes whose interior points are
    moved by a random fraction, at most one quarter, of the uniform spacing,
    keeping the endpoints fixed and using a fixed random seed so that the study
-   is reproducible. Use $h=\max_eh_e$ in @eq-c7-observed-rate and check
+   is reproducible. Use $h=\max_e h_e$ in @eq-c7-observed-rate and check
    whether the rates change. Then use the elementwise estimate
    @eq-c7-1d-global-interpolation to explain why the global bound is stated
    with the largest element size $h$.
-4. Replace the six-point quadrature rule by the one-point rule in the
-   assembly of $\bF$ only, and describe the effect on the observed rates for
-   $p=2$. Explain the result in terms of the variational crimes discussed
-   after @eq-c7-discrete-problem.
+4. For $p=2$, replace the six-point quadrature rule by the one-point rule in
+   the assembly of $\bF$ only. Compute the resulting $L^2$- and energy-error
+   rates and compare them with the rates obtained using the six-point rule.
+   Explain the change in terms of the variational crimes discussed after
+   @eq-c7-discrete-problem.
 :::
 
 ## Interpretation for linear elasticity {#sec-c7-elasticity}

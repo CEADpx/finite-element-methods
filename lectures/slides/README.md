@@ -74,7 +74,7 @@ cp build/chapter07_duality_verification_lecture.pdf chapter07_duality_verificati
 
 ## `aposteriori-error/`
 
-Opening Chapter 8 lecture on the residual functional, localization into cell
+Opening Chapter 8 lecture on the residual functional, localization into element
 and facet defects, residual indicators, and the reliability argument. The
 first lecture stops before marking and refinement.
 

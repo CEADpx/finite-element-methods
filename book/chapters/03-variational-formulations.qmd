@@ -33,7 +33,7 @@ to satisfy that equation and its boundary conditions in the classical sense.
 The required regularity depends on the differential operator and the
 coefficients.
 
-Many finite element functions are continuous across cell boundaries but do not
+Many finite element functions are continuous across element boundaries but do not
 have the classical second derivatives required by a second-order differential
 equation. The variational formulation reduces the required derivative order
 and leads to the definition of a weak solution.

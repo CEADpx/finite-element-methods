@@ -13,6 +13,12 @@
 \usepackage{scrlayer-scrpage}
 \usepackage[most]{tcolorbox}
 
+% Latin Modern Math renders calligraphic I too similarly to J.  Use the
+% pxtx calligraphic alphabet only for interpolation operators; the rest of
+% the book retains its existing math font and calligraphic alphabet.
+\let\mathbfscr\relax
+\usepackage[scr=pxtx]{mathalpha}
+
 % Match the HTML theorem headings by bolding parenthetical theorem titles.
 % Pandoc/Quarto assigns theorem-like environments to the three amsthm styles
 % below; append the note-font override after those styles are selected.  The

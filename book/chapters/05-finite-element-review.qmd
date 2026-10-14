@@ -218,21 +218,28 @@ polynomials defined on the pieces of that partition.
 For the bar occupying $[0,L]$, choose ordered points
 
 $$
-0=x_1<x_2<\cdots<x_{N+1}=L.
+0=x_1<x_2<\cdots<x_{N_n}=L.
 $$ {#eq-c5-mesh-nodes}
 
-These points are the **nodes**. Consecutive nodes define the **elements**
+These points are the **nodes**. For two-node linear elements,
+
+$$
+N_n=N_e+1,
+$$
+
+where $N_e$ is the number of elements and $N_n$ is the number of nodes.
+Consecutive nodes define the **elements**
 
 $$
 \mathcal{K}_e=(x_e,x_{e+1}),
 \qquad
-e=1,\ldots,N.
+e=1,\ldots,N_e.
 $$ {#eq-c5-elements}
 
 The collection of elements
 
 $$
-\Th=\{\mathcal{K}_1,\mathcal{K}_2,\ldots,\mathcal{K}_{N}\}
+\Th=\{\mathcal{K}_1,\mathcal{K}_2,\ldots,\mathcal{K}_{N_e}\}
 $$
 
 is the **finite element mesh**, or simply the **mesh**.
@@ -256,7 +263,7 @@ $$
 and the mesh size is
 
 $$
-h=\max_{1\le e\le N}h_e.
+h=\max_{1\le e\le N_e}h_e.
 $$
 
 A mesh is **uniform** if all element lengths are equal. It is **nonuniform** if
@@ -271,7 +278,7 @@ The open element interiors are disjoint, while their closures cover the bar:
 $$
 [0,L]
 =
-\bigcup_{e=1}^{N}[x_e,x_{e+1}].
+\bigcup_{e=1}^{N_e}[x_e,x_{e+1}].
 $$
 
 This decomposition will later allow an integral over the whole bar to be
@@ -288,7 +295,7 @@ For a two-node linear element, local node 1 is the left endpoint and local
 node 2 is the right endpoint. The **connectivity map**
 
 $$
-I^e:\{1,2\}\longrightarrow\{1,\ldots,N+1\}
+I^e:\{1,2\}\longrightarrow\{1,\ldots,N_n\}
 $$
 
 records which global nodes belong to element $e$. With the consecutive global
@@ -307,33 +314,24 @@ $\mathcal{K}_2$, but it is only one global node. This distinction will matter du
 assembly: both neighboring elements will contribute to equations associated
 with that shared global node.
 
-The inverse connectivity map $J^e$ is defined only for the global nodes that
-belong to element $e$:
+For a global node $i$ that belongs to element $e$, the inverse
+$(I^e)^{-1}(i)$ gives its local number on that element. Thus
 
 $$
-J^e:\{I^e(1),I^e(2)\}\longrightarrow\{1,2\},
+(I^1)^{-1}(2)=2,
 \qquad
-J^e\bigl(I^e(a)\bigr)=a.
+(I^2)^{-1}(2)=1.
 $$ {#eq-c5-inverse-connectivity}
 
-Thus $J^e(i)$ gives the local number of global node $i$ on element $e$. For
-the shared node $x_2$ in @fig-c5-local-global-numbering,
-
-$$
-J^1(2)=2,
-\qquad
-J^2(2)=1.
-$$
-
-The element superscript is necessary because the same global node can have a
-different local number in each incident element.
+The element label on $I^e$ is necessary because the same global node can have
+a different local number in each incident element.
 
 For a global node $i$, define the set of elements that contain that node by
 
 $$
 \mathcal{E}(i)
 =
-\{e\in\{1,\ldots,N\}:x_i\in\overline{\mathcal{K}}_e\}.
+\{e\in\{1,\ldots,N_e\}:x_i\in\overline{\mathcal{K}}_e\}.
 $$ {#eq-c5-incident-elements}
 
 On the three-element mesh in @fig-c5-local-global-numbering,
@@ -374,7 +372,7 @@ functions in a particular mesh-based way. To distinguish this construction,
 we write the finite element basis as
 
 $$
-\phi_1,\phi_2,\ldots,\phi_{N+1}.
+\phi_1,\phi_2,\ldots,\phi_{N_n}.
 $$
 
 Thus the symbols have changed, but their role has not:
@@ -634,17 +632,17 @@ $$
 \left\{
 v_h\in C([0,L]):
 v_h|_{\mathcal{K}_e}\in\mathbb P_1(\mathcal{K}_e)
-\text{ for }e=1,\ldots,N
+\text{ for }e=1,\ldots,N_e
 \right\}.
 $$ {#eq-c5-linear-space}
 
 Its global nodal basis is
-$\{\phi_1,\phi_2,\ldots,\phi_{N+1}\}$. Every $u_h\in\mathcal{V}_h$ has a unique expansion
+$\{\phi_1,\phi_2,\ldots,\phi_{N_n}\}$. Every $u_h\in\mathcal{V}_h$ has a unique expansion
 
 $$
 u_h(x)
 =
-\sum_{j=1}^{N+1}U_j\phi_j(x).
+\sum_{j=1}^{N_n}U_j\phi_j(x).
 $$ {#eq-c5-global-expansion}
 
 At node $x_i$,
@@ -652,7 +650,7 @@ At node $x_i$,
 $$
 u_h(x_i)
 =
-\sum_{j=1}^{N+1}U_j\phi_j(x_i)
+\sum_{j=1}^{N_n}U_j\phi_j(x_i)
 =
 U_i.
 $$ {#eq-c5-nodal-coefficient}
@@ -669,7 +667,7 @@ those two terms gives
 $$
 u_h|_{\mathcal{K}_e}
 =
-\sum_{j=1}^{N+1}U_j\,\phi_j|_{\mathcal{K}_e}
+\sum_{j=1}^{N_n}U_j\,\phi_j|_{\mathcal{K}_e}
 =
 U_{I^e(1)}\phi_1^e+U_{I^e(2)}\phi_2^e
 =
@@ -791,12 +789,12 @@ a(u_h,v_h)=\ell(v_h)
 \forall v_h\in\mathcal{V}_{h,0}.
 $$ {#eq-c5-discrete-variational}
 
-Write $u_h=\sum_{j=1}^{N+1}U_j\phi_j$. The coefficient $U_1$ is prescribed by
+Write $u_h=\sum_{j=1}^{N_n}U_j\phi_j$. The coefficient $U_1$ is prescribed by
 the essential boundary condition. Testing with each free nodal basis function
 gives
 
 $$
-\sum_{j=1}^{N+1}K_{ij}U_j=F_i,
+\sum_{j=1}^{N_n}K_{ij}U_j=F_i,
 $$
 
 with
@@ -837,7 +835,7 @@ The mesh partitions the interval, so
 $$
 K_{ij}
 =
-\sum_{e=1}^{N}
+\sum_{e=1}^{N_e}
 \int_{\mathcal{K}_e}
 AE\,\phi_j'\phi_i'\,\dd x.
 $$ {#eq-c5-global-entry-sum}
@@ -871,14 +869,14 @@ one supplies. An element lies in the common support of $\phi_i$ and $\phi_j$
 exactly when it contains both nodes, that is, when
 $e\in\mathcal{E}(i)\cap\mathcal{E}(j)$. On such an element, the inverse
 connectivity map @eq-c5-inverse-connectivity gives the local numbers
-$a=J^e(i)$ and $b=J^e(j)$. Collecting the contributions of all such elements
+$a=(I^e)^{-1}(i)$ and $b=(I^e)^{-1}(j)$. Collecting the contributions of all such elements
 in @eq-c5-global-entry-sum gives
 
 $$
 K_{ij}
 =
 \sum_{e\in\mathcal{E}(i)\cap\mathcal{E}(j)}
-K_{J^e(i),J^e(j)}^e.
+K_{(I^e)^{-1}(i),(I^e)^{-1}(j)}^e.
 $$ {#eq-c5-assembled-stiffness-entry}
 
 If $\mathcal{E}(i)\cap\mathcal{E}(j)$ is empty, the sum has no terms and
@@ -891,7 +889,7 @@ F_i^{\mathrm{dist}}
 =
 \int_0^L f\phi_i\,\dd x
 =
-\sum_{e=1}^{N}\int_{\mathcal{K}_e}f\phi_i\,\dd x.
+\sum_{e=1}^{N_e}\int_{\mathcal{K}_e}f\phi_i\,\dd x.
 $$ {#eq-c5-global-load-sum}
 
 For each element $e$, define its local load entries by
@@ -906,14 +904,14 @@ $$ {#eq-c5-element-load-entry}
 The argument is the same as for the stiffness entry, now with one global index
 instead of two. If $e\notin\mathcal{E}(i)$, then $\phi_i$ vanishes on
 $\mathcal{K}_e$, so that element contributes zero. If $e\in\mathcal{E}(i)$,
-the local number of global node $i$ is $J^e(i)$, and
-$\phi_i|_{\mathcal{K}_e}=\phi_{J^e(i)}^e$. The global distributed-load entry is
+the local number of global node $i$ is $(I^e)^{-1}(i)$, and
+$\phi_i|_{\mathcal{K}_e}=\phi_{(I^e)^{-1}(i)}^e$. The global distributed-load entry is
 therefore
 
 $$
 F_i^{\mathrm{dist}}
 =
-\sum_{e\in\mathcal{E}(i)} F_{J^e(i)}^e.
+\sum_{e\in\mathcal{E}(i)} F_{(I^e)^{-1}(i)}^e.
 $$ {#eq-c5-assembled-load-entry}
 
 The complete global entry also contains the prescribed end load:
@@ -994,11 +992,11 @@ $\int_{\mathcal{K}_e}f\,\dd x$. Thus the element vector preserves the total dist
 load.
 
 The natural boundary term is already part of the global load functional. Since
-$\phi_i(L)=\delta_{i,N+1}$, an applied force $\overline P$ at $x=L$ contributes
+$\phi_i(L)=\delta_{i,N_n}$, an applied force $\overline P$ at $x=L$ contributes
 only to the right-end global load entry:
 
 $$
-F_{N+1}\mathrel{+}=\overline P.
+F_{N_n}\mathrel{+}=\overline P.
 $$
 
 This is the discrete counterpart of the way a natural boundary condition enters
@@ -1011,7 +1009,7 @@ Suppose the bar carries no distributed load, but the right endpoint is subject
 to the axial force $\overline P$. Then every element load vector from the
 distributed load is zero, yet the global load vector is not. The finite element
 equations acquire the single contribution
-$F_{N+1}\mathrel{+}=\overline P$ at the global degree of freedom associated with
+$F_{N_n}\mathrel{+}=\overline P$ at the global degree of freedom associated with
 $x=L$. This is why a natural boundary condition appears on the right-hand side
 rather than in the definition of the admissible displacement space.
 :::
@@ -1222,8 +1220,8 @@ before any additional natural boundary contribution is added.
 ## Two equivalent views of assembly
 
 @eq-c5-assembled-load-entry fixes a global node $i$ and collects the local
-entry from every element in $\mathcal{E}(i)$; the inverse map $J^e$ identifies
-the required local node on each element. In an implementation, one normally
+entry from every element in $\mathcal{E}(i)$; $(I^e)^{-1}$ identifies the
+required local node on each element. In an implementation, one normally
 uses the equivalent forward operation: compute $\bF^e$, loop over its local
 entries $F_a^e$, and add each entry to the global position $I^e(a)$ according
 to @eq-c5-assembly-rule. Both views produce the global vector in
@@ -1264,13 +1262,13 @@ before introducing block notation. If $U_1$ is prescribed, a free global
 equation of the form
 
 $$
-K_{i1}U_1+K_{i2}U_2+\cdots+K_{i,N+1}U_{N+1}=F_i
+K_{i1}U_1+K_{i2}U_2+\cdots+K_{i,N_n}U_{N_n}=F_i
 $$
 
 is rewritten by moving the known term to the right-hand side:
 
 $$
-K_{i2}U_2+\cdots+K_{i,N+1}U_{N+1}
+K_{i2}U_2+\cdots+K_{i,N_n}U_{N_n}
 =
 F_i-K_{i1}U_1.
 $$
@@ -1373,11 +1371,11 @@ $$ {#eq-c5-nonzero-prescribed}
 
 The known function $\overline u\,\phi_1$ carries the prescribed value, and its
 contribution moves to the right-hand side. Writing
-$z_h=\sum_{j=2}^{N+1}U_j\phi_j$ and testing with $\phi_i$ for a free node $i$
+$z_h=\sum_{j=2}^{N_n}U_j\phi_j$ and testing with $\phi_i$ for a free node $i$
 gives
 
 $$
-\sum_{j=2}^{N+1}K_{ij}U_j=F_i-K_{i1}\overline u,
+\sum_{j=2}^{N_n}K_{ij}U_j=F_i-K_{i1}\overline u,
 $$
 
 because $a(\phi_1,\phi_i)=K_{i1}$. This is the free equation written at the
@@ -1786,21 +1784,21 @@ with reference coordinate $\xi$. A coordinate map for element $e$ is a
 one-to-one map
 
 $$
-F_e:\widehat{\mathcal K}\longrightarrow\mathcal K_e,
+x^e:\widehat{\mathcal K}\longrightarrow\mathcal K_e,
 \qquad
-x=F_e(\xi),
+x=x^e(\xi),
 $$ {#eq-c5-abstract-element-map}
 
 from the reference element to the physical element. The reference element and
-its basis functions are the same for every element. The map $F_e$ contains the
+its basis functions are the same for every element. The map $x^e$ contains the
 element-specific geometry.
 
 For the physical interval $\mathcal{K}_e=[x_e,x_{e+1}]$, first seek an affine
-map $F_e(\xi)=m_e\xi+c_e$ satisfying
-$F_e(-1)=x_e$ and $F_e(1)=x_{e+1}$. Solving for $m_e$ and $c_e$ gives
+map $x^e(\xi)=m_e\xi+c_e$ satisfying
+$x^e(-1)=x_e$ and $x^e(1)=x_{e+1}$. Solving for $m_e$ and $c_e$ gives
 
 $$
-F_e(\xi)
+x^e(\xi)
 =
 \frac{x_e+x_{e+1}}{2}
 +
@@ -1809,11 +1807,11 @@ F_e(\xi)
 J_e=\frac{\dd x}{\dd\xi}=\frac{h_e}{2}.
 $$ {#eq-c5-reference-map}
 
-Thus $F_e$ sends the two reference nodes to the two physical nodes. Its inverse
+Thus $x^e$ sends the two reference nodes to the two physical nodes. Its inverse
 is
 
 $$
-F_e^{-1}(x)
+(x^e)^{-1}(x)
 =
 \frac{2}{h_e}
 \left(
@@ -1859,7 +1857,7 @@ If $U_a^e$ are the local coefficients, the finite element field is evaluated on
 the reference interval as
 
 $$
-u_h(F_e(\xi))
+u_h(x^e(\xi))
 =
 \sum_{a=1}^{p+1}
 U_a^e\widehat\phi_a(\xi).
@@ -1870,7 +1868,7 @@ Equivalently, the physical basis function is obtained by composition:
 $$
 \phi_a^e(x)
 =
-\widehat\phi_a(F_e^{-1}(x)).
+\widehat\phi_a((x^e)^{-1}(x)).
 $$ {#eq-c5-reference-to-physical}
 
 ### Geometry and field interpolation {#sec-c5-parametric-interpolation}
@@ -1879,7 +1877,7 @@ The geometry map and the finite element field are two different
 interpolations. In general, write the geometry map as
 
 $$
-F_e(\xi)
+x^e(\xi)
 =
 \sum_{A=1}^{n_g}
 \widehat N_A^{\mathrm{geo}}(\xi)x_A^e,
@@ -1906,14 +1904,14 @@ For an isoparametric degree-$p$ Lagrange element,
 $n_g=p+1$ and $\widehat N_a^{\mathrm{geo}}=\widehat\phi_a$. Therefore,
 
 $$
-F_e(\xi)
+x^e(\xi)
 =
 \sum_{a=1}^{p+1}
 \widehat\phi_a(\xi)x_a^e,
 \qquad
 J_e(\xi)
 =
-\frac{\dd F_e}{\dd\xi}.
+\frac{\dd x^e}{\dd\xi}.
 $$ {#eq-c5-isoparametric-map}
 
 For $p=1$, @eq-c5-isoparametric-map is exactly the affine map in
@@ -1968,7 +1966,7 @@ $g$,
 $$
 \int_{\mathcal{K}_e}g(x)\,\dd x
 =
-\int_{-1}^{1}g(F_e(\xi))J_e(\xi)\,\dd\xi.
+\int_{-1}^{1}g(x^e(\xi))J_e(\xi)\,\dd\xi.
 $$ {#eq-c5-change-of-variables}
 
 The element entries become
@@ -1978,7 +1976,7 @@ K_{ab}^e
 =
 \int_{-1}^{1}
 \frac{\dd\widehat\phi_b}{\dd\xi}
-A(F_e(\xi))E(F_e(\xi))
+A(x^e(\xi))E(x^e(\xi))
 \frac{\dd\widehat\phi_a}{\dd\xi}
 \frac{1}{J_e(\xi)}
 \,\dd\xi,
@@ -1991,7 +1989,7 @@ F_a^e
 =
 \int_{-1}^{1}
 \widehat\phi_a(\xi)
-f(F_e(\xi))
+f(x^e(\xi))
 J_e(\xi)
 \,\dd\xi.
 $$ {#eq-c5-reference-load}
@@ -2043,7 +2041,7 @@ w_r
 f(x_r)
 J_e(\xi_r),
 \qquad
-x_r=F_e(\xi_r).
+x_r=x^e(\xi_r).
 $$ {#eq-c5-quadrature-entries}
 
 For affine geometry and constant $AE$, the linear-element stiffness integrand
@@ -2159,7 +2157,7 @@ nodal values.
 
 A **finite element** is a triple $(K,\mathcal P,\mathcal N)$, where
 
-1. $K$ is a cell;
+1. $K$ is an element;
 2. $\mathcal P$ is a finite-dimensional vector space of functions on $K$; and
 3. $\mathcal N=\{N_1,\ldots,N_m\}$ is a basis for the dual space
    $\mathcal P^*$.
@@ -2289,6 +2287,6 @@ three possible relationships.
 The formal triple $(K,\mathcal P,\mathcal N)$ expresses the local finite
 element construction independently of a particular polynomial degree.
 
-Chapter 6 extends these ideas to multidimensional cells, vector-valued fields,
+Chapter 6 extends these ideas to multidimensional elements, vector-valued fields,
 multidimensional coordinate mappings, boundary integrals, and finite element
 software.

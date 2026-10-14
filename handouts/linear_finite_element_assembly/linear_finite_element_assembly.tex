@@ -68,7 +68,7 @@ The global node numbers identify nodes in the complete mesh. The local node
 numbers restart at $1$ and $2$ on every element. Thus the same physical node
 $x_2$ is local node $2$ of element $1$ and local node $1$ of element $2$.
 
-\subsection{The three maps used in assembly}
+\subsection{Connectivity and incident elements}
 
 The local-to-global map $I^e$ tells us the global number of a local node:
 \[
@@ -82,13 +82,12 @@ e&I^e(1)&I^e(2)\\ \hline
 I^e(1)=e,\quad I^e(2)=e+1.
 \]
 
-The inverse map $J^e$ is used only on element $e$. If global node $i$ belongs
-to element $e$, then $J^e(i)$ gives its local number on that element. For
-example,
+If global node $i$ belongs to element $e$, then $(I^e)^{-1}(i)$ gives its
+local number on that element. For example,
 \[
-J^1(2)=2,
+(I^1)^{-1}(2)=2,
 \qquad
-J^2(2)=1.
+(I^2)^{-1}(2)=1.
 \]
 The superscript is necessary because global node $2$ has a different local
 number in the two elements that meet there.
@@ -106,7 +105,7 @@ Thus
 \[
 \begin{array}{rcl}
 I^e(a)&:&\text{local node $a$ goes to which global node?}\\
-J^e(i)&:&\text{global node $i$ has which local number on element $e$?}\\
+(I^e)^{-1}(i)&:&\text{global node $i$ has which local number on element $e$?}\\
 \mathcal E(i)&:&\text{which elements meet at global node $i$?}
 \end{array}
 \]
@@ -248,11 +247,11 @@ F_a^e=\int_{\mathcal K_e}f\phi_a^e\,\dd x,
 \qquad a=1,2.
 \label{eq:local-load-entry}
 \end{equation}
-Because $\phi_i|_{\mathcal K_e}=\phi_{J^e(i)}^e$, Equation
+Because $\phi_i|_{\mathcal K_e}=\phi_{(I^e)^{-1}(i)}^e$, Equation
 \eqref{eq:global-load-incident-sum} becomes
 \begin{equation}
 \boxed{
-F_i=\sum_{e\in\mathcal E(i)}F_{J^e(i)}^e.
+F_i=\sum_{e\in\mathcal E(i)}F_{(I^e)^{-1}(i)}^e.
 }
 \label{eq:load-entry-assembly}
 \end{equation}
@@ -307,7 +306,7 @@ $i$ and $j$. Hence
 \boxed{
 K_{ij}
 =\sum_{e\in\mathcal E(i)\cap\mathcal E(j)}
-K_{J^e(i),J^e(j)}^e.
+K_{(I^e)^{-1}(i),(I^e)^{-1}(j)}^e.
 }
 \label{eq:stiffness-entry-assembly}
 \end{equation}
@@ -397,7 +396,7 @@ The corresponding algorithm is
 {\small
 \begin{verbatim}
 initialize F = 0 and K = 0
-for each element e = 1,...,N:
+for each element e = 1,...,N_e:
     compute F^e and K^e
     for a = 1,2:
         i = I^e(a)

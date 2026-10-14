@@ -55,7 +55,7 @@ Chapter 7 ended with an a priori statement such as
 It predicts a rate, but it does not answer two questions after a computation:
 \begin{enumerate}
   \item Is the error on this mesh small enough?
-  \item Which cells should be refined?
+  \item Which elements should be refined?
 \end{enumerate}
 
 \vspace{0.25cm}
@@ -65,7 +65,7 @@ $u_h$:
   \boxed{\text{solve}\ \longrightarrow\ \text{estimate}\ \longrightarrow\
   \text{mark}\ \longrightarrow\ \text{refine}.}
 \]
-Today: derive the residual, localize it to cells and facets, and build the
+Today: derive the residual, localize it to elements and facets, and build the
 estimator. Marking and refinement follow in the next class.
 \end{frame}
 
@@ -116,7 +116,7 @@ This identity is exact, but it is not yet computable:
 \end{itemize}
 
 \vspace{0.18cm}
-The next step rewrites $R(u_h;v)$ as cell and facet contributions.
+The next step rewrites $R(u_h;v)$ as element and facet contributions.
 \end{frame}
 
 \begin{frame}{A conforming mesh has three facet classes}
@@ -147,7 +147,7 @@ The next step rewrites $R(u_h;v)$ as cell and facet contributions.
   \end{column}
   \begin{column}{0.50\textwidth}
     \begin{itemize}
-      \item $\Fh^{\mathrm{int}}$: shared by two cells $\mathcal K^+$ and
+      \item $\Fh^{\mathrm{int}}$: shared by two elements $\mathcal K^+$ and
       $\mathcal K^-$;
       \item $\Fh^D$: boundary facets on $\GamD$;
       \item $\Fh^N$: boundary facets on $\GamN$.
@@ -157,25 +157,25 @@ The next step rewrites $R(u_h;v)$ as cell and facet contributions.
     \[
       [\![w]\!]_{\mathcal F}=w^+-w^-.
     \]
-    Reversing the cell labels reverses both the jump and the normal, so the
+    Reversing the element labels reverses both the jump and the normal, so the
     normal-flux jump used below is unchanged.
   \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Cellwise integration by parts exposes the strong defect}
+\begin{frame}{Elementwise integration by parts exposes the strong defect}
 Start from
 \[
   R(u_h;v)=\int_\Om fv\,\dd x-\int_{\GamN}qv\,\dd s
   -\int_\Om k\grad u_h\cdot\grad v\,\dd x.
 \]
-On one cell $\mathcal K_e$,
+On one element $\mathcal K_e$,
 \[
   \int_{\mathcal K_e}k\grad u_h\cdot\grad v\,\dd x
   =-\int_{\mathcal K_e}\divg(k\grad u_h)v\,\dd x
   +\int_{\partial\mathcal K_e}(k\grad u_h\cdot\bn_e)v\,\dd s.
 \]
-After summing over cells,
+After summing over elements,
 \[
 \begin{aligned}
   R(u_h;v)
@@ -193,7 +193,7 @@ regrouped facet by facet.
 \begin{frame}{Facet regrouping gives two flux defects}
 \small
 Define the computed flux $\bq_h=-k\grad u_h$. On an interior facet,
-the two cell-boundary terms combine into
+the two element-boundary terms combine into
 \[
   j_{\mathcal F}
   =-[\![k\grad u_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F}
@@ -225,16 +225,16 @@ the exact representation is
   box/.style={draw,rounded corners=2pt,align=center,text width=3.15cm,
     minimum height=1.25cm,inner sep=5pt},
   >=Stealth]
-  \node[box,fill=blue!6] (cell) {\textbf{Cell residual}\\
-    $r_e=f-\divg\bq_h$\\balance defect inside a cell};
-  \node[box,fill=orange!9,right=0.45cm of cell] (int) {\textbf{Interior facet}\\
-    $j_{\mathcal F}=[\![\bq_h\cdot\bn_{\mathcal F}]\!]$\\flux leaving one cell does not enter the next};
+  \node[box,fill=blue!6] (element) {\textbf{Element residual}\\
+    $r_e=f-\divg\bq_h$\\balance defect inside an element};
+  \node[box,fill=orange!9,right=0.45cm of element] (int) {\textbf{Interior facet}\\
+    $j_{\mathcal F}=[\![\bq_h\cdot\bn_{\mathcal F}]\!]$\\flux leaving one element does not enter the next};
   \node[box,fill=green!9,right=0.45cm of int] (neu) {\textbf{Neumann facet}\\
     $j_{\mathcal F}=\bq_h\cdot\bn-q$\\computed flux misses prescribed flux};
 \end{tikzpicture}
 \end{center}
 
-For $p=1$ and cellwise-constant $k$, $\grad u_h$ is constant on each cell,
+For $p=1$ and elementwise-constant $k$, $\grad u_h$ is constant on each element,
 so $\divg(k\grad u_h)=0$ and $r_e=f$. The computed gradient information then
 appears in the facet jumps.
 
@@ -293,7 +293,7 @@ For an interior hat function,
   j_i\phi_i(x_i)=-h.
 \]
 At the last node, the two terms are $h/2$ and $-h/2$. This is residual
-orthogonality in local form: the discrete equations balance cell and facet
+orthogonality in local form: the discrete equations balance element and facet
 defects, but the defects still detect the error between nodes.
 \end{frame}
 
@@ -321,9 +321,9 @@ defined for $H^1$ functions even when nodal interpolation is not.
 The factors $h_e$ and $h_{\mathcal F}^{1/2}$ become the estimator weights.
 \end{frame}
 
-\begin{frame}{Local indicators assign a computable number to each cell}
+\begin{frame}{Local indicators assign a computable number to each element}
 \small
-For each cell $\mathcal K_e$, define
+For each element $\mathcal K_e$, define
 \[
 \boxed{
 \begin{aligned}
@@ -340,9 +340,9 @@ The global estimator is
 \[
   \boxed{\eta=\left(\sum_e\eta_e^2\right)^{1/2}.}
 \]
-The factor $1/2$ assigns half of an interior facet to each adjacent cell.
-After summing over cells, every facet is counted exactly once. A Neumann
-facet belongs to only one cell, so it receives no factor $1/2$.
+The factor $1/2$ assigns half of an interior facet to each adjacent element.
+After summing over elements, every facet is counted exactly once. A Neumann
+facet belongs to only one element, so it receives no factor $1/2$.
 \end{frame}
 
 \begin{frame}{In one dimension, reliability has an explicit constant}
@@ -381,7 +381,7 @@ Assume Hypothesis (Q), shape regularity, and $k\geq k_0>0$. Then
 The proof uses four steps:
 \begin{enumerate}
   \item $\norm[a]{e}^2=R(u_h;e)=R(u_h;e-\mathcal Q_he)$;
-  \item insert the cell-and-facet residual representation;
+  \item insert the element-and-facet residual representation;
   \item apply Hypothesis (Q), then Cauchy--Schwarz to the combined sums;
   \item use finite patch overlap and
   $\seminorm[H^1(\Om)]{e}\leq\norm[a]{e}/\sqrt{k_0}$.
@@ -421,18 +421,18 @@ definition.
 \begin{itemize}
   \item The residual is the error measured through the bilinear form:
   $R(u_h;v)=a(u-u_h,v)$.
-  \item Cellwise integration by parts separates element balance defects from
+  \item Elementwise integration by parts separates element balance defects from
   interior and Neumann flux defects.
   \item Galerkin orthogonality allows subtraction of a local approximation;
   this produces the powers of the local mesh size.
-  \item $\eta_e$ localizes the estimator and $\eta$ combines the cells.
+  \item $\eta_e$ localizes the estimator and $\eta$ combines the elements.
   Reliability means the estimator controls the energy error up to a
   mesh-independent constant.
 \end{itemize}
 
 \vspace{0.22cm}
 \textbf{Exit question.} For linear elements with constant $k$ and $f=0$ on
-every cell, can the estimator still be nonzero? Identify the term that remains.
+every element, can the estimator still be nonzero? Identify the term that remains.
 
 \vspace{0.22cm}
 \textbf{Next class.} Complete the multidimensional proof, compare marking

@@ -91,97 +91,90 @@ Uppercase operators distinguish differentiation with respect to reference coordi
 | $R(u;v)$ | Residual evaluated in direction $v$ |
 | $\Pi(u)$ | Energy or potential functional |
 | $\delta\Pi(u;v)$ | First variation of $\Pi$ at $u$ in direction $v$ |
+| $\norm{v}_V$ | Norm of $v$ in $V$ |
+| $\seminorm{v}_{H^m(\Om)}$ | Sobolev seminorm of order $m$ |
+| $\inner{u}{v}_V$ | Inner product of $u$ and $v$ in $V$ |
+| $\dual{f}{v}$ | Duality pairing between a functional $f$ and an argument $v$ |
 | $\norm{v}_a=a(v,v)^{1/2}$ | Energy norm induced by a symmetric, coercive bilinear form |
 
-The norm, seminorm, inner product, and duality pairing are written as
-
-$$
-\norm{v}_V,
-\qquad
-\seminorm{v}_{H^m(\Om)},
-\qquad
-\inner{u}{v}_V,
-\qquad
-\dual{f}{v}.
-$$
+The subscript identifies the space or inner product associated with the
+notation. It may be omitted when the choice is clear from the surrounding
+discussion.
 
 ## Finite element notation
 
 | Symbol | Meaning |
 |---|---|
 | $\Th$ | Mesh of the domain |
-| $\mathcal K_e\in\Th$ | Cell $e$ in the mesh |
-| $h_e$ | Diameter or characteristic size of cell $\mathcal K_e$ |
+| $\mathcal K_e\in\Th$ | Element $e$ in the mesh |
+| $h_e$ | Diameter or characteristic size of element $\mathcal K_e$ |
 | $h=\max_{\mathcal K_e\in\Th}h_e$ | Global mesh-size parameter |
-| $\rho_e$ | Inradius of cell $\mathcal K_e$ in shape-regularity estimates |
+| $\rho_e$ | Inradius of element $\mathcal K_e$ in shape-regularity estimates |
 | $p$ | Polynomial degree of the finite element approximation |
-| $(K,\mathcal P,\mathcal N)$ | Cell, local function space, and degrees of freedom defining a finite element |
-| $\mathbb P_p$, $\mathbb Q_p$ | Polynomial spaces of degree $p$ on simplex and tensor-product cells, respectively |
-| $N$ | Number of elements in the one-dimensional meshes of Chapter 5 |
-| $N_c$, $N_v$, $N_n$ | Numbers of cells, mesh vertices, and finite element nodes, respectively |
+| $(K,\mathcal P,\mathcal N)$ | Element domain, local function space, and degrees of freedom defining a finite element |
+| $\mathbb P_p$, $\mathbb Q_p$ | Polynomial spaces of degree $p$ on simplex and tensor-product elements, respectively |
+| $N_e$, $N_v$, $N_n$ | Numbers of elements, mesh vertices, and finite element nodes, respectively |
 | $\Uh$, $\Vh$ | Discrete trial and test spaces |
 | $\Vhzero$ | Discrete test space satisfying homogeneous Dirichlet data |
 | $\uh$, $\vh$ | Discrete trial and test functions |
-| $\phi_i$, $\phi_a^e$, $\widehat\phi_a$ | Global, cell-local, and reference-cell basis functions |
-| $U_i$, $U_a^e$ | Global and cell-local coefficients |
-| $I^e(a)$ | Global number of local degree of freedom $a$ on cell $e$ |
-| $J^e(i)$ | Local number of global degree of freedom $i$ on cell $e$, when $i$ belongs to that cell |
-| $F_e$ | Map from the reference cell $\widehat{\mathcal K}$ to $\mathcal K_e$ |
-| $J_e$, $\bm J_e$ | Jacobian of $F_e$ in one and several dimensions, respectively |
-| $\Ie$ | Interpolation operator on cell $\mathcal K_e$ |
-| $\widehat{\mathcal I}$ | Interpolation operator on the reference cell |
+| $\phi_i$, $\phi_a^e$, $\widehat\phi_a$ | Global, element-local, and reference-element basis functions |
+| $\bN^e$ | Element shape-function matrix used to interpolate vector-valued fields |
+| $U_i$, $U_a^e$ | Global and element-local coefficients |
+| $I^e(a)$ | Global number of local degree of freedom $a$ on element $e$ |
+| $(I^e)^{-1}(i)$ | Local number of global degree of freedom $i$ on element $e$, when $i$ belongs to that element |
+| $x^e$, $\bx^e$ | Coordinate map from the reference element $\widehat{\mathcal K}$ to physical element $\mathcal K_e$ in one and several dimensions, respectively |
+| $J_e$, $\bm J_e$ | Jacobian of $x^e$ or $\bx^e$ in one and several dimensions, respectively |
+| $\Ie$ | Interpolation operator on element $\mathcal K_e$ |
+| $\Iref$ | Interpolation operator on the reference element |
 | $\Ih$ | Global finite element interpolation operator |
+| $C_I$ | Mesh-independent constant in an interpolation estimate |
+| $C_{\mathrm{reg}}$ | Regularity constant for a dual problem |
+| $\mathcal E(i)$ | Set of elements incident on global node or degree of freedom $i$ |
 | $\mathcal F_h$ | Set of mesh facets |
+| $h_{\mathcal F}$ | Diameter or characteristic size of facet $\mathcal F$ |
 | $\mathcal Q_h$ | Local averaging or quasi-interpolation operator used in residual estimates |
-| $r_e$, $j_{\mathcal F}$ | Cell and facet residuals |
+| $r_e$, $j_{\mathcal F}$ | Element and facet residuals |
 | $\eta_e$ | Local a posteriori error indicator |
+| $\bK^e$, $\bF^e$, $\bU^e$ | Element stiffness matrix, load vector, and coefficient vector |
 | $\bK\bU=\bF$ | Representative assembled algebraic system |
 | $\bR=\bK\bU-\bF$ | Algebraic residual vector, including reactions at prescribed degrees of freedom |
 
-The book uses *cell* for a geometric member of a mesh. The calligraphic
-symbols $\widehat{\mathcal I}$, $\Ie$, and $\Ih$ denote interpolation
-operators. They are distinct
-from the connectivity maps $I^e$ and $J^e$ and from the geometric Jacobians
-$J_e$ and $\bm J_e$.
+The book uses *element* for a geometric member of a mesh. The calligraphic
+symbols $\Iref$, $\Ie$, and $\Ih$ denote interpolation operators. They are
+distinct from the connectivity map $I^e$ and the geometric Jacobians $J_e$
+and $\bm J_e$.
 
 The symbols $\mathbb P_p$ and $\mathbb Q_p$ denote polynomial spaces. Phrases
 such as “$P_1$ triangle,” “$P_2$ triangle,” and “$Q_1$ quadrilateral” are the
 customary names of the corresponding element families.
 
-In finite element formulas, $e$ indexes cells, $a,b$ index local degrees of
+In finite element formulas, $e$ indexes elements, $a,b$ index local degrees of
 freedom, and $i,j$ index global degrees of freedom. In continuum component
 notation, lowercase indices $i,j,k$ denote spatial components, while uppercase
 indices $I,J,K$ denote material components when reference and current
 configurations must be distinguished.
 
-The unadorned symbol $h$ is reserved for the mesh-size parameter. For a
-diffusion or heat-conduction problem, $\bq$ denotes the flux vector and
-
-$$
-q=\bq\cdot\bn
-$$
-
-denotes its outward normal component on the boundary. Thus $q>0$ represents
-flux leaving the domain.
+The unadorned symbol $h$ is reserved for the mesh-size parameter. The scalar
+$q$ is the outward normal component of the flux vector $\bq$; consequently,
+$q>0$ represents flux leaving the domain.
 
 ## Recurring physical fields
 
 | Symbol | Meaning | Symbol | Meaning |
 |---|---|---|---|
 | $T$ | Temperature | $\bq$ | Flux vector |
+| $q=\bq\cdot\bn$ | Outward normal flux | $\bm K$ | Conductivity tensor |
 | $\bb$ | Body force per unit mass | $\rho\bb$ | Body force per unit current volume |
 | $\bb_0$ | Body force per unit reference volume | $\rho$ | Mass density |
 | $\bu$ | Displacement vector | $\beps$ | Infinitesimal strain tensor |
 | $\bsig$ | Cauchy stress tensor | $\bF$ | Deformation gradient |
-| $\bC=\bF^T\bF$ | Right Cauchy--Green tensor | $\bP$ | First Piola--Kirchhoff stress tensor |
-| $J = \mathrm{det}(\bF)$ | Jacobian (determinant of $\bF$) | $I_1 = \mathrm{tr}(\bC)$ | First invariant of $\bC$ (trace) |
+| $J = \mathrm{det}(\bF)$ | Jacobian (determinant of $\bF$) | $\bC=\bF^T\bF$ | Right Cauchy--Green tensor |
+| $I_1 = \mathrm{tr}(\bC)$ | First invariant of $\bC$ (trace) | $\bP$ | First Piola--Kirchhoff stress tensor |
+| $\bm N$ | Outward unit normal in the reference configuration | $\bt$ | Prescribed traction vector |
 
 Some standard symbols recur in different settings. In finite-deformation
 mechanics, $\bF$ is the deformation gradient and $J=\det\bF$. In the assembled
 finite element system, $\bF$ is the load vector. These objects do not occur in
 the same derivation. Similarly, $\bm K$ is a conductivity tensor in the heat
-equation and $\bK$ is a stiffness matrix in the algebraic system, while
-$\bm N$ is a reference-configuration unit normal and $\bN^e$ is an element
-shape-function matrix. Their meaning is stated when each setting is
-introduced, and the element superscript distinguishes $\bN^e$ from the unit
-normal.
+equation and $\bK$ is a stiffness matrix in the algebraic system. Their
+meaning is stated when each setting is introduced.

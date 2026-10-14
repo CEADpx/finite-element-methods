@@ -361,7 +361,7 @@ elements through interface terms [@arnold-brezzi-cockburn-marini2002]. This book
 focuses on conforming finite element methods; discontinuous Galerkin methods are
 outside its present scope.
 
-Each geometric member of the mesh is called a *cell* or *element*. A finite
+Each geometric member of the mesh is called an *element*. A finite
 element is more precisely the combination of an element, a local function space,
 and a set of degrees of freedom.
 

@@ -29,8 +29,8 @@
   <text x="39" y="93" class="label">x̂₃</text>
 
   <path d="M430 230 C520 170, 610 170, 690 230" class="map"/>
-  <text x="560" y="145" text-anchor="middle" class="math">x = Fₑ(ξ)</text>
-  <text x="560" y="282" text-anchor="middle" class="small">Fₑ(x̂ₐ) = xₐᵉ</text>
+  <text x="560" y="145" text-anchor="middle" class="math">x = xᵉ(ξ)</text>
+  <text x="560" y="282" text-anchor="middle" class="small">xᵉ(x̂ₐ) = xₐᵉ</text>
 
   <polygon points="760,355 1040,310 850,85" class="phys"/>
   <circle cx="760" cy="355" r="9" class="physnode"/>

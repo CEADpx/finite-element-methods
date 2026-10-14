@@ -100,7 +100,7 @@ On an element $\mathcal K_e$,
   (\Ih u)|_{\mathcal K_e}
   =\Ie(u|_{\mathcal K_e}).
 \]
-Thus the global interpolant can be constructed cell by cell from the nodal
+Thus the global interpolant can be constructed element by element from the nodal
 values of $u$.
 \end{frame}
 
@@ -406,11 +406,11 @@ Thus the full $H^1$-norm interpolation error is also of order $h$.
   \vfill
   {\LARGE\bfseries Interpolation in several dimensions\par}
   \vspace{0.45cm}
-  {\large The estimate must account for both cell size and cell shape.\par}
+  {\large The estimate must account for both element size and element shape.\par}
   \vfill
 \end{frame}
 
-\begin{frame}{Cell size alone does not control interpolation}
+\begin{frame}{Element size alone does not control interpolation}
 \begin{columns}[T,onlytextwidth]
   \begin{column}{0.48\textwidth}
     \centering
@@ -436,8 +436,8 @@ Thus the full $H^1$-norm interpolation error is also of order $h$.
   \end{column}
 \end{columns}
 \vspace{0.2cm}
-Both cells have the same diameter, but the diameter $\rho_e$ of the largest
-inscribed disk is much smaller for the flat cell. The next two slides show
+Both elements have the same diameter, but the diameter $\rho_e$ of the largest
+inscribed disk is much smaller for the flat element. The next two slides show
 how this difference enters the affine element map and the basis-function
 gradients.
 \end{frame}
@@ -473,7 +473,7 @@ using
 \]
 For $0<\varepsilon\leq\sqrt3$, the longest side is the base from $\bx_1$ to
 $\bx_2$, so every triangle in this family has $h_e=2$. Decreasing
-$\varepsilon$ changes the cell shape without changing its diameter.
+$\varepsilon$ changes the element shape without changing its diameter.
 \end{frame}
 
 \begin{frame}{The inverse Jacobian amplifies a basis gradient}
@@ -528,16 +528,16 @@ As $\varepsilon\to0$,
   \qquad
   \frac{h_e}{\rho_e}\text{ grows like }\frac2\varepsilon.
 \]
-The inverse-Jacobian factor is therefore controlled only when the cell-shape
+The inverse-Jacobian factor is therefore controlled only when the element-shape
 ratio is controlled.
 \end{frame}
 
 \begin{frame}{Shape regularity}
-For a cell $\mathcal K_e$:
+For an element $\mathcal K_e$:
 \begin{itemize}
   \item $h_e=\operatorname{diam}(\mathcal K_e)$ is the largest distance
-  between two points in the cell;
-  \item $\rho_e$ is the diameter of the largest ball contained in the cell.
+  between two points in the element;
+  \item $\rho_e$ is the diameter of the largest ball contained in the element.
 \end{itemize}
 The ratio $h_e/\rho_e$ increases as a triangle or tetrahedron becomes flatter.
 
@@ -546,9 +546,9 @@ A family of meshes $\{\Th\}$ is \textbf{shape regular} if one constant
 $\sigma$ satisfies
 \[
   \boxed{\frac{h_e}{\rho_e}\leq\sigma}
-  \qquad\text{for every cell in every mesh of the family.}
+  \qquad\text{for every element in every mesh of the family.}
 \]
-Refinement may create smaller cells, but it may not create cells that become
+Refinement may create smaller elements, but it may not create elements that become
 progressively flatter.
 \end{frame}
 

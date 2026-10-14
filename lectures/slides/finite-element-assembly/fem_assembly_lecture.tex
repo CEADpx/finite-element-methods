@@ -91,20 +91,17 @@ Assembly must place these local entries into the correct rows and columns of
   shared nodes of the complete mesh.
 \end{frame}
 
-\begin{frame}{The three maps used in assembly}
-For a two-node element,
+\begin{frame}{Connectivity and incident elements}
+For a mesh with $N_e$ two-node elements, $N_n=N_e+1$ is the number of global
+nodes. The connectivity map is
 \[
-  I^e:\{1,2\}\longrightarrow\{1,\ldots,N+1\},
+  I^e:\{1,2\}\longrightarrow\{1,\ldots,N_n\},
   \qquad
   I^e(1)=e,\quad I^e(2)=e+1.
 \]
 
-For a global node that belongs to element $e$,
-\[
-  J^e:\{I^e(1),I^e(2)\}\longrightarrow\{1,2\},
-  \qquad
-  J^e(I^e(a))=a.
-\]
+For a global node $i$ that belongs to element $e$, $(I^e)^{-1}(i)$ gives its
+local number on that element.
 
 The elements incident on global node $i$ are
 \[
@@ -139,7 +136,7 @@ For the shared node $2$,
 \begin{frame}{A global function restricted to one element}
 The global finite element function is
 \[
-  u_h(x)=\sum_{i=1}^{N+1}U_i\phi_i(x).
+  u_h(x)=\sum_{i=1}^{N_n}U_i\phi_i(x).
 \]
 
 On $\mathcal K_e$, all terms except those associated with its two nodes vanish:
@@ -165,18 +162,18 @@ Connectivity extracts the local coefficient vector from the global vector.
 The distributed part of global entry $i$ is
 \[
   F_i^{\mathrm{dist}}
-  =\sum_{e=1}^{N}\int_{\mathcal K_e}f\phi_i\dd x.
+  =\sum_{e=1}^{N_e}\int_{\mathcal K_e}f\phi_i\dd x.
 \]
 
 Only elements in $\mathcal E(i)$ contribute. Define
 \[
   F_a^e=\int_{\mathcal K_e}f\phi_a^e\dd x.
 \]
-Since $\phi_i|_{\mathcal K_e}=\phi_{J^e(i)}^e$,
+Since $\phi_i|_{\mathcal K_e}=\phi_{(I^e)^{-1}(i)}^e$,
 \[
   \boxed{
   F_i^{\mathrm{dist}}
-  =\sum_{e\in\mathcal E(i)}F_{J^e(i)}^e.}
+  =\sum_{e\in\mathcal E(i)}F_{(I^e)^{-1}(i)}^e.}
 \]
 
 This formula fixes a global node $i$ and gathers all incident-element
@@ -213,7 +210,7 @@ At a shared node, the neighboring element contributions add.
 The global entry is
 \[
   K_{ij}
-  =\sum_{e=1}^{N}
+  =\sum_{e=1}^{N_e}
   \int_{\mathcal K_e}AE\,\phi_j'\phi_i'\dd x.
 \]
 
@@ -227,7 +224,7 @@ we obtain
   \boxed{
   K_{ij}
   =\sum_{e\in\mathcal E(i)\cap\mathcal E(j)}
-  K_{J^e(i),J^e(j)}^e.}
+  K_{(I^e)^{-1}(i),(I^e)^{-1}(j)}^e.}
 \]
 
 For example,
