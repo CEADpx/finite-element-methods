@@ -51,6 +51,7 @@ book:
   references: references.qmd
 
 bibliography: references.bib
+link-citations: true
 
 execute:
   freeze: auto
