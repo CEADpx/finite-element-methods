@@ -252,12 +252,25 @@ def make_shape_regularity_figure(filename):
             color=data["edgecolor"],
             linewidth=1.25,
         )
+        if data["title"] == "Flat triangle":
+            label_position = (
+                data["center"][0] + radius + 0.10,
+                data["center"][1],
+            )
+            horizontal_alignment = "left"
+            vertical_alignment = "center"
+        else:
+            label_position = (
+                data["center"][0],
+                data["center"][1] + 0.08,
+            )
+            horizontal_alignment = "center"
+            vertical_alignment = "bottom"
         axis.text(
-            data["center"][0],
-            data["center"][1] + 0.08,
+            *label_position,
             r"$\rho_e$",
-            ha="center",
-            va="bottom",
+            ha=horizontal_alignment,
+            va=vertical_alignment,
             fontsize=12,
             color=data["edgecolor"],
         )
@@ -271,9 +284,87 @@ def make_shape_regularity_figure(filename):
     plt.close(figure)
 
 
+def make_best_approximation_figure(filename):
+    """Show the energy projection with separated labels and a clear right angle."""
+    figure, axis = plt.subplots(figsize=(9.6, 4.8))
+    axis.set_xlim(0.25, 6.15)
+    axis.set_ylim(0.20, 3.35)
+    axis.axis("off")
+
+    line_start = np.array((0.65, 0.62))
+    line_end = np.array((5.65, 1.72))
+    tangent = line_end - line_start
+    tangent = tangent / np.linalg.norm(tangent)
+    normal = np.array((-tangent[1], tangent[0]))
+
+    u_h = np.array((3.62, 1.2734))
+    u = u_h + 1.58 * normal
+    v_h = np.array((1.72, 0.8554))
+
+    axis.plot(
+        (line_start[0], line_end[0]),
+        (line_start[1], line_end[1]),
+        color="#2f638f",
+        linewidth=4.2,
+        solid_capstyle="round",
+    )
+    axis.text(5.63, 1.88, r"$V_h$", fontsize=24, color="#2f638f", ha="right", va="bottom")
+
+    axis.plot((u[0], u_h[0]), (u[1], u_h[1]), color="#c65b2a", linewidth=2.8, linestyle=(0, (6, 5)))
+    axis.plot((u[0], v_h[0]), (u[1], v_h[1]), color="#3b9665", linewidth=2.8, linestyle=(0, (6, 5)))
+
+    axis.scatter((u[0],), (u[1],), s=115, color="#c65b2a", zorder=5)
+    axis.scatter((u_h[0],), (u_h[1],), s=115, color="#2f638f", zorder=5)
+    axis.scatter((v_h[0],), (v_h[1],), s=115, color="#3b9665", zorder=5)
+
+    axis.text(u[0] + 0.12, u[1] + 0.08, r"$u$", fontsize=24, color="#733417", ha="left", va="bottom")
+    axis.text(u_h[0] + 0.13, u_h[1] - 0.13, r"$u_h$", fontsize=23, color="#244a6b", ha="left", va="top")
+    axis.text(v_h[0] - 0.10, v_h[1] - 0.14, r"$v_h$", fontsize=23, color="#286746", ha="right", va="top")
+
+    marker_size = 0.20
+    corner_1 = u_h - marker_size * tangent
+    corner_2 = corner_1 + marker_size * normal
+    corner_3 = u_h + marker_size * normal
+    axis.plot(
+        (corner_1[0], corner_2[0], corner_3[0]),
+        (corner_1[1], corner_2[1], corner_3[1]),
+        color="#303840",
+        linewidth=3.0,
+        solid_capstyle="round",
+        zorder=6,
+    )
+
+    orange_midpoint = 0.54 * u + 0.46 * u_h
+    green_midpoint = 0.53 * u + 0.47 * v_h
+    axis.text(
+        orange_midpoint[0] + 0.28,
+        orange_midpoint[1] + 0.02,
+        r"$\Vert u-u_h\Vert_a$",
+        fontsize=20,
+        color="#733417",
+        ha="left",
+        va="center",
+        bbox={"facecolor": "white", "edgecolor": "none", "pad": 1.5, "alpha": 0.92},
+    )
+    axis.text(
+        green_midpoint[0] - 0.18,
+        green_midpoint[1] + 0.14,
+        r"$\Vert u-v_h\Vert_a$",
+        fontsize=20,
+        color="#286746",
+        ha="right",
+        va="center",
+        bbox={"facecolor": "white", "edgecolor": "none", "pad": 1.5, "alpha": 0.92},
+    )
+
+    figure.savefig(OUTPUT_DIR / filename, bbox_inches="tight", facecolor="white")
+    plt.close(figure)
+
+
 if __name__ == "__main__":
     make_two_dimensional_figure(3, "interpolation-2d.png")
     make_two_dimensional_figure(6, "interpolation-2d-fine.png")
     make_one_dimensional_figure(4, "interpolation-1d.svg")
     make_one_dimensional_figure(8, "interpolation-1d-fine.svg")
     make_shape_regularity_figure("shape-regularity-comparison.svg")
+    make_best_approximation_figure("best-approximation-geometry.svg")

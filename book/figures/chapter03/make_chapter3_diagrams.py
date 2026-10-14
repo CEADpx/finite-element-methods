@@ -174,7 +174,7 @@ def make_boundary_partition() -> None:
         0.49,
         0.90,
         r"$\mathbf{q}\cdot\mathbf{n}=q$ on $\Gamma_N$",
-        fontsize=15,
+        fontsize=17,
         color="#b65e18",
         **text_style,
     )
@@ -182,19 +182,19 @@ def make_boundary_partition() -> None:
         0.49,
         0.08,
         r"$u=g$ on $\Gamma_D$",
-        fontsize=15,
+        fontsize=17,
         color="#1f5f96",
         **text_style,
     )
-    ax.text(0.12, 0.50, r"$\Gamma_D$", fontsize=19, color="#1f5f96", **text_style)
-    ax.text(0.49, 0.82, r"$\Gamma_N$", fontsize=19, color="#b65e18", **text_style)
+    ax.text(0.12, 0.50, r"$\Gamma_D$", fontsize=21, color="#1f5f96", **text_style)
+    ax.text(0.49, 0.82, r"$\Gamma_N$", fontsize=21, color="#b65e18", **text_style)
     ax.text(
         0.925,
         0.50,
         r"$\mathbf{n}$",
         ha="left",
         va="center",
-        fontsize=17,
+        fontsize=19,
         color="#40464b",
     )
 

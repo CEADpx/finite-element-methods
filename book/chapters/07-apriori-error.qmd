@@ -417,7 +417,7 @@ $V_h$. The closest point is measured using the selected norm. For the energy
 inner product, Galerkin orthogonality makes $u_h$ the orthogonal projection of
 $u$ onto $V_h$, as illustrated in @fig-c7-best-approximation-geometry.
 
-![Best approximation in the energy inner product. The error $u-u_h$ is orthogonal to $V_h$, while another choice $v_h$ has a larger energy-norm error. Distances and the right angle are understood in the geometry defined by $a$.](../figures/chapter07/best-approximation-geometry.svg){#fig-c7-best-approximation-geometry width=72%}
+![Best approximation in the energy inner product. The error $u-u_h$ is orthogonal to $V_h$, while another choice $v_h$ has a larger energy-norm error. Distances and the right angle are understood in the geometry defined by $a$.](../figures/chapter07/best-approximation-geometry.svg){#fig-c7-best-approximation-geometry width=80%}
 
 ::: {#exm-c7-weighted-projection}
 ## Best approximation depends on the norm

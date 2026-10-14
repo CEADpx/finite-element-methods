@@ -146,7 +146,7 @@ regularity, and admissible variations. They are part of the formulation.
 @fig-variational-formulation-process summarizes the steps. Each arrow represents
 a mathematical operation or choice that must be stated in the formulation.
 
-![Stages in the construction of a variational problem from a strong boundary-value problem.](../figures/chapter03/variational-formulation-process.png){#fig-variational-formulation-process width="60%" fig-align="center"}
+![Stages in the construction of a variational problem from a strong boundary-value problem.](../figures/chapter03/variational-formulation-process.png){#fig-variational-formulation-process width="90%" fig-align="center"}
 
 ## Canonical scalar diffusion problem {#sec-variational-model-problem}
 
@@ -171,7 +171,7 @@ $\overline{\Gam_D}\cap\overline{\Gam_N}$ has boundary measure zero and that
 $\Gam_D$ has positive boundary measure. The partition and the outward unit
 normal are shown schematically in @fig-variational-boundary-partition.
 
-![Partition of the boundary into a Dirichlet portion $\Gam_D$ and a Neumann portion $\Gam_N$.](../figures/chapter03/diffusion-boundary-partition.png){#fig-variational-boundary-partition width="40%" fig-align="center"}
+![Partition of the boundary into a Dirichlet portion $\Gam_D$ and a Neumann portion $\Gam_N$.](../figures/chapter03/diffusion-boundary-partition.png){#fig-variational-boundary-partition width="46%" fig-align="center"}
 
 Consider
 

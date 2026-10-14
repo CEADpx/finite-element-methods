@@ -12,6 +12,25 @@
 \usepackage{enumitem}
 \usepackage{scrlayer-scrpage}
 \usepackage[most]{tcolorbox}
+\usepackage{adjustbox}
+
+% Give every embedded figure a light frame without changing its requested
+% width. The outer adjustbox scales the framed object only when necessary.
+\definecolor{femfigureframe}{HTML}{C8D2DC}
+\NewCommandCopy{\femincludegraphics}{\includegraphics}
+\RenewDocumentCommand{\includegraphics}{s O{} m}{%
+  \begingroup
+  \setlength{\fboxsep}{2pt}%
+  \setlength{\fboxrule}{0.4pt}%
+  \adjustbox{max width=\linewidth}{%
+    \fcolorbox{femfigureframe}{white}{%
+      \IfBooleanTF{#1}
+        {\femincludegraphics*[#2]{#3}}
+        {\femincludegraphics[#2]{#3}}%
+    }%
+  }%
+  \endgroup
+}
 
 % Use the same New Computer Modern math design as the HTML book.  The HTML
 % output loads MathJax 4 with its mathjax-newcm font in _quarto.yml.

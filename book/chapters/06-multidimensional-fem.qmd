@@ -77,7 +77,7 @@ geometry and finite element degrees of freedom.
 
 ![Common element geometries in two and three dimensions.](../figures/chapter06/cell_families.svg){#fig-c6-element-families width="90%" fig-align="center"}
 
-![Elements, vertices, shared facets, and boundary facets in a two-dimensional triangular mesh.](../figures/chapter06/triangular_mesh_concepts.svg){#fig-c6-mesh-concepts width="100%" fig-align="center"}
+![Elements, vertices, shared facets, and boundary facets in a two-dimensional triangular mesh.](../figures/chapter06/triangular_mesh_concepts.svg){#fig-c6-mesh-concepts width="90%" fig-align="center"}
 
 Two neighboring elements meet along a shared facet. A facet contained in
 $\partial\Om$ is a **boundary facet**. This distinction matters because domain
@@ -332,7 +332,7 @@ $$
 y.
 $$ {#eq-c6-example-triangle-basis}
 
-![Geometry, polynomial space, and nodal property of a physical $P_1$ triangular element.](../figures/chapter06/physical_p1_triangle.svg){#fig-c6-physical-p1 width="90%" fig-align="center"}
+![Geometry, polynomial space, and nodal property of a physical $P_1$ triangular element.](../figures/chapter06/physical_p1_triangle.svg){#fig-c6-physical-p1 width="80%" fig-align="center"}
 
 ![The three nodal basis functions over the physical triangle. Each basis function is one at its associated vertex and zero along the opposite edge.](../figures/chapter06/p1_basis_functions.svg){#fig-c6-p1-basis-surfaces width="100%" fig-align="center"}
 
@@ -848,7 +848,7 @@ include:
 
 The weights sum to $1/2$, the area of the reference triangle.
 
-![One-point and three-point quadrature rules on the reference triangle.](../figures/chapter06/triangle_quadrature.svg){#fig-c6-triangle-quadrature width="80%" fig-align="center"}
+![One-point and three-point quadrature rules on the reference triangle.](../figures/chapter06/triangle_quadrature.svg){#fig-c6-triangle-quadrature width="70%" fig-align="center"}
 
 The transformed scalar-diffusion stiffness entry is
 
@@ -1131,7 +1131,7 @@ $$ {#eq-c6-edge-integral-transform}
 
 This is an ordinary one-dimensional integral on the reference edge.
 
-![A natural boundary condition contributes through an integral over a boundary facet.](../figures/chapter06/boundary_facet_load.svg){#fig-c6-boundary-facet width="95%" fig-align="center"}
+![A natural boundary condition contributes through an integral over a boundary facet.](../figures/chapter06/boundary_facet_load.svg){#fig-c6-boundary-facet width="82%" fig-align="center"}
 
 The global load vector therefore receives contributions from both elements and
 boundary facets.
@@ -1693,11 +1693,11 @@ reference to physical coordinates, applies quadrature, and assembles the local
 contributions into a global PETSc matrix. The code does not replace the
 derivation; it implements it.
 
-@fig-c6-diffusion-four-triangles shows the finite element solution and nodal
-error on the coarsest mesh. Refining the mesh from 4 to 16 and then 64
+@fig-c6-diffusion-four-triangles shows the finite element solution on the
+coarsest mesh. Refining the mesh from 4 to 16 and then 64
 triangles gives the results in @fig-c6-diffusion-refinement.
 
-![Finite element solution and nodal error on a four-triangle mesh.](../figures/chapter06/diffusion_4_triangles.png){#fig-c6-diffusion-four-triangles width="92%" fig-align="center"}
+![Finite element solution on a four-triangle mesh.](../figures/chapter06/diffusion_4_triangles.png){#fig-c6-diffusion-four-triangles width="76%" fig-align="center"}
 
 ![Finite element solutions on three successively refined triangular meshes.](../figures/chapter06/diffusion_refinement.png){#fig-c6-diffusion-refinement width="100%" fig-align="center"}
 
@@ -1761,7 +1761,7 @@ $1$--$2$, $2$--$3$, and $3$--$1$, respectively. Software libraries may order
 the edge nodes differently; as with vector components, every element array must
 use one consistent ordering.
 
-![Local nodes of the quadratic reference triangle: three vertices and three edge midpoints.](../figures/chapter06/p2_reference_nodes.svg){#fig-c6-p2-nodes width="65%" fig-align="center"}
+![Local nodes of the quadratic reference triangle: three vertices and three edge midpoints.](../figures/chapter06/p2_reference_nodes.svg){#fig-c6-p2-nodes width="54%" fig-align="center"}
 
 The basis is most easily written with the reference $P_1$ functions
 @eq-c6-reference-triangle-basis, which are the barycentric coordinates of the
@@ -1925,7 +1925,7 @@ $$ {#eq-c6-q1-field}
 Using the same basis for the geometry and the field is the **isoparametric
 construction** introduced in Chapter 5.
 
-![Isoparametric mapping from the reference square to a four-node physical quadrilateral.](../figures/chapter06/q1_isoparametric_mapping.svg){#fig-c6-q1-map width="95%" fig-align="center"}
+![Isoparametric mapping from the reference square to a four-node physical quadrilateral.](../figures/chapter06/q1_isoparametric_mapping.svg){#fig-c6-q1-map width="82%" fig-align="center"}
 
 The physical basis is again obtained by composition,
 
@@ -2214,7 +2214,7 @@ $7=(1,1,1)$, and $8=(-1,1,1)$. The first four nodes form the
 lower face and the last four the corresponding upper face. This is the
 numbering in @fig-c6-3d-numbering; a software library may use another order.
 
-![Local reference-node numbering for the tetrahedron and hexahedron. The tetrahedral nodes follow the four basis functions above; the cube follows the sign triples specified in the text.](../figures/chapter06/reference_3d_numbering.svg){#fig-c6-3d-numbering width="100%" fig-align="center"}
+![Local reference-node numbering for the tetrahedron and hexahedron. The tetrahedral nodes follow the four basis functions above; the cube follows the sign triples specified in the text.](../figures/chapter06/reference_3d_numbering.svg){#fig-c6-3d-numbering width="80%" fig-align="center"}
 
 Their span is
 

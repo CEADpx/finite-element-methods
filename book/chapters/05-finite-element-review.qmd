@@ -47,7 +47,7 @@ a(u,v)=\int_0^L AE\,u'v'\,\dd x,
 \ell(v)=\int_0^L fv\,\dd x+\overline P\,v(L).
 $$ {#eq-c5-bar-forms}
 
-![One-dimensional axial bar with a prescribed displacement at the left endpoint, a distributed axial load, and an applied force at the right endpoint.](../figures/chapter05/bar_loading_schematic.svg){#fig-c5-bar-loading width="95%" fig-align="center"}
+![One-dimensional axial bar with a prescribed displacement at the left endpoint, a distributed axial load, and an applied force at the right endpoint.](../figures/chapter05/bar_loading_schematic.svg){#fig-c5-bar-loading width="86%" fig-align="center"}
 
 The unknown in this problem is a function. In principle, the equation must hold
 for every admissible test function $v\in\mathcal{V}_0$. A computer, however, cannot
@@ -823,7 +823,7 @@ $$ {#eq-c5-support-sparsity}
 For linear elements, an interior basis function overlaps only with itself and
 its immediate neighbors.
 
-![Local support of the basis functions produces a sparse global stiffness matrix.](../figures/chapter05/basis_overlap_sparsity.svg){#fig-c5-basis-overlap-sparsity width="68%" fig-align="center"}
+![Local support of the basis functions produces a sparse global stiffness matrix.](../figures/chapter05/basis_overlap_sparsity.svg){#fig-c5-basis-overlap-sparsity width="60%" fig-align="center"}
 
 @eq-c5-global-entries already defines the
 discrete problem. It would be possible to evaluate each entry by integrating
@@ -954,7 +954,7 @@ $$
 \end{bmatrix}.
 $$ {#eq-c5-linear-element-matrix-vector}
 
-![A typical linear element, its local nodal unknowns, and the corresponding element stiffness matrix and consistent load vector.](../figures/chapter05/typical_element_matrix_guide.svg){#fig-c5-typical-element width="100%" fig-align="center"}
+![A typical linear element, its local nodal unknowns, and the corresponding element stiffness matrix and consistent load vector.](../figures/chapter05/typical_element_matrix_guide.svg){#fig-c5-typical-element width="92%" fig-align="center"}
 
 The picture is worth pausing over. The geometry of one element
 $\mathcal{K}_e$, the two nodal displacement values collected in $\bU^e$, the
@@ -1819,7 +1819,7 @@ x-\frac{x_e+x_{e+1}}{2}
 \right).
 $$
 
-![The coordinate map sends the fixed reference interval to one physical element. Reference nodes and quadrature points are mapped separately.](../figures/chapter05/reference_mapping_quadrature.svg){#fig-c5-reference-map width="95%" fig-align="center"}
+![The coordinate map sends the fixed reference interval to one physical element. Reference nodes and quadrature points are mapped separately.](../figures/chapter05/reference_mapping_quadrature.svg){#fig-c5-reference-map width="86%" fig-align="center"}
 
 For a degree-$p$ Lagrange element, choose $p+1$ distinct reference nodes
 $\xi_1,\ldots,\xi_{p+1}$. The reference basis function associated with
