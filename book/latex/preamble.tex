@@ -13,11 +13,9 @@
 \usepackage{scrlayer-scrpage}
 \usepackage[most]{tcolorbox}
 
-% Latin Modern Math renders calligraphic I too similarly to J.  Use the
-% pxtx calligraphic alphabet only for interpolation operators; the rest of
-% the book retains its existing math font and calligraphic alphabet.
-\let\mathbfscr\relax
-\usepackage[scr=pxtx]{mathalpha}
+% Use the same New Computer Modern math design as the HTML book.  The HTML
+% output loads MathJax 4 with its mathjax-newcm font in _quarto.yml.
+\setmathfont{NewCMMath-Regular.otf}
 
 % Match the HTML theorem headings by bolding parenthetical theorem titles.
 % Pandoc/Quarto assigns theorem-like environments to the three amsthm styles

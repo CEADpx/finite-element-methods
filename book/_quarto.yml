@@ -75,7 +75,9 @@ format:
     code-fold: false
     code-copy: true
     code-tools: true
-    html-math-method: mathjax
+    html-math-method:
+      method: mathjax
+      url: "https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"
     include-in-header:
       - latex/mathjax.html
   pdf:
