@@ -180,13 +180,17 @@ $$
 \qquad\forall\bx\in\Om,
 $$ {#eq-variational-strong-pde}
 
-Define the diffusion-flux vector and its outward normal component by
+Define the flux vector used in the diffusion equation and its outward normal
+component by
 
 $$
-\bq=-k\grad u,
+\bq=k\grad u,
 \qquad
 q=\bq\cdot\bn.
 $$ {#eq-variational-flux-definition}
+
+Thus $-\divg\bq=f$. For heat conduction, the physical heat-flow vector is
+$-\bq$, so positive $q$ means heat enters the body.
 
 The boundary conditions are
 
@@ -293,12 +297,12 @@ $$
 $$
 
 The first integral is zero because $v=0$ on $\Gam_D$. On $\Gam_N$,
-@eq-variational-flux-definition gives $k\grad u\cdot\bn=-q$. Equation
+@eq-variational-flux-definition gives $k\grad u\cdot\bn=q$. Equation
 @eq-variational-after-parts then becomes
 
 $$
 \int_{\Om}k\grad u\cdot\grad v\,\dx
-=\int_{\Om}fv\,\dx-\int_{\Gam_N}qv\,\ds.
+=\int_{\Om}fv\,\dx+\int_{\Gam_N}qv\,\ds.
 $$ {#eq-variational-diffusion-weak}
 
 The highest derivative of $u$ in this identity is its first derivative. This
@@ -379,7 +383,7 @@ that
 
 $$
 \int_{\Om}k\grad u\cdot\grad v\,\dx
-=\int_{\Om}fv\,\dx-\int_{\Gam_N}qv\,\ds
+=\int_{\Om}fv\,\dx+\int_{\Gam_N}qv\,\ds
 \qquad\forall v\in\Vzero.
 $$ {#eq-variational-weak-with-spaces}
 
@@ -392,7 +396,7 @@ naturally to a bilinear form $a$ and a linear functional $\ell$, defined by
 $$
 a(w,v)=\int_{\Om}k\grad w\cdot\grad v\,\dx,
 \qquad
-\ell(v)=\int_{\Om}fv\,\dx-\int_{\Gam_N}qv\,\ds.
+\ell(v)=\int_{\Om}fv\,\dx+\int_{\Gam_N}qv\,\ds.
 $$ {#eq-variational-forms}
 
 ::: {#def-weak-diffusion-problem}
@@ -495,11 +499,11 @@ importance.
 A Robin condition combines the unknown and its normal flux. If
 
 $$
-q(\bx)=\beta(\bx)u(\bx)-r(\bx)
+q(\bx)=r(\bx)-\beta(\bx)u(\bx)
 \qquad\forall\bx\in\Gam_N,
 $$
 
-then $k\grad u\cdot\bn=-q=r-\beta u$. Substitution into
+then $k\grad u\cdot\bn=q=r-\beta u$. Substitution into
 @eq-variational-after-parts gives
 
 $$
@@ -534,7 +538,7 @@ $\Gam_N=\partial\Om$ and $v=1$ in
 @eq-variational-weak-with-spaces. Because $\grad v=0$, the equation gives
 
 $$
-\int_{\Om}f\,\dx=\int_{\partial\Om}q\,\ds.
+\int_{\Om}f\,\dx+\int_{\partial\Om}q\,\ds=0.
 $$
 
 When this condition holds, a requirement such as

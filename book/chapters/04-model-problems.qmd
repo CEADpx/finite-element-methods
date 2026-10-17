@@ -62,13 +62,13 @@ $T(\bx,t)$ in kelvin. The material quantities used below are:
 
 - mass density $\rho>0$, in $\mathrm{kg}/\mathrm{m}^3$;
 - specific heat capacity $c>0$, in $\mathrm{J}/(\mathrm{kg}\,\mathrm{K})$;
-- conductive heat-flux vector $\bq$, in $\mathrm{W}/\mathrm{m}^2$; and
+- flux vector $\bq$, in $\mathrm{W}/\mathrm{m}^2$; and
 - volumetric heat supply $r$, in $\mathrm{W}/\mathrm{m}^3$.
 
 The product $\rho c$, in $\mathrm{J}/(\mathrm{m}^3\,\mathrm{K})$, is the
-heat capacity per unit volume. The vector
-$\bq(\bx,t)$ points in the direction of heat flow, and
-$\bq\cdot\bn$ is the rate of heat leaving the body per unit boundary area.
+heat capacity per unit volume. We use $\bq$ for the negative of the physical
+heat-flow vector. Thus
+$-\bq\cdot\bn$ is the rate of heat leaving the body per unit boundary area.
 The source $r$ is positive when heat is supplied within the body.
 
 ### Energy balance and Fourier's law
@@ -82,12 +82,12 @@ $$
 =\int_\omega \rho c\bigl(T(\bx,t)-T_{\mathrm{ref}}\bigr)\,\dx.
 $$
 
-The rate of stored energy equals the heat supplied inside $\omega$ minus the
-heat leaving through its boundary:
+The rate of stored energy equals the heat supplied inside $\omega$ plus the
+heat entering through its boundary:
 
 $$
 \frac{\dd}{\dd t}\int_\omega\rho cT\,\dx
-=\int_\omega r\,\dx-\int_{\partial\omega}\bq\cdot\bn\,\ds.
+=\int_\omega r\,\dx+\int_{\partial\omega}\bq\cdot\bn\,\ds.
 $$ {#eq-model-heat-integral-balance}
 
 Apply the Gauss divergence theorem @cor-foundations-divergence to the boundary
@@ -96,7 +96,7 @@ integral and move all terms to the left. This gives
 $$
 \int_\omega
 \left(\rho c\,\frac{\partial T}{\partial t}
-+\divg\bq-r\right)\,\dx=0
+-\divg\bq-r\right)\,\dx=0
 $$
 
 for every subdomain $\omega\subset\Om$. The passage from this integral
@@ -109,7 +109,7 @@ balance is
 
 $$
 \rho c\,\frac{\partial T}{\partial t}
-+\divg\bq=r
+-\divg\bq=r
 \qquad\text{in }\Om.
 $$ {#eq-model-heat-local-balance}
 
@@ -117,14 +117,14 @@ The balance equation contains two unknown fields, $T$ and $\bq$, and is not
 sufficient to determine both. Fourier's law supplies a relation between them:
 
 $$
-\bq=-k\grad T.
+\bq=k\grad T.
 $$ {#eq-model-fourier-law}
 
 For an isotropic material, the conductivity $k$, measured in
 $\mathrm{W}/(\mathrm{m}\,\mathrm{K})$, is a positive scalar. The
-minus sign states that conductive heat flows toward lower temperature. An
+physical heat-flow vector $-\bq=-k\grad T$ points toward lower temperature. An
 anisotropic material instead uses
-$\bq=-\bm{K}\grad T$, where $\bm{K}$ is a symmetric positive-definite
+$\bq=\bm{K}\grad T$, where $\bm{K}$ is a symmetric positive-definite
 second-order conductivity tensor. We use the isotropic form unless stated
 otherwise.
 
@@ -145,7 +145,7 @@ This derivation follows the standard balance-law treatment of heat flow
 1. Verify that every term in @eq-model-heat-local-balance has units of
    $\mathrm{W}/\mathrm{m}^3$.
 2. Use @eq-model-fourier-law to verify the SI units of $k$.
-3. Let $T(\bx)=T_0+Gx_1$, where $G>0$ is constant. Compute $\bq$ and state
+3. Let $T(\bx)=T_0+Gx_1$, where $G>0$ is constant. Compute $-\bq$ and state
    whether heat flows in the positive or negative $x_1$ direction.
 :::
 
@@ -171,27 +171,29 @@ $$
 \begin{aligned}
 T&=\overline T &&\text{on }\Gam_T,\\
 \bq\cdot\bn&=q &&\text{on }\Gam_q,\\
-\bq\cdot\bn&=h_c(T-T_\infty) &&\text{on }\Gam_R.
+\bq\cdot\bn&=h_c(T_\infty-T) &&\text{on }\Gam_R.
 \end{aligned}
 $$ {#eq-model-heat-boundary-conditions}
 
 Here $\overline T$ and $T_\infty$ are measured in kelvin,
-$q$ is the prescribed **outward** normal heat flux in
+$q=\bq\cdot\bn$ is the prescribed normal component in
 $\mathrm{W}/\mathrm{m}^2$, and $h_c\geq0$ is a heat-transfer coefficient in
 $\mathrm{W}/(\mathrm{m}^2\,\mathrm{K})$. Thus
-$q>0$ means that heat leaves the body. An insulated boundary is
+$q>0$ means that heat enters the body. An insulated boundary is
 the special case $q=0$. The condition on $\Gam_R$ is a convection,
 or Robin, condition.
 
-Because $\bq=-k\grad T$, the prescribed-flux condition is
+Because $\bq=k\grad T$, the prescribed-flux condition is
 
 $$
--k\grad T\cdot\bn=q
+k\grad T\cdot\bn=q
 \qquad\text{on }\Gam_q.
 $$ {#eq-model-heat-flux-gradient}
 
 This is the normal-flux convention used throughout the book:
-$q=\bq\cdot\bn$ is positive when heat leaves the domain.
+$q=\bq\cdot\bn$ is positive when heat enters the domain. For example,
+$q=0.1\,\mathrm{W}/\mathrm{m}^2$ means that heat enters at a rate of
+$0.1$ watt per square meter of boundary.
 
 A transient problem also requires
 
@@ -220,8 +222,8 @@ $$
 \begin{aligned}
 -\divg(k\grad T)&=r &&\text{in }\Om,\\
 T&=\overline T &&\text{on }\Gam_T,\\
--k\grad T\cdot\bn&=q &&\text{on }\Gam_q,\\
--k\grad T\cdot\bn&=h_c(T-T_\infty) &&\text{on }\Gam_R.
+k\grad T\cdot\bn&=q &&\text{on }\Gam_q,\\
+k\grad T\cdot\bn&=h_c(T_\infty-T) &&\text{on }\Gam_R.
 \end{aligned}
 \right\}
 \qquad\text{Strong form}
@@ -254,7 +256,7 @@ $$
 +\int_{\Gam_R}h_cTv\,\ds\\
 &\qquad
 =\int_{\Om}rv\,\dx
--\int_{\Gam_q}q v\,\ds
++\int_{\Gam_q}q v\,\ds
 +\int_{\Gam_R}h_cT_\infty v\,\ds
 \quad\forall v\in\mathcal V_0.
 \end{aligned}
@@ -262,9 +264,8 @@ $$
 \qquad\text{Variational form}
 $$ {#eq-model-steady-heat-weak}
 
-The negative sign multiplying $q$ follows from defining it as an
-outward flux. It also agrees with the global steady energy balance: internal
-heat generation must equal the net outward heat flow.
+The positive sign multiplying $q$ follows from $q=k\grad T\cdot\bn$.
+Positive $q$ supplies heat to the body, while negative $q$ removes heat.
 
 To write @eq-model-steady-heat-weak in the abstract notation of Chapter 3,
 define the thermal bilinear form $a_T$ and the thermal load functional
@@ -277,7 +278,7 @@ a_T(S,v)
 +\int_{\Gam_R}h_cSv\,\ds,\\
 \ell_T(v)
 &=\int_{\Om}rv\,\dx
--\int_{\Gam_q}q v\,\ds
++\int_{\Gam_q}q v\,\ds
 +\int_{\Gam_R}h_cT_\infty v\,\ds.
 \end{aligned}
 $$ {#eq-model-steady-heat-forms}
@@ -293,10 +294,10 @@ Suppose $\Gam_T=\varnothing$ and $\Gam_R=\varnothing$, so that heat flux is
 prescribed on the entire boundary. Only $\grad T$ appears in the variational
 problem. If $T$ is a solution, then $T+C$ is also a solution for every
 constant $C$. A solution can exist only if the total heat supplied is
-consistent with the prescribed outward flux:
+consistent with the prescribed boundary heat input:
 
 $$
-\int_{\Om}r\,\dx=\int_{\partial\Om}q\,\ds.
+\int_{\Om}r\,\dx+\int_{\partial\Om}q\,\ds=0.
 $$
 
 The temperature becomes unique after fixing a reference value, such as its
@@ -310,26 +311,26 @@ boundary.
 ::: {#exm-model-one-dimensional-heat}
 ## Heat flux through a wall
 Let $\Om=(0,L)$, let $k$ be constant, and assume $r=0$. Prescribe
-$T(0)=T_0$ and a constant outward flux $q$ at $x=L$. The strong
+$T(0)=T_0$ and a constant datum $q=kT'(L)$ at $x=L$. The strong
 problem is
 
 $$
 -(kT')'=0,\qquad
 T(0)=T_0,\qquad
--kT'(L)=q.
+kT'(L)=q.
 $$
 
 Because $k$ is constant, the differential equation gives $T''=0$. Therefore
 $T(x)=A+Bx$. The condition at $x=0$ gives $A=T_0$, and the flux condition at
-$x=L$ gives $B=-q/k$. The resulting classical solution is
+$x=L$ gives $B=q/k$. The resulting classical solution is
 
 $$
-T(x)=T_0-\frac{q}{k}x.
+T(x)=T_0+\frac{q}{k}x.
 $$
 
 Direct substitution shows that this function satisfies the differential
-equation and both boundary conditions. When $q>0$, heat leaves
-through $x=L$ and temperature decreases in the positive $x$ direction.
+equation and both boundary conditions. When $q>0$, heat enters
+through $x=L$ and temperature increases in the positive $x$ direction.
 :::
 
 ::: {#exr-model-steady-heat-form}
@@ -355,7 +356,7 @@ $$
 ={}&\frac12\int_{\Om}k|\grad S|^2\,\dx
 +\frac12\int_{\Gam_R}h_cS^2\,\ds
 -\int_{\Om}rS\,\dx\\
-&+\int_{\Gam_q}qS\,\ds
+&-\int_{\Gam_q}qS\,\ds
 -\int_{\Gam_R}h_cT_\infty S\,\ds.
 \end{aligned}
 $$ {#eq-model-thermal-potential}
@@ -1621,8 +1622,8 @@ retained:
 - $\mathbb C:\beps(\bu)$ arises from momentum balance, small-strain
   kinematics, and linear elasticity;
 - $\bP(\bF)$ acts on reference area and is derived from stored energy; and
-- boundary signs depend on whether the prescribed quantity is an outward
-  physical flux or the normal component used in an abstract equation.
+- prescribed natural data enter the load functional with a positive sign;
+  for heat conduction, $q>0$ represents heat entering the body.
 
 Chapter 5 replaces the continuous spaces by finite-dimensional spaces. The
 physical models and continuous variational problems remain unchanged.

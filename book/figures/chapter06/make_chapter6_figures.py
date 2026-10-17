@@ -246,7 +246,7 @@ def make_boundary_facet_load():
     axis.text(
         1.82,
         0.59,
-        r"$F_a^{\mathcal{F}}=-\int_{\mathcal{F}}\;q\,\phi_a^e\,\mathrm{d}s$",
+        r"$F_a^{\mathcal{F}}=\int_{\mathcal{F}}\;q\,\phi_a^e\,\mathrm{d}s$",
         fontsize=27,
         color=DARK,
     )
@@ -274,15 +274,15 @@ def make_two_triangle_patch_test():
     for vertical_coordinate in (0.23, 0.50, 0.77):
         axis.add_patch(
             FancyArrowPatch(
-                (1.77, vertical_coordinate),
                 (1.48, vertical_coordinate),
+                (1.77, vertical_coordinate),
                 arrowstyle="-|>",
                 mutation_scale=19,
                 color=GREEN,
                 lw=2.3,
             )
         )
-    axis.text(1.87, 0.50, r"$q=-1$", color=GREEN, fontsize=21, rotation=90, ha="center", va="center")
+    axis.text(1.87, 0.50, r"$q=1$", color=GREEN, fontsize=21, rotation=90, ha="center", va="center")
     axis.text(0.73, 1.10, r"$q=0$", color=GREEN, fontsize=19, ha="center", va="bottom")
     axis.text(0.73, -0.14, r"$q=0$", color=GREEN, fontsize=19, ha="center", va="top")
 

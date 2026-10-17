@@ -43,7 +43,8 @@ solid body occupying a
 domain $\Om\subset\R^d$. The primary unknown is the temperature $T(\bx,t)$.
 Conservation of energy relates its rate of change to heat flux and internal heat
 generation. Fourier's law, the constitutive relation in this model, relates the
-heat flux $\bq$ to the temperature gradient. For an isotropic material, the
+physical heat flux $-\bq$ to the temperature gradient, with $\bq=k\grad T$.
+For an isotropic material, the
 resulting equation has the form
 
 $$
@@ -311,12 +312,12 @@ from the variational structure.
 ## A steady heat-conduction model
 A rectangular plate $\Om=(0,L)\times(0,H)$ has constant thermal conductivity
 $k$ and a volumetric heat source $r$. The temperature is $T_0$ on the left
-edge, the outward normal heat flux is $q$ on the right edge, and the top and bottom
+edge, $k\grad T\cdot\bn=q$ on the right edge, and the top and bottom
 edges are insulated. Without solving the problem:
 
 1. identify the primary unknown and state whether it is scalar, vector, or
    tensor valued;
-2. state Fourier's law for $\bq$ and the steady governing PDE;
+2. state Fourier's law for the physical heat flux $-\bq$ and the steady governing PDE;
 3. write the boundary condition on each of the four edges and classify it as
    essential or natural;
 4. identify three distinct quantities of interest that could be computed from

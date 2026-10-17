@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-10-13T20:56:29.885403</dc:date>
+    <dc:date>2026-10-16T21:53:49.409949</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -34,42 +34,42 @@ z
 L 260.711111 219.991765 
 L 84.837778 71.825647 
 z
-" clip-path="url(#p56078b154b)" style="fill: #ffffff; stroke: #27577f; stroke-width: 2.8; stroke-linejoin: miter"/>
+" clip-path="url(#pe84039db1b)" style="fill: #ffffff; stroke: #27577f; stroke-width: 2.8; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 135.377495 111.790665 
 Q 145.344094 100.082572 153.861265 90.077171 
-" clip-path="url(#p56078b154b)" style="fill: none; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
+" clip-path="url(#pe84039db1b)" style="fill: none; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
     <path d="M 147.276066 92.876305 
 L 153.861265 90.077171 
 L 152.149452 97.024811 
 z
-" clip-path="url(#p56078b154b)" style="fill: #d97728; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
+" clip-path="url(#pe84039db1b)" style="fill: #d97728; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
    </g>
    <g id="patch_4">
     <path d="M 177.587095 147.350533 
 Q 187.553694 135.64244 196.070865 125.637039 
-" clip-path="url(#p56078b154b)" style="fill: none; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
+" clip-path="url(#pe84039db1b)" style="fill: none; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
     <path d="M 189.485666 128.436173 
 L 196.070865 125.637039 
 L 194.359052 132.584679 
 z
-" clip-path="url(#p56078b154b)" style="fill: #d97728; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
+" clip-path="url(#pe84039db1b)" style="fill: #d97728; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
    </g>
    <g id="patch_5">
     <path d="M 219.796695 182.910401 
 Q 229.763294 171.202309 238.280465 161.196907 
-" clip-path="url(#p56078b154b)" style="fill: none; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
+" clip-path="url(#pe84039db1b)" style="fill: none; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
     <path d="M 231.695266 163.996041 
 L 238.280465 161.196907 
 L 236.568652 168.144547 
 z
-" clip-path="url(#p56078b154b)" style="fill: #d97728; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
+" clip-path="url(#pe84039db1b)" style="fill: #d97728; stroke: #d97728; stroke-width: 2; stroke-linecap: round"/>
    </g>
    <g id="line2d_1">
     <path d="M 84.837778 71.825647 
 L 260.711111 219.991765 
-" clip-path="url(#p56078b154b)" style="fill: none; stroke: #d97728; stroke-width: 6; stroke-linecap: square"/>
+" clip-path="url(#pe84039db1b)" style="fill: none; stroke: #d97728; stroke-width: 6; stroke-linecap: square"/>
    </g>
    <g id="text_1">
     <!-- $\mathbf{x}_1$ -->
@@ -640,7 +640,7 @@ z
     </g>
    </g>
    <g id="text_6">
-    <!-- $F_a^{\mathcal{F}}=-\int_{\mathcal{F}}\;q\,\phi_a^e\,\mathrm{d}s$ -->
+    <!-- $F_a^{\mathcal{F}}=\int_{\mathcal{F}}\;q\,\phi_a^e\,\mathrm{d}s$ -->
     <g style="fill: #202a35" transform="translate(319.335556 126.993882) scale(0.27 -0.27)">
      <defs>
       <path id="STIXGeneral-Italic-29" d="M 4128 4179 
@@ -768,13 +768,6 @@ L 307 768
 L 307 1190 
 L 4077 1190 
 L 4077 768 
-z
-" transform="scale(0.015625)"/>
-      <path id="STIXGeneral-Regular-425" d="M 3974 1408 
-L 410 1408 
-L 410 1830 
-L 3974 1830 
-L 3974 1408 
 z
 " transform="scale(0.015625)"/>
       <path id="STIXGeneral-Regular-43e" d="M 1306 -794 
@@ -943,15 +936,14 @@ z
      <use xlink:href="#STIXNonUnicode-Italic-78" transform="translate(71.662289 41.657813) scale(0.7)"/>
      <use xlink:href="#STIXGeneral-Italic-44" transform="translate(61.099945 -30.542187) scale(0.7)"/>
      <use xlink:href="#STIXGeneral-Regular-20" transform="translate(141.802244 0.357812)"/>
-     <use xlink:href="#STIXGeneral-Regular-425" transform="translate(230.302183 0.357812)"/>
-     <use xlink:href="#STIXGeneral-Regular-43e" transform="translate(298.802122 0.357812)"/>
-     <use xlink:href="#STIXNonUnicode-Italic-78" transform="translate(336.049429 -36.642208) scale(0.7)"/>
-     <use xlink:href="#STIXGeneral-Italic-54" transform="translate(409.467384 0.357812)"/>
-     <use xlink:href="#STIXGeneral-Italic-221" transform="translate(476.134338 0.357812)"/>
-     <use xlink:href="#STIXGeneral-Italic-48" transform="translate(550.026618 41.657813) scale(0.7)"/>
-     <use xlink:href="#STIXGeneral-Italic-44" transform="translate(538.834274 -30.542187) scale(0.7)"/>
-     <use xlink:href="#STIXGeneral-Regular-47" transform="translate(602.273592 0.357812)"/>
-     <use xlink:href="#STIXGeneral-Italic-56" transform="translate(652.273547 0.357812)"/>
+     <use xlink:href="#STIXGeneral-Regular-43e" transform="translate(230.302183 0.357812)"/>
+     <use xlink:href="#STIXNonUnicode-Italic-78" transform="translate(267.54949 -36.642208) scale(0.7)"/>
+     <use xlink:href="#STIXGeneral-Italic-54" transform="translate(340.967445 0.357812)"/>
+     <use xlink:href="#STIXGeneral-Italic-221" transform="translate(407.634399 0.357812)"/>
+     <use xlink:href="#STIXGeneral-Italic-48" transform="translate(481.526679 41.657813) scale(0.7)"/>
+     <use xlink:href="#STIXGeneral-Italic-44" transform="translate(470.334335 -30.542187) scale(0.7)"/>
+     <use xlink:href="#STIXGeneral-Regular-47" transform="translate(533.773653 0.357812)"/>
+     <use xlink:href="#STIXGeneral-Italic-56" transform="translate(583.773608 0.357812)"/>
     </g>
    </g>
    <g id="text_7">
@@ -1136,7 +1128,7 @@ z
    </g>
    <g id="PathCollection_1">
     <defs>
-     <path id="m9a16c4592d" d="M 0 5.361903 
+     <path id="m429d241fa1" d="M 0 5.361903 
 C 1.421993 5.361903 2.785937 4.796939 3.791438 3.791438 
 C 4.796939 2.785937 5.361903 1.421993 5.361903 0 
 C 5.361903 -1.421993 4.796939 -2.785937 3.791438 -3.791438 
@@ -1148,16 +1140,16 @@ C -2.785937 4.796939 -1.421993 5.361903 0 5.361903
 z
 " style="stroke: #27577f"/>
     </defs>
-    <g clip-path="url(#p56078b154b)">
-     <use xlink:href="#m9a16c4592d" x="30.966667" y="219.991765" style="fill: #27577f; stroke: #27577f"/>
-     <use xlink:href="#m9a16c4592d" x="260.711111" y="219.991765" style="fill: #27577f; stroke: #27577f"/>
-     <use xlink:href="#m9a16c4592d" x="84.837778" y="71.825647" style="fill: #27577f; stroke: #27577f"/>
+    <g clip-path="url(#pe84039db1b)">
+     <use xlink:href="#m429d241fa1" x="30.966667" y="219.991765" style="fill: #27577f; stroke: #27577f"/>
+     <use xlink:href="#m429d241fa1" x="260.711111" y="219.991765" style="fill: #27577f; stroke: #27577f"/>
+     <use xlink:href="#m429d241fa1" x="84.837778" y="71.825647" style="fill: #27577f; stroke: #27577f"/>
     </g>
    </g>
   </g>
  </g>
  <defs>
-  <clipPath id="p56078b154b">
+  <clipPath id="pe84039db1b">
    <rect x="7.2" y="7.2" width="641.7" height="241.164"/>
   </clipPath>
  </defs>

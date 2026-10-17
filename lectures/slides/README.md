@@ -74,9 +74,11 @@ cp build/chapter07_duality_verification_lecture.pdf chapter07_duality_verificati
 
 ## `aposteriori-error/`
 
-Opening Chapter 8 lecture on the residual functional, localization into element
-and facet defects, residual indicators, and the reliability argument. The
-first lecture stops before marking and refinement.
+The first Chapter 8 lecture introduces the residual functional, mesh facets,
+normal-flux jumps, and elementwise integration by parts. The second deck,
+`chapter08_estimator_reliability_lecture.tex`, completes the element-and-facet
+residual representation, constructs the residual estimator, and develops its
+reliability bound through one- and two-dimensional examples.
 
 Build the slides from that directory with:
 
@@ -85,4 +87,9 @@ conda run -n finite-elements latexmk -pdf \
   -interaction=nonstopmode -halt-on-error \
   -outdir=build chapter08_residual_estimation_lecture.tex
 cp build/chapter08_residual_estimation_lecture.pdf chapter08_residual_estimation_lecture.pdf
+
+conda run -n finite-elements latexmk -pdf \
+  -interaction=nonstopmode -halt-on-error \
+  -outdir=build chapter08_estimator_reliability_lecture.tex
+cp build/chapter08_estimator_reliability_lecture.pdf chapter08_estimator_reliability_lecture.pdf
 ```

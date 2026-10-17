@@ -283,7 +283,7 @@ contains both factors and is therefore unchanged by the choice of labels.
 Following @eq-variational-flux-definition, define the **discrete flux**
 
 $$
-\bq_h=-k\grad u_h
+\bq_h=k\grad u_h
 \qquad\text{on each element }\mathcal K_e .
 $$ {#eq-c8-discrete-flux}
 
@@ -301,7 +301,7 @@ $$
 R(u_h;v)
 =
 \int_\Om fv\,\dx
--\int_{\Gam_N}qv\,\ds
++\int_{\Gam_N}qv\,\ds
 -\int_\Om k\grad u_h\cdot\grad v\,\dx
 \qquad\forall v\in\Vzero .
 $$
@@ -332,7 +332,7 @@ R(u_h;v)
 \bigl(f+\divg(k\grad u_h)\bigr)v\,\dx
 -\sum_{e=1}^{N_e}\int_{\partial\mathcal K_e}
 (k\grad u_h\cdot\bn_e)\,v\,\ds
--\int_{\Gam_N}qv\,\ds .
++\int_{\Gam_N}qv\,\ds .
 $$ {#eq-c8-residual-elementwise}
 
 The element boundary integrals are now regrouped facet by facet. Every facet of
@@ -347,9 +347,9 @@ combines with the part of the last integral over the same facet:
 
 $$
 -\int_{\mathcal F}(k\grad u_h\cdot\bn)\,v\,\ds
--\int_{\mathcal F}qv\,\ds
++\int_{\mathcal F}qv\,\ds
 =
--\int_{\mathcal F}\bigl(q+k\grad u_h\cdot\bn\bigr)v\,\ds .
+\int_{\mathcal F}\bigl(q-k\grad u_h\cdot\bn\bigr)v\,\ds .
 $$
 
 *Interior facets.* An interior facet appears twice in the middle sum: once
@@ -380,7 +380,7 @@ r_e
 =
 f+\divg(k\grad u_h)
 =
-f-\divg\bq_h
+f+\divg\bq_h
 \qquad\text{on }\mathcal K_e .
 $$ {#eq-c8-element-residual}
 
@@ -392,10 +392,10 @@ j_{\mathcal F}
 =
 \begin{cases}
 -[\![k\grad u_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F}
-=[\![\bq_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F},
+=-[\![\bq_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F},
 & \mathcal F\in\mathcal F_h^{\mathrm{int}},\\[0.4em]
--\bigl(q+k\grad u_h\cdot\bn\bigr)
-=\bq_h\cdot\bn-q,
+q-k\grad u_h\cdot\bn
+=q-\bq_h\cdot\bn,
 & \mathcal F\in\mathcal F_h^{N}.
 \end{cases}
 $$ {#eq-c8-facet-residual}
@@ -422,16 +422,17 @@ Each residual measures a failure of $u_h$ to satisfy one part of the strong
 problem of Chapter 3. The element residual is the defect in the balance
 equation $-\divg(k\grad u)=f$ of @eq-variational-strong-pde, evaluated in
 the interior of an element. In heat conduction it is the difference between the
-prescribed heat source and the net outflow of the computed flux per unit
-volume.
+prescribed heat source and the net outward physical heat flow per unit
+volume; the physical heat-flow vector is $-\bq_h$.
 
-The interior facet residual is the jump in the normal component of the
-computed flux. If the exact solution is regular enough on each element for the
+The interior facet residual is the negative jump in the normal component of
+$\bq_h$, or equivalently the jump in physical heat flow. If the exact solution
+is regular enough on each element for the
 corresponding quantities to be defined, its normal flux is continuous across
 interior facets: the heat leaving one element through a facet enters its
 neighbor. The computed flux does not have this property, because $\grad u_h$
 is discontinuous across facets. The Neumann residual is the difference between
-the computed normal flux $\bq_h\cdot\bn$ and the prescribed normal flux $q$.
+the prescribed normal datum $q$ and the computed component $\bq_h\cdot\bn$.
 The Galerkin method satisfies both flux conditions only in the weak sense of
 @eq-c8-residual-orthogonality.
 
@@ -495,8 +496,8 @@ present in the loading. The boundary residual $j_{N+1}$ is the mismatch between
 the applied end force and the computed end force. These expressions agree with
 @eq-c8-element-residual and @eq-c8-facet-residual: with $\mathcal K^+$ the
 element to the left of a node, $\bn_{\mathcal F}=+1$, and the bar's natural
-condition $AE\,u'(L)=\overline P$ corresponds to the outward normal flux
-$q=-\overline P$ at $x=L$.
+condition $AE\,u'(L)=\overline P$ corresponds to the normal datum
+$q=\overline P$ at $x=L$.
 
 Now take the uniformly loaded bar of @exm-c5-python-assembly, with
 $L=AE=f=1$, $\overline P=0$, a uniform mesh of size $h$, and exact solution

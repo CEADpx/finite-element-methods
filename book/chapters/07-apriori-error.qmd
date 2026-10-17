@@ -59,7 +59,7 @@ a(u,v)=\ell(v)
 $$ {#eq-c7-continuous-problem}
 
 with $a$ and $\ell$ given by @eq-variational-forms. Here $q=\bq\cdot\bn$ is
-the prescribed outward normal flux, while $h$ denotes the mesh size.
+the prescribed normal component of $\bq=k\grad u$, while $h$ denotes the mesh size.
 
 For the discrete problem we make the following assumptions, which are those of
 Chapter 6.
@@ -80,7 +80,7 @@ a(u_h,v_h)=\ell(v_h)
 $$ {#eq-c7-discrete-problem}
 
 This is @eq-c6-discrete-diffusion with $g=0$, and for $d=1$ it is the bar
-problem @eq-c5-discrete-variational.
+problem @eq-c5-discrete-variational with $k=AE$ and $q(L)=\overline P$.
 
 The third assumption idealizes the computations of Chapters 5 and 6, which use
 quadrature, and the restriction $g=0$ avoids the boundary interpolant $g_h$ of
@@ -1436,7 +1436,7 @@ $$
 \begin{aligned}
 -\divg(k\grad z)&=r &&\text{in }\Om,\\
 z&=0 &&\text{on }\Gam_D,\\
--k\grad z\cdot\bn&=0 &&\text{on }\Gam_N.
+k\grad z\cdot\bn&=0 &&\text{on }\Gam_N.
 \end{aligned}
 $$ {#eq-c7-dual-strong-problem}
 

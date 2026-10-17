@@ -155,15 +155,16 @@ indices $I,J,K$ denote material components when reference and current
 configurations must be distinguished.
 
 The unadorned symbol $h$ is reserved for the mesh-size parameter. The scalar
-$q$ is the outward normal component of the flux vector $\bq$; consequently,
-$q>0$ represents flux leaving the domain.
+$q=\bq\cdot\bn$ is the outward normal component of $\bq=k\grad u$.
+In heat conduction, the physical heat-flow vector is $-\bq$, so $q>0$
+means that heat enters the body.
 
 ## Recurring physical fields
 
 | Symbol | Meaning | Symbol | Meaning |
 |---|---|---|---|
-| $T$ | Temperature | $\bq$ | Flux vector |
-| $q=\bq\cdot\bn$ | Outward normal flux | $\bm K$ | Conductivity tensor |
+| $T$ | Temperature | $\bq=k\grad u$ | Flux vector used in the PDE; physical heat flow is $-\bq$ |
+| $q=\bq\cdot\bn$ | Prescribed normal component; enters $\ell$ with a plus sign | $\bm K$ | Conductivity tensor |
 | $\bb$ | Body force per unit mass | $\rho\bb$ | Body force per unit current volume |
 | $\bb_0$ | Body force per unit reference volume | $\rho$ | Mass density |
 | $\bu$ | Displacement vector | $\beps$ | Infinitesimal strain tensor |

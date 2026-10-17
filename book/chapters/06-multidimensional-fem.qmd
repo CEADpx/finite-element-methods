@@ -945,13 +945,14 @@ $$
 Here
 
 $$
-\bq=-k\grad u,
+\bq=k\grad u,
 \qquad
 q=\bq\cdot\bn.
 $$
 
-The scalar $q$ is the outward normal flux; $q>0$ represents flux leaving the
-domain. The symbol $h$ remains reserved for the mesh size.
+The scalar $q=\bq\cdot\bn$ is the prescribed normal component. In heat
+conduction, physical heat flow is $-\bq$, so $q>0$ means heat enters the body.
+The symbol $h$ remains reserved for the mesh size.
 
 The variational problem is
 
@@ -977,7 +978,7 @@ $$
 \ell(v)
 =
 \int_\Om f v\,\dx
--
++
 \int_{\Gam_N}q v\,\ds.
 $$ {#eq-c6-diffusion-forms}
 
@@ -1046,7 +1047,7 @@ $$
 F_i
 =
 \int_\Om f\phi_i\,\dx
--
++
 \int_{\Gam_N}q\phi_i\,\ds.
 $$ {#eq-c6-global-diffusion-entries}
 
@@ -1089,7 +1090,7 @@ $\mathcal F\subset\partial\mathcal K_e\cap\Gam_N$, its contribution is
 $$
 F_a^{\mathcal F}
 =
--\int_{\mathcal F}
++\int_{\mathcal F}
 q\,\phi_a^e\,\ds.
 $$ {#eq-c6-boundary-facet-load}
 
@@ -1122,7 +1123,7 @@ Therefore,
 $$
 F_a^{\mathcal F}
 =
--\int_{-1}^{1}
++\int_{-1}^{1}
 q(\bx(\zeta))
 \phi_a^e(\bx(\zeta))
 J_{\mathcal F}
@@ -1209,18 +1210,18 @@ because a constant nodal field has zero gradient.
 ## A constant flux on one edge
 
 Let a boundary edge of a $P_1$ triangle have length $L_{\mathcal F}$ and let
-the prescribed outward normal flux be the constant $q_0$. Only the two vertex basis
+the prescribed normal datum be the constant $q_0$. Only the two vertex basis
 functions associated with the edge are nonzero on that facet. Their
 restrictions are $(1-\zeta)/2$ and $(1+\zeta)/2$. For the endpoint whose
 restriction is $(1-\zeta)/2$, @eq-c6-edge-integral-transform gives
 
 $$
--\int_{\mathcal F}q_0\phi_a^e\,\ds
+\int_{\mathcal F}q_0\phi_a^e\,\ds
 =
--\frac{q_0L_{\mathcal F}}{2}
+\frac{q_0L_{\mathcal F}}{2}
 \int_{-1}^{1}\frac{1-\zeta}{2}\,\dd\zeta
 =
--\frac{q_0L_{\mathcal F}}{2},
+\frac{q_0L_{\mathcal F}}{2},
 $$
 
 and the same value is obtained for the other endpoint. Hence the facet load
@@ -1229,7 +1230,7 @@ vector is
 $$
 \bF^{\mathcal F}
 =
--\frac{q_0L_{\mathcal F}}{2}
+\frac{q_0L_{\mathcal F}}{2}
 \begin{bmatrix}
 1\\
 1
@@ -1250,8 +1251,8 @@ linearly from $q_i$ at endpoint $i$ to $q_j$ at endpoint $j$.
 2. Use @eq-c6-edge-integral-transform to derive the two-entry consistent
    facet load vector.
 3. Verify that the sum of the entries equals
-   $-L_{\mathcal F}(q_i+q_j)/2$. Separately verify that the outward flux
-   integral itself is $L_{\mathcal F}(q_i+q_j)/2$.
+   $L_{\mathcal F}(q_i+q_j)/2$. For heat conduction, verify that the
+   physical outward heat-flow integral is $-L_{\mathcal F}(q_i+q_j)/2$.
 :::
 
 ::: {#exr-c6-triangle-element-matrix}
@@ -1290,8 +1291,8 @@ I^2=(2,4,3).
 $$
 
 Let $k=1$ and $f=0$. Prescribe $u=0$ on the left boundary,
-$q=-1$ on the right boundary, and $q=0$ on the top and bottom boundaries.
-Because $\bq=-\grad u$, these are the boundary data satisfied by
+$q=1$ on the right boundary, and $q=0$ on the top and bottom boundaries.
+Because $\bq=\grad u$, these are the boundary data satisfied by
 $u(x,y)=x$.
 
 Direct calculation gives
@@ -1329,8 +1330,8 @@ $$
 \end{bmatrix}.
 $$ {#eq-c6-two-triangle-global-matrix}
 
-The right boundary edge has length one and $q=-1$. The minus sign in the
-variational boundary term therefore makes the two load entries positive. The
+The right boundary edge has length one and $q=1$. The positive sign in the
+variational boundary term gives two positive load entries. The
 constant-flux calculation in @exm-c6-boundary-edge-load gives
 
 $$
@@ -1475,7 +1476,7 @@ nodal support forces. For scalar diffusion, the entry associated with a
 prescribed nodal degree of freedom $i$ is
 $R_i=a(u_h,\phi_i)-\ell(\phi_i)$. If $u_h$ is replaced by a sufficiently smooth
 exact solution, integration by parts shows that this quantity equals
-$-\int_{\Gam_D}q\,\phi_i\,\ds$. The reactions are discrete
+$\int_{\Gam_D}q\,\phi_i\,\ds$. The reactions are discrete
 counterparts of these weighted boundary fluxes; they need not equal direct
 boundary integrals of the computed gradient. Their sum is also a useful check.
 The nodal basis functions sum to one, the free equations give
@@ -1487,7 +1488,7 @@ $$
 =
 -\ell(1)
 =
--\int_\Om f\,\dx+\int_{\Gam_N}q\,\ds.
+-\int_\Om f\,\dx-\int_{\Gam_N}q\,\ds.
 $$
 
 The discrete reactions therefore balance the source and the prescribed
@@ -1526,7 +1527,7 @@ for each boundary facet carrying natural data:
     for each facet quadrature point:
         evaluate the restricted basis functions and facet Jacobian
         evaluate the prescribed flux or traction
-        add the negative normal-flux contribution to F^facet
+        add the positive natural-boundary load contribution to F^facet
 
     scatter-add F^facet into F
 
@@ -1591,13 +1592,13 @@ $$
 u_\star(x,y)=1+x+x(1-x)\sin(\pi y).
 $$
 
-Prescribe $u=g=1+x$ on the vertical sides and the outward normal flux $q$ on
+Prescribe $u=g=1+x$ on the vertical sides and $q=\grad u\cdot\bn$ on
 the horizontal sides. Substitution gives
 
 $$
 f(x,y)=\left[2+\pi^2x(1-x)\right]\sin(\pi y),
 \qquad
-q(x,y)=\pi x(1-x).
+q(x,y)=-\pi x(1-x).
 $$ {#eq-c6-fenicsx-manufactured-data}
 
 The same expression for $q$ holds on the top and bottom edges because the
@@ -1624,7 +1625,7 @@ V = fem.functionspace(domain, ("Lagrange", 1))
 x = ufl.SpatialCoordinate(domain)
 u_exact = 1 + x[0] + x[0] * (1 - x[0]) * ufl.sin(np.pi * x[1])
 f = (2 + np.pi**2 * x[0] * (1 - x[0])) * ufl.sin(np.pi * x[1])
-q = np.pi * x[0] * (1 - x[0])
+q = -np.pi * x[0] * (1 - x[0])
 
 fdim = domain.topology.dim - 1
 vertical_facets = mesh.locate_entities_boundary(
@@ -1650,7 +1651,7 @@ u = ufl.TrialFunction(V)
 v = ufl.TestFunction(V)
 ds = ufl.Measure("ds", domain=domain, subdomain_data=facet_tags)
 a = ufl.inner(ufl.grad(u), ufl.grad(v)) * ufl.dx
-L = f * v * ufl.dx - q * v * ds(1)
+L = f * v * ufl.dx + q * v * ds(1)
 
 problem = LinearProblem(
     a,
@@ -1669,8 +1670,8 @@ if domain.comm.rank == 0:
     print(f"L2 error: {error_L2:.6e}")
 ```
 
-The boundary-facet term in `L` has a minus sign because $q=\bq\cdot\bn$ and
-$\bq=-\grad u$. The notebook
+The boundary-facet term in `L` has a plus sign because $q=\bq\cdot\bn$ and
+$\bq=\grad u$. The notebook
 [`diffusion_2d_demo.ipynb`](https://github.com/CEADpx/finite-element-methods/blob/main/notebooks/diffusion/diffusion_2d_demo.ipynb)
 contains the complete calculation, including boundary tags, plots, error
 evaluation, and a refinement loop.
@@ -1722,7 +1723,7 @@ Using the accompanying notebook:
    bilinear form, linear functional, and prescribed boundary condition in the
    code.
 2. Verify @eq-c6-fenicsx-manufactured-data by differentiating $u_\star$ and
-   evaluating $q=-\grad u_\star\cdot\bn$ on both horizontal edges.
+   evaluating $q=\grad u_\star\cdot\bn$ on both horizontal edges.
 3. Run the calculation with $(n_x,n_y)=(1,2)$, $(2,4)$, and $(4,8)$ and
    reproduce the error table above.
 4. Explain which steps of the element loop in @sec-c6-procedure are carried
@@ -2184,10 +2185,10 @@ with vertices $(2,0,0)$, $(0,1,0)$, and $(0,0,3)$.
 2. Use @eq-c6-facet-jacobian to compute the area of $\mathcal F$.
 3. Determine the outward unit normal and verify that it points away from the
    fourth vertex $(0,0,0)$.
-4. For a constant outward normal flux $q_0$ on this face, compute the three
+4. For a constant normal datum $q_0$ on this face, compute the three
    facet load entries associated with the $P_1$ basis functions of the face
-   vertices, and verify that they sum to $-q_0|\mathcal F|$. Separately
-   verify that the outward flux integral is $q_0|\mathcal F|$.
+   vertices, and verify that they sum to $q_0|\mathcal F|$. For heat conduction,
+   verify that the physical outward heat-flow integral is $-q_0|\mathcal F|$.
 :::
 
 ### Hexahedral elements {#sec-c6-hexahedron}
@@ -2282,9 +2283,9 @@ $$ {#eq-c6-facet-jacobian}
 [@belytschko2000, p. 4-44]. A facet load entry then becomes
 
 $$
--\int_{\mathcal F}q\,\phi_a^e\,\ds
+\int_{\mathcal F}q\,\phi_a^e\,\ds
 =
--\int_{\widehat{\mathcal F}}
+\int_{\widehat{\mathcal F}}
 q(\bx(\bm\zeta))\,
 \phi_a^e(\bx(\bm\zeta))\,
 \norm{\bm g_1\times\bm g_2}_2

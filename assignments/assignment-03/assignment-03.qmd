@@ -42,7 +42,7 @@ $$
 Define the diffusion-flux vector and its outward normal component by
 
 $$
-\bq=-k\grad u,
+\bq=k\grad u,
 \qquad
 q=\bq\cdot\bn.
 $$
@@ -135,8 +135,8 @@ $$
 For directional derivatives and first variations, see Chapter 2, Section
 *Directional derivatives and first variations*.
 
-Use the same coefficient functions $k$ and $c$, source $f$, outward normal
-flux $q$,
+Use the same coefficient functions $k$ and $c$, source $f$, normal datum
+$q=\bq\cdot\bn$,
 and boundary partition as in Problem 1. Now allow a prescribed value
 
 $$
@@ -167,7 +167,7 @@ k|\grad z|^2+cz^2
 \right)\,\dx
 -
 \int_{\Om}fz\,\dx
-+
+-
 \int_{\Gam_N}qz\,\ds.
 $$
 

@@ -138,10 +138,12 @@ assembly procedure is in Chapter 6.
     \[
       \begin{gathered}
         \Gam_N=\{y=0\}\cup\{y=1\},\\
-        \bq=-\nabla u,\qquad
+        \bq=\nabla u,\qquad
         q=\bq\cdot\bn\quad\text{on }\Gam_N.
       \end{gathered}
     \]
+    For heat conduction, physical heat flow is $-\bq$; positive $q$ means
+    heat enters the body.
   \end{column}
 \end{columns}
 \end{frame}
@@ -156,7 +158,7 @@ Substitution into the differential equation and boundary conditions gives
   \begin{aligned}
     f(x,y)&=\bigl[2+\pi^2x(1-x)\bigr]\sin(\pi y),\\
     g(x,y)&=1+x && \text{on }\Gam_D,\\
-    q(x,y)&=\pi x(1-x) && \text{on }\Gam_N.
+    q(x,y)&=-\pi x(1-x) && \text{on }\Gam_N.
   \end{aligned}
 \]
 Thus $u=1$ on the left edge and $u=2$ on the right edge. The prescribed
@@ -178,7 +180,7 @@ The variational problem is
   \int_\Om\nabla u\cdot\nabla v\,\dd x
   =
   \int_\Om f v\,\dd x
-  -\int_{\Gam_N}qv\,\dd s
+  +\int_{\Gam_N}qv\,\dd s
   \quad\forall v\in\mathcal V_0.
 \]
 
@@ -205,7 +207,7 @@ with entries
   K_{ij}=\int_\Om\nabla\phi_j\cdot\nabla\phi_i\,\dd x,
   \qquad
   F_i=\int_\Om f\phi_i\,\dd x
-      -\int_{\Gam_N}q\phi_i\,\dd s.
+      +\int_{\Gam_N}q\phi_i\,\dd s.
 \]
 
 In practice, the code computes element matrices $\bK^e$, element load vectors
