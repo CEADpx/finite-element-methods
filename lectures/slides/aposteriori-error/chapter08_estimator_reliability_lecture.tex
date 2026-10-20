@@ -31,12 +31,14 @@
 \newcommand{\Vzero}{\mathcal V_0}
 \newcommand{\Vhzero}{\mathcal V_{h,0}}
 \newcommand{\Qh}{\mathcal Q_h}
+\newcommand{\Ih}{\mathcal I_h}
 \newcommand{\norm}[2][]{\left\lVert#2\right\rVert_{#1}}
 \newcommand{\seminorm}[2][]{\left\lvert#2\right\rvert_{#1}}
 \newcommand{\grad}{\nabla}
 \newcommand{\divg}{\nabla\!\cdot}
 \newcommand{\bn}{\bm n}
 \newcommand{\bq}{\bm q}
+\newcommand{\bx}{\bm x}
 
 \begin{document}
 
@@ -51,47 +53,102 @@
 
 \begin{frame}{Lecture outline}
 We begin with the elementwise integration-by-parts formula obtained in the
-previous lecture.
+previous lecture. The aim is to obtain a computable bound for the energy error.
+
+\vspace{0.2cm}
 
 \begin{enumerate}
   \item Regroup element-boundary terms into interior, Neumann, and Dirichlet
   facet contributions.
-  \item Compute element and facet residuals in one and two dimensions.
-  \item Derive the mesh-size weights in the residual estimator.
-  \item Prove that the estimator gives a reliable upper bound for the energy
-  error.
+  \item Compute the residuals on a two-element 1D mesh.
+  \item Construct a local averaging operator and use its approximation
+  estimates to obtain the mesh-size weights.
+  \item Evaluate the estimator on a two-triangle mesh and prove the global
+  energy-error bound.
 \end{enumerate}
 
-The two worked examples show where the element and facet terms enter. The
-reliability proof then explains why these computable terms control the unknown
-error.
+The one-dimensional example shows the effect of element size. The
+two-dimensional example shows why facet residuals must also be included.
 \end{frame}
 
-\begin{frame}{Review: residual and Galerkin orthogonality}
-For the diffusion problem,
+\begin{frame}{Review: diffusion problem and test spaces}
+Recall the diffusion problem
 \[
-  R(u_h;v)=\ell(v)-a(u_h,v),
-  \qquad v\in\Vzero.
+\begin{aligned}
+ -\divg(k\grad u)&=f &&\text{in }\Om,\\
+ u&=0 &&\text{on }\GamD,\\
+ k\grad u\cdot\bn&=q &&\text{on }\GamN,
+\end{aligned}
 \]
-If $e=u-u_h$, then the continuous equation gives
+Here $q$ is the \textbf{prescribed normal flux} on $\GamN$, and $\bn$ is the
+outward unit normal:
 \[
-  R(u_h;v)=a(e,v),
-  \qquad
-  \norm[a]{e}^2=R(u_h;e).
+ \bq=k\grad u,\qquad q=\bq\cdot\bn=k\grad u\cdot\bn.
 \]
-The finite element equation gives
+The test spaces are
 \[
-  R(u_h;v_h)=0
-  \qquad\forall v_h\in\Vhzero.
+ \Vzero=\{v\in H^1(\Om):v=0\text{ on }\GamD\},
+ \qquad \Vhzero\subset\Vzero.
 \]
-Thus the residual measures the part of the continuous problem not tested by
-the discrete space. Galerkin orthogonality will later allow us to replace an
-unknown test function by its finite element approximation error.
+Here $\Vhzero$ is the continuous Lagrange space with zero values on $\GamD$.
+Assume $|\GamD|>0$ and $0<k_0\leq k\leq k_1$ throughout.
+\end{frame}
+
+\begin{frame}{Review: variational forms and energy norm}
+For $f\in L^2(\Om)$ and $q\in L^2(\GamN)$, define
+\[
+ a(w,v)=\int_\Om k\grad w\cdot\grad v\,\dd x,
+ \qquad
+ \ell(v)=\int_\Om fv\,\dd x+\int_{\GamN}qv\,\dd s.
+\]
+The continuous and discrete equations are
+\[
+ a(u,v)=\ell(v)\quad\forall v\in\Vzero,
+ \qquad
+ a(u_h,v_h)=\ell(v_h)\quad\forall v_h\in\Vhzero.
+\]
+Since $a$ is symmetric and coercive on $\Vzero$, its energy norm is
+\[
+ \norm[a]{v}=\sqrt{a(v,v)}
+ =\left(\int_\Om k|\grad v|^2\,\dd x\right)^{1/2}.
+\]
+The same $a$ and $\ell$ define both problems. The test space changes from
+$\Vzero$ to its finite element subspace $\Vhzero$.
+\end{frame}
+
+\begin{frame}{Review: residual and energy error}
+Since $u,u_h\in\Vzero$, the error $e=u-u_h$ also belongs to $\Vzero$.
+For any $v\in\Vzero$, the continuous equation gives $\ell(v)=a(u,v)$.
+Starting from the definition of the residual,
+\[
+\begin{aligned}
+ R(u_h;v)
+ &=\ell(v)-a(u_h,v)\\
+ &=a(u,v)-a(u_h,v) &&\text{(continuous equation)}\\
+ &=a(u-u_h,v)=a(e,v) &&\text{(bilinearity)}.
+\end{aligned}
+\]
+We may take $v=e$ because $e\in\Vzero$. This gives
+\[
+ \boxed{R(u_h;e)=a(e,e)=\norm[a]{e}^2.}
+\]
+The last equality uses the definition $\norm[a]{e}=\sqrt{a(e,e)}$.
+Thus testing the residual with the error gives the squared energy error.
 \end{frame}
 
 \begin{frame}{Review: integration by parts on each element}
-The previous lecture stopped after applying Green's formula separately on
-every element:
+Start with the product rule on $\mathcal K_e$:
+\[
+ \divg(vk\grad u_h)
+ =k\grad u_h\cdot\grad v+v\divg(k\grad u_h).
+\]
+Integrate over $\mathcal K_e$ and apply the divergence theorem:
+\[
+ \int_{\partial\mathcal K_e}v(k\grad u_h\cdot\bn_e)\,\dd s
+ =\int_{\mathcal K_e}k\grad u_h\cdot\grad v\,\dd x
+  +\int_{\mathcal K_e}v\divg(k\grad u_h)\,\dd x.
+\]
+Rearrange to isolate the first volume integral:
 \[
 \begin{aligned}
  \int_{\mathcal K_e}k\grad u_h\cdot\grad v\,\dd x
@@ -100,16 +157,31 @@ every element:
  (k\grad u_h\cdot\bn_e)v\,\dd s.
 \end{aligned}
 \]
-The first term measures the balance defect inside $\mathcal K_e$. The second
-term lies on the element boundary.
-
-\vspace{0.2cm}
-The next step is to sum over all elements and determine what the boundary
-terms become on each class of facet.
+Here $\bn_e$ is the outward unit normal of $\mathcal K_e$.
 \end{frame}
 
-\begin{frame}{After summing, every element boundary must be classified}
-Substituting the elementwise identity into the residual gives
+\begin{frame}{Expanding the residual before integration by parts}
+Start from $R(u_h;v)=\ell(v)-a(u_h,v)$. Substitute the definitions of
+$\ell$ and $a$:
+\[
+ R(u_h;v)=\int_\Om fv\,\dd x+\int_{\GamN}qv\,\dd s
+          -\int_\Om k\grad u_h\cdot\grad v\,\dd x.
+\]
+The elements partition $\Om$, so each volume integral is a sum of element
+integrals:
+\[
+\begin{aligned}
+ R(u_h;v)={}&\sum_e\int_{\mathcal K_e}fv\,\dd x
+       +\int_{\GamN}qv\,\dd s\\
+ &-\sum_e\int_{\mathcal K_e}k\grad u_h\cdot\grad v\,\dd x.
+\end{aligned}
+\]
+Apply the preceding Green's formula to each integral in the second line.
+The minus sign in front of this sum changes both signs in that formula.
+\end{frame}
+
+\begin{frame}{Element and boundary contributions to the residual}
+In the last line of the preceding slide, substitute Green's formula:
 \[
 \begin{aligned}
 R(u_h;v)={}&
@@ -130,45 +202,69 @@ The first line is already separated by element. In the second line:
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Interior facet: the two outward normals have opposite signs}
+\begin{frame}{Interior facets: combining the two boundary terms}
 Let $\mathcal F=\partial\mathcal K^+\cap\partial\mathcal K^-$. The outward
 normals are $\bn_{\mathcal F}$ for $\mathcal K^+$ and
 $-\bn_{\mathcal F}$ for $\mathcal K^-$. The two boundary terms are
 \[
 \begin{aligned}
 &-\int_{\mathcal F}
-  k\grad u_h^+\cdot\bn_{\mathcal F}\,v\,\dd s
+  k^+\grad u_h^+\cdot\bn_{\mathcal F}\,v\,\dd s
 -\int_{\mathcal F}
-  k\grad u_h^-\cdot(-\bn_{\mathcal F})\,v\,\dd s\\
+  k^-\grad u_h^-\cdot(-\bn_{\mathcal F})\,v\,\dd s\\
 &\qquad=-\int_{\mathcal F}
-  \bigl(k\grad u_h^+-k\grad u_h^-\bigr)
+  \bigl(k^+\grad u_h^+-k^-\grad u_h^-\bigr)
   \cdot\bn_{\mathcal F}\,v\,\dd s.
 \end{aligned}
 \]
-Because $v\in H^1(\Om)$ has the same boundary value on the shared facet when
-approached from either conforming element, the same $v$ appears in both terms.
-The coefficient of $v$ in the resulting facet integral is the negative
-normal-flux jump. Define the interior-facet residual by
+The superscripts identify values from the two elements. The same $v$ appears
+in both terms because its values match across the shared facet. Define
 \[
   j_{\mathcal F}
-  =-[\![k\grad u_h\cdot\bn_{\mathcal F}]\!]_{\mathcal F}.
+  =-\bigl(k^+\grad u_h^+-k^-\grad u_h^-\bigr)\cdot\bn_{\mathcal F}.
 \]
+If the element labels are exchanged, the new normal is
+$-\bn_{\mathcal F}$. The new residual is
+\[
+ -(k^-\grad u_h^--k^+\grad u_h^+)\cdot(-\bn_{\mathcal F})
+ =j_{\mathcal F}.
+\]
+The flux difference and the normal both change sign, so their dot product
+is unchanged.
 \end{frame}
 
-\begin{frame}{Boundary facets and the complete residual representation}
-Define the computed vector flux element by element:
+\begin{frame}{Boundary facets: Neumann mismatch and Dirichlet values}
+On a Neumann facet, combine the two boundary terms from the residual:
 \[
-  \bq_h=k\grad u_h.
+ -\int_{\mathcal F}(k\grad u_h\cdot\bn)v\,\dd s
+ +\int_{\mathcal F}qv\,\dd s
+ =\int_{\mathcal F}(q-k\grad u_h\cdot\bn)v\,\dd s.
 \]
-On a Neumann facet, the element-boundary term and prescribed-flux term give
+The Neumann-facet residual is therefore
 \[
   j_{\mathcal F}
-  =q-k\grad u_h\cdot\bn
-  =q-\bq_h\cdot\bn.
+  =\underbrace{q}_{\text{prescribed}}
+   -\underbrace{k\grad u_h\cdot\bn}_{\text{computed}}.
 \]
-On a Dirichlet facet, $v=0$. Define
+On a Dirichlet facet, the test function satisfies $v=0$, so
 \[
-  r_e=f+\divg(k\grad u_h)=f+\divg\bq_h.
+ -\int_{\mathcal F}(k\grad u_h\cdot\bn)v\,\dd s=0.
+\]
+There is no Dirichlet-facet term in the residual representation.
+\end{frame}
+
+\begin{frame}{Complete element-and-facet residual representation}
+Let $\Fh^{\mathrm{int}}$ denote interior facets and $\Fh^N$ boundary facets
+on $\GamN$. The residuals are
+\[
+  r_e=f+\divg(k\grad u_h)\quad\text{on }\mathcal K_e.
+\]
+\[
+j_{\mathcal F}=\begin{cases}
+ -(k^+\grad u_h^+-k^-\grad u_h^-)\cdot\bn_{\mathcal F},
+   &\mathcal F\in\Fh^{\mathrm{int}},\\[3pt]
+ q-k\grad u_h\cdot\bn, &\mathcal F\in\Fh^N.
+\end{cases}
 \]
 The residual is therefore
 \[
@@ -178,7 +274,7 @@ R(u_h;v)=
 +\sum_{\mathcal F\in\Fh^{\mathrm{int}}\cup\Fh^N}
 \int_{\mathcal F}j_{\mathcal F}v\,\dd s.}
 \]
-This is an exact identity, not an estimate.
+Each interior facet appears once in this exact identity.
 \end{frame}
 
 \begin{frame}{What the two residuals measure}
@@ -187,11 +283,11 @@ This is an exact identity, not an estimate.
   box/.style={draw,rounded corners=2pt,align=center,text width=4.9cm,
     minimum height=1.35cm,inner sep=5pt}]
   \node[box,fill=blue!6] (element) {\textbf{Element residual}\\
-    $r_e=f+\divg\bq_h$\\
+    $r_e=f+\divg(k\grad u_h)$\\
     balance defect inside $\mathcal K_e$};
   \node[box,fill=orange!9,right=0.6cm of element] (facet) {\textbf{Facet residual}\\
     $j_{\mathcal F}$\\
-    normal-flux jump or Neumann mismatch};
+    flux jump or mismatch};
 \end{tikzpicture}
 \end{center}
 
@@ -205,14 +301,13 @@ The element residual then reduces to the prescribed source. The
 computed-gradient information is contained in the facet residuals.
 \end{frame}
 
-\begin{frame}{Nonuniform 1D example: compute the residuals}
+\begin{frame}{Nonuniform 1D example: mesh and computed solution}
+Consider the problem
 \[
-  -u''=1\ \text{in }(0,1),
-  \qquad u(0)=0,
-  \qquad u'(1)=0,
-  \qquad
-  (U_1,U_2,U_3)=\left(0,\frac5{18},\frac12\right).
+ -u''=1\quad\text{on }(0,1),\qquad u(0)=0,\qquad u'(1)=0.
 \]
+Here $k=1$, $f=1$, and $q=0$ at $x=1$. Take the computed nodal values
+$U_1=0$, $U_2=5/18$, and $U_3=1/2$ as given.
 \begin{center}
 \begin{tikzpicture}[x=8.0cm,y=1cm]
   \draw[thick] (0,0)--(1,0);
@@ -230,48 +325,39 @@ computed-gradient information is contained in the facet residuals.
 \end{tikzpicture}
 \end{center}
 \[
-  u_h'|_{\mathcal K_1}=\frac56,
+  u_h'|_{\mathcal K_1}=\frac{U_2-U_1}{h_1}
+       =\frac{5/18-0}{1/3}=\frac56,
   \qquad
-  u_h'|_{\mathcal K_2}=\frac13,
-  \qquad r_1=r_2=1.
+  u_h'|_{\mathcal K_2}=\frac{U_3-U_2}{h_2}
+       =\frac{1/2-5/18}{2/3}=\frac13.
 \]
-In one dimension the facets are nodes. Thus
-$j_2=1/3-5/6=-1/2$ and $j_3=0-1/3=-1/3$.
+Since $u_h''=0$ inside each element,
+$r_1=r_2=f+u_h''=1$. The remaining residuals are at the nodes.
 \end{frame}
 
-\begin{frame}{What the 1D example shows}
-For every test function $v$ with $v(0)=0$,
+\begin{frame}{The 1D residual includes nodal facet terms}
+In one dimension, facet integrals become evaluations at nodes.
+At $x_2$, the outward normals are $n_1=+1$ from $\mathcal K_1$ and
+$n_2=-1$ from $\mathcal K_2$. Substitute the computed slopes into
 \[
-  R(u_h;v)
-  =\int_{\mathcal K_1}v\,\dd x
-   +\int_{\mathcal K_2}v\,\dd x
-   -\frac12v(x_2)-\frac13v(x_3).
+ j_2=-\bigl(u_h'|_{\mathcal K_1}n_1+u_h'|_{\mathcal K_2}n_2\bigr)
+ =-\left(\frac56(+1)+\frac13(-1)\right)=-\frac12.
 \]
-The residual therefore contains both the element terms and the two facet
-terms.
-
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.49\textwidth}
-\textbf{Effect of element size.}
+At $x_3=1$, the prescribed normal datum is $q=0$, so
 \[
- h_e^2\norm[L^2(\mathcal K_e)]{r_e}^2=h_e^3,
- \qquad
- \norm[a,\mathcal K_e]{u-u_h}^2=\frac{h_e^3}{12}.
+ j_3=q-u_h'(1)\,(+1)=0-\frac13=-\frac13.
 \]
-Because $h_2=2h_1$, $\mathcal K_2$ contributes eight times as much to both
-squared quantities.
-\end{column}
-\begin{column}{0.48\textwidth}
-\textbf{Special feature of 1D.}
-For $w=e-\mathcal I_h e$,
+Substitute $r_1=r_2=1$, $j_2=-1/2$, and $j_3=-1/3$ into the residual
+representation:
 \[
-  w(x_i)=0
+\begin{aligned}
+  R(u_h;v)&=\sum_{e=1}^2\int_{\mathcal K_e}r_ev\,\dd x
+               +j_2v(x_2)+j_3v(x_3)\\
+  &=\int_{\mathcal K_1}v\,\dd x+\int_{\mathcal K_2}v\,\dd x
+       -\frac12v(x_2)-\frac13v(x_3).
+\end{aligned}
 \]
-at every node. Thus the point-facet terms vanish from the 1D reliability
-proof even though $j_2$ and $j_3$ are nonzero. For $d\geq2$, the facet terms
-remain in the estimator.
-\end{column}
-\end{columns}
+Here $v\in H^1(0,1)$ and $v(0)=0$, so there is no term at $x_1=0$.
 \end{frame}
 
 \section{Residual estimator}
@@ -285,132 +371,324 @@ remain in the estimator.
   \vfill
 \end{frame}
 
-\begin{frame}{What are we trying to construct?}
-A \textbf{local error indicator} $\eta_e$ is a computable number associated
-with element $\mathcal K_e$. The indicators are used to rank elements when
-selecting where the mesh should be refined.
-The \textbf{global estimator} is
-\[
-  \eta=\left(\sum_e\eta_e^2\right)^{1/2}.
-\]
-The desired result is a \textbf{reliability bound}
-\[
-  \boxed{\norm[a]{u-u_h}\leq C_{\mathrm{rel}}\eta,}
-\]
-where $C_{\mathrm{rel}}$ is independent of the mesh size.
-
-The residuals $r_e$ and $j_{\mathcal F}$ are computable, but the correct
-powers of $h_e$ and $h_{\mathcal F}$ have not yet been established. The
-derivation determines those powers.
-\end{frame}
-
-\begin{frame}{Why the exact residual identity is not computable}
-Let $e=u-u_h$. Taking $v=e$ in the exact residual representation gives
+\begin{frame}{The unknown error in the residual identity}
+Combining $R(u_h;e)=\norm[a]{e}^2$ with the residual representation gives
 \[
   \norm[a]{e}^2
-  =\sum_e\int_{\mathcal K_e}r_e e\,\dd x
+  =R(u_h;e)
+  =\sum_{e'}\int_{\mathcal K_{e'}}r_{e'} e\,\dd x
   +\sum_{\mathcal F\in\Fh^{\mathrm{int}}\cup\Fh^N}
    \int_{\mathcal F}j_{\mathcal F}e\,\dd s.
 \]
-The residuals are known, but $e$ is not. For example,
+Here $e'$ indexes elements, while $e$ is the error function. All residuals
+are known, but $e$ is not. By Cauchy--Schwarz,
 \[
-  \left|\int_{\mathcal K_e}r_e e\,\dd x\right|
-  \leq \norm[L^2(\mathcal K_e)]{r_e}
-        \norm[L^2(\mathcal K_e)]{e}
+  \left|\int_{\mathcal K_{e'}}r_{e'} e\,\dd x\right|
+  \leq \norm[L^2(\mathcal K_{e'})]{r_{e'}}
+        \norm[L^2(\mathcal K_{e'})]{e}
 \]
-still contains the unknown local error norm. It also supplies no factor of
-$h_e$. We need to replace $e$ by a locally small function without changing
-the value of the residual functional.
+which still contains the unknown local error norm.
+
+The goal is a bound $\norm[a]{e}\leq C_{\mathrm{rel}}\eta$, where $\eta$
+uses only $u_h$, the data, and the mesh. A finite element approximation of
+$e$ will let us introduce the local mesh sizes into this bound.
 \end{frame}
 
-\begin{frame}{The quasi-interpolant $\Qh$}
-The error $e$ is known only to belong to $H^1(\Om)$. In two and three
-dimensions, such a function need not have nodal point values, so the nodal
-interpolant cannot be applied to $e$.
+\begin{frame}{Testing the residual with the error}
+Both $u$ and $u_h$ satisfy the same zero Dirichlet condition. Hence
+$e=u-u_h\in\Vzero$ is an admissible test function.
 
-A \textbf{quasi-interpolation operator}
-\[
-  \Qh:\Vzero\longrightarrow\Vhzero
-\]
-constructs a finite element function from local averages rather than nodal
-values. We use it only in the proof; $e$ and $\Qh e$ are not computed when
-the estimator is evaluated.
-
-For an element $\mathcal K_e$, let $\omega_e$ be the union of the elements
-sharing a vertex with $\mathcal K_e$. For a facet $\mathcal F$, define
-$\omega_{\mathcal F}$ similarly. These neighborhoods are called
-\textbf{patches}.
-\end{frame}
-
-\begin{frame}{Step 1: use Galerkin orthogonality}
-For every $v_h\in\Vhzero$, the finite element equations give
-\[
-  R(u_h;v_h)=0.
-\]
-Hence, for any $v\in\Vzero$ and any $v_h\in\Vhzero$,
-\[
-  R(u_h;v)=R(u_h;v-v_h).
-\]
-Choose $v_h=\Qh v$, using the quasi-interpolant defined on the preceding
-slide. With $v=e$, define
-\[
-  w=e-\Qh e.
-\]
-Then
-\[
-  \boxed{\norm[a]{e}^2=R(u_h;e)=R(u_h;w).}
-\]
-The residual now acts on an approximation error $w$, whose local size can be
-bounded by the local mesh size.
-\end{frame}
-
-\begin{frame}{Step 2: local approximation supplies the mesh sizes}
-Let
-\[
-  h_e=\operatorname{diam}(\mathcal K_e),
-  \qquad h_{\mathcal F}=\operatorname{diam}(\mathcal F).
-\]
-For $d\geq2$, a standard quasi-interpolant satisfies
+Take $v=e$ in the continuous equation $a(u,v)=\ell(v)$, giving
+$\ell(e)=a(u,e)$. Starting from the residual definition,
 \[
 \begin{aligned}
-  \norm[L^2(\mathcal K_e)]{e-\Qh e}
-  &\leq C_Q h_e\seminorm[H^1(\omega_e)]{e},\\
-  \norm[L^2(\mathcal F)]{e-\Qh e}
-  &\leq C_Q\,h_{\mathcal F}^{1/2}
-  \seminorm[H^1(\omega_{\mathcal F})]{e}.
+ R(u_h;e)&=\ell(e)-a(u_h,e)
+   &&\text{(definition of the residual)}\\[3pt]
+ &=a(u,e)-a(u_h,e)
+   &&\text{(continuous equation, $v=e$)}\\[3pt]
+ &=a(u-u_h,e)
+   &&\text{(bilinearity in the first argument)}\\[3pt]
+ &=a(e,e)
+   &&\text{($e=u-u_h$)}\\[3pt]
+ &=\norm[a]{e}^2
+   &&\text{(definition of the energy norm)}.
 \end{aligned}
 \]
-The constant $C_Q$ depends on mesh shape regularity, but not on the mesh
-size. The first estimate supplies one power of $h_e$; the scaled trace
-estimate on a facet supplies one half power of $h_{\mathcal F}$.
+\end{frame}
 
-In one dimension, facets are points and are treated separately, as in the
-preceding example.
+\begin{frame}{Subtracting a finite element function}
+The preceding calculation gives $R(u_h;e)=\norm[a]{e}^2$.
+The discrete equation is $a(u_h,v_h)=\ell(v_h)$ for every
+$v_h\in\Vhzero$. It gives the separate identity
+\[
+ R(u_h;v_h)=\ell(v_h)-a(u_h,v_h)=\ell(v_h)-\ell(v_h)=0.
+\]
+Now use linearity of the residual in its test function:
+\[
+\begin{aligned}
+ R(u_h;e-v_h)
+ &=R(u_h;e)-\underbrace{R(u_h;v_h)}_{0}\\
+ &=R(u_h;e)=\norm[a]{e}^2.
+\end{aligned}
+\]
+We can choose $v_h$ to approximate $e$ without changing the residual value.
+\end{frame}
+
+\begin{frame}{An approximation that does not need nodal values}
+For a continuous function $v$, the nodal interpolant from Chapter 7 is
+\[
+ \Ih v=\sum_i v(\bx_i)\phi_i.
+\]
+But $e=u-u_h$ is known only to belong to $H^1(\Om)$. In two and three
+dimensions, an $H^1$ function need not have well-defined point values
+$e(\bx_i)$.
+
+A local average is well defined even when a point value is not. We will
+replace $v(\bx_i)$ by an average over the elements meeting at $\bx_i$.
+
+This defines a \textbf{quasi-interpolation operator} $\Qh$. Its output is
+a continuous finite element function, so it can serve as $v_h$ in the
+subtraction identity.
+\end{frame}
+
+\begin{frame}{A vertex patch}
+A \textbf{vertex patch} $\omega_i$ contains all elements meeting at the
+vertex $\bx_i$:
+\[
+ \omega_i=\bigcup_{\mathcal K_e:\,\bx_i\in\overline{\mathcal K_e}}
+                 \overline{\mathcal K_e}.
+\]
+\begin{columns}[c,onlytextwidth]
+\begin{column}{0.43\textwidth}
+\centering
+\begin{tikzpicture}[x=0.82cm,y=0.82cm]
+ \fill[blue!18] (1,1)--(2,1)--(3,2)--(3,3)--(2,3)--(1,2)--cycle;
+ \draw[gray!65,step=1] (0,0) grid (4,4);
+ \foreach \i in {0,...,3}{\foreach \j in {0,...,3}{
+   \draw[gray!65] (\i,\j)--(\i+1,\j+1);
+ }}
+ \draw[very thick,blue!70!black]
+  (1,1)--(2,1)--(3,2)--(3,3)--(2,3)--(1,2)--cycle;
+ \fill[red!75!black] (2,2) circle (2.5pt);
+ \node[above left=3pt,fill=white,fill opacity=0.86,text opacity=1,
+       inner sep=1.5pt] at (2,2) {$\bx_i$};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.53\textwidth}
+The six blue triangles form $\omega_i$ in this mesh.
+
+The nodal basis function $\phi_i$ is nonzero only on these elements, so
+\[
+ \operatorname{supp}\phi_i=\omega_i.
+\]
+The average used for coefficient $i$ will use $v$ on this blue region.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The Cl\'{e}ment averaging construction}
+For $P_1$ elements, replace the nodal value by the \textbf{patch average}
+\[
+ c_i(v)=\frac{1}{|\omega_i|}\int_{\omega_i}v\,\dd x,
+ \qquad \bx_i\notin\overline{\GamD}.
+\]
+Here $|\omega_i|$ is the area or volume of the patch. Set $c_i(v)=0$ at
+Dirichlet vertices. With $N_n$ mesh vertices, form
+\[
+ \boxed{\Qh v=\sum_{i=1}^{N_n}c_i(v)\phi_i.}
+\]
+The shared nodal coefficients make $\Qh v$ continuous. On a Dirichlet
+facet, all vertex coefficients are zero, so the linear function is zero
+on the whole facet. Thus $\Qh v\in\Vhzero$ for $v\in\Vzero$.
+
+\vspace{0.15cm}
+{\footnotesize Averaging version: Sch\"oberl, \S4.3, Definition 74, p.~64.}
+\end{frame}
+
+\begin{frame}{A concrete quasi-interpolant}
+Take $\Om=(-1,1)^2$, $\GamD=\partial\Om$, and
+$v(x_1,x_2)=(1-x_1^2)(1-x_2^2)$. This function is zero on the boundary.
+
+\begin{columns}[c,onlytextwidth]
+\begin{column}{0.35\textwidth}
+\centering
+\begin{tikzpicture}[x=1.05cm,y=1.05cm]
+ \fill[blue!12] (-1,-1) rectangle (1,1);
+ \draw[thick] (-1,-1) rectangle (1,1);
+ \foreach \x/\y in {-1/-1,1/-1,1/1,-1/1}{
+  \draw (0,0)--(\x,\y);
+  \fill (\x,\y) circle (1.4pt);
+ }
+ \fill[red!75!black] (0,0) circle (2.1pt);
+\end{tikzpicture}
+
+$\bx_1=(0,0)$
+
+$\omega_1=\overline\Om$
+\end{column}
+\begin{column}{0.61\textwidth}
+The only free vertex is $\bx_1$, with $|\omega_1|=4$. First evaluate
+\[
+ \int_{-1}^1(1-t^2)\,\dd t
+ =\left[t-\frac{t^3}{3}\right]_{-1}^1=\frac43.
+\]
+The product form of $v$ lets us factor the double integral.
+All boundary coefficients are zero.
+\end{column}
+\end{columns}
+\[
+\begin{aligned}
+ c_1(v)&=\frac14\int_{-1}^{1}\int_{-1}^{1}
+ (1-x_1^2)(1-x_2^2)\,\dd x_1\,\dd x_2\\
+ &=\frac14\left(\int_{-1}^1(1-t^2)\,\dd t\right)^2
+ =\frac14\left(\frac43\right)^2=\frac49.
+\end{aligned}
+\]
+Thus $\Qh v=\frac49\phi_1$, whereas $\Ih v=\phi_1$ since $v(0,0)=1$.
+\end{frame}
+
+\begin{frame}{The patches in the local estimates}
+An \textbf{element patch} $\omega_e$ contains all elements sharing a vertex
+with $\mathcal K_e$. A \textbf{facet patch} $\omega_{\mathcal F}$ contains
+all elements sharing a vertex with $\mathcal F$.
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\centering
+\begin{tikzpicture}[x=0.72cm,y=0.72cm]
+ \foreach \a/\b in {1/1,2/1,2/2}{
+  \fill[blue!18,shift={(\a,\b)}]
+   (-1,-1)--(0,-1)--(1,0)--(1,1)--(0,1)--(-1,0)--cycle;
+ }
+ \draw[gray!65,step=1] (0,0) grid (4,4);
+ \foreach \i in {0,...,3}{\foreach \j in {0,...,3}{
+   \draw[gray!65] (\i,\j)--(\i+1,\j+1);
+ }}
+ \filldraw[fill=blue!45,draw=blue!80!black,very thick]
+  (1,1)--(2,1)--(2,2)--cycle;
+\end{tikzpicture}
+
+Dark triangle: $\mathcal K_e$
+
+Blue region: $\omega_e$
+\end{column}
+\begin{column}{0.48\textwidth}
+\centering
+\begin{tikzpicture}[x=0.72cm,y=0.72cm]
+ \foreach \a/\b in {1/1,2/2}{
+  \fill[blue!18,shift={(\a,\b)}]
+   (-1,-1)--(0,-1)--(1,0)--(1,1)--(0,1)--(-1,0)--cycle;
+ }
+ \draw[gray!65,step=1] (0,0) grid (4,4);
+ \foreach \i in {0,...,3}{\foreach \j in {0,...,3}{
+   \draw[gray!65] (\i,\j)--(\i+1,\j+1);
+ }}
+ \draw[red!75!black,line width=2pt] (1,1)--(2,2);
+ \fill[red!75!black] (1,1) circle (2pt);
+ \fill[red!75!black] (2,2) circle (2pt);
+\end{tikzpicture}
+
+Red edge: $\mathcal F$
+
+Blue region: $\omega_{\mathcal F}$
+\end{column}
+\end{columns}
+\vspace{0.12cm}
+These neighborhoods appear because each coefficient of $\Qh v$ uses a
+vertex patch, rather than a value on one element alone.
+\end{frame}
+
+\begin{frame}{Assumptions for the residual error bound}
+The estimates below use the following setting, as in Chapter 8.
+\begin{itemize}
+ \item The mesh consists of affine triangles or tetrahedra. It is
+ conforming, boundary fitted, and shape regular. The geometric constants
+ then stay bounded as the mesh is refined.
+ \item The finite element space is the continuous Lagrange space of fixed
+ degree $p\geq1$. In particular, it contains the piecewise-linear
+ approximation $\Qh v$.
+ \item The coefficient satisfies
+ $k|_{\mathcal K_e}\in C^1(\overline{\mathcal K_e})$.
+ It may jump between elements. The element divergence and facet fluxes
+ can therefore be evaluated separately on each element.
+ \item The discrete equations are solved exactly, and the forms are
+ evaluated exactly. These assumptions give $R(u_h;v_h)=0$ for all
+ $v_h\in\Vhzero$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Local approximation estimates for $\Qh$}
+For a shape-regular mesh in $d=2$ or $3$, use the following standard
+quasi-interpolation estimates for $v\in\Vzero$:
+\[
+\boxed{\begin{aligned}
+ \norm[L^2(\mathcal K_e)]{v-\Qh v}
+ &\leq C_Q h_e\seminorm[H^1(\omega_e)]{v},\\[3pt]
+ \norm[L^2(\mathcal F)]{v-\Qh v}
+ &\leq C_Q h_{\mathcal F}^{1/2}
+              \seminorm[H^1(\omega_{\mathcal F})]{v}.
+\end{aligned}}
+\]
+Here $h_e=\operatorname{diam}(\mathcal K_e)$,
+$h_{\mathcal F}=\operatorname{diam}(\mathcal F)$, and
+\[
+ \seminorm[H^1(\omega)]{v}
+ =\left(\int_\omega|\grad v|^2\,\dd x\right)^{1/2}.
+\]
+The constant $C_Q$ does not depend on mesh size. We use these estimates
+without proving them. They are Hypothesis (Q) in Chapter 8.
+
+\vspace{0.12cm}
+{\footnotesize Sch\"oberl, \S4.3, Theorem 75, p.~65. The element and facet
+powers are $h_e$ and $h_{\mathcal F}^{1/2}$, respectively.}
+\end{frame}
+
+\begin{frame}{Applying the subtraction identity to the error}
+The operator gives $\Qh e\in\Vhzero$. Set $v_h=\Qh e$ in
+the subtraction identity:
+\[
+\begin{aligned}
+ \norm[a]{e}^2
+ &=R(u_h;e)\\
+ &=R(u_h;e)-\underbrace{R(u_h;\Qh e)}_{0}\\
+ &=R(u_h;e-\Qh e).
+\end{aligned}
+\]
+Write $w=e-\Qh e\in\Vzero$. Substituting this particular test function into the
+element-and-facet residual representation gives
+\[
+ \boxed{\norm[a]{e}^2
+ =\sum_{e'}\int_{\mathcal K_{e'}}r_{e'}w\,\dd x
+ +\sum_{\mathcal F\in\Fh^{\mathrm{int}}\cup\Fh^N}
+            \int_{\mathcal F}j_{\mathcal F}w\,\dd s.}
+\]
+Neither $e$ nor $\Qh e$ is computed when evaluating the estimator.
 \end{frame}
 
 \begin{frame}{The element term produces the weight $h_e$}
-Recall $w=e-\Qh e$. For one element,
+Recall $w=e-\Qh e$. For one element $\mathcal K_{e'}$,
 \[
 \begin{aligned}
-\left|\int_{\mathcal K_e}r_e w\,\dd x\right|
+\left|\int_{\mathcal K_{e'}}r_{e'} w\,\dd x\right|
 &\leq
-\norm[L^2(\mathcal K_e)]{r_e}
-\norm[L^2(\mathcal K_e)]{w}\\
+\norm[L^2(\mathcal K_{e'})]{r_{e'}}
+\norm[L^2(\mathcal K_{e'})]{w}\\[4pt]
 &\leq
 C_Q\,
-\underbrace{h_e\norm[L^2(\mathcal K_e)]{r_e}}_{
+\underbrace{h_{e'}\norm[L^2(\mathcal K_{e'})]{r_{e'}}}_{
 \text{computable weighted element residual}}
-\seminorm[H^1(\omega_e)]{e}.
+\seminorm[H^1(\omega_{e'})]{e}.
 \end{aligned}
 \]
-The first inequality is Cauchy--Schwarz on $\mathcal K_e$. The second uses
-the element approximation estimate for $\Qh$.
+Use Cauchy--Schwarz on $\mathcal K_{e'}$, then the element estimate with
+$v=e$, for which $v-\Qh v=w$.
 
-After squaring, this weighted residual contributes
+The square of the computable factor is
 \[
-  h_e^2\norm[L^2(\mathcal K_e)]{r_e}^2
+  \left(h_{e'}\norm[L^2(\mathcal K_{e'})]{r_{e'}}\right)^2
+  =h_{e'}^2\norm[L^2(\mathcal K_{e'})]{r_{e'}}^2.
 \]
-to the estimator.
+This is the element contribution used in the estimator.
 \end{frame}
 
 \begin{frame}{The facet term produces the weight $h_{\mathcal F}^{1/2}$}
@@ -428,22 +706,24 @@ For one interior or Neumann facet,
 \seminorm[H^1(\omega_{\mathcal F})]{e}.
 \end{aligned}
 \]
-The first inequality is Cauchy--Schwarz on $\mathcal F$. The second uses the
-facet approximation estimate for $\Qh$.
+Use Cauchy--Schwarz on $\mathcal F$, then the facet estimate with $v=e$,
+for which $v-\Qh v=w$.
 
-After squaring, this weighted residual contributes
+The square of the computable factor is
 \[
-  h_{\mathcal F}\norm[L^2(\mathcal F)]{j_{\mathcal F}}^2
+  \left(h_{\mathcal F}^{1/2}\norm[L^2(\mathcal F)]{j_{\mathcal F}}\right)^2
+  =h_{\mathcal F}\norm[L^2(\mathcal F)]{j_{\mathcal F}}^2.
 \]
-to the estimator. The facet term is part of the estimator; it is not optional.
+This is the facet contribution used in the estimator.
 \end{frame}
 
-\begin{frame}{Step 3: define the global residual estimator}
+\begin{frame}{The global residual estimator}
 Let
 \[
   \Fh^\ast=\Fh^{\mathrm{int}}\cup\Fh^N.
 \]
-The preceding two bounds identify the \textbf{global residual estimator}
+For $d=2$ or $3$, define the \textbf{global residual estimator} by collecting
+the squared computable factors from the two bounds:
 \[
 \boxed{
   \eta^2=
@@ -453,12 +733,11 @@ The preceding two bounds identify the \textbf{global residual estimator}
 \]
 Every quantity in $\eta$ is computable from the mesh, the data, and $u_h$.
 
-This is a definition. It becomes an error estimator only after a bound is
-proved that compares it with the unknown error.
+The reliability proof will compare $\eta$ with the unknown energy error.
 \end{frame}
 
 \begin{frame}{Local indicators distribute the global estimator}
-For each element $\mathcal K_e$, define
+For each element $\mathcal K_e$, define the \textbf{local error indicator} by
 \[
 \boxed{
 \begin{aligned}
@@ -472,20 +751,20 @@ h_{\mathcal F}\norm[L^2(\mathcal F)]{j_{\mathcal F}}^2.
 \end{aligned}
 }
 \]
-An interior facet is shared by two elements, so one half of its contribution
-is assigned to each. A Neumann facet belongs to only one element. Therefore
+On summing over elements, each interior contribution has total weight
+$1/2+1/2=1$. Each Neumann contribution is counted once. Hence
 \[
   \eta^2=\sum_e\eta_e^2.
 \]
-The value $\eta_e$ is an indicator used for marking; it is not the exact error
-on $\mathcal K_e$.
+The values $\eta_e$ help select elements for refinement. They are not exact
+local errors.
 \end{frame}
 
-\begin{frame}{Two triangles: the facet residual carries the defect}
+\begin{frame}{Two-triangle example: zero element residuals}
 \small
-Consider $-\Delta u=0$ on the square, with Dirichlet conditions on the whole
-boundary. The square is divided along its diagonal, and the nodal values of
-$u_h$ are shown below.
+Consider $-\Delta u=0$ on $\Om=(0,1)^2$, with Dirichlet values shown at
+the four vertices and varying linearly along each boundary edge. Use the
+two $P_1$ triangles shown below.
 
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.42\textwidth}
@@ -512,11 +791,12 @@ $u_h$ are shown below.
 $\displaystyle \bn_{\mathcal F}=\frac{(-1,1)}{\sqrt2}$
 \end{column}
 \begin{column}{0.55\textwidth}
-On each triangle, the $P_1$ function is determined by its three nodal values:
+All vertices lie on the boundary. The unique linear function matching
+the three nodal values on each triangle is
 \[
-  u_h^+(x,y)=x,
+  u_h^+(x_1,x_2)=x_1,
   \qquad
-  u_h^-(x,y)=y.
+  u_h^-(x_1,x_2)=x_2.
 \]
 Therefore,
 \[
@@ -528,7 +808,7 @@ Because $f=0$ and these gradients are constant,
 \[
   r_\pm=\divg(\grad u_h^\pm)=0.
 \]
-The estimator would be zero if it contained only element residuals.
+The boundary data are imposed exactly, so $e=0$ on $\partial\Om$.
 \end{column}
 \end{columns}
 \end{frame}
@@ -555,46 +835,114 @@ The diagonal has length $h_{\mathcal F}=\sqrt2$, so
 The shared-facet contribution is divided equally between its two neighboring
 elements:
 \[
-  \eta_+^2=\eta_-^2=2,
+  \eta_+^2=\eta_-^2=0+\frac12\,(4)=2,
   \qquad
   \eta^2=\eta_+^2+\eta_-^2.
 \]
 
-The computed function is continuous, but its gradient is not. The facet
-residual detects this defect; an element-residual-only estimator would miss it.
+Since $r_\pm=0$ and there are no Neumann facets, the residual formula reduces
+to $R(u_h;v)=\sqrt2\int_{\mathcal F}v\,\dd s$. For example,
+$v=x_1(1-x_1)x_2(1-x_2)$ is zero on $\partial\Om$ and positive inside
+$\mathcal F$, so $R(u_h;v)>0$. Element terms alone miss this residual.
 \end{frame}
 
-\begin{frame}{Cauchy--Schwarz combines all weighted terms}
-Substituting $w=e-\Qh e$ in the residual representation and using the two
-local bounds gives a sum of products. Cauchy--Schwarz for that finite sum
-gives
+\section{Reliability}
+
+\begin{frame}[plain]
+  \centering\vfill
+  {\LARGE\bfseries Reliability of the estimator\par}
+  \vspace{0.4cm}
+  {\large Combine the weighted residual bounds and obtain a global
+  energy-error estimate\par}
+  \vfill
+\end{frame}
+
+\begin{frame}{Combining the weighted residual bounds}
+With $w=e-\Qh e$ and $\Fh^\ast=\Fh^{\mathrm{int}}\cup\Fh^N$, start from
 \[
 \begin{aligned}
-  \norm[a]{e}^2
-\leq C_Q\eta
-\Bigg(&\sum_e\seminorm[H^1(\omega_e)]{e}^2\\
-&+\sum_{\mathcal F\in\Fh^\ast}
-\seminorm[H^1(\omega_{\mathcal F})]{e}^2\Bigg)^{1/2}.
+ \norm[a]{e}^2
+ &=\sum_{e'}\int_{\mathcal K_{e'}}r_{e'}w\,\dd x
+   +\sum_{\mathcal F\in\Fh^\ast}\int_{\mathcal F}j_{\mathcal F}w\,\dd s\\
+ &\leq\sum_{e'}\left|\int_{\mathcal K_{e'}}r_{e'}w\,\dd x\right|
+   +\sum_{\mathcal F\in\Fh^\ast}
+                  \left|\int_{\mathcal F}j_{\mathcal F}w\,\dd s\right|.
 \end{aligned}
 \]
-The first factor is the computable estimator $\eta$. The second factor still
-contains the error, but only through its $H^1$ seminorm over overlapping
-patches.
+Apply the element and facet bounds to these absolute values:
+\[
+\begin{aligned}
+ \norm[a]{e}^2\leq C_Q\Bigg[&
+ \sum_{e'} h_{e'}\norm[L^2(\mathcal K_{e'})]{r_{e'}}
+          \seminorm[H^1(\omega_{e'})]{e}\\[3pt]
+ &+\sum_{\mathcal F\in\Fh^\ast}h_{\mathcal F}^{1/2}
+ \norm[L^2(\mathcal F)]{j_{\mathcal F}}
+ \seminorm[H^1(\omega_{\mathcal F})]{e}\Bigg].
+\end{aligned}
+\]
+\end{frame}
+
+\begin{frame}{The two lists in Cauchy--Schwarz}
+For nonnegative numbers $A_i$ and $B_i$, Cauchy--Schwarz gives
+\[
+ \sum_i A_iB_i\leq
+ \left(\sum_i A_i^2\right)^{1/2}
+ \left(\sum_i B_i^2\right)^{1/2}.
+\]
+Use one combined list, with an entry for every element and every facet:
+\begin{center}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{ccc}
+\toprule
+Entry & $A_i$: weighted residual & $B_i$: patch seminorm\\
+\midrule
+Element $e'$ & $h_{e'}\norm[L^2(\mathcal K_{e'})]{r_{e'}}$
+ & $\seminorm[H^1(\omega_{e'})]{e}$\\
+Facet $\mathcal F$ & $h_{\mathcal F}^{1/2}\norm[L^2(\mathcal F)]{j_{\mathcal F}}$
+ & $\seminorm[H^1(\omega_{\mathcal F})]{e}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+The sum $\sum_i A_iB_i$ is exactly the bracket in the preceding bound.
+\end{frame}
+
+\begin{frame}{Applying Cauchy--Schwarz to both residual sums}
+Substitute the entries in the table into
+$\norm[a]{e}^2\leq C_Q\sum_i A_iB_i$ and apply Cauchy--Schwarz:
+\[
+\begin{aligned}
+ \norm[a]{e}^2\leq C_Q\,
+ &\underbrace{\left(
+ \sum_{e'}h_{e'}^2\norm[L^2(\mathcal K_{e'})]{r_{e'}}^2
+ +\sum_{\mathcal F\in\Fh^\ast}
+ h_{\mathcal F}\norm[L^2(\mathcal F)]{j_{\mathcal F}}^2
+ \right)^{1/2}}_{\eta}\\[3pt]
+ {}\times{}&\left(\sum_{e'}\seminorm[H^1(\omega_{e'})]{e}^2
+ +\sum_{\mathcal F\in\Fh^\ast}
+  \seminorm[H^1(\omega_{\mathcal F})]{e}^2\right)^{1/2}.
+\end{aligned}
+\]
+The first factor is exactly the estimator already defined. The remaining
+task is to bound the sum of the patch seminorms.
 \end{frame}
 
 \begin{frame}{Finite patch overlap gives a global error norm}
-On a shape-regular mesh, an element belongs to at most a fixed number
-$N_{\mathrm{ov}}$ of the patches $\omega_e$ and $\omega_{\mathcal F}$.
-Consequently,
+Let $m_{e'}$ be the number of element and facet patches containing
+$\mathcal K_{e'}$. Shape regularity gives a mesh-independent bound
+$m_{e'}\leq N_{\mathrm{ov}}$. Expand each squared seminorm as an integral:
 \[
-  \sum_e\seminorm[H^1(\omega_e)]{e}^2
+\begin{aligned}
+ &\sum_{e'}\seminorm[H^1(\omega_{e'})]{e}^2
   +\sum_{\mathcal F\in\Fh^\ast}
-   \seminorm[H^1(\omega_{\mathcal F})]{e}^2
-  \leq N_{\mathrm{ov}}\seminorm[H^1(\Om)]{e}^2.
+   \seminorm[H^1(\omega_{\mathcal F})]{e}^2\\
+ &=\sum_{e'}m_{e'}\int_{\mathcal K_{e'}}|\grad e|^2\,\dd x\\
+ &\leq N_{\mathrm{ov}}\sum_{e'}
+                 \int_{\mathcal K_{e'}}|\grad e|^2\,\dd x
+  =N_{\mathrm{ov}}\seminorm[H^1(\Om)]{e}^2.
+\end{aligned}
 \]
-This is a counting statement: each element contribution to
-$\seminorm[H^1(\Om)]{e}^2$ appears in no more than $N_{\mathrm{ov}}$ patches.
-Thus
+Thus each element integral is counted at most $N_{\mathrm{ov}}$ times.
+Take the square root and substitute into the second Cauchy--Schwarz factor:
 \[
   \norm[a]{e}^2
   \leq C_Q\sqrt{N_{\mathrm{ov}}}\,\eta
@@ -603,73 +951,140 @@ Thus
 \end{frame}
 
 \begin{frame}{Reliability of the residual estimator}
-The diffusion coefficient satisfies $k(\bm x)\geq k_0>0$. Hence
+Since $k(\bx)\geq k_0>0$, the $H^1$ seminorm satisfies
 \[
-  \norm[a]{e}^2
-  =\int_\Om k|\grad e|^2\,\dd x
-  \geq k_0\seminorm[H^1(\Om)]{e}^2,
+ \seminorm[H^1(\Om)]{e}^2
+ =\int_\Om|\grad e|^2\,\dd x
+ \leq\frac1{k_0}\int_\Om k|\grad e|^2\,\dd x
+ =\frac1{k_0}\norm[a]{e}^2.
 \]
-and therefore
+In $\norm[a]{e}^2\leq C_Q\sqrt{N_{\mathrm{ov}}}\,\eta
+\seminorm[H^1(\Om)]{e}$, replace the seminorm by
+$\norm[a]{e}/\sqrt{k_0}$:
 \[
-  \seminorm[H^1(\Om)]{e}
-  \leq\frac{1}{\sqrt{k_0}}\norm[a]{e}.
+ \norm[a]{e}^2\leq
+ C_Q\sqrt{\frac{N_{\mathrm{ov}}}{k_0}}\,\eta\,\norm[a]{e}.
 \]
-Substituting this inequality into the preceding bound and dividing by
-$\norm[a]{e}$ gives
+If $e\neq0$, divide by $\norm[a]{e}$. If $e=0$, the bound is immediate:
 \[
   \boxed{\norm[a]{u-u_h}\leq
   C_Q\sqrt{\frac{N_{\mathrm{ov}}}{k_0}}\,\eta.}
 \]
-Thus $C_{\mathrm{rel}}=C_Q\sqrt{N_{\mathrm{ov}}/k_0}$. The constant is
-independent of the mesh size, although it depends on mesh shape regularity and
-the coefficient lower bound.
+This is the reliability bound, with
+$C_{\mathrm{rel}}=C_Q\sqrt{N_{\mathrm{ov}}/k_0}$ independent of mesh size.
 \end{frame}
 
-\begin{frame}{Reliability and efficiency answer different questions}
-\textbf{Reliability} is the global upper bound
+\begin{frame}{What reliability tells us}
+The result just proved is
 \[
-  \norm[a]{e}\leq C_{\mathrm{rel}}\eta.
+ \norm[a]{u-u_h}\leq C_{\mathrm{rel}}\eta.
 \]
-It ensures that a small estimator implies a small energy error.
-
-\textbf{Local efficiency} is a lower-bound statement of the form
+On a shape-regular mesh family, $C_{\mathrm{rel}}$ stays fixed as the mesh
+is refined. Consequently,
 \[
-  \eta_e\leq C_{\mathrm{eff}}
-  \left(\norm[a,\omega_e]{e}+\operatorname{osc}_e\right).
+ \eta\longrightarrow0\quad\Longrightarrow\quad
+ \norm[a]{u-u_h}\longrightarrow0.
 \]
-It ensures that a large local indicator is associated with error near
-$\mathcal K_e$, apart from the unresolved variation in the prescribed data.
-The quantity $\operatorname{osc}_e$, called \textbf{data oscillation},
-measures the part of $f$, $q$, or $k$ that is not represented by the local
-polynomial data approximation used to evaluate the residual.
+The computed $\eta$ is \emph{not itself} a guaranteed numerical upper bound:
+the theorem contains the constant $C_{\mathrm{rel}}$, which we have not
+computed.
 
-Today we proved reliability. Local efficiency requires a separate
-lower-bound argument and is not proved in this lecture.
+Likewise, $\eta_e$ is a contribution to the estimator, not the exact error
+on $\mathcal K_e$. Reliability is a global statement. A separate estimate is
+needed to compare $\eta_e$ with the error on its surrounding patch.
 \end{frame}
 
-\begin{frame}{Effectivity measures the scale of an estimator}
-When the exact error is available, define the \textbf{effectivity index}
-\[
-  I_{\mathrm{eff}}
-  =\frac{\eta}{\norm[a]{u-u_h}}.
-\]
-An effectivity index near one means that $\eta$ estimates the magnitude of the
-energy error accurately. A nearly constant value different from one means
-that the estimator tracks the error but consistently overestimates or
-underestimates it.
+\begin{frame}{Returning to 1D: the nodal terms in the error bound}
+On an interval, $e\in H^1(0,1)$ has nodal values. We can choose
+$v_h=\Ih e\in\Vhzero$ and set $w=e-\Ih e$. At each node,
+$w(x_i)=e(x_i)-(\Ih e)(x_i)=0$.
 
-Effectivity is normally evaluated only in verification problems, because the
-exact error is unknown in the applications for which an estimator is needed.
-
-\vspace{0.2cm}
-These terms should not be interchanged:
+Start from the subtraction identity, then use the 1D residual formula:
 \[
-\begin{array}{c|c}
-\text{reliability} & \text{the estimator bounds the error from above}\\
-\text{efficiency} & \text{the indicator is not unnecessarily large}\\
-\text{effectivity} & \text{the observed ratio of estimator to exact error}
-\end{array}
+\begin{aligned}
+ \norm[a]{e}^2
+ &=R(u_h;e)-\underbrace{R(u_h;\Ih e)}_{0}=R(u_h;w)\\
+ &=\sum_{e'=1}^2\int_{\mathcal K_{e'}}r_{e'}w\,\dd x
+   \underbrace{-\frac12w(x_2)-\frac13w(x_3)}_{0}\\
+ &\leq\sum_{e'=1}^2\norm[L^2(\mathcal K_{e'})]{r_{e'}}
+                         \norm[L^2(\mathcal K_{e'})]{w}.
+\end{aligned}
 \]
+The last step uses Cauchy--Schwarz on each element. The nodal residuals
+are nonzero, but their products with $w(x_i)$ vanish.
+\end{frame}
+
+\begin{frame}{The 1D interpolation bound and Cauchy--Schwarz}
+For linear nodal interpolation on an interval, use the estimate
+\[
+ \norm[L^2(\mathcal K_{e'})]{v-\Ih v}
+ \leq h_{e'}\norm[L^2(\mathcal K_{e'})]{\mathrm dv/\mathrm dx},
+ \qquad v\in H^1(0,1).
+\]
+Use this estimate from Chapter 8 without proof. Set $v=e$, so
+$v-\Ih v=w$, then apply Cauchy--Schwarz to the sum:
+\[
+\begin{aligned}
+ \norm[a]{e}^2
+ &\leq\sum_{e'=1}^2h_{e'}\norm[L^2(\mathcal K_{e'})]{r_{e'}}
+                  \norm[L^2(\mathcal K_{e'})]{\mathrm de/\mathrm dx}\\
+ &\leq\underbrace{\left(\sum_{e'=1}^2
+ h_{e'}^2\norm[L^2(\mathcal K_{e'})]{r_{e'}}^2\right)^{1/2}}_{
+ \eta_{\mathrm{1D}}}
+ \left(\sum_{e'=1}^2\norm[L^2(\mathcal K_{e'})]{\mathrm de/\mathrm dx}^2
+ \right)^{1/2}.
+\end{aligned}
+\]
+Since the elements partition $(0,1)$ and $k=1$, the last factor is
+$\norm[L^2(0,1)]{\mathrm de/\mathrm dx}=\norm[a]{e}$.
+Cancel $\norm[a]{e}$ when nonzero to obtain
+$\norm[a]{e}\leq\eta_{\mathrm{1D}}$. For $e=0$, this bound is immediate.
+\end{frame}
+
+\begin{frame}{The actual element errors in the 1D example}
+The exact solution is $u(x)=x-x^2/2$: it satisfies $-u''=1$, $u(0)=0$,
+and $u'(1)=0$. Thus $u'=1-x$. Subtract the two computed slopes:
+\[
+ (u-u_h)'=\begin{cases}
+ (1-x)-5/6=1/6-x,&x\in\mathcal K_1=(0,1/3),\\
+ (1-x)-1/3=2/3-x,&x\in\mathcal K_2=(1/3,1).
+ \end{cases}
+\]
+Since $k=1$, integrate the square to obtain each local energy error:
+\[
+\begin{aligned}
+ \int_{\mathcal K_1}|u'-u_h'|^2\,\dd x
+ &=\int_0^{1/3}(x-1/6)^2\,\dd x
+ =\left[\frac{(x-1/6)^3}{3}\right]_0^{1/3}=\frac1{324},\\[4pt]
+ \int_{\mathcal K_2}|u'-u_h'|^2\,\dd x
+ &=\int_{1/3}^1(x-2/3)^2\,\dd x
+ =\left[\frac{(x-2/3)^3}{3}\right]_{1/3}^1=\frac8{324}.
+\end{aligned}
+\]
+\end{frame}
+
+\begin{frame}{Element size in the same 1D example}
+Recall $h_1=1/3$, $h_2=2/3$, and $r_1=r_2=1$. For each element, the
+squared contribution to $\eta_{\mathrm{1D}}$ is
+\[
+ h_e^2\norm[L^2(\mathcal K_e)]{r_e}^2
+ =h_e^2\int_{\mathcal K_e}1\,\dd x
+ =h_e^2h_e=h_e^3.
+\]
+Compare these contributions with the squared errors just calculated:
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+Element & $h_e$ & $h_e^3$ & $\displaystyle\int_{\mathcal K_e}|u'-u_h'|^2\,\dd x$\\
+\midrule
+$\mathcal K_1$ & $1/3$ & $1/27$ & $1/324$\\[2pt]
+$\mathcal K_2$ & $2/3$ & $8/27$ & $8/324$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Here $h_2=2h_1$, so $h_2^3/h_1^3=2^3=8$. The squared local errors
+also have ratio $8$. The residuals are equal, but element size makes the
+longer element contribute more to both the estimator and the error.
 \end{frame}
 
 \begin{frame}{Summary and next step}
@@ -678,11 +1093,10 @@ These terms should not be interchanged:
   the unknown error.
   \item Elementwise integration by parts separates balance defects inside
   elements from flux defects on interior and Neumann facets.
-  \item Galerkin orthogonality allows $v$ to be replaced by
-  $v-\Qh v$; local approximation then supplies the powers of the local mesh
-  size.
+  \item Galerkin orthogonality gives $R(u_h;v)=R(u_h;v-\Qh v)$.
+  Local approximation estimates then supply the powers of the mesh size.
   \item The indicators $\eta_e$ identify where the residual is concentrated,
-  while reliability bounds the global energy error by $\eta$.
+  while reliability bounds the global energy error by $C_{\mathrm{rel}}\eta$.
 \end{itemize}
 
 \vspace{0.2cm}
@@ -692,6 +1106,25 @@ $f=0$, can $\eta$ still be nonzero? Identify the residual term that remains.
 \vspace{0.2cm}
 \textbf{Next lecture.} Use the local indicators to mark elements, refine the
 mesh conformingly, and repeat the solve--estimate--mark--refine loop.
+\end{frame}
+
+\begin{frame}{References for the construction and estimates}
+\begin{itemize}
+ \item J.~Sch\"oberl, \emph{Numerical Methods for Partial Differential
+ Equations}, \S4.3, pp.~64--67. Definition 74 gives the patch-average
+ construction. Theorems 75--76 give its local estimates and reliability.
+ \href{https://jschoeberl.github.io/iFEM/aposteriori/residualEE.html}{Online version: \S27.1--27.2.}
+ \item D.~N.~Arnold, \emph{Lecture Notes on Numerical Analysis of Partial
+ Differential Equations}, Chapter 4, \S9.1--9.4, pp.~67--73.
+ Equations (4.16)--(4.18) give local estimates for a projection-based
+ Cl\'{e}ment operator. Equations (4.19)--(4.21) derive the residual bound.
+ \item M.~G.~Larson and F.~Bengzon, \emph{The Finite Element Method:
+ Theory, Implementation, and Practice}, \S4.9.1, pp.~88--89,
+ Theorem 4.7. See also \S2.6.1, pp.~38--39, for the 1D argument.
+\end{itemize}
+The references develop the homogeneous Dirichlet case. Our proof retains
+the Neumann residual and uses the boundary-preserving estimates stated in
+Chapter 8 as Hypothesis (Q).
 \end{frame}
 
 \end{document}
