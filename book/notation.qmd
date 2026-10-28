@@ -135,6 +135,14 @@ discussion.
 | $\mathcal Q_h$ | Local averaging or quasi-interpolation operator used in residual estimates |
 | $r_e$, $j_{\mathcal F}$ | Element and facet residuals |
 | $\eta_e$ | Local a posteriori error indicator |
+| $\eta=(\sum_e\eta_e^2)^{1/2}$ | Global residual error estimator |
+| $R(u_h;v)=\ell(v)-a(u_h,v)$ | Variational residual tested with $v$ |
+| $\omega_i$, $\omega_e$, $\omega_{\mathcal F}$ | Vertex, element, and facet patches in residual estimates |
+| $C_Q$, $N_{\mathrm{ov}}$ | Quasi-interpolation constant and bound on patch overlap |
+| $C_{\mathrm{rel}}$, $C_{\mathrm{eff}}$ | Reliability and local-efficiency constants |
+| $\mathrm{osc}_e$ | Local oscillation term; its precise definition depends on the stated estimator result |
+| $I_{\mathrm{eff}}=\eta/\norm{u-u_h}_a$ | Effectivity index when the exact energy error is known and nonzero |
+| $\mathcal M$, $\theta$ | Marked element set and selected fraction of the squared estimator in bulk marking |
 | $\bK^e$, $\bF^e$, $\bU^e$ | Element stiffness matrix, load vector, and coefficient vector |
 | $\bK\bU=\bF$ | Representative assembled algebraic system |
 | $\bR=\bK\bU-\bF$ | Algebraic residual vector, including reactions at prescribed degrees of freedom |

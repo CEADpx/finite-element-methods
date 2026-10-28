@@ -74,11 +74,22 @@ cp build/chapter07_duality_verification_lecture.pdf chapter07_duality_verificati
 
 ## `aposteriori-error/`
 
-The first Chapter 8 lecture introduces the residual functional, mesh facets,
-normal-flux jumps, and elementwise integration by parts. The second deck,
-`chapter08_estimator_reliability_lecture.tex`, completes the element-and-facet
-residual representation, constructs the residual estimator, and develops its
-reliability bound through one- and two-dimensional examples.
+The introductory Chapter 8 lecture covers the residual functional, mesh
+facets, normal-flux jumps, and elementwise integration by parts. The subsequent
+material is organized in three parts:
+
+- Part 1: residual representation and the quasi-interpolation operator.
+- Part 2: the remaining estimator and reliability material, for independent study.
+- Part 3: efficiency, effectivity, marking, and adaptive refinement, for independent study.
+
+See the [reading guide and slide links](aposteriori-error/README.md) for the
+coverage of each part. The Part 1 source retains the existing filename
+`chapter08_estimator_reliability_lecture.tex`.
+
+`chapter08_adaptive_fem_lecture.tex` is the closing lecture with the key
+estimator/reliability steps and a Gaussian-pulse adaptive-refinement
+demonstration, followed by an additional corner-domain example. Its notebook is
+[`notebooks/adaptivity/residual_adaptivity.ipynb`](../../notebooks/adaptivity/residual_adaptivity.ipynb).
 
 Build the slides from that directory with:
 
@@ -92,4 +103,19 @@ conda run -n finite-elements latexmk -pdf \
   -interaction=nonstopmode -halt-on-error \
   -outdir=build chapter08_estimator_reliability_lecture.tex
 cp build/chapter08_estimator_reliability_lecture.pdf chapter08_estimator_reliability_lecture.pdf
+
+conda run -n finite-elements latexmk -pdf \
+  -interaction=nonstopmode -halt-on-error \
+  -outdir=build chapter08_estimator_independent_study.tex
+cp build/chapter08_estimator_independent_study.pdf chapter08_estimator_independent_study.pdf
+
+conda run -n finite-elements latexmk -pdf \
+  -interaction=nonstopmode -halt-on-error \
+  -outdir=build chapter08_adaptivity_independent_study.tex
+cp build/chapter08_adaptivity_independent_study.pdf chapter08_adaptivity_independent_study.pdf
+
+conda run -n finite-elements latexmk -pdf \
+  -interaction=nonstopmode -halt-on-error \
+  -outdir=build chapter08_adaptive_fem_lecture.tex
+cp build/chapter08_adaptive_fem_lecture.pdf chapter08_adaptive_fem_lecture.pdf
 ```

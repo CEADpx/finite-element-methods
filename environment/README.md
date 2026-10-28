@@ -65,6 +65,23 @@ provided by the same `finite-elements` environment. Quarto and TinyTeX are
 needed to render the assignment and book documents, but not to execute the
 assignment notebooks.
 
+### macOS form compilation
+
+FEniCSx compiles variational forms when a notebook first uses them. If a
+Conda compiler/linker cannot read the installed Apple SDK and reports an
+unknown architecture such as `arm64e.x1-macos`, select the installed Apple
+compiler before importing FEniCSx:
+
+```python
+import os
+os.environ["CC"] = "/usr/bin/clang"
+os.environ["LDSHARED"] = "/usr/bin/clang -bundle -undefined dynamic_lookup"
+```
+
+Restart the kernel before retrying. The adaptive-refinement notebook includes
+this selection on macOS and preserves compiler settings already supplied by
+the user. No additional Conda packages are required for this workaround.
+
 ## Verify the environment
 
 ```bash

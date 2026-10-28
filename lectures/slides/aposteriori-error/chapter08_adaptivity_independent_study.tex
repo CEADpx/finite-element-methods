@@ -1,0 +1,300 @@
+\documentclass[11pt,aspectratio=169]{beamer}
+
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{%
+  \leavevmode
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.6ex,dp=1.1ex,right]{page number in head/foot}%
+      \insertframenumber/\inserttotalframenumber\hspace{0.35cm}
+    \end{beamercolorbox}%
+  }%
+}
+\setbeamertemplate{frametitle}{\vspace{0.25cm}\insertframetitle\par\vspace{0.08cm}\hrule}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{frametitle}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=black}
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
+
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\Om}{\Omega}
+\newcommand{\GamD}{\Gamma_D}
+\newcommand{\GamN}{\Gamma_N}
+\newcommand{\Th}{\mathcal T_h}
+\newcommand{\Fh}{\mathcal F_h}
+\newcommand{\Vzero}{\mathcal V_0}
+\newcommand{\Vhzero}{\mathcal V_{h,0}}
+\newcommand{\Qh}{\mathcal Q_h}
+\newcommand{\Ih}{\mathcal I_h}
+\newcommand{\norm}[2][]{\left\lVert#2\right\rVert_{#1}}
+\newcommand{\seminorm}[2][]{\left\lvert#2\right\rvert_{#1}}
+\newcommand{\grad}{\nabla}
+\newcommand{\divg}{\nabla\!\cdot}
+\newcommand{\bn}{\bm n}
+\newcommand{\bq}{\bm q}
+\newcommand{\bx}{\bm x}
+
+\begin{document}
+
+
+\begin{frame}[plain]
+  \centering\vfill
+  {\LARGE\bfseries Interpretation and Adaptive Refinement\par}
+  \vspace{0.45cm}
+  {\large Part 3: independent study\par}
+  \vspace{0.25cm}
+  {\large Efficiency, effectivity, marking, and the adaptive loop\par}
+  \vfill
+\end{frame}
+
+\begin{frame}{Reading outline}
+Part 2 derived a computable estimator and proved
+\[
+ \norm[a]{u-u_h}\leq C_{\mathrm{rel}}\eta,
+ \qquad \eta^2=\sum_e\eta_e^2.
+\]
+This part addresses how to interpret and use these numbers.
+\begin{enumerate}
+ \item Distinguish reliability, local efficiency, and effectivity.
+ \item Select elements using their local indicators.
+ \item Refine the selected mesh and compute a new FE solution.
+ \item Interpret a stopping test and recognize what it does not guarantee.
+\end{enumerate}
+The discussion continues the scalar-diffusion setting of Parts 1 and 2.
+\end{frame}
+
+\begin{frame}{Reliability and local efficiency}
+Reliability bounds the global energy error from above:
+\[
+ \norm[a]{e}\leq C_{\mathrm{rel}}\eta,
+ \qquad e=u-u_h.
+\]
+Local efficiency asks for a converse comparison on a surrounding patch:
+\[
+ \eta_e\leq C_{\mathrm{eff}}
+ \bigl(\norm[a,\omega_e]{e}+\mathrm{osc}_e\bigr),
+ \qquad
+ \norm[a,\omega_e]{e}^2=\int_{\omega_e}k\grad e\cdot\grad e\,\dd x.
+\]
+Here $\mathrm{osc}_e$ measures unresolved variation in the prescribed data.
+The constants must be independent of mesh size on the stated mesh family.
+
+Reliability makes a small $\eta$ meaningful. When data oscillation is small,
+local efficiency ties a large indicator to error near that element.
+
+\vspace{0.12cm}
+{\footnotesize Chapter 8, \S8.5 defines local efficiency. Neither that chapter
+nor this deck proves the displayed efficiency bound for the general problem.}
+\end{frame}
+
+\begin{frame}{Meaning of data oscillation}
+Consider the simpler case $k=1$ and $u=0$ on the whole boundary.
+An example of a data-oscillation term uses the element average
+\[
+ \overline f_e=\frac{1}{|\mathcal K_e|}\int_{\mathcal K_e}f\,\dd x,
+ \qquad
+ \mathrm{osc}_e=h_e\norm[L^2(\mathcal K_e)]{f-\overline f_e}.
+\]
+The difference $f-\overline f_e$ is the part of the source not represented
+by that constant average. For constant $f$ on an element, this term is zero.
+
+With Neumann data, a data-oscillation term can similarly compare $q$ with
+its local polynomial approximation on a boundary facet.
+The worked examples here use constant source and Neumann data on each
+element or facet, so these oscillation terms vanish.
+\end{frame}
+
+\begin{frame}{The effectivity index}
+For a verification problem with known exact solution and nonzero error, define
+\[
+ \boxed{I_{\mathrm{eff}}=\frac{\eta}{\norm[a]{u-u_h}}.}
+\]
+\begin{itemize}
+ \item $I_{\mathrm{eff}}=1$ means that estimator and energy error agree.
+ \item $I_{\mathrm{eff}}>1$ means that the estimator exceeds the error by that factor.
+ \item Reliability gives $I_{\mathrm{eff}}\geq1/C_{\mathrm{rel}}$.
+ With an unknown $C_{\mathrm{rel}}$, this does not imply $I_{\mathrm{eff}}\geq1$.
+\end{itemize}
+Exact error is unavailable in a general computation, so effectivity is a
+verification measure, not a stopping test for an unknown solution.
+
+\vspace{0.15cm}
+{\footnotesize Chapter 8, equation for the effectivity index and
+``Effectivity for the uniformly loaded bar.''}
+\end{frame}
+
+\begin{frame}{Effectivity in the nonuniform 1D example}
+Part 2 obtained the squared estimator contributions and squared element errors
+\[
+ \left(\eta_{1,\mathrm{1D}}^2,\eta_{2,\mathrm{1D}}^2\right)
+ =\left(\frac1{27},\frac8{27}\right),\qquad
+ \left(E_1^2,E_2^2\right)=\left(\frac1{324},\frac8{324}\right).
+\]
+Here $E_e^2=\int_{\mathcal K_e}|u'-u_h'|^2\,\dd x$ and
+$\eta_{e,\mathrm{1D}}^2=h_e^3$. Summing gives
+\[
+ \eta_{\mathrm{1D}}^2=\frac13,\qquad
+ \norm[a]{e}^2=\frac1{36},\qquad
+ I_{\mathrm{eff}}=\frac{1/\sqrt3}{1/6}=\sqrt{12}\approx3.46.
+\]
+The explicit 1D bound $\norm[a]{e}\leq\eta_{\mathrm{1D}}$ is valid, but
+the estimator is about $3.46$ times the actual error in this example.
+
+This calculation checks one example. It does not establish a general
+efficiency theorem.
+\end{frame}
+
+\begin{frame}{Marking elements for refinement}
+Let $\mathcal M\subset\Th$ be the set of elements selected for refinement.
+The indicators determine this set before a new mesh is constructed.
+
+\textbf{Maximum marking.} Choose $0<\gamma<1$ and mark every element with
+\[
+ \eta_e\geq\gamma\max_j\eta_j.
+\]
+\textbf{D\"orfler (bulk) marking.} Choose $0<\theta<1$ and select enough
+elements that
+\[
+ \boxed{\sum_{\mathcal K_e\in\mathcal M}\eta_e^2
+ \geq\theta\sum_e\eta_e^2=\theta\eta^2.}
+\]
+A simple procedure sorts the squared indicators from largest to smallest
+and includes them until the required fraction is reached.
+
+\vspace{0.12cm}
+{\footnotesize Arnold, Chapter 4, \S9.4, printed p.~73 (PDF p.~77).
+Here $\theta$ denotes the fraction of the squared total.}
+\end{frame}
+
+\begin{frame}{Bulk marking in the 1D example}
+Use the 1D estimator from Part 2, not the multidimensional facet formula:
+\[
+ \eta_{1,\mathrm{1D}}^2=\frac1{27},\qquad
+ \eta_{2,\mathrm{1D}}^2=\frac8{27},\qquad
+ \eta_{\mathrm{1D}}^2=\frac13.
+\]
+Take $\theta=0.8$. The second element contributes the fraction
+\[
+ \frac{\eta_{2,\mathrm{1D}}^2}{\eta_{\mathrm{1D}}^2}
+ =\frac{8/27}{9/27}=\frac89>0.8.
+\]
+Therefore $\mathcal M=\{\mathcal K_2\}$ meets the bulk criterion.
+
+The source residual is $1$ on both elements. The second element is marked
+because its larger length produces the larger weighted contribution.
+\end{frame}
+
+\begin{frame}{Refining the marked element}
+Bisect $\mathcal K_2=(1/3,1)$ at $x=2/3$. The new mesh is
+\[
+ 0,\quad 1/3,\quad 2/3,\quad 1,
+\]
+so every new element has length $1/3$.
+Solve the FE problem again on this mesh. For $P_1$ elements, $k=1$, and
+$f=1$, the new element residuals are still $r_e=1$. Hence
+\[
+ \eta_{\mathrm{1D,new}}^2
+ =3\left(\frac13\right)^3=\frac19
+ <\frac13=\eta_{\mathrm{1D,old}}^2.
+\]
+This reduction was calculated for this problem. It does not guarantee the
+same reduction for every problem or marked mesh.
+
+In 2D and 3D, refinement must also preserve conformity and shape regularity.
+Neighboring elements may need refinement to avoid hanging nodes.
+\end{frame}
+
+\begin{frame}{The adaptive finite element loop}
+Begin with a conforming, shape-regular mesh.
+\begin{enumerate}
+ \item \textbf{Solve:} compute $u_h$ on the current mesh.
+ \item \textbf{Estimate:} evaluate the element and facet residuals, then
+ $\eta_e$ and $\eta=(\sum_e\eta_e^2)^{1/2}$.
+ \item \textbf{Check:} stop if the chosen estimator tolerance is met or
+ a stated resource limit is reached.
+ \item \textbf{Mark:} select elements using the local indicators.
+ \item \textbf{Refine:} construct a conforming new mesh and return to Step 1.
+\end{enumerate}
+Refining the mesh changes the FE space and the computed solution. Recompute
+the indicators after each new solve rather than retaining the old values.
+
+\vspace{0.15cm}
+{\footnotesize Arnold, \S9.4, p.~73. Larson--Bengzon, \S4.9.2.}
+\end{frame}
+
+\begin{frame}{Stopping criteria and the unknown constant}
+Given an estimator tolerance $\varepsilon_{\mathrm{est}}>0$, a common test is
+\[
+ \eta\leq\varepsilon_{\mathrm{est}}.
+\]
+Reliability then gives
+\[
+ \norm[a]{u-u_h}\leq C_{\mathrm{rel}}\varepsilon_{\mathrm{est}}.
+\]
+If $C_{\mathrm{rel}}$ is unknown, this test does not certify the same numerical
+tolerance for the true error.
+
+For the 1D example, the proved bound has $C_{\mathrm{rel}}=1$. There,
+$\eta_{\mathrm{1D}}\leq\varepsilon$ does guarantee
+$\norm[a]{u-u_h}\leq\varepsilon$.
+
+A solver or mesh-size limit is a separate stopping reason. Reaching such a
+limit does not establish that an error tolerance was achieved.
+\end{frame}
+
+\begin{frame}{Reading and practice}
+\begin{enumerate}
+ \item Read Part 2 through the estimator definition and reliability proof.
+ Track where Galerkin orthogonality, each local estimate, and
+ Cauchy--Schwarz enter the argument.
+ \item Work through the 1D and two-triangle calculations in Part 2.
+ Distinguish squared indicator contributions from the exact element errors.
+ \item Read Part 3 through the marking calculation and adaptive loop.
+ Apply the bulk criterion before deciding which elements to bisect.
+\end{enumerate}
+Book reading:
+\href{https://ceadpx.github.io/finite-element-methods/chapters/08-aposteriori-adaptivity.html\#sec-c8-estimator}{Chapter 8, \S8.4},
+followed by
+\href{https://ceadpx.github.io/finite-element-methods/chapters/08-aposteriori-adaptivity.html\#sec-c8-reliability-efficiency}{\S8.5}.
+The marking and adaptive-loop discussion is supplied by this deck and Arnold
+\S9.4 because those sections of the book are not yet written.
+\end{frame}
+
+\begin{frame}{Scope of the residual-estimation module}
+The three parts develop the following argument:
+\begin{itemize}
+ \item The variational residual equals the energy action of the unknown error.
+ \item Element and facet residuals produce computable weighted indicators.
+ \item Quasi-interpolation and finite patch overlap give a reliability bound.
+ \item The indicators guide marking, and a new solve supplies the next estimate.
+\end{itemize}
+Efficiency and effectivity describe additional properties of an estimator.
+A single computed effectivity index does not prove efficiency.
+
+The general local-efficiency proof, convergence/optimality of the adaptive
+algorithm, FEniCSx implementation, elasticity estimators, and goal-oriented
+estimation are not developed in these decks.
+\end{frame}
+
+\begin{frame}{References and further reading}
+\begin{itemize}
+ \item Course book, Chapter 8, \S\S8.4--8.5: estimator, reliability,
+ 1D effectivity, and definitions of efficiency.
+ \item D.~N.~Arnold, \emph{Lecture Notes on Numerical Analysis of Partial
+ Differential Equations}, Chapter 4, \S9.4, printed p.~73 (PDF p.~77):
+ local indicators, maximum and D\"orfler marking, and the adaptive loop.
+ \item M.~G.~Larson and F.~Bengzon, \emph{The Finite Element Method:
+ Theory, Implementation, and Practice}, \S2.6.1, pp.~38--39, and
+ \S4.9, pp.~88--92: residual bounds and adaptive refinement.
+\end{itemize}
+For the operator and reliability proof used in Part 2:
+\href{https://jschoeberl.github.io/iFEM/aposteriori/residualEE.html}{J.~Sch\"oberl, \emph{Interactive Finite Elements}, \S\S27.1--27.2.}
+\end{frame}
+
+\end{document}
