@@ -17,10 +17,12 @@ The book is organized into four parts:
 
 1. **Review and Foundations**
 2. **Error Analysis and Adaptivity**
-3. **Advanced Finite Element Formulations**
+3. **Nonlinear and Transient Finite Element Methods**
 4. **PDE-Constrained Optimization**
 
-The first part reviews the mathematical, variational, continuum-mechanics, and finite element foundations needed for the advanced topics that follow. The second part develops a priori and a posteriori error estimation, convergence analysis, and adaptive mesh refinement. The third part addresses constraints, mixed formulations for nearly incompressible solids, nonlinear and transient finite element methods, and the associated spatial and temporal discretizations. The fourth part considers PDE-constrained optimization, including the inference of sources and model parameters, structural and topology optimization, and sensor placement. Together, these topics connect the mathematical foundations of finite element methods with tools for assessing, improving, and optimizing computational models.
+The first part reviews the mathematical, variational, continuum-mechanics, and finite element foundations needed for the topics that follow. The second part develops a priori and a posteriori error estimation, convergence analysis, and adaptive mesh refinement. The third part develops nonlinear finite element methods using hyperelasticity, followed by time discretization for transient problems. The fourth part introduces PDE-constrained optimization: formulating an objective and a PDE constraint, computing direct and adjoint sensitivities, verifying gradients, and solving the resulting optimization problem. Heat conduction and solid mechanics provide recurring examples throughout the book.
+
+Chapters 1--8 have been developed for the course. The chapters on nonlinear methods, transient methods, and PDE-constrained optimization are forthcoming; the [development status](status.qmd) records their progress.
 
 The perspective of this book draws on the author's experience applying finite element methods to deformation and fracture mechanics [@jha2021finite], multiphysics modeling [@fritz2021modeling; @fritz2021analysis], neural networks [@jha2026practical; @jha2024residual], Bayesian inference [@jha2022goal; @jha2020bayesian], and topology optimization [@galloway2026topology]. The author first studied finite element methods during his master's program at the Indian Institute of Science, Bangalore, where C. S. Jog's lecture notes [@jog] served as an excellent first-level introduction to the finite element method. The author further developed understanding of fine details of the method during his doctoral studies at Carnegie Mellon University, where he served for several semesters as a teaching assistant for Jacobo Bielak's graduate introductory course on finite element methods.
 

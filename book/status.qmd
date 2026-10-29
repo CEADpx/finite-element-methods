@@ -23,12 +23,12 @@ consistency with later chapters.
 
 ## Yet to be started
 
-The following chapters currently contain placeholders:
+The material through a posteriori error estimation and adaptivity has been
+covered in the course. The remaining three chapters are planned in the
+following order and currently contain placeholders:
 
-- **Chapter 9: Constraints in Finite Element Methods**
-- **Chapter 10: Mixed Finite Element Methods**
-- **Chapter 11: Nonlinear Finite Element Methods**
-- **Chapter 12: Transient Finite Element Methods**
-- **Chapter 13: PDE-Constrained Optimization**
+- **[Chapter 9: Nonlinear Finite Element Methods](chapters/11-nonlinear-fem.qmd)**
+- **[Chapter 10: Transient Finite Element Methods](chapters/12-transient-fem.qmd)**
+- **[Chapter 11: PDE-Constrained Optimization](chapters/13-pde-constrained-optimization.qmd)**
 
 Last updated: October 28, 2026.

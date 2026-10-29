@@ -547,9 +547,9 @@ arguments. Chapter 3 derives variational formulations from boundary-value
 problems and explains trial and test spaces, essential and natural boundary
 conditions, continuous load functionals, and energy minimization. Chapter 4
 develops heat conduction, linear elasticity, and the finite-deformation
-quantities needed for hyperelasticity. Chapter 5 constructs finite element
-spaces and connects meshes, basis functions, mappings, quadrature, assembly,
-boundary conditions, and FEniCSx.
+quantities needed for hyperelasticity. Chapters 5 and 6 construct finite element
+spaces in one and multiple dimensions and connect meshes, basis functions,
+mappings, quadrature, assembly, boundary conditions, and FEniCSx.
 
 ### Error analysis and adaptivity
 
@@ -558,24 +558,18 @@ A posteriori analysis seeks computable information about the error in a complete
 solution. Adaptive FEM uses that information to refine or enrich the
 discretization where additional resolution is most valuable.
 
-### Constraints and mixed formulations
-
-Constraints arise in contact, incompressibility, and other admissibility
-conditions. Mixed methods introduce multiple primary fields, such as displacement
-and pressure or flux and temperature. Their stability depends on compatibility
-between spaces and cannot be inferred from the behavior of a single scalar
-coercive problem.
-
 ### Nonlinear and transient problems
 
 Finite-deformation mechanics produces nonlinear residual equations. Their
 solution requires consistent linearization, tangent operators, and iterative
-methods. Transient problems add time discretization and require separate control
-of spatial and temporal errors.
+methods. @sec-nonlinear-fem develops these methods using the hyperelastic model from
+Chapter 4. Transient problems add time discretization and require separate
+control of spatial and temporal errors; @sec-transient-fem develops these ideas using
+the transient heat equation.
 
 ### PDE-constrained optimization
 
-Optimization treats a PDE solution as a constraint while adjusting design or
+@sec-pde-optimization treats a PDE solution as a constraint while adjusting design or
 control variables to improve an objective. Adjoint equations make sensitivities
 computationally tractable and bring together variational formulations, linearized
 operators, solver design, and quantities of interest.

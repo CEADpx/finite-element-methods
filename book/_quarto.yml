@@ -36,10 +36,8 @@ book:
       chapters:
         - chapters/07-apriori-error.qmd
         - chapters/08-aposteriori-adaptivity.qmd
-    - part: "Advanced Finite Element Formulations"
+    - part: "Nonlinear and Transient Finite Element Methods"
       chapters:
-        - chapters/09-constraints.qmd
-        - chapters/10-mixed-fem.qmd
         - chapters/11-nonlinear-fem.qmd
         - chapters/12-transient-fem.qmd
     - part: "PDE-Constrained Optimization"

@@ -18,13 +18,15 @@ The Quarto sources are in [`book/`](book/). The current complete chapters cover:
 2. mathematical foundations;
 3. partial differential equations and variational formulations;
 4. model problems in heat transfer and solid mechanics;
-5. the finite element method in one dimension; and
-6. finite element approximation in multiple dimensions.
+5. the finite element method in one dimension;
+6. finite element approximation in multiple dimensions;
+7. a priori error estimation and convergence; and
+8. a posteriori error estimation and adaptive finite elements.
 
 The book also includes appendices on real-analysis essentials and tensor
-notation and index calculus. Later chapters will address error estimation,
-adaptivity, constraints, mixed methods, nonlinear and transient problems, and
-PDE-constrained optimization. The development status of each chapter is
+notation and index calculus. The three forthcoming chapters address nonlinear
+FEM using hyperelasticity, transient FEM, and basic PDE-constrained optimization,
+in that order. The development status of each chapter is
 maintained in [`book/status.qmd`](book/status.qmd).
 
 To render both the HTML and PDF versions from the repository root, use:

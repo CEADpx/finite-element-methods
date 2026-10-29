@@ -147,9 +147,9 @@ $$ {#eq-c7-discrete-stability}
 
 The constant on the right does not depend on the mesh or on the polynomial
 degree. For a coercive problem, every conforming subspace inherits stability
-from the continuous problem [@arnold2018, p. 58]. This will not remain true for
-the mixed formulations of Chapter 10, where stability of the discrete problem
-must be established separately.
+from the continuous problem [@arnold2018, p. 58]. This conclusion relies on
+coercivity; it does not extend automatically to mixed formulations, whose
+discrete stability must be established separately.
 
 The same fact has a direct algebraic meaning. If $\bV$ is the vector of free
 coefficients of a nonzero $v_h\in\Vhzero$, then
@@ -2027,8 +2027,8 @@ incompressible materials show unphysical oscillations, more severe for linear
 than for quadratic elements [@arnold2018, pp. 155--157]. Volumetric locking is the excessive stiffness caused by the displacement
 space being unable to satisfy the near-incompressibility constraint without
 severely restricting deformation. Stress oscillations can accompany this
-loss of accuracy. Chapter 10 develops mixed formulations and their stability
-requirements; adding a pressure unknown alone does not ensure a remedy.
+loss of accuracy. Mixed formulations require compatible approximation spaces;
+adding a pressure unknown alone does not ensure a remedy.
 
 ::: {#exr-c7-isotropic-constants}
 ## Material dependence of the elasticity estimate

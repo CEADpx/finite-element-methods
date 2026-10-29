@@ -407,7 +407,7 @@ $$ {#eq-model-transient-heat-weak}
 
 The first integral is the **capacity term**. The variational problem
 @eq-model-transient-heat-weak remains continuous in time; no time-stepping
-method has been selected. Chapter 11 introduces temporal discretization.
+method has been selected. @sec-transient-fem introduces temporal discretization.
 
 ::: {#rem-model-transient-mathematical-energy}
 ## A mathematical energy estimate
@@ -632,8 +632,7 @@ $$
 $$ {#eq-model-lame-parameters}
 
 For three-dimensional isotropic elasticity, $E>0$ and $-1<\nu<1/2$ ensure
-positive strain energy. The limit $\nu\to1/2$ is nearly incompressible and
-will motivate the mixed formulation in Chapter 9.
+positive strain energy. The limit $\nu\to1/2$ is nearly incompressible.
 
 ### Voigt and engineering notation
 
@@ -1138,7 +1137,7 @@ Starting from @eq-model-bar-strong:
 Small-strain kinematics are not appropriate when changes in length, angle, or
 orientation are large. We now distinguish reference and current
 configurations and formulate equilibrium over the reference body. Numerical
-linearization and solution are reserved for Chapter 10.
+linearization and solution are reserved for @sec-nonlinear-fem.
 
 @fig-model-reference-current-configurations shows the two configurations and
 the deformation map between them.
@@ -1405,7 +1404,7 @@ $$
 +\lambda(\ln J)\bF^{-T}.
 $$ {#eq-model-neo-hookean-stress}
 
-Chapter 10 differentiates $\bP$ with respect to $\bF$ when constructing
+@sec-nonlinear-fem differentiates $\bP$ with respect to $\bF$ when constructing
 Newton's method for the nonlinear equilibrium equations.
 
 ### Reference-configuration variational problem
