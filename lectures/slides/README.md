@@ -2,6 +2,10 @@
 
 Lecture materials are grouped by topic.
 
+## `nonlinear-fem/`
+
+- Large deformation and reference formulation: [PDF](nonlinear-fem/chapter11_large_deformation_lecture01.pdf) · [LaTeX](nonlinear-fem/chapter11_large_deformation_lecture01.tex).
+
 ## `finite-element-assembly/`
 
 One-dimensional finite element assembly, boundary conditions, reactions, and
