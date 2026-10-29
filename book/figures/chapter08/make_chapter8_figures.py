@@ -3,6 +3,7 @@
 Reuse the companion notebook's numerical functions without executing its
 presentation cells or changing the notebook. Use --concepts-only to rebuild
 the explanatory figures without rerunning the adaptive computations.
+Use --point-load-only to recompute only the cantilever loading comparison.
 """
 
 import ast
@@ -36,9 +37,9 @@ ORANGE = "#c65b2a"
 EDGE = "#707b85"
 
 
-def notebook_functions():
+def notebook_functions(filename="residual_adaptivity.ipynb"):
     notebook = json.loads(
-        (ROOT / "notebooks/adaptivity/residual_adaptivity.ipynb").read_text()
+        (ROOT / "notebooks/adaptivity" / filename).read_text()
     )
     namespace = {}
     for cell in notebook["cells"]:
@@ -50,7 +51,7 @@ def notebook_functions():
             if isinstance(node, (ast.Import, ast.ImportFrom, ast.FunctionDef))
         ]
         exec(compile(ast.Module(body=definitions, type_ignores=[]),
-                     "residual_adaptivity.ipynb", "exec"), namespace)
+                     filename, "exec"), namespace)
     namespace["quadrature_degree"] = 20
     return namespace
 
@@ -458,9 +459,72 @@ def convergence_figures(adaptive, uniform):
     save(figure, "pulse-effectivity")
 
 
+def point_load_comparison():
+    """Recompute the local-refinement comparison using the checked notebook solver."""
+    api = notebook_functions("elasticity_point_load_comparison.ipynb")
+    api.update(E=1.0, nu=0.3, P=1e-6, width=0.5,
+               mu=1 / 2.6, lambda_ps=0.3 / (1 - 0.3**2))
+    domain = api["mesh"].create_rectangle(
+        api["MPI"].COMM_SELF, [np.array([0., 0.]), np.array([4., 1.])], [64, 16])
+    point, distributed = [], []
+    for cycle in range(7):
+        for loading, history in [("point", point), ("distributed", distributed)]:
+            result, _, _, _ = api["solve_cantilever"](16, loading, domain)
+            history.append(result["compliance/P^2"])
+        if cycle < 6:
+            count = domain.topology.index_map(2).size_local
+            elements = np.arange(count, dtype=np.int32)
+            centers = api["mesh"].compute_midpoints(domain, 2, elements)
+            distance = np.linalg.norm(centers[:, :2] - [4., 0.5], axis=1)
+            marked = elements[distance < 0.3 * 0.5**cycle]
+            domain.topology.create_entities(1)
+            domain.topology.create_connectivity(2, 1)
+            edges = api["mesh"].compute_incident_entities(domain.topology, marked, 2, 1)
+            domain, _, _ = api["mesh"].refine(domain, edges)
+    changes_point = np.sqrt(np.diff(point))
+    changes_distributed = np.sqrt(np.diff(distributed))
+    assert np.isclose(changes_point[-1], 0.66065, rtol=1e-4)
+    assert 0.00020 < changes_distributed[-1] < 0.00030
+
+    fig, axes = plt.subplots(2, 2, figsize=(8.6, 4.6), layout="constrained",
+                             gridspec_kw={"height_ratios": [0.8, 2]})
+    for ax, title in zip(axes[0], ["Point force", "Fixed-width traction"]):
+        ax.plot([0, 4, 4, 0, 0], [0, 0, 1, 1, 0], color=EDGE)
+        ax.plot([0, 0], [0, 1], color=BLUE, linewidth=4)
+        ax.text(0.12, 0.5, "fixed", color=BLUE, va="center", fontsize=12)
+        ax.set(xlim=(-0.1, 5.3), ylim=(-0.05, 1.3), aspect="equal")
+        ax.axis("off")
+        ax.set_title(title, fontsize=13)
+    axes[0, 0].annotate("", (4, 0.5), (4, 1.3),
+                         arrowprops={"arrowstyle": "->", "color": ORANGE, "lw": 1.8})
+    axes[0, 0].text(4.15, 0.85, "$P$", fontsize=13)
+    for y in [0.3, 0.5, 0.7]:
+        axes[0, 1].annotate("", (4, y), (4, y + 0.15),
+                             arrowprops={"arrowstyle": "->", "color": ORANGE})
+    axes[0, 1].text(4.15, 0.5, "$w=1/2$", fontsize=12, va="center")
+    for values, label, color, marker in [
+            (point, "Point", BLUE, "o"),
+            (distributed, "Distributed", ORANGE, "s")]:
+        axes[1, 0].plot(range(7), np.array(values) - values[0], marker+"-",
+                         color=color, label=label, markersize=4)
+        axes[1, 1].semilogy(range(1, 7), np.sqrt(np.diff(values)), marker+"-",
+                             color=color, label=label, markersize=4)
+    axes[1, 0].set(ylabel=r"$(C_m-C_0)/P^2$", title="Change in compliance")
+    axes[1, 1].set(ylabel="Successive energy difference / P",
+                    title="Change between successive solutions")
+    for ax in axes[1]:
+        ax.set_xlabel("Local refinement step")
+        ax.grid(True, alpha=0.25)
+        ax.legend(fontsize=11)
+    save(fig, "point-load-comparison")
+    print("Verified point/distributed successive energy differences:",
+          changes_point[-1], changes_distributed[-1])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--concepts-only", action="store_true")
+    parser.add_argument("--point-load-only", action="store_true")
     args = parser.parse_args()
     plt.rcParams.update({
         "font.family": "serif", "font.serif": ["STIX Two Text", "STIXGeneral"],
@@ -468,10 +532,14 @@ def main():
         "ytick.labelsize": 10, "mathtext.fontset": "cm", "svg.fonttype": "path",
         "svg.hashsalt": "finite-elements-chapter08", "axes.linewidth": 0.7,
     })
+    if args.point_load_only:
+        point_load_comparison()
+        return
     concept_figures()
     if args.concepts_only:
         print("Regenerated explanatory vector figures.")
         return
+    point_load_comparison()
     api = notebook_functions()
     domains, adaptive_dofs, adaptive_eta, adaptive_error = [], [], [], []
     domain = api["create_square_mesh"]()
@@ -522,7 +590,7 @@ def main():
         (adaptive_dofs, adaptive_eta, adaptive_error),
         (uniform_dofs, uniform_eta, uniform_error),
     )
-    print("Regenerated thirteen vector figures; mesh counts and reported errors verified.")
+    print("Regenerated Chapter 8 vector figures; mesh counts and reported errors verified.")
 
 
 if __name__ == "__main__":

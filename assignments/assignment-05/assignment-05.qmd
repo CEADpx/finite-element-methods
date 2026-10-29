@@ -1,0 +1,42 @@
+---
+title: "Assignment 5"
+subtitle: "ME/BME 736 — A Posteriori Error Estimation and Refinement"
+author: "Prashant K. Jha"
+date: "28 October, 2026"
+---
+
+## Submission
+
+The two notebooks in
+[`assignments/assignment-05/notebooks/`](https://github.com/CEADpx/finite-element-methods/tree/main/assignments/assignment-05/notebooks)
+contain working examples followed by the assignment tasks. Use the supplied
+code and extend it where requested; do not rebuild the finite element solvers.
+Include your calculations, plots, tables, and short explanations in the
+notebooks. No separate report is needed.
+
+Submit `lastname_assignment05_gaussian.ipynb` and
+`lastname_assignment05_elasticity.ipynb`. Each must run without errors after
+**Restart Kernel and Run All Cells**. Follow
+[`environment/README.md`](https://github.com/CEADpx/finite-element-methods/blob/main/environment/README.md)
+and select **Python (Finite Elements)**. Run on one MPI process.
+
+# Residual-based refinement of a Gaussian solution {.problem marks="60"}
+
+Notebook: `problem1.ipynb`. Reading: Chapter 8.
+
+Compare residual-based element selection with selection based on the known
+elementwise error. Write the adaptive loop and show its indicators, marked
+elements, and refined meshes. Compare marking choices by the degrees of
+freedom needed to reach a specified true error. The three tasks carry
+20, 25, and 15 marks.
+
+# Adaptive refinement of an elastic cantilever {.problem marks="40"}
+
+Notebook: `problem2.ipynb`. Reading: the cantilever loading example in Chapter 8
+and the linear-elastic formulation in Chapter 4.
+
+Check the traction residuals and use them to select refinements for two
+fixed-width distributed loads. Show the selection and resulting meshes at
+three stages. Then use the supplied, separately identified point-force
+experiment to examine the loading model and the limits of the residual
+estimate. The three tasks carry 10, 20, and 10 marks.

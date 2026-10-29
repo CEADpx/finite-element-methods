@@ -4,6 +4,14 @@
 - [Assignment 2: Mathematical Foundations](assignment-02/assignment-02.qmd)
 - [Assignment 3: Variational Formulations and Energy Principles](assignment-03/assignment-03.qmd)
 - [Assignment 4: Finite Element Computation in One and Two Dimensions](assignment-04/assignment-04.qmd)
+- [Assignment 5: A Posteriori Error Estimation and Refinement](assignment-05/assignment-05.qmd)
+
+The Assignment 5 notebooks are in
+[`assignment-05/notebooks/`](assignment-05/notebooks/). Students carry out
+residual-based mesh selection for Gaussian diffusion and distributed-load
+elasticity, display marked and refined meshes, and interpret a separate
+controlled point-force experiment. Working first-step calculations are supplied.
+Both completed notebooks are submitted without a separate report.
 
 The Assignment 4 notebooks are in
 [`assignment-04/notebooks/`](assignment-04/notebooks/). They build on the

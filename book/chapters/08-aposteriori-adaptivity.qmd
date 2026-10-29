@@ -1736,6 +1736,75 @@ energy norm $\norm{\bv}_{a_{\mathrm{el}}}=\sqrt{a_{\mathrm{el}}(\bv,\bv)}$
 and Korn's inequality from Chapter 4. The scalar reliability constant cannot
 be reused unchanged.
 
+::: {#exm-c8-point-load}
+## Concentrated and distributed loading of a cantilever
+
+Persistent refinement can reflect the loading model rather than an unresolved
+finite-energy solution. Consider the plane-stress cantilever
+$\Om=(0,4)\times(0,1)$, fixed on $x_1=0$, with no body force. Use unit
+thickness and consistent nondimensional data $E=1$, $\nu=0.3$, and
+$P=10^{-6}$. The constitutive law is
+
+$$
+\bsig(\bu)=2\mu\beps(\bu)
++\lambda_{\mathrm{ps}}\operatorname{tr}\beps(\bu)\bm I,
+\qquad
+\mu=\frac{E}{2(1+\nu)},\quad
+\lambda_{\mathrm{ps}}=\frac{E\nu}{1-\nu^2}.
+$$
+
+Compare a downward point force at $\bx_P=(4,1/2)^T$ with a distributed
+traction on $\Gam_P=\{4\}\times[1/4,3/4]$. For the latter, set
+$w=1/2$, $s=(x_2-1/4)/w$, and
+$\overline{\bt}=(0,-6Ps(1-s)/w)^T$ on $\Gam_P$, with zero traction
+elsewhere on the unfixed boundary. Both loads have downward resultant $P$
+and the same moment about the clamp. Their discrete load functionals are
+
+$$
+\ell_{\mathrm{point}}(\bv_h)=-P v_{h,2}(\bx_P),
+\qquad
+\ell_{\mathrm{dist}}(\bv_h)
+=\int_{\Gam_P}\overline{\bt}\cdot\bv_h\,\ds.
+$$
+
+Use continuous vector-valued $P_1$ elements with $\bx_P$ a mesh node.
+The point force contributes $-P$ to that node's vertical load-vector entry;
+it is not a traction spread over a shrinking edge. The
+[comparison notebook](https://github.com/CEADpx/finite-element-methods/blob/main/notebooks/adaptivity/elasticity_point_load_comparison.ipynb)
+starts with $64\times16$ rectangles split into triangles and repeatedly
+refines near $\bx_P$, keeping the traction width fixed. This is prescribed
+local refinement, not residual-based marking.
+
+Let $\bu_m$ denote the solution after step $m$ and define its compliance
+$C_m=\ell(\bu_m)=a_{\mathrm{el}}(\bu_m,\bu_m)$; stored elastic energy is
+$C_m/2$. For either fixed loading, nested spaces give
+$a_{\mathrm{el}}(\bu_{m+1},\bu_m)=\ell(\bu_m)=C_m$.
+Expanding the squared energy norm gives
+
+$$
+\norm{\bu_{m+1}-\bu_m}_{a_{\mathrm{el}}}^2
+=C_{m+1}-C_m.
+$$ {#eq-c8-point-load-increment}
+
+In @fig-c8-point-load-comparison, the point-load difference divided by $P$
+stays near $0.661$, whereas the distributed-load difference falls from
+$0.154$ to approximately $0.000247$. The point-load compliance continues
+increasing by about $0.436P^2$ per step. Displacement away from the load
+can nevertheless look settled: under uniform refinement, the two models
+give almost identical displacement at $(3,1/2)$.
+
+Point evaluation is not bounded on the two-dimensional $H^1$ energy space.
+The ideal point force therefore falls outside the finite-energy load
+assumptions used here, although every discrete system is solvable.
+The fixed-width traction is admissible. Refinement resolves the point-load
+singularity; it does not remove it. The computed differences are not true
+errors, and the ordinary $L^2$ Neumann-residual term cannot be used for a
+Dirac force. These observations concern a two-dimensional continuum, not
+a point load in one-dimensional bar or beam theory.
+:::
+
+![The same resultant force is applied at one point or over a fixed boundary segment. Repeated local refinement produces a persistent energy change for the point force but a decreasing change for the distributed load. The remaining mesh is not globally refined.](../figures/chapter08/point-load-comparison.svg){#fig-c8-point-load-comparison width=100% fig-pos="H"}
+
 ### Error in a linear output {#sec-c8-goal-oriented}
 
 Sometimes the requested output is a continuous linear functional

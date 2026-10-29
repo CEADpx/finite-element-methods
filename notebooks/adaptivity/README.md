@@ -39,3 +39,22 @@ marking, and built-in
 [dolfinx.mesh.refine](https://docs.fenicsproject.org/dolfinx/v0.11.0/python/generated/dolfinx.mesh.html#dolfinx.mesh.refine).
 No additional package is required. Both examples execute the complete
 solve–estimate–mark–refine loop.
+
+## Concentrated versus distributed force
+
+[`elasticity_point_load_comparison.ipynb`](elasticity_point_load_comparison.ipynb)
+compares a nodal point force with a fixed-width boundary traction on a
+plane-stress cantilever. It includes uniform and prescribed near-load refinement,
+checks force and moment balance, and compares compliance, successive-mesh energy
+differences, and local energy density. This is a loading-model
+comparison, not an application of the standard residual estimator to a point
+force. The comparison is a worked example in Chapter 8 and forms the basis
+of Assignment 5's elasticity problem. The student notebooks, with assignment
+tasks, are in [`assignments/assignment-05/notebooks/`](../../assignments/assignment-05/notebooks/).
+
+The cantilever notebook also implements residual-based adaptive refinement for
+two fixed-width distributed tractions. At cycles 0, 2, and 4, it displays the
+indicators, marked elements, and conforming refined mesh. All Neumann facets
+are included, even where the prescribed traction is zero. This adaptive
+calculation is distinct from the prescribed near-point refinement study;
+no standard residual error bound is claimed for the ideal point force.
