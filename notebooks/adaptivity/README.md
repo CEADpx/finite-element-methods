@@ -48,9 +48,8 @@ plane-stress cantilever. It includes uniform and prescribed near-load refinement
 checks force and moment balance, and compares compliance, successive-mesh energy
 differences, and local energy density. This is a loading-model
 comparison, not an application of the standard residual estimator to a point
-force. The comparison is a worked example in Chapter 8 and forms the basis
-of Assignment 5's elasticity problem. The student notebooks, with assignment
-tasks, are in [`assignments/assignment-05/notebooks/`](../../assignments/assignment-05/notebooks/).
+force. The comparison is a worked example in Chapter 8; it is separate from
+Assignment 5's two-dimensional bracket problem.
 
 The cantilever notebook also implements residual-based adaptive refinement for
 two fixed-width distributed tractions. At cycles 0, 2, and 4, it displays the
@@ -58,3 +57,13 @@ indicators, marked elements, and conforming refined mesh. All Neumann facets
 are included, even where the prescribed traction is zero. This adaptive
 calculation is distinct from the prescribed near-point refinement study;
 no standard residual error bound is claimed for the ideal point force.
+
+## Two-dimensional mounting bracket
+
+The [Assignment 5 student notebook](../../assignments/assignment-05/notebooks/problem1.ipynb)
+uses a two-dimensional plane-stress bracket under a distributed load.
+The solver, traction-residual estimator and a mesh-plotting routine are
+supplied. Students implement Dörfler marking and the adaptive and uniform
+loops, calling FEniCSx refinement explicitly. They compare end deflection,
+estimator and corner stress.
+The same `finite-elements` environment is used; no new dependencies are needed.

@@ -4,14 +4,13 @@
 - [Assignment 2: Mathematical Foundations](assignment-02/assignment-02.qmd)
 - [Assignment 3: Variational Formulations and Energy Principles](assignment-03/assignment-03.qmd)
 - [Assignment 4: Finite Element Computation in One and Two Dimensions](assignment-04/assignment-04.qmd)
-- [Assignment 5: A Posteriori Error Estimation and Refinement](assignment-05/assignment-05.qmd)
+- [Assignment 5: Adaptive Refinement of a Mounting Bracket](assignment-05/notebooks/problem1.ipynb)
 
-The Assignment 5 notebooks are in
-[`assignment-05/notebooks/`](assignment-05/notebooks/). Students carry out
-residual-based mesh selection for Gaussian diffusion and distributed-load
-elasticity, display marked and refined meshes, and interpret a separate
-controlled point-force experiment. Working first-step calculations are supplied.
-Both completed notebooks are submitted without a separate report.
+Assignment 5 is provided only as a notebook. It contains the complete problem,
+tasks, marks, supplied routines and submission instructions. Students implement
+marking and refinement studies for a two-dimensional plane-stress bracket,
+compare adaptive and uniform refinement, and assess deflection and corner
+stress. They submit the completed notebook; there is no separate handout or report.
 
 The Assignment 4 notebooks are in
 [`assignment-04/notebooks/`](assignment-04/notebooks/). They build on the
@@ -24,10 +23,10 @@ kernel, and launch JupyterLab by following
 [`environment/README.md`](../environment/README.md). Use the kernel
 **Python (Finite Elements)** for the assignment notebooks.
 
-## Problem headings
+## Quarto problem headings
 
-Write each problem as a level-one heading with the `problem` class and a
-`marks` attribute:
+For `.qmd` assignment sheets, write each problem as a level-one heading with
+the `problem` class and a `marks` attribute:
 
 ```markdown
 # Sequences and limits {.problem marks="10"}
@@ -38,9 +37,9 @@ the example above as `Problem 1 (10 marks): Sequences and limits`. Move the
 entire problem section when reordering problems; the displayed numbers update
 automatically in both HTML and PDF.
 
-Each assignment has its own folder, `assignment-NN/`, holding the `.qmd`
-source, the rendered PDF, and any notebooks. Render all assignments from the
-repository root with
+Assignments 1-4 have their own folders holding a `.qmd` source, rendered PDF
+and any notebooks. Assignment 5 is notebook-only and does not need Quarto
+rendering. Render the `.qmd` assignments from the repository root with
 
 ```bash
 quarto render assignments
