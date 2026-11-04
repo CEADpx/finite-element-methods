@@ -52,7 +52,7 @@
 \vspace{0.5cm}
 Prashant K. Jha\par
 ME/BME 736\par
-October 29, 2026
+November 3, 2026
 \vfill
 \end{frame}
 
@@ -61,11 +61,10 @@ October 29, 2026
 \item The difficulty: equilibrium on an unknown deformed body.
 \item The deformation map and the geometry needed to describe that body.
 \item Mapping surface forces and equilibrium to the reference body.
-\item The resulting hyperelastic boundary-value problem.
+\item The hyperelastic boundary-value problem, variational form, and residual.
 \end{enumerate}
 \vspace{0.3cm}
-The closing section develops the variational problem and introduces
-Newton's method through a scalar equation.
+The next lecture develops Newton's method for the resulting nonlinear equations.
 \end{frame}
 
 \begin{frame}{The loaded body and its unknown shape}
@@ -539,92 +538,6 @@ coefficients. We must solve nonlinear equations for those coefficients,
 rather than one system with a fixed stiffness matrix.
 \end{frame}
 
-\begin{frame}{Newton's method: one scalar equation}
-Consider $r(z)=z^2-2=0$. Let $z^k$ be an approximation and
-$\Delta z^k$ its correction.
-Linearize about $z^k$:
-\[
-r(z^k+\Delta z^k)
-\approx r(z^k)+r'(z^k)\Delta z^k.
-\]
-Set this linear approximation to zero:
-\[
-\boxed{r'(z^k)\Delta z^k=-r(z^k),\qquad
-z^{k+1}=z^k+\Delta z^k.}
-\]
-Starting from $z^0=1$,
-\[
-r(1)=-1,\qquad r'(1)=2,\qquad
-2\Delta z^0=1,\qquad z^1=1.5.
-\]
-Each iteration solves a linear correction equation and updates the approximation.
-\end{frame}
-
-\begin{frame}{A tangent equation predicts the next approximation}
-\begin{columns}[c,onlytextwidth]
-\begin{column}{.62\textwidth}
-\centering
-\begin{tikzpicture}[>=Stealth,xscale=3,yscale=.85]
-\draw[->,gray] (0,0)--(2.15,0) node[right] {$z$};
-\draw[->,gray] (0,-2.2)--(0,2.5) node[above] {$r(z)$};
-\node[above left] at (0,0) {$0$};
-\draw[very thick,femblue,domain=0:2.05,samples=90]
-  plot(\x,{\x*\x-2});
-\draw[thick,femorange,domain=.4:2.08] plot(\x,{2*\x-3});
-\draw[dashed] (1,-1)--(1,0);
-\fill[femblue] (1,-1) circle(1pt);
-\draw[thick] (1,.08)--(1,-.08);
-\node[above] at (1,.12) {$z^0=1$};
-\fill[femorange] (1.5,0) circle(1pt);
-\node[below] at (1.65,-.12) {$z^1=1.5$};
-\draw[thin] (1.5,-.02)--(1.58,-.12);
-\draw[->,femorange,thick] (1,-2.05)--(1.5,-2.05);
-\node[below] at (1.25,-2.08) {$\Delta z^0=0.5$};
-\draw[very thick,femblue] (.68,2.65)--(.85,2.65);
-\node[right] at (.85,2.65) {$r(z)$};
-\draw[thick,femorange] (1.35,2.65)--(1.52,2.65);
-\node[right] at (1.52,2.65) {tangent};
-\end{tikzpicture}
-\end{column}
-\begin{column}{.35\textwidth}
-The tangent at $z^0=1$ is
-\[
-r(1)+r'(1)(z-1)=2z-3.
-\]
-Its zero gives $z^1=1.5$.
-
-Repeating the update gives
-\[
-1.5,\quad1.416667,\quad1.414216.
-\]
-The tangent must be evaluated again at each new iterate.
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}{The same correction idea for displacement}
-For hyperelasticity, seek $R(\bu;\bv)=0$ for every $\bv\in\Vzero$.
-Hold $\bv$ fixed and define the directional derivative
-\[
-D_uR(\bu;\bv)[\bw]
-=\left.\frac{\mathrm d}{\mathrm d\epsilon}
-R(\bu+\epsilon\bw;\bv)\right|_{\epsilon=0}.
-\]
-The first-order expansion is
-\[
-R(\bu^k+\Delta\bu^k;\bv)
-\approx R(\bu^k;\bv)+D_uR(\bu^k;\bv)[\Delta\bu^k].
-\]
-Setting this approximation to zero gives the linear correction problem
-\[
-\boxed{D_uR(\bu^k;\bv)[\Delta\bu^k]
-=-R(\bu^k;\bv)\quad\forall\bv\in\Vzero.}
-\]
-Update $\bu^{k+1}=\bu^k+\Delta\bu^k$.
-If the iterate satisfies the prescribed displacement, the correction is zero
-on $\Gamma_{0u}$. The next lecture constructs this tangent problem explicitly.
-\end{frame}
-
 \begin{frame}{Summary and next step}
 \begin{itemize}
 \item Large deformation changes the body on which equilibrium is written.
@@ -649,8 +562,6 @@ material coordinates and the reference-area description of force.
 \item Local Belytschko notes, Chapter 3, \S3.2--3.4:
 deformation gradient, Green strain, and surface/stress transformations.
 Nanson's relation appears in \S3.4.2, printed p.\ 3-33.
-\item Local Belytschko notes, Chapter 6, \S6.3.3--6.3.4:
-Newton's method.
 \end{itemize}
 Our convention is $\bt_0=\bP\bN$ and $\bP=J\bsig\bF^{-T}$.
 The local notes' nominal stress uses the transpose convention.
