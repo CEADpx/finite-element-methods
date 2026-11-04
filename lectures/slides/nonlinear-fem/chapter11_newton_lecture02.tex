@@ -445,6 +445,8 @@ Setting the approximation to zero gives
 \]
 $\bK_T$ is the Jacobian matrix of $\bR$. The loads are fixed during this
 iteration, so $\partial F_{i\alpha}/\partial U_{j\beta}=0$.
+With $R=\ell_{\rm hyp}-a_{\rm hyp}$, this Jacobian is the negative of
+the internal-force tangent.
 \end{frame}
 
 \begin{frame}{Linearize first, then discretize}
@@ -471,6 +473,8 @@ the same basis, quadrature, and prescribed-displacement treatment.
 \end{frame}
 
 \begin{frame}{Element tangent entries in components}
+Here $a,b$ label local nodes, $\alpha,\beta,\gamma$ displacement components,
+and $I,J$ reference-coordinate directions.
 Define the fourth-order material tangent by
 \[
 \mathbb A_{\alpha I\beta J}(\bF)
@@ -482,7 +486,13 @@ Define the fourth-order material tangent by
 For a local basis direction,
 $(\Grad(\phi_b^e\bm e_\beta))_{\gamma J}
 =\delta_{\gamma\beta}\,\partial\phi_b^e/\partial X_J$.
-Substitution gives the element tangent entry
+Hence its stress variation has components
+\[
+\bigl(\delta\bP(\bF;\Grad(\phi_b^e\bm e_\beta))\bigr)_{\alpha I}
+=\sum_J\mathbb A_{\alpha I\beta J}
+\frac{\partial\phi_b^e}{\partial X_J}.
+\]
+Insert this into the tangent integral from the preceding slide:
 \[
 \boxed{(K_T^e)_{a\alpha,b\beta}
 =-\int_{\mathcal K_e}\sum_{I,J}
@@ -490,21 +500,33 @@ Substitution gives the element tangent entry
 \mathbb A_{\alpha I\beta J}(\bF^k)
 \frac{\partial\phi_b^e}{\partial X_J}\,\mathrm dV_0.}
 \]
-$a,b$ are local nodes, $\alpha,\beta$ are displacement components,
-and $I,J$ are reference-coordinate directions.
 At each iteration, evaluate $\mathbb A$ at the current $\bF^k$ at the
 element integration points.
 \end{frame}
 
-\begin{frame}{Element residuals and assembly}
-The element residual row is
+\begin{frame}{Element loads and residuals}
+Restrict the global load integral to element $\mathcal K_e$:
+\[
+\begin{aligned}
+F^e_{a\alpha}
+={}&\int_{\mathcal K_e}(\bb_0)_\alpha\phi_a^e\,\mathrm dV_0\\
+&+\int_{\partial\mathcal K_e\cap\Gamma_{0t}}
+(\overline{\bt}_0)_\alpha\phi_a^e\,\mathrm dA.
+\end{aligned}
+\]
+Subtract the element internal force to obtain its residual row:
 \[
 R^e_{a\alpha}
 =F^e_{a\alpha}-\int_{\mathcal K_e}\sum_I P_{\alpha I}(\bF^k)
 \frac{\partial\phi_a^e}{\partial X_I}\,\mathrm dV_0.
 \]
-Here $F^e_{a\alpha}$ contains the element body-force and boundary-traction
-contributions. Use the existing local-to-global node map $i=I^e(a)$:
+Only element boundaries on $\Gamma_{0t}$ contribute prescribed traction.
+The internal-force integral uses the stress at the current iterate.
+\end{frame}
+
+\begin{frame}{Assembly of the residual and tangent}
+Use the local-to-global node map $i=I^e(a)$ from Chapters 5--6.
+For each element, add its residual rows and tangent entries to the global arrays:
 \[
 \begin{aligned}
 R_{I^e(a),\alpha}&\mathrel{+}=R^e_{a\alpha},\\
@@ -629,7 +651,8 @@ The stretch remains positive throughout this iteration.
 \end{frame}
 
 \begin{frame}{Checking a tangent by finite differences}
-For a free-coefficient direction $\bm d$ with $\bm d_p=\bm0$,
+For a coefficient perturbation $\bm d$ with displacement units and
+$\bm d_p=\bm0$,
 the assembled derivative should satisfy
 \[
 \frac{\bR_f(\bU+\epsilon\bm d)-\bR_f(\bU)}{\epsilon}
