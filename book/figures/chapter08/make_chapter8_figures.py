@@ -11,15 +11,11 @@ import argparse
 import json
 import os
 from pathlib import Path
-import sys
 import tempfile
 
 os.environ.setdefault(
     "MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "finite-elements-matplotlib")
 )
-if sys.platform == "darwin":
-    os.environ.setdefault("CC", "/usr/bin/clang")
-    os.environ.setdefault("LDSHARED", "/usr/bin/clang -bundle -undefined dynamic_lookup")
 
 import matplotlib
 

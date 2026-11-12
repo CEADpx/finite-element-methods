@@ -21,8 +21,7 @@ jupyter lab notebooks/adaptivity/residual_adaptivity.ipynb
 ```
 
 Use **Restart Kernel and Run All Cells** to reproduce the saved outputs.
-The notebook is tested with DOLFINx 0.11.0 on one MPI process. Environment and
-macOS compiler instructions are maintained in
+The notebook is tested with DOLFINx 0.11.0 on one MPI process. See
 [`environment/README.md`](../../environment/README.md).
 
 ## Implementation references
