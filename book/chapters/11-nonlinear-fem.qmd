@@ -60,9 +60,9 @@ The internal and external forms from
 $$
 \begin{aligned}
 a_{\mathrm{hyp}}(\bu;\bv)
-&=\int_{\Om_0}\bP(\bF(\bu)):\Grad\bv\,\dd V_0,\\
+&=\int_{\Om_0}\bP(\bF(\bu)):\Grad\bv\,\dd V,\\
 \ell_{\mathrm{hyp}}(\bv)
-&=\int_{\Om_0}\bb_0\cdot\bv\,\dd V_0
+&=\int_{\Om_0}\bb_0\cdot\bv\,\dd V
 +\int_{\Gam_{0t}}\overline{\bt}_0\cdot\bv\,\dd A.
 \end{aligned}
 $$ {#eq-c9-forms}
@@ -93,7 +93,7 @@ from @eq-model-hyperelastic-potential can be written
 
 $$
 \Pi_{\mathrm{hyp}}(\bu)
-=\int_{\Om_0}\Psi(\bF(\bu))\,\dd V_0-\ell_{\mathrm{hyp}}(\bu).
+=\int_{\Om_0}\Psi(\bF(\bu))\,\dd V-\ell_{\mathrm{hyp}}(\bu).
 $$ {#eq-c9-potential}
 
 For the variations below, assume sufficient regularity to differentiate
@@ -111,7 +111,7 @@ $$
 \delta\Pi_{\mathrm{hyp}}(\bu;\bv)
 &=\left.\frac{\dd}{\dd\epsilon}
 \Pi_{\mathrm{hyp}}(\bu+\epsilon\bv)\right|_{\epsilon=0}\\
-&=\int_{\Om_0}\bP(\bF(\bu)):\Grad\bv\,\dd V_0
+&=\int_{\Om_0}\bP(\bF(\bu)):\Grad\bv\,\dd V
 -\ell_{\mathrm{hyp}}(\bv)\\
 &=-R(\bu;\bv).
 \end{aligned}
@@ -184,7 +184,8 @@ $$
 \qquad z^{k+1}=z^k+\Delta z^k.}
 $$ {#eq-c9-scalar-newton}
 
-The derivative is evaluated at the current approximation. Reusing a
+The correction requires $r'(z^k)\ne 0$. Evaluate the derivative at the
+current approximation. Reusing a
 derivative from an earlier iterate defines a different iteration and need
 not give Newton's convergence rate [@belytschko2000].
 
@@ -228,7 +229,8 @@ R(\bu^k+\Delta\bu^k;\bv)
 \approx R(\bu^k;\bv)+\delta_uR(\bu^k;\bv)[\Delta\bu^k].
 $$
 
-Setting this approximation to zero gives the Newton problem:
+Setting this approximation to zero gives the formal Newton equation for
+the displacement field:
 
 $$
 \boxed{\begin{aligned}
@@ -238,10 +240,13 @@ $$
 \end{aligned}}
 $$ {#eq-c9-field-newton}
 
-After solving this linear problem, set
-$\bu^{k+1}=\bu^k+\Delta\bu^k$ and reevaluate the nonlinear residual.
-Although the coefficients of the correction problem depend on $\bu^k$, its
-unknown $\Delta\bu^k$ enters linearly.
+The coefficients depend on $\bu^k$, but the equation is linear in
+$\Delta\bu^k$. This derivation assumes that the residual can be differentiated
+in the directions used. The $H^1$ boundary-value spaces and $J>0$ alone do
+not ensure this: $\bF^{-1}$ can become unbounded as $J$ approaches zero.
+In @sec-c9-discretization we solve the finite element version of
+@eq-c9-field-newton, then update the displacement and reevaluate the
+residual.
 
 The zero boundary value of the correction follows from the boundary data,
 not from assuming that the prescribed displacement is zero. Suppose the
@@ -295,20 +300,19 @@ under the integral,
 
 $$
 \boxed{\delta_uR(\bu;\bv)[\bw]
-=-\int_{\Om_0}\delta\bP(\bF(\bu);\Grad\bw):\Grad\bv\,\dd V_0.}
+=-\int_{\Om_0}\delta\bP(\bF(\bu);\Grad\bw):\Grad\bv\,\dd V.}
 $$ {#eq-c9-tangent-form}
 
 In particular, with $\bF^k=\bI+\Grad\bu^k$, @eq-c9-field-newton is
 
 $$
--\int_{\Om_0}\delta\bP(\bF^k;\Grad\Delta\bu^k):\Grad\bv\,\dd V_0
+-\int_{\Om_0}\delta\bP(\bF^k;\Grad\Delta\bu^k):\Grad\bv\,\dd V
 =-R(\bu^k;\bv)\quad\forall\bv\in\Vzero.
 $$ {#eq-c9-explicit-field-newton}
 
-The minus sign on the integral comes from $R=\ell-a$, and the minus sign
-on the right comes from Newton's equation. They have different origins.
-Multiplying both sides by $-1$ gives an equivalent equation, but changing
-only one side reverses the correction.
+The minus sign on the integral comes from $R=\ell-a$; the one on the
+right comes from moving the current residual to the right-hand side of
+Newton's equation.
 
 ### The neo-Hookean material tangent
 
@@ -391,7 +395,7 @@ $$
 F_{i\alpha}&=\ell_{\mathrm{hyp}}(\phi_i\bm e_\alpha),\\
 R_{i\alpha}(\bU)
 &=F_{i\alpha}-\int_{\Om_0}
-\bP(\bF(\bu_h)):\Grad(\phi_i\bm e_\alpha)\,\dd V_0\\
+\bP(\bF(\bu_h)):\Grad(\phi_i\bm e_\alpha)\,\dd V\\
 &=R(\bu_h;\phi_i\bm e_\alpha).
 \end{aligned}
 $$ {#eq-c9-assembled-residual}
@@ -432,7 +436,7 @@ $$
 (K_T)_{i\alpha,j\beta}(\bU^k)
 &=\delta_uR(\bu_h^k;\phi_i\bm e_\alpha)[\phi_j\bm e_\beta]\\
 &=-\int_{\Om_0}\delta\bP(\bF^k;\Grad(\phi_j\bm e_\beta))
-:\Grad(\phi_i\bm e_\alpha)\,\dd V_0.
+:\Grad(\phi_i\bm e_\alpha)\,\dd V.
 \end{aligned}
 $$ {#eq-c9-tangent-entries}
 
@@ -494,10 +498,10 @@ independently chosen quadrature rule for the tangent need not produce the
 Jacobian of that residual. For the displacement-independent loads here,
 $R=\ell-a$ makes $\bK_T$ the negative of the internal-force derivative.
 
-The FEniCSx example in @sec-c9-fenicsx uses the first route at the level of
-forms: UFL differentiates the residual before DOLFINx assembles it. The
-second route is useful when the residual is already available as an
-algebraic function of the coefficients.
+In @sec-c9-fenicsx, UFL differentiates the residual form before DOLFINx
+assembles the matrix. Differentiating after discretization is useful when the
+residual is already available as an algebraic function of the coefficients.
+See also @arnold2018 [Section 10.2] and @larson-bengzon2010 [Sections 9.2--9.4].
 
 ### The discrete potential
 
@@ -515,91 +519,6 @@ $$ {#eq-c9-discrete-energy}
 For a twice continuously differentiable $\Pi_h$, this free Jacobian is symmetric.
 It need not be positive definite. At a strict local minimum with positive
 definite energy Hessian on free directions, $(K_T)_{ff}$ is negative definite.
-
-### Element quantities and assembly
-
-Use the local basis functions $\phi_a^e$ on $\mathcal K_e$ and the
-local-to-global map $i=I^e(a)$ from Chapters 5 and 6. The element external
-load entry is
-
-$$
-\begin{aligned}
-F^e_{a\alpha}
-={}&\int_{\mathcal K_e}b_{0\alpha}\phi_a^e\,\dd V_0\\
-&+\int_{\partial\mathcal K_e\cap\Gam_{0t}}
-\overline t_{0\alpha}\phi_a^e\,\dd A.
-\end{aligned}
-$$ {#eq-c9-element-load}
-
-Only element boundaries lying on the prescribed-traction boundary contribute
-to the second integral. Use $I,J$ for reference-coordinate directions and
-$\gamma$ for a displacement component. Using
-$(\Grad(\phi_a^e\bm e_\alpha))_{\gamma I}
-=\delta_{\gamma\alpha}\partial\phi_a^e/\partial X_I$,
-the residual entry is
-
-$$
-R^e_{a\alpha}
-=F^e_{a\alpha}-\int_{\mathcal K_e}
-\sum_I P_{\alpha I}(\bF^k)
-\frac{\partial\phi_a^e}{\partial X_I}\,\dd V_0.
-$$ {#eq-c9-element-residual}
-
-Define the fourth-order material tangent through its components:
-
-$$
-\mathbb A_{\alpha I\beta J}(\bF)
-=\frac{\partial P_{\alpha I}}{\partial F_{\beta J}},
-\qquad
-(\delta\bP(\bF;\bm H))_{\alpha I}
-=\sum_{\beta,J}\mathbb A_{\alpha I\beta J}H_{\beta J}.
-$$ {#eq-c9-material-tangent}
-
-For the basis direction $\phi_b^e\bm e_\beta$, this gives
-
-$$
-\bigl(\delta\bP(\bF;\Grad(\phi_b^e\bm e_\beta))\bigr)_{\alpha I}
-=\sum_J\mathbb A_{\alpha I\beta J}(\bF)
-\frac{\partial\phi_b^e}{\partial X_J}.
-$$
-
-Insert this expression into @eq-c9-tangent-entries restricted to
-$\mathcal K_e$:
-
-$$
-\boxed{(K_T^e)_{a\alpha,b\beta}
-=-\int_{\mathcal K_e}\sum_{I,J}
-\frac{\partial\phi_a^e}{\partial X_I}
-\mathbb A_{\alpha I\beta J}(\bF^k)
-\frac{\partial\phi_b^e}{\partial X_J}\,\dd V_0.}
-$$ {#eq-c9-element-tangent}
-
-Initialize the global residual and tangent arrays to zero, then scatter-add
-each element contribution:
-
-$$
-\begin{aligned}
-R_{I^e(a),\alpha}&\mathrel{+}=R^e_{a\alpha},\\
-(K_T)_{I^e(a)\alpha,I^e(b)\beta}
-&\mathrel{+}=(K_T^e)_{a\alpha,b\beta}.
-\end{aligned}
-$$ {#eq-c9-assembly}
-
-As before, a matrix entry can be nonzero only if its two basis directions
-are supported on a common element. The connectivity and sparsity pattern
-remain fixed during Newton iteration. The stress and material tangent are
-reevaluated at the current deformation at every integration point.
-
-The element map from Chapter 6 sends points of the reference element to
-points in $\mathcal K_e\subset\Om_0$. Its geometric Jacobian $\bm J_e$ is
-the derivative of that map: it sends infinitesimal reference-element
-directions to directions in $\mathcal K_e$. The deformation gradient $\bF$
-instead maps material line elements from $\Om_0$ to $\Om_t$.
-For nonconstant $\bF$,
-the inverse and logarithm generally make the stress integrands
-nonpolynomial. A quadrature rule exact for the linear elastic stiffness
-is not automatically exact here. Differentiate the quadrature approximation
-used for the residual consistently when constructing its Jacobian.
 
 ### Prescribed coefficients and reactions
 
@@ -683,9 +602,9 @@ admissible throughout this iteration.
 
 ### Element equations for the constrained problem
 
-The preceding example also supplies a small FE problem for which all
-assembly steps can be exposed. Divide $[0,L_0]$ into linear elements. On
-element $e$ of length $L_e$, with local axial coefficients $U_1^e,U_2^e$,
+We can assemble the finite element equations for this example by hand.
+Divide $[0,L_0]$ into linear elements. For element $e$ of length $L_e$,
+the local axial coefficients $U_1^e,U_2^e$ give the stretch
 
 $$
 s_e=1+\frac{U_2^e-U_1^e}{L_e}.
@@ -710,6 +629,29 @@ $(-1/L_e,1/L_e)$. Differentiating $-\bm f_{\mathrm{int}}^e$ with these
 derivatives produces the negative matrix in @eq-c9-stretch-element.
 The only applied load is the end force $A_0\tau$. Assemble
 $\bR=\bF-\bm f_{\mathrm{int}}$ and impose $U_1=0$.
+
+Take two equal elements, with $L_0=1$ mm and $A_0=1$ mm$^2$. At the
+initial displacement $\bU^0=\bm0$, each element has $s_e=1$,
+$P_{11}(1)=0$, and $P_{11}'(1)=4$ MPa. Thus the internal forces are zero
+and each element tangent is the matrix in @eq-c9-stretch-element with
+prefactor $-8$ N/mm. Node 2 receives a diagonal contribution from both
+elements; node 3 receives one from the second element. The free residual is
+$\bR_f(\bU^0)=(0,1)^T$ N because only node 3 carries the end load.
+Using @eq-c9-free-newton, with matrix entries in N/mm and forces in N,
+the first correction solves
+
+$$
+\begin{bmatrix}-16&8\\8&-8\end{bmatrix}
+\begin{bmatrix}\Delta U_2^0\\ \Delta U_3^0\end{bmatrix}
+=\begin{bmatrix}0\\-1\end{bmatrix},
+\qquad
+\begin{bmatrix}\Delta U_2^0\\ \Delta U_3^0\end{bmatrix}
+=\begin{bmatrix}0.125\\0.25\end{bmatrix}\ \mathrm{mm}.
+$$ {#eq-c9-stretch-first-correction}
+
+The next iterate is $\bU^1=(0,0.125,0.25)^T$ mm. Both elements
+now have stretch $1.25$, the first updated value in the scalar example.
+The program below repeats this calculation until the residual is small.
 
 The following NumPy program uses millimeters, newtons, and megapascals, so
 $L_0=A_0=1$ means $1$ mm and $1$ mm$^2$, respectively. As in Chapters 5
@@ -783,6 +725,95 @@ $u_1(0)=0.1$ mm while leaving $\tau=1$ MPa unchanged.
 2. Modify the initialization in the program and compute the nodal
    displacements and reaction. Explain why the stretches do not change.
 :::
+
+## Element quantities and assembly {#sec-c9-element-assembly}
+
+The stretch example assembled two free axial equations. The same procedure
+applies to the three-dimensional problem, with one residual entry for each
+displacement component at each node.
+
+Use the local basis functions $\phi_a^e$ on $\mathcal K_e$ and the
+local-to-global map $i=I^e(a)$ from Chapters 5 and 6. The element external
+load entry is
+
+$$
+\begin{aligned}
+F^e_{a\alpha}
+={}&\int_{\mathcal K_e}b_{0\alpha}\phi_a^e\,\dd V\\
+&+\int_{\partial\mathcal K_e\cap\Gam_{0t}}
+\overline t_{0\alpha}\phi_a^e\,\dd A.
+\end{aligned}
+$$ {#eq-c9-element-load}
+
+Only element boundaries lying on the prescribed-traction boundary contribute
+to the second integral. Use $I,J$ for reference-coordinate directions and
+$\gamma$ for a displacement component. Using
+$(\Grad(\phi_a^e\bm e_\alpha))_{\gamma I}
+=\delta_{\gamma\alpha}\partial\phi_a^e/\partial X_I$,
+the residual entry is
+
+$$
+R^e_{a\alpha}
+=F^e_{a\alpha}-\int_{\mathcal K_e}
+\sum_I P_{\alpha I}(\bF^k)
+\frac{\partial\phi_a^e}{\partial X_I}\,\dd V.
+$$ {#eq-c9-element-residual}
+
+Define the fourth-order material tangent through its components:
+
+$$
+\mathbb A_{\alpha I\beta J}(\bF)
+=\frac{\partial P_{\alpha I}}{\partial F_{\beta J}},
+\qquad
+(\delta\bP(\bF;\bm H))_{\alpha I}
+=\sum_{\beta,J}\mathbb A_{\alpha I\beta J}H_{\beta J}.
+$$ {#eq-c9-material-tangent}
+
+For the basis direction $\phi_b^e\bm e_\beta$, this gives
+
+$$
+\bigl(\delta\bP(\bF;\Grad(\phi_b^e\bm e_\beta))\bigr)_{\alpha I}
+=\sum_J\mathbb A_{\alpha I\beta J}(\bF)
+\frac{\partial\phi_b^e}{\partial X_J}.
+$$
+
+Insert this expression into @eq-c9-tangent-entries restricted to
+$\mathcal K_e$:
+
+$$
+\boxed{(K_T^e)_{a\alpha,b\beta}
+=-\int_{\mathcal K_e}\sum_{I,J}
+\frac{\partial\phi_a^e}{\partial X_I}
+\mathbb A_{\alpha I\beta J}(\bF^k)
+\frac{\partial\phi_b^e}{\partial X_J}\,\dd V.}
+$$ {#eq-c9-element-tangent}
+
+Initialize the global residual and tangent arrays to zero, then scatter-add
+each element contribution:
+
+$$
+\begin{aligned}
+R_{I^e(a),\alpha}&\mathrel{+}=R^e_{a\alpha},\\
+(K_T)_{I^e(a)\alpha,I^e(b)\beta}
+&\mathrel{+}=(K_T^e)_{a\alpha,b\beta}.
+\end{aligned}
+$$ {#eq-c9-assembly}
+
+As before, a matrix entry can be nonzero only if its two basis directions
+are supported on a common element. The connectivity and sparsity pattern
+remain fixed during Newton iteration. The stress and material tangent are
+reevaluated at the current deformation at every integration point.
+
+The element map from Chapter 6 sends points of the reference element to
+points in $\mathcal K_e\subset\Om_0$. Its geometric Jacobian $\bm J_e$ is
+the derivative of that map: it sends infinitesimal reference-element
+directions to directions in $\mathcal K_e$. The deformation gradient $\bF$
+instead maps material line elements from $\Om_0$ to $\Om_t$.
+For nonconstant $\bF$,
+the inverse and logarithm generally make the stress integrands
+nonpolynomial. A quadrature rule exact for the linear elastic stiffness
+is not automatically exact here. Differentiate the quadrature approximation
+used for the residual consistently when constructing its Jacobian.
 
 ## Verification and convergence of the nonlinear solve {#sec-c9-verification}
 
@@ -918,23 +949,24 @@ R_\zeta(\bu;\bv)
 =\zeta\ell_{\mathrm{hyp}}(\bv)-a_{\mathrm{hyp}}(\bu;\bv).
 $$ {#eq-c9-load-factor}
 
-Suppose $\bU_m$ is in equilibrium at $\zeta_m$. Let $\bF_f$ be the free
+Suppose $\bU(\zeta_m)$ is in equilibrium at $\zeta_m$. Let $\bF_f$ be the free
 entries of the load vector at $\zeta=1$. At $\zeta_m+\Delta\zeta$, use
-$\bU_m$ as the initial iterate. The internal forces have not yet changed,
-so subtracting the old free residual, which is zero, gives
+$\bU(\zeta_m)$ as the initial iterate. At that displacement, the internal
+forces are unchanged and only the external load changes:
 
 $$
-\bR_f(\bU_m;\zeta_m+\Delta\zeta)
-=\bR_f(\bU_m;\zeta_m)+\Delta\zeta\,\bF_f
+\bR_f(\bU(\zeta_m);\zeta_m+\Delta\zeta)
+=\underbrace{\bR_f(\bU(\zeta_m);\zeta_m)}_{\bm0}+\Delta\zeta\,\bF_f
 =\Delta\zeta\,\bF_f.
 $$ {#eq-c9-load-increment-residual}
 
 The first Newton correction therefore satisfies
-$(K_T)_{ff}(\bU_m)\Delta\bU_f=-\Delta\zeta\,\bF_f$.
+$(K_T)_{ff}(\bU(\zeta_m))\Delta\bU_f=-\Delta\zeta\,\bF_f$.
 If the free tangent is nonsingular and its inverse is bounded, the
 correction is small when $\Delta\zeta$ is small. More precisely, near
-such an equilibrium the implicit function theorem gives a smooth local
-solution branch. Differentiating $\bR_f(\bU(\zeta);\zeta)=\bm0$ gives
+such an equilibrium the implicit function theorem gives a unique nearby
+solution $\bU(\zeta)$ that varies smoothly with $\zeta$. Differentiating
+$\bR_f(\bU(\zeta);\zeta)=\bm0$ gives
 
 $$
 (K_T)_{ff}\frac{\dd\bU_f}{\dd\zeta}=-\bF_f.
@@ -942,10 +974,10 @@ $$ {#eq-c9-load-sensitivity}
 
 Thus, away from a singular tangent, nearby loads have nearby equilibria.
 This is why the previous solution can put the next Newton solve within
-its range of local convergence. Near a limit point, the tangent may
-become singular and the equilibrium path may turn back in load. Reducing
-the increment cannot in general trace that path using load as the
-parameter.
+its range of local convergence. At a load limit point, the equilibrium path
+turns back in load and the tangent becomes singular. Smaller increments
+cannot follow the path past that turning point while continuing to increase
+the load.
 
 For a scalar example, take the residual $R_\zeta(s)=10\zeta-s-s^3$.
 At $\zeta=0.2$, the equilibrium is $s=1$. At $\zeta=0.4$, starting again
@@ -975,9 +1007,11 @@ load. If it changes, impose the new prescribed values before starting the
 inner solve and keep the prescribed correction zero during that solve.
 In that case the initial residual also reflects the change in the prescribed
 coefficients, so @eq-c9-load-increment-residual no longer applies as written.
-The load factor labels quasistatic equilibria. It is not a time step.
-For incremental equilibrium algorithms and alternatives to load control,
-see @belytschko2000 [Sections 6.3.5 and 6.3.7].
+The load factor labels quasistatic equilibria rather than times in a
+transient problem.
+For incremental equilibrium, see @belytschko2000 [Section 6.3.7],
+especially Box 6.4. Section 6.5.3 of the same book discusses continuation
+and arc-length methods as alternatives to load control.
 
 ### Damped Newton iteration and backtracking
 
@@ -1048,7 +1082,7 @@ Newton's method solves stationarity equations and may approach stationary
 points that are not energy minima. Load stepping and backtracking improve
 the range of usable initial guesses but do not guarantee a unique or stable
 equilibrium for every nonlinear problem. For line searches in nonlinear
-finite element analysis, see @belytschko2000 [Section 6.3.8]. For the
+finite element analysis, see @belytschko2000 [Section 6.3.10]. For the
 backtracking algorithm used by the FEniCSx examples, see the PETSc
 documentation [@petsc-snes-linesearch-bt].
 
@@ -1066,10 +1100,9 @@ Apply scalar Newton iteration to $r(s)=1/s-2$ on $s>0$, starting at $s^0=2$.
 
 The cube example below delegates the nonlinear iterations to PETSc. The
 [hyperelastic cantilever notebook](https://github.com/CEADpx/finite-element-methods/blob/main/notebooks/nonlinear/hyperelasticity_newton.ipynb)
-used in Lecture 3 follows the same workflow with a beam in bending: UFL
+follows the same procedure for a beam in bending: UFL
 differentiates the residual form before assembly, and DOLFINx calls PETSc
-for the Newton iterations at each load. The determinant checks apply to
-converged states, not to every trial displacement.
+for the Newton iterations at each load.
 
 ### A three-dimensional test problem
 
@@ -1084,7 +1117,10 @@ is not its exact solution.
 ![The reference cube, clamped at $X_1=0$ and loaded by reference traction on $X_1=1$ mm. The four other faces have zero prescribed traction. The arrows indicate the load direction, and $\zeta$ scales its magnitude.](../figures/chapter09/cube-boundary-data.svg){#fig-c9-cube-boundary width="82%"}
 
 Use four subdivisions in each coordinate direction and split the cubes into
-tetrahedra. The displacement space is vector-valued $P_1$. The following
+tetrahedra. The displacement space is vector-valued $P_1$. On these affine
+elements, the displacement gradient and the basis gradients are constant
+on each element, so the default quadrature integrates the internal residual
+and tangent terms exactly. The following
 blocks form one program and are intended to run sequentially in the
 repository's `finite-elements` environment, with a single MPI process.
 They were checked with DOLFINx 0.11.0. The nonlinear solver interface follows
@@ -1178,8 +1214,11 @@ uses prescribed increments and stops on failure. To implement the retry
 algorithm above, save the last converged coefficients before `solve()`;
 if a solve fails, restore them and reduce the load increment.
 
-The residual tolerances and iteration limit are passed to PETSc. A direct
-LU solve is adequate for this small mesh. PETSc's `bt` line search uses
+PETSc checks the absolute and relative residual tolerances separately,
+rather than adding them as in @eq-c9-force-tolerance. It can also report
+convergence when the update is small. Check the final residual norm and
+the reason reported by the solver [@petsc-snes-converged-default].
+A direct LU solve is adequate for this small mesh. PETSc's `bt` line search uses
 polynomial interpolation by default to choose trial step lengths for
 reducing the squared residual norm [@petsc-snes-linesearch-bt], rather
 than the simple halving rule above. This program does not supply a check
@@ -1201,13 +1240,15 @@ raw_R = fem.assemble_vector(fem.form(residual)).array.copy()
 reaction = -raw_R.reshape(-1, 3)[fixed].sum(axis=0)
 area = fem.assemble_scalar(fem.form(1.0 * ds(1)))
 applied = np.array([0.2 * float(load.value) * area, 0.0, 0.0])
+print("Free residual norm:", problem.solver.getFunctionNorm())
+print("Convergence reason:", problem.solver.getConvergedReason())
 print("Force balance:", reaction + applied)
 ```
 
-Second, check the element volume ratios. Because the mesh has affine
-tetrahedra and the displacement is $P_1$, $\bF$ and $J$ are constant on each
-element. A discontinuous degree-zero (`DG0`) function therefore records the
-computed $J$ exactly, one value per element:
+Second, check the element volume ratios. On affine tetrahedra with
+$P_1$ displacements, $\bF$ and $J$ are constant on each element.
+A discontinuous degree-zero (`DG0`) function records
+the computed $J$ exactly, one value per element:
 
 ```{python}
 #| eval: false
@@ -1257,11 +1298,11 @@ diffusion coefficient depends on the gradient of $u$:
 
 $$
 \begin{aligned}
--\grad\cdot\bigl(k(u)\grad u\bigr)+c(\bx)u^3 &= f(\bx)
+-\divg\bigl(k(\grad u)\grad u\bigr)+c(\bx)u^3 &= f(\bx)
 &&\text{in }\Om,\\
 u&=0 &&\text{on }\partial\Om,
 \end{aligned}
-\qquad k(u)=k_0(1+|\grad u|^2).
+\qquad k(\grad u)=k_0(1+|\grad u|^2).
 $$ {#eq-c9-diffusion-strong}
 
 Here $k_0>0$ is constant, $|\grad u|^2=\grad u\cdot\grad u$,
@@ -1272,18 +1313,18 @@ $f\in L^{4/3}(\Om)$.
 
 For smooth fields, multiply @eq-c9-diffusion-strong by $v$ and
 integrate the diffusion term by parts. Its boundary term
-$-\int_{\partial\Om}v k(u)\grad u\cdot\bn\,\dd s$ vanishes because $v=0$
+$-\int_{\partial\Om}v k(\grad u)\grad u\cdot\bn\,\dd s$ vanishes because $v=0$
 on $\partial\Om$. Define the remaining terms by
 
 $$
 \begin{aligned}
-a(u;v)&=\int_\Om \bigl[k(u)\grad u\cdot\grad v+cu^3v\bigr]\,\dx,\\
+a(u;v)&=\int_\Om \bigl[k(\grad u)\grad u\cdot\grad v+cu^3v\bigr]\,\dx,\\
 \ell(v)&=\int_\Om fv\,\dx.
 \end{aligned}
 $$ {#eq-c9-diffusion-forms}
 
-Use $V=W^{1,4}_0(\Om)$ for both the trial and test functions. The zero
-subscript means zero trace on the boundary. To see why we use fourth-power
+Use $V=W^{1,4}_0(\Om)$ for both the trial and test functions, which have
+zero boundary values. To see why we use fourth-power
 integrability, note that $|\grad u|^3$ is in $L^{4/3}$ when $\grad u$ is
 in $L^4$: raising the former to the power $4/3$ gives $|\grad u|^4$.
 Hölder's inequality (@eq-foundations-holder), with exponents $4/3$ and
@@ -1303,7 +1344,7 @@ $$
 The $L^4$ norms are finite by the choice of $V$. The norms of $c$ and $f$
 are finite by assumption. The linear part of the diffusion term is also
 finite because $L^4(\Om)\subset L^2(\Om)$ on the square. The cubic
-diffusion flux is the reason for using the Banach space $W^{1,4}_0$:
+gradient term is the reason for using the Banach space $W^{1,4}_0$:
 membership in the Hilbert space $H^1_0$ alone does not guarantee a gradient
 in $L^4$.
 
@@ -1341,15 +1382,15 @@ $$ {#eq-c9-diffusion-energy-residual}
 ### Newton correction
 
 Hold $v$ fixed and replace $u$ by $u+\epsilon w$ with $w\in V$. The
-load term is fixed. The derivative of $k(u+\epsilon w)$ at zero is
+load term is fixed. The derivative of $k(\grad u+\epsilon\grad w)$ at zero is
 $2k_0\grad u\cdot\grad w$. The product rule for
-$k(u+\epsilon w)\grad(u+\epsilon w)$ gives two terms, and
+$k(\grad u+\epsilon\grad w)(\grad u+\epsilon\grad w)$ gives two terms, and
 the reaction $c(u+\epsilon w)^3$ contributes $3cu^2w$. The result is
 
 $$
 \begin{aligned}
 \delta_uR(u;v)[w]=-\int_\Om\bigl[&
-k(u)\grad w\cdot\grad v\\
+k(\grad u)\grad w\cdot\grad v\\
 &+2k_0(\grad u\cdot\grad w)(\grad u\cdot\grad v)
 +3cu^2wv\bigr]\,\dx .
 \end{aligned}
@@ -1374,7 +1415,7 @@ The remaining term in @eq-c9-diffusion-tangent splits into a constant
 coefficient term and a term bounded by the first estimate above.
 
 Let $\Vhzero\subset V$ consist of continuous piecewise-linear functions on
-triangles with zero trace. Find $\Delta u_h^k\in\Vhzero$ such that
+triangles with zero boundary values. Find $\Delta u_h^k\in\Vhzero$ such that
 
 $$
 \delta_uR(u_h^k;v_h)[\Delta u_h^k]=-R(u_h^k;v_h)
@@ -1383,9 +1424,9 @@ $$ {#eq-c9-diffusion-newton}
 
 Then update $u_h^{k+1}=u_h^k+\omega\Delta u_h^k$, where $\omega=1$ for a
 full Newton step. At each fixed iterate the correction equation is linear.
-In fact, with $v_h=w_h$, the negative of @eq-c9-diffusion-tangent is
+With $v_h=w_h$, the negative of @eq-c9-diffusion-tangent is
 bounded below by $k_0\norm{\grad w_h}_{L^2}^2$ because $c\ge 0$.
-This is positive for every nonzero $w_h$ with zero trace. Consequently,
+This is positive for every nonzero $w_h$ with zero boundary values. Consequently,
 the negative of the free residual Jacobian is symmetric positive definite.
 The lower bound controls the $H^1$ seminorm, not the $W^{1,4}$ norm.
 
