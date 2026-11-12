@@ -180,8 +180,8 @@ $$
 R(u_h;\phi_i)=F_i-\sum_jK_{ij}U_j=0.
 $$ {#eq-c8-assembled-residual}
 
-This is the negative of the corresponding entry of the algebraic residual
-$\bR=\bK\bU-\bF$. The discrete equations say nothing about the residual on
+This is the corresponding entry of the algebraic residual
+$\bR=\bF-\bK\bU$. The discrete equations say nothing about the residual on
 functions outside $\Vhzero$. In general, $R(u_h;v)\neq0$ for such functions,
 and the residual vanishes on all of $\Vzero$ only when $u_h=u$.
 

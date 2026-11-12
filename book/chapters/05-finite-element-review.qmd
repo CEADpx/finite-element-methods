@@ -1320,7 +1320,7 @@ After the free displacements have been found, they provide the forces required
 to enforce the prescribed values:
 
 $$
-\bR_p
+\bm r_p
 =
 \bK_{pf}\bU_f+\bK_{pp}\bU_p-\bF_p.
 $$ {#eq-c5-reactions}
@@ -1329,11 +1329,13 @@ In computation it is convenient to insert the prescribed values into $\bU$,
 form the complete residual vector
 
 $$
-\bR=\bK\bU-\bF,
+\bR=\bF-\bK\bU,
 $$ {#eq-c5-residual-vector}
 
-and read the reactions from its prescribed entries. The free entries of
-$\bR$ are $\bK_{ff}\bU_f+\bK_{fp}\bU_p-\bF_f$, which vanish, up to rounding
+and recover the support reactions as $\bm r_p=-\bR_p$. This sign follows
+because $\bR$ is external force minus internal force; the support supplies
+the additional force needed for equilibrium. The free entries of
+$\bR$ are $\bF_f-\bK_{ff}\bU_f-\bK_{fp}\bU_p$, which vanish, up to rounding
 error, because they are exactly the equations solved in
 @eq-c5-reduced-system. Checking them is therefore a simple test of the solve.
 
@@ -1527,7 +1529,7 @@ Finally, the reaction at node 1 is obtained from the first row of the original
 assembled system:
 
 $$
-R_1
+r_1=-R_1
 =
 -\frac{AE}{h}U_2-\frac{f_0h}{2}
 =
@@ -1537,7 +1539,7 @@ $$
 Because $\int_0^L f_0\,\dd x=f_0L$,
 
 $$
-R_1+\int_0^L f_0\,\dd x=0.
+r_1+\int_0^L f_0\,\dd x=0.
 $$
 
 The recovered reaction therefore satisfies global equilibrium.
@@ -1600,7 +1602,8 @@ and recovery of the reaction. The arrays use Python's zero-based indexing;
 thus `dofs = [e, e + 1]` represents the theoretical connectivity
 $I^{e+1}=(e+1,e+2)$. The two nested loops over the local indices `a` and `b`
 transcribe the scatter-add rule @eq-c5-assembly-rule line by line, and the
-reaction is read from the residual vector @eq-c5-residual-vector.
+reaction is the negative of the prescribed entry of the residual vector
+@eq-c5-residual-vector, or equivalently the prescribed entry of `K @ U - F`.
 
 ```{python}
 #| label: fig-c5-python-mesh-refinement
@@ -1631,7 +1634,8 @@ def solve_bar(num_elements):
     U = np.zeros(num_elements + 1)
     rhs = F[free] - K[np.ix_(free, prescribed)] @ U[prescribed]
     U[free] = np.linalg.solve(K[np.ix_(free, free)], rhs)
-    reaction = (K @ U - F)[prescribed]
+    R = F - K @ U
+    reaction = -R[prescribed]
     return x, U, reaction
 
 x_plot = np.linspace(0.0, 1.0, 501)
@@ -2264,8 +2268,8 @@ For the first element in @exm-c5-complete-bar, state
   $\bF$.
 - Essential boundary conditions prescribe selected coefficients and produce a
   reduced system for the free degrees of freedom. Natural boundary data enter
-  the load vector, and reactions are obtained from the prescribed entries of
-  the residual after the solution is known.
+  the load vector, and reactions are the negatives of the prescribed entries
+  of the residual after the solution is known.
 - Quadratic and higher-order Lagrange elements follow the same construction
   with richer local polynomial spaces. The reference element makes the basis,
   coordinate mapping, and quadrature reusable across physical elements.

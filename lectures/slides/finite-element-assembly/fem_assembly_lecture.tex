@@ -285,12 +285,12 @@ one-based indices.
 \begin{frame}{Reactions and final checks}
 After constructing the complete coefficient vector,
 \[
-  \bR=\bK\bU-\bF.
+  \bR=\bF-\bK\bU.
 \]
 
-The entries associated with prescribed degrees of freedom are the reactions:
+The support reactions are the negatives of the prescribed residual entries:
 \[
-  \bR_p
+  \bm r_p=-\bR_p
   =\bK_{pf}\bU_f+\bK_{pp}\bU_p-\bF_p.
 \]
 
@@ -376,7 +376,8 @@ K_ff = K[1:, 1:]
 F_f = F[1:]
 U[1:] = np.linalg.solve(K_ff, F_f)
 
-reaction = (K @ U - F)[0]
+R = F - K @ U
+reaction = -R[0]
 \end{lstlisting}
 
 For this problem, the computed nodal values agree with the exact quadratic

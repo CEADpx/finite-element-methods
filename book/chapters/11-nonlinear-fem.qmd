@@ -4,4 +4,1201 @@
 \chaptershorttitle{Nonlinear FEM}
 ```
 
-*Chapter placeholder. Content will be developed from the finalized course notes and references.*
+The linear problems of Chapters 5 and 6 led to a matrix equation
+$\bK\bU=\bF$. Once the mesh, material parameters, and boundary data were
+specified, the matrix did not depend on the unknown displacement. Finite
+deformation changes this situation. In the hyperelastic problem of
+@sec-model-hyperelasticity, the stress depends on
+$\bF(\bu)=\bI+\Grad\bu$ through its determinant and inverse. Substituting a
+finite element displacement into the variational equation therefore gives
+nonlinear equations for its coefficients.
+
+This chapter develops the solution of those equations. We retain the
+reference configuration and constitutive model introduced in Chapter 4,
+linearize its residual, and discretize the resulting Newton correction
+problem. Element assembly then follows the connectivity and support
+arguments of Chapters 5 and 6. Worked calculations and a small FEniCSx
+example provide checks on the stress derivative, reaction forces, and
+nonlinear solve. Load stepping and step reduction address cases in which a
+full Newton update is not suitable.
+
+## Equilibrium, residual, and energy {#sec-c9-residual}
+
+### The reference-configuration problem
+
+Let $\Om_0\subset\R^3$ be the reference body, with prescribed displacement
+$\overline{\bu}$ on $\Gam_{0u}$ and prescribed reference traction
+$\overline{\bt}_0$ on $\Gam_{0t}$. The body force $\bb_0$ is measured per
+unit reference volume. Throughout the chapter, these loads are independent
+of displacement. The reference geometry remains fixed while the current
+configuration is determined by $\bx=\bX+\bu(\bX)$.
+
+Recall the strong problem @eq-model-hyperelastic-strong and the spaces
+@eq-model-hyperelastic-spaces:
+
+$$
+\begin{aligned}
+\mathcal U_{\overline{\bu}}
+&=\{\bw\in H^1(\Om_0;\R^3):\bw=\overline{\bu}
+\text{ on }\Gam_{0u}\},\\
+\Vzero
+&=\{\bv\in H^1(\Om_0;\R^3):\bv=\bm0
+\text{ on }\Gam_{0u}\}.
+\end{aligned}
+$$ {#eq-c9-spaces}
+
+As in @rem-model-hyperelastic-admissibility, we assume enough regularity for
+the following stress and energy integrals to be finite. Deformations must
+satisfy $J=\det\bF>0$; the $H^1$ condition alone does not impose this
+requirement. Our purpose here is the construction and solution of the
+discrete equations, not an existence theory for nonlinear elasticity.
+
+The internal and external forms from
+@eq-model-hyperelastic-semilinear-form are
+
+$$
+\begin{aligned}
+a_{\mathrm{hyp}}(\bu;\bv)
+&=\int_{\Om_0}\bP(\bF(\bu)):\Grad\bv\,\dd V_0,\\
+\ell_{\mathrm{hyp}}(\bv)
+&=\int_{\Om_0}\bb_0\cdot\bv\,\dd V_0
++\int_{\Gam_{0t}}\overline{\bt}_0\cdot\bv\,\dd A.
+\end{aligned}
+$$ {#eq-c9-forms}
+
+The first is generally nonlinear in $\bu$ and linear in $\bv$; the second
+is linear in $\bv$. Define their residual using external minus internal
+work:
+
+$$
+R(\bu;\bv)=\ell_{\mathrm{hyp}}(\bv)-a_{\mathrm{hyp}}(\bu;\bv).
+$$ {#eq-c9-residual}
+
+The nonlinear variational problem is
+
+$$
+\boxed{\text{Find }\bu\in\mathcal U_{\overline{\bu}}\text{ such that }
+R(\bu;\bv)=0\quad\forall\bv\in\Vzero.}
+$$ {#eq-c9-equilibrium}
+
+A trial displacement satisfies the prescribed boundary displacement but
+need not satisfy @eq-c9-equilibrium. Its nonzero residual supplies the
+right-hand side for a correction.
+
+### First and second variations of the potential
+
+For the displacement-independent loads in @eq-c9-forms, the total potential
+from @eq-model-hyperelastic-potential can be written
+
+$$
+\Pi_{\mathrm{hyp}}(\bu)
+=\int_{\Om_0}\Psi(\bF(\bu))\,\dd V_0-\ell_{\mathrm{hyp}}(\bu).
+$$ {#eq-c9-potential}
+
+For the variations below, assume sufficient regularity to differentiate
+under the integral and use directions for which the perturbed displacement
+remains admissible for sufficiently small $|\epsilon|$. In particular,
+zero prescribed displacement of a direction alone does not guarantee that
+$J$ stays positive along the perturbation.
+
+The first variation was defined in @def-directional-derivative. Since
+$\bF(\bu+\epsilon\bv)=\bF(\bu)+\epsilon\Grad\bv$ and
+$\bP=\partial\Psi/\partial\bF$, the chain rule gives
+
+$$
+\begin{aligned}
+\delta\Pi_{\mathrm{hyp}}(\bu;\bv)
+&=\left.\frac{\dd}{\dd\epsilon}
+\Pi_{\mathrm{hyp}}(\bu+\epsilon\bv)\right|_{\epsilon=0}\\
+&=\int_{\Om_0}\bP(\bF(\bu)):\Grad\bv\,\dd V_0
+-\ell_{\mathrm{hyp}}(\bv)\\
+&=-R(\bu;\bv).
+\end{aligned}
+$$ {#eq-c9-first-variation}
+
+Consequently, stationarity for every admissible direction $\bv$ is exactly
+the variational equation @eq-c9-equilibrium. This equivalence concerns
+stationary points; a stationary point need not minimize the potential.
+
+Newton's method requires the variation of the residual with respect to the
+displacement. Hold the test function $\bv$ fixed and perturb $\bu$ in a
+direction $\bw\in\Vzero$:
+
+$$
+\delta_uR(\bu;\bv)[\bw]
+:=\left.\frac{\dd}{\dd\epsilon}
+R(\bu+\epsilon\bw;\bv)\right|_{\epsilon=0}.
+$$ {#eq-c9-residual-variation}
+
+For a twice-differentiable potential, its **second variation** is
+
+$$
+\delta^2\Pi_{\mathrm{hyp}}(\bu;\bv,\bw)
+:=\left.\frac{\dd}{\dd\epsilon}
+\delta\Pi_{\mathrm{hyp}}(\bu+\epsilon\bw;\bv)\right|_{\epsilon=0}.
+$$ {#eq-c9-second-variation}
+
+Differentiating @eq-c9-first-variation with $\bv$ fixed gives
+
+$$
+\boxed{\delta_uR(\bu;\bv)[\bw]
+=-\delta^2\Pi_{\mathrm{hyp}}(\bu;\bv,\bw).}
+$$ {#eq-c9-energy-tangent}
+
+Thus the residual derivative and the second variation describe the same
+linearized stress response, with opposite signs under our residual
+convention. If the second derivative is continuous, the second variation is
+symmetric in $\bv$ and $\bw$. Symmetry alone does not establish positivity
+or stability.
+
+::: {#exr-c9-energy-sign}
+## Energy and the residual of a nonlinear spring
+Let $\Pi(z)=kz^2/2+cz^4/4-Pz$, where $k,c>0$ and $P$ is prescribed.
+Define the residual as applied force minus spring force.
+
+1. Find $r(z)$ and verify $\delta\Pi(z;v)=-r(z)v$.
+2. Calculate $\delta^2\Pi(z;v,w)$ and $r'(z)vw$. Verify their sign relation.
+3. Show that $\Pi''(z)>0$ for every $z$, and explain why this particular
+   spring has at most one equilibrium for a given $P$.
+:::
+
+## Newton's method {#sec-c9-newton}
+
+### A scalar equation
+
+Consider a scalar equation $r(z)=0$, with $r$ twice continuously
+differentiable near the iterate. Given an approximation
+$z^k$, write the next approximation as $z^{k+1}=z^k+\Delta z^k$. Taylor
+expansion gives
+
+$$
+r(z^k+\Delta z^k)
+=r(z^k)+r'(z^k)\Delta z^k+O((\Delta z^k)^2).
+$$
+
+Newton's method sets the first-order approximation to zero and solves
+
+$$
+\boxed{r'(z^k)\Delta z^k=-r(z^k),
+\qquad z^{k+1}=z^k+\Delta z^k.}
+$$ {#eq-c9-scalar-newton}
+
+The derivative is evaluated at the current approximation. Reusing a
+derivative from an earlier iterate defines a different iteration and need
+not give Newton's convergence rate [@belytschko2000].
+
+::: {#exm-c9-scalar-newton}
+## Computing a square root
+For $r(z)=z^2-2$, $r'(z)=2z$. Starting from $z^0=1$, the first correction is
+
+$$
+2\Delta z^0=1,\qquad \Delta z^0=\frac12,\qquad z^1=1.5.
+$$
+
+In general, @eq-c9-scalar-newton becomes
+
+$$
+z^{k+1}=z^k-\frac{(z^k)^2-2}{2z^k}
+=\frac12\left(z^k+\frac2{z^k}\right).
+$$
+
+| $k$ | $z^k$ | $|r(z^k)|$ |
+|---:|---:|---:|
+| 0 | 1.000000 | $1$ |
+| 1 | 1.500000 | $0.25$ |
+| 2 | 1.416667 | $6.9444\times10^{-3}$ |
+| 3 | 1.414216 | $6.0073\times10^{-6}$ |
+
+The iterates approach $\sqrt2$. The tangent construction is shown in
+@fig-c9-newton-tangent. Starting instead at $z^0=0$ would fail because the
+linear correction equation would have zero coefficient and nonzero
+right-hand side.
+:::
+
+![Newton's first correction for $r(z)=z^2-2$. The zero of the tangent at $z^0=1$ is the next iterate $z^1=1.5$, rather than the zero of the nonlinear curve.](../figures/chapter09/newton-tangent.svg){#fig-c9-newton-tangent width="82%"}
+
+### Correction of a displacement field
+
+For @eq-c9-equilibrium, the unknown is a field rather than a scalar. Keep
+$\bv\in\Vzero$ fixed and expand the residual about $\bu^k$:
+
+$$
+R(\bu^k+\Delta\bu^k;\bv)
+\approx R(\bu^k;\bv)+\delta_uR(\bu^k;\bv)[\Delta\bu^k].
+$$
+
+Setting this approximation to zero gives the Newton problem:
+
+$$
+\boxed{\begin{aligned}
+&\text{Find }\Delta\bu^k\in\Vzero\text{ such that}\\
+&\delta_uR(\bu^k;\bv)[\Delta\bu^k]
+=-R(\bu^k;\bv)\quad\forall\bv\in\Vzero.
+\end{aligned}}
+$$ {#eq-c9-field-newton}
+
+After solving this linear problem, set
+$\bu^{k+1}=\bu^k+\Delta\bu^k$ and reevaluate the nonlinear residual.
+Although the coefficients of the correction problem depend on $\bu^k$, its
+unknown $\Delta\bu^k$ enters linearly.
+
+The zero boundary value of the correction follows from the boundary data,
+not from assuming that the prescribed displacement is zero. Suppose the
+initial iterate satisfies $\bu^0=\overline{\bu}$ on $\Gam_{0u}$ and that
+the data are fixed during this solve. At iteration $k$,
+
+$$
+\begin{aligned}
+\bu^{k+1}=\bu^k+\Delta\bu^k&=\overline{\bu}
+&&\text{on }\Gam_{0u},\\
+\Delta\bu^k&=\overline{\bu}-\bu^k=\bm0
+&&\text{on }\Gam_{0u}.
+\end{aligned}
+$$ {#eq-c9-correction-bc}
+
+Thus every update preserves the prescribed displacement. Assigning
+$\Delta\bu^k=\overline{\bu}$ instead would repeatedly add the boundary
+displacement and solve a different problem.
+
+## Consistent linearization of hyperelasticity {#sec-c9-linearization}
+
+### Differentiating the stress work
+
+We now calculate the derivative in @eq-c9-field-newton. Since the loads in
+@eq-c9-forms are independent of $\bu$,
+
+$$
+\delta_uR(\bu;\bv)[\bw]
+=-\delta_u a_{\mathrm{hyp}}(\bu;\bv)[\bw].
+$$
+
+The perturbation of the deformation gradient is
+
+$$
+\bF(\bu+\epsilon\bw)
+=\bI+\Grad\bu+\epsilon\Grad\bw
+=\bF(\bu)+\epsilon\Grad\bw.
+$$ {#eq-c9-gradient-variation}
+
+For a tensor direction $\bm H$, define the stress variation by
+
+$$
+\delta\bP(\bF;\bm H)
+:=\left.\frac{\dd}{\dd\epsilon}
+\bP(\bF+\epsilon\bm H)\right|_{\epsilon=0}.
+$$ {#eq-c9-stress-variation}
+
+Substitute $\bm H=\Grad\bw$ into @eq-c9-stress-variation and differentiate
+the internal-work integral. Assuming sufficient smoothness to differentiate
+under the integral,
+
+$$
+\boxed{\delta_uR(\bu;\bv)[\bw]
+=-\int_{\Om_0}\delta\bP(\bF(\bu);\Grad\bw):\Grad\bv\,\dd V_0.}
+$$ {#eq-c9-tangent-form}
+
+In particular, with $\bF^k=\bI+\Grad\bu^k$, @eq-c9-field-newton is
+
+$$
+-\int_{\Om_0}\delta\bP(\bF^k;\Grad\Delta\bu^k):\Grad\bv\,\dd V_0
+=-R(\bu^k;\bv)\quad\forall\bv\in\Vzero.
+$$ {#eq-c9-explicit-field-newton}
+
+The minus sign on the integral comes from $R=\ell-a$, and the minus sign
+on the right comes from Newton's equation. They have different origins.
+Multiplying both sides by $-1$ gives an equivalent equation, but changing
+only one side reverses the correction.
+
+### Inverse and determinant variations
+
+The neo-Hookean stress in @eq-model-neo-hookean-stress contains
+$\bF^{-T}$ and $\ln J$. To differentiate it, take $\delta\bF=\bm H$ and
+vary the identity $\bF\bF^{-1}=\bI$:
+
+$$
+\bm H\bF^{-1}+\bF\delta(\bF^{-1})=\bm0.
+$$
+
+Multiplying on the left by $\bF^{-1}$ and then transposing gives
+
+$$
+\begin{aligned}
+\delta(\bF^{-1})&=-\bF^{-1}\bm H\bF^{-1},\\
+\delta(\bF^{-T})&=-\bF^{-T}\bm H^T\bF^{-T}.
+\end{aligned}
+$$ {#eq-c9-inverse-variation}
+
+The derivative of the determinant can be expressed through the cofactor
+tensor $J\bF^{-T}$:
+
+$$
+\delta J=(J\bF^{-T}):\bm H
+=J\tr(\bF^{-1}\bm H).
+$$ {#eq-c9-determinant-variation}
+
+Here $\bF^{-T}:\bm H=\tr(\bF^{-1}\bm H)$ follows from the definition
+of the double contraction. Applying the scalar chain rule to $\ln J$ yields
+
+$$
+\delta(\ln J)=\frac{\delta J}{J}
+=\tr(\bF^{-1}\bm H).
+$$ {#eq-c9-log-variation}
+
+All these formulas refer to the same perturbation $\delta\bF=\bm H$ and
+require an invertible $\bF$; the logarithm also requires $J>0$.
+
+### The neo-Hookean material tangent
+
+Rewrite @eq-model-neo-hookean-stress as
+
+$$
+\bP(\bF)=\mu\bF+(\lambda\ln J-\mu)\bF^{-T}.
+$$
+
+The product rule first gives
+
+$$
+\delta\bP(\bF;\bm H)
+=\mu\bm H+\lambda\delta(\ln J)\bF^{-T}
++(\lambda\ln J-\mu)\delta(\bF^{-T}).
+$$
+
+Substitution of @eq-c9-inverse-variation and @eq-c9-log-variation gives
+
+$$
+\boxed{\begin{aligned}
+\delta\bP(\bF;\bm H)
+={}&\mu\bm H
++\lambda\tr(\bF^{-1}\bm H)\bF^{-T}\\
+&+(\mu-\lambda\ln J)\bF^{-T}\bm H^T\bF^{-T}.
+\end{aligned}}
+$$ {#eq-c9-neo-hookean-tangent}
+
+For Newton's problem, evaluate this expression at $\bF^k$ and set
+$\bm H=\Grad\Delta\bu^k$. This derivative is called a **consistent
+tangent** because it differentiates the stress law actually used in the
+residual. Substituting a small-strain stiffness while retaining the
+finite-deformation stress would not give this derivative.
+
+::: {#exm-c9-linear-limit}
+## Recovery of the linear elastic response
+At the undeformed state, $\bF=\bI$ and $J=1$,
+@eq-c9-neo-hookean-tangent becomes
+
+$$
+\delta\bP(\bI;\bm H)
+=\mu(\bm H+\bm H^T)+\lambda\tr(\bm H)\bI.
+$$
+
+Set $\bm H=\Grad\bw$. Since
+$\beps(\bw)=(\Grad\bw+(\Grad\bw)^T)/2$, this is
+
+$$
+\delta\bP(\bI;\Grad\bw)
+=2\mu\beps(\bw)+\lambda\tr(\beps(\bw))\bI.
+$$
+
+This is the isotropic linear elastic stress associated with the incremental
+displacement $\bw$. The finite-deformation law therefore recovers the
+small-strain law at first order about its stress-free reference state.
+:::
+
+::: {#exr-c9-shear-tangent}
+## A shear perturbation
+At $\bF=\bI$, let $\bm H=\gamma\bm e_1\otimes\bm e_2$.
+Use @eq-c9-neo-hookean-tangent to calculate every nonzero component of
+$\delta\bP(\bI;\bm H)$. Repeat with the skew-symmetric direction
+$\bm H=\gamma(\bm e_1\otimes\bm e_2-\bm e_2\otimes\bm e_1)$.
+Explain the second result using the infinitesimal strain of that direction.
+:::
+
+## Finite element residual and tangent matrix {#sec-c9-discretization}
+
+### Coefficients, free directions, and equilibrium equations
+
+Use a conforming reference mesh $\Th$ and scalar nodal basis functions
+$\phi_i$, $i=1,\ldots,N_n$. Following the vector-valued construction in
+Chapter 6, write
+
+$$
+\bu_h(\bX)=\sum_{i=1}^{N_n}\phi_i(\bX)\bm U_i,
+\qquad
+\bm U_i=\begin{bmatrix}U_{i1}&U_{i2}&U_{i3}\end{bmatrix}^{T}.
+$$ {#eq-c9-fe-displacement}
+
+Stack the nodal vectors into $\bU$. Here $i,j$ label nodes and Greek
+indices $\alpha,\beta$ label spatial components. A vector basis direction is
+$\phi_i\bm e_\alpha$, where $\bm e_\alpha$ is a Cartesian unit vector.
+The discrete test space $\Vhzero\subset\Vzero$ consists of the finite
+element fields with zero prescribed displacement. Only free basis directions
+belong to this space. The discrete trial space satisfies the prescribed
+displacement, with coefficients denoted by $\bU_p=\overline{\bU}_p$.
+
+Define the load and residual entries before eliminating prescribed rows:
+
+$$
+\begin{aligned}
+F_{i\alpha}&=\ell_{\mathrm{hyp}}(\phi_i\bm e_\alpha),\\
+R_{i\alpha}(\bU)
+&=F_{i\alpha}-\int_{\Om_0}
+\bP(\bF(\bu_h)):\Grad(\phi_i\bm e_\alpha)\,\dd V_0\\
+&=R(\bu_h;\phi_i\bm e_\alpha).
+\end{aligned}
+$$ {#eq-c9-assembled-residual}
+
+Thus the algebraic residual has exactly the sign of the variational residual.
+The discrete equilibrium equations are $\bR_f(\bU)=\bm0$ on free rows.
+Prescribed rows define force imbalances, not equations that must vanish:
+the support reactions are $\bm r_p=-\bR_p$ as in
+@eq-c5-residual-vector. The components $F_{i\alpha}$ are nodal loads, whereas
+$F_{\alpha I}$ is a component of the deformation gradient, with $I$ indexing
+the reference-coordinate directions.
+
+### Linearize, then discretize
+
+Start with the linearized variational equation @eq-c9-field-newton.
+Evaluate it at the current FE displacement $\bu_h^k$ and expand the correction:
+
+$$
+\Delta\bu_h^k=\sum_{j,\beta}\phi_j\bm e_\beta\Delta U_{j\beta}^k.
+$$
+
+The prescribed correction coefficients in this expansion are zero by
+@eq-c9-correction-bc. Choose $\bv_h=\phi_i\bm e_\alpha$ for a free row.
+Linearity in the correction direction gives
+
+$$
+\sum_{j,\beta}
+\delta_uR(\bu_h^k;\phi_i\bm e_\alpha)[\phi_j\bm e_\beta]
+\Delta U_{j\beta}^k
+=-R(\bu_h^k;\phi_i\bm e_\alpha).
+$$
+
+The coefficient of $\Delta U_{j\beta}^k$ defines the tangent entry.
+Using @eq-c9-tangent-form with $\bF^k=\bI+\Grad\bu_h^k$ gives
+
+$$
+\begin{aligned}
+(K_T)_{i\alpha,j\beta}(\bU^k)
+&=\delta_uR(\bu_h^k;\phi_i\bm e_\alpha)[\phi_j\bm e_\beta]\\
+&=-\int_{\Om_0}\delta\bP(\bF^k;\Grad(\phi_j\bm e_\beta))
+:\Grad(\phi_i\bm e_\alpha)\,\dd V_0.
+\end{aligned}
+$$ {#eq-c9-tangent-entries}
+
+The right-hand side is minus the residual entry in @eq-c9-assembled-residual.
+Thus the free Newton rows are
+
+$$
+\sum_{j,\beta}(K_T)_{i\alpha,j\beta}(\bU^k)\Delta U_{j\beta}^k
+=-R_{i\alpha}(\bU^k).
+$$ {#eq-c9-discrete-newton-rows}
+
+The test direction determines the row, and the correction basis direction
+determines the column. This is the sequence used in @sec-c9-fenicsx:
+differentiate the variational form, then assemble the matrix.
+
+### Comparison with the assembled residual Jacobian
+
+One can also differentiate @eq-c9-assembled-residual after discretization.
+Changing $U_{j\beta}$ by $\epsilon$ changes $\bu_h$ by
+$\epsilon\phi_j\bm e_\beta$. With the test direction fixed, the chain rule
+therefore gives the same entry as @eq-c9-tangent-entries:
+
+$$
+(K_T)_{i\alpha,j\beta}(\bU)
+=\frac{\partial R_{i\alpha}(\bU)}{\partial U_{j\beta}}.
+$$ {#eq-c9-jacobian}
+
+The entries agree in computation when both constructions use the same basis,
+quadrature, and treatment of prescribed coefficients. Since $R=\ell-a$
+and the loads are independent of displacement, $\bK_T$ is the negative of
+the internal-force derivative.
+
+For a hyperelastic material, let
+$\Pi_h(\bU)=\Pi_{\mathrm{hyp}}(\bu_h)$ be the discrete potential. Then
+@eq-c9-first-variation evaluated on each free basis direction, with prescribed
+coefficients held fixed, shows that
+
+$$
+\bR_f=-\nabla_{\bU_f}\Pi_h,
+\qquad
+(K_T)_{ff}=-\nabla_{\bU_f}^{\,2}\Pi_h.
+$$ {#eq-c9-discrete-energy}
+
+For a twice continuously differentiable $\Pi_h$, this free Jacobian is symmetric.
+It need not be positive definite. At a strict local minimum with positive
+definite energy Hessian on free directions, $(K_T)_{ff}$ is negative definite.
+
+### Element quantities and assembly
+
+Use the local basis functions $\phi_a^e$ on $\mathcal K_e$ and the
+local-to-global map $i=I^e(a)$ from Chapters 5 and 6. The element external
+load entry is
+
+$$
+\begin{aligned}
+F^e_{a\alpha}
+={}&\int_{\mathcal K_e}b_{0\alpha}\phi_a^e\,\dd V_0\\
+&+\int_{\partial\mathcal K_e\cap\Gam_{0t}}
+\overline t_{0\alpha}\phi_a^e\,\dd A.
+\end{aligned}
+$$ {#eq-c9-element-load}
+
+Only element boundaries lying on the prescribed-traction boundary contribute
+to the second integral. Use $I,J$ for reference-coordinate directions and
+$\gamma$ for a displacement component. Using
+$(\Grad(\phi_a^e\bm e_\alpha))_{\gamma I}
+=\delta_{\gamma\alpha}\partial\phi_a^e/\partial X_I$,
+the residual entry is
+
+$$
+R^e_{a\alpha}
+=F^e_{a\alpha}-\int_{\mathcal K_e}
+\sum_I P_{\alpha I}(\bF^k)
+\frac{\partial\phi_a^e}{\partial X_I}\,\dd V_0.
+$$ {#eq-c9-element-residual}
+
+Define the fourth-order material tangent through its components:
+
+$$
+\mathbb A_{\alpha I\beta J}(\bF)
+=\frac{\partial P_{\alpha I}}{\partial F_{\beta J}},
+\qquad
+(\delta\bP(\bF;\bm H))_{\alpha I}
+=\sum_{\beta,J}\mathbb A_{\alpha I\beta J}H_{\beta J}.
+$$ {#eq-c9-material-tangent}
+
+For the basis direction $\phi_b^e\bm e_\beta$, this gives
+
+$$
+\bigl(\delta\bP(\bF;\Grad(\phi_b^e\bm e_\beta))\bigr)_{\alpha I}
+=\sum_J\mathbb A_{\alpha I\beta J}(\bF)
+\frac{\partial\phi_b^e}{\partial X_J}.
+$$
+
+Insert this expression into @eq-c9-tangent-entries restricted to
+$\mathcal K_e$:
+
+$$
+\boxed{(K_T^e)_{a\alpha,b\beta}
+=-\int_{\mathcal K_e}\sum_{I,J}
+\frac{\partial\phi_a^e}{\partial X_I}
+\mathbb A_{\alpha I\beta J}(\bF^k)
+\frac{\partial\phi_b^e}{\partial X_J}\,\dd V_0.}
+$$ {#eq-c9-element-tangent}
+
+Initialize the global residual and tangent arrays to zero, then scatter-add
+each element contribution:
+
+$$
+\begin{aligned}
+R_{I^e(a),\alpha}&\mathrel{+}=R^e_{a\alpha},\\
+(K_T)_{I^e(a)\alpha,I^e(b)\beta}
+&\mathrel{+}=(K_T^e)_{a\alpha,b\beta}.
+\end{aligned}
+$$ {#eq-c9-assembly}
+
+As before, a matrix entry can be nonzero only if its two basis directions
+are supported on a common element. The connectivity and sparsity pattern
+remain fixed during Newton iteration. The stress and material tangent are
+reevaluated at the current deformation at every integration point.
+
+The element map from Chapter 6 sends points of the reference element to
+points in $\mathcal K_e\subset\Om_0$. Its geometric Jacobian $\bm J_e$ is
+the derivative of that map: it sends infinitesimal reference-element
+directions to directions in $\mathcal K_e$. The deformation gradient $\bF$
+instead maps material line elements from $\Om_0$ to $\Om_t$.
+For nonconstant $\bF$,
+the inverse and logarithm generally make the stress integrands
+nonpolynomial. A quadrature rule exact for the linear elastic stiffness
+is not automatically exact here. Differentiate the quadrature approximation
+used for the residual consistently when constructing its Jacobian.
+
+### Prescribed coefficients and reactions
+
+Partition $\bU$ into free and prescribed entries. If
+$\bU_p^k=\overline{\bU}_p$, @eq-c9-correction-bc gives
+$\Delta\bU_p^k=\bm0$. The free rows of @eq-c9-discrete-newton-rows are
+
+$$
+(K_T)_{ff}\Delta\bU_f^k
++(K_T)_{fp}\underbrace{\Delta\bU_p^k}_{\bm0}
+=-\bR_f(\bU^k).
+$$
+
+Thus the system actually solved is
+
+$$
+\boxed{(K_T)_{ff}(\bU^k)\Delta\bU_f^k=-\bR_f(\bU^k),
+\qquad \bU_f^{k+1}=\bU_f^k+\Delta\bU_f^k.}
+$$ {#eq-c9-free-newton}
+
+Keep $\bU_p^{k+1}=\overline{\bU}_p$. The residual and tangent are evaluated
+using the full displacement vector, including the prescribed values.
+Once the solve converges, assemble the full residual without replacing its
+prescribed rows by boundary equations. The support reactions are
+
+$$
+\bm r_p=-\bR_p(\bU).
+$$ {#eq-c9-reactions}
+
+These reactions are additional external forces supplied by the supports.
+They balance the applied forces when the free equations are satisfied.
+
+## Worked stretch problem and an explicit implementation {#sec-c9-stretch}
+
+::: {#exm-c9-constrained-stretch}
+## Homogeneous constrained stretch
+Consider a prismatic body of reference length $L_0$ and area $A_0$.
+Constrain transverse displacement throughout the body and seek an axial
+displacement independent of transverse position. With no body force, the
+homogeneous deformation is
+
+$$
+\bu(\bX)=\begin{bmatrix}(s-1)X_1&0&0\end{bmatrix}^{T},
+\qquad \bF=\operatorname{diag}(s,1,1),\qquad J=s>0.
+$$
+
+The stretch $s$ is dimensionless. Impose $u_1=0$ at $X_1=0$ and reference
+traction $\tau\bm e_1$ on the end $X_1=L_0$. This is a constrained stretch,
+not a bar with traction-free lateral contraction: the transverse constraints
+supply reactions. Substitution into @eq-model-neo-hookean-stress gives
+
+$$
+P_{11}(s)=\mu(s-s^{-1})+\lambda\frac{\ln s}{s}.
+$$ {#eq-c9-stretch-stress}
+
+The axial equilibrium equation and its derivative are
+
+$$
+\begin{aligned}
+r(s)&=\tau-P_{11}(s)=0,\\
+r'(s)&=-\mu(1+s^{-2})-\lambda\frac{1-\ln s}{s^2}.
+\end{aligned}
+$$ {#eq-c9-stretch-residual}
+
+For $\mu=1$ MPa, $\lambda=2$ MPa, and $\tau=1$ MPa, start at $s^0=1$.
+The first Newton equation is
+$(-4\ \mathrm{MPa})\Delta s^0=-1\ \mathrm{MPa}$, giving $s^1=1.25$.
+Recomputing $r$ and $r'$ after each update gives
+
+| $k$ | $s^k$ | $r(s^k)$ (MPa) | $\Delta s^k$ |
+|---:|---:|---:|---:|
+| 0 | 1.000000 | $1$ | $0.250000$ |
+| 1 | 1.250000 | $0.192970$ | $0.073251$ |
+| 2 | 1.323251 | $0.009125$ | $0.003813$ |
+| 3 | 1.327064 | $2.1507\times10^{-5}$ | $9.0286\times10^{-6}$ |
+| 4 | 1.327073 | $1.1978\times10^{-10}$ | — |
+
+The computed stretch is approximately $1.327072596$. The deformation remains
+admissible throughout this iteration.
+:::
+
+### Element equations for the constrained problem
+
+The preceding example also supplies a small FE problem for which all
+assembly steps can be exposed. Divide $[0,L_0]$ into linear elements. On
+element $e$ of length $L_e$, with local axial coefficients $U_1^e,U_2^e$,
+
+$$
+s_e=1+\frac{U_2^e-U_1^e}{L_e}.
+$$
+
+The axial basis derivatives are $(-1/L_e,1/L_e)$. The stress is constant on
+the element, so its internal-force vector and residual derivative are
+
+$$
+\begin{aligned}
+\bm f_{\mathrm{int}}^e
+&=A_0P_{11}(s_e)\begin{bmatrix}-1\\1\end{bmatrix},\\
+\bK_T^e
+&=-\frac{A_0P_{11}'(s_e)}{L_e}
+\begin{bmatrix}1&-1\\-1&1\end{bmatrix}.
+\end{aligned}
+$$ {#eq-c9-stretch-element}
+
+To check the sign, differentiate
+$s_e=1+(U_2^e-U_1^e)/L_e$: its coefficient derivatives are
+$(-1/L_e,1/L_e)$. Differentiating $-\bm f_{\mathrm{int}}^e$ with these
+derivatives produces the negative matrix in @eq-c9-stretch-element.
+The only applied load is the end force $A_0\tau$. Assemble
+$\bR=\bF-\bm f_{\mathrm{int}}$ and impose $U_1=0$.
+
+The following NumPy program uses millimeters, newtons, and megapascals, so
+$L_0=A_0=1$ means $1$ mm and $1$ mm$^2$, respectively. As in Chapters 5
+and 6, Python uses zero-based indices. The arrays `ids = [e, e + 1]`
+implement the two-node connectivity; they do not change the one-based
+mathematical numbering.
+
+```{python}
+#| label: c9-stretch-code
+#| output: false
+import numpy as np
+
+mu, lam, tau = 1.0, 2.0, 1.0
+L0, A0 = 1.0, 1.0
+x = np.linspace(0.0, L0, 3)
+U = np.zeros(len(x))
+free = np.arange(1, len(x))
+F_load = np.zeros(len(x))
+F_load[-1] = A0 * tau
+
+def assemble(U):
+    R = F_load.copy()
+    K_T = np.zeros((len(x), len(x)))
+    for e in range(len(x) - 1):
+        ids = [e, e + 1]
+        Le = x[e + 1] - x[e]
+        s = 1 + (U[e + 1] - U[e]) / Le
+        if s <= 0:
+            raise ValueError("Nonpositive element stretch")
+        P = mu * (s - 1/s) + lam * np.log(s)/s
+        dP = mu * (1 + 1/s**2) + lam * (1 - np.log(s))/s**2
+        f_int = A0 * P * np.array([-1.0, 1.0])
+        K_e = -A0 * dP/Le * np.array([[1.0, -1.0], [-1.0, 1.0]])
+        for a in range(2):
+            R[ids[a]] -= f_int[a]
+            for b in range(2):
+                K_T[ids[a], ids[b]] += K_e[a, b]
+    return R, K_T
+
+for k in range(20):
+    R, K_T = assemble(U)
+    if np.linalg.norm(R[free]) < 1e-9:
+        break
+    delta_U = np.linalg.solve(K_T[np.ix_(free, free)], -R[free])
+    U[free] += delta_U
+else:
+    raise RuntimeError("Newton iteration did not converge")
+
+reaction = -R[0]
+print("U =", U)
+print("Support reaction =", reaction)
+```
+
+The computed nodal displacements are approximately
+$[0,0.163536298,0.327072596]$ mm, and the reaction is $-1$ N. Both elements
+have the same stretch as @exm-c9-constrained-stretch. The exact displacement
+within this constrained model is affine and belongs to the linear FE
+space. This example checks assembly and Newton iteration; it is not a mesh
+convergence experiment. @fig-c9-stretch-solution shows the displacement and
+the computed stress-stretch relation.
+
+![The constrained stretch example. Left: the two-element displacement coincides with the affine exact solution. Right: Newton iterates approach the intersection of the nonlinear stress curve with the prescribed reference traction.](../figures/chapter09/stretch-solution.svg){#fig-c9-stretch-solution width="100%"}
+
+::: {#exr-c9-nonzero-prescribed}
+## A nonzero prescribed displacement
+In the constrained stretch problem, replace $u_1(0)=0$ by
+$u_1(0)=0.1$ mm while leaving $\tau=1$ MPa unchanged.
+
+1. State the prescribed coefficient and the boundary value of its Newton
+   correction.
+2. Modify the initialization in the program and compute the nodal
+   displacements and reaction. Explain why the stretches do not change.
+:::
+
+## Verification and convergence of the nonlinear solve {#sec-c9-verification}
+
+### Checking the implemented tangent
+
+A derivative can be checked without knowing the equilibrium solution. Choose
+an admissible coefficient vector $\bU$ and a perturbation $\bm d$ with
+displacement units and $\bm d_p=\bm0$. Taylor expansion gives
+
+$$
+\bR_f(\bU+\epsilon\bm d)
+=\bR_f(\bU)+\epsilon(K_T)_{ff}(\bU)\bm d_f+O(\epsilon^2).
+$$
+
+Consequently, the difference
+
+$$
+\bm E(\epsilon)
+=\frac{\bR_f(\bU+\epsilon\bm d)-\bR_f(\bU)}{\epsilon}
+-(K_T)_{ff}(\bU)\bm d_f
+$$ {#eq-c9-finite-difference}
+
+should decrease linearly with the dimensionless parameter $\epsilon$ for
+sufficiently small perturbations, until floating-point cancellation becomes
+important. Keep both coefficient vectors admissible. Holding the prescribed
+entries fixed ensures that the finite difference tests the same reduced
+Jacobian used in Newton's equation.
+
+::: {#exm-c9-tangent-check}
+## Checking the stretch derivative
+For the parameters of @exm-c9-constrained-stretch, evaluate the derivative at
+$s=1.25$. From @eq-c9-stretch-residual,
+
+$$
+r'(1.25)=-2.634376\ \mathrm{MPa}\quad\text{approximately}.
+$$
+
+Compare this value with $[r(1.25+\epsilon)-r(1.25)]/\epsilon$:
+
+| $\epsilon$ | Absolute difference from $r'(1.25)$ (MPa) |
+|---:|---:|
+| $10^{-3}$ | $1.818\times10^{-3}$ |
+| $10^{-4}$ | $1.819\times10^{-4}$ |
+| $10^{-5}$ | $1.819\times10^{-5}$ |
+
+The factor-of-ten reduction tests the derivative, including its sign. It
+does not test whether the selected material model or boundary data describe
+the intended physical experiment.
+:::
+
+### Stopping criteria
+
+The free residual measures the force imbalance in the equations being solved.
+One absolute-and-relative criterion is
+
+$$
+\norm{\bR_f(\bU^k)}_2
+\leq\varepsilon_{\mathrm{abs}}
++\varepsilon_{\mathrm{rel}}\norm{\bR_f(\bU^0)}_2.
+$$ {#eq-c9-force-tolerance}
+
+Here $\varepsilon_{\mathrm{abs}}$ has force units and
+$\varepsilon_{\mathrm{rel}}$ is dimensionless. Choose tolerances relative
+to the force scale and required solve accuracy. Prescribed residual entries
+are excluded because they contain the support reactions and need not vanish.
+
+An additional check on the latest displacement correction is
+
+$$
+\norm{\Delta\bU_f^k}_2
+\leq\varepsilon_u\bigl(U_{\mathrm{scale}}+
+\norm{\bU_f^{k+1}}_2\bigr),
+$$
+
+where $U_{\mathrm{scale}}>0$ is a displacement scale and $\varepsilon_u$ is
+dimensionless. A small correction alone does not establish equilibrium:
+an iteration can stall with a substantial residual. Evaluate the residual
+at the updated displacement and impose an iteration limit.
+
+### Local convergence and finite element accuracy
+
+Let $\bU_f^\star$ solve the free equations on the chosen mesh, with
+prescribed coefficients fixed. If the free residual has continuous second
+derivatives near $\bU_f^\star$, its Jacobian is nonsingular there, and the
+initial iterate is sufficiently close, Newton iteration has local quadratic
+convergence [@belytschko2000]:
+
+$$
+\norm{\bU_f^{k+1}-\bU_f^\star}_2
+\leq C\norm{\bU_f^k-\bU_f^\star}_2^2.
+$$ {#eq-c9-quadratic-convergence}
+
+The reason can be seen by expanding the exact residual about the current
+iterate. Write $\bm e^k=\bU_f^k-\bU_f^\star$. Since
+$\bR_f(\bU^\star)=\bm0$,
+
+$$
+\bm0=\bR_f(\bU^k)-(K_T)_{ff}(\bU^k)\bm e^k
++O(\norm{\bm e^k}_2^2).
+$$
+
+The Newton equation gives
+$\bm e^{k+1}=\bm e^k-(K_T)_{ff}^{-1}\bR_f(\bU^k)$.
+Substitution of the expansion cancels the term linear in $\bm e^k$.
+A bounded inverse Jacobian in a neighborhood of the solution then gives
+@eq-c9-quadratic-convergence. The qualifications are important: the argument
+does not guarantee convergence from an arbitrary initial iterate or through
+a singular tangent.
+
+This convergence is to the solution of the nonlinear equations on a fixed
+mesh. It does not measure the spatial discretization error between $\bu_h$
+and the continuum solution. Mesh studies and checks on quantities of
+interest are still needed. Nor does a small residual prove that the
+equilibrium is a stable energy minimum. The linear error theory of
+Chapters 7 and 8 cannot be applied unchanged to a general nonlinear problem.
+
+## Load stepping and step reduction {#sec-c9-load-stepping}
+
+### Increasing the load in stages
+
+A large final load may place the undeformed initial guess far from a
+solution. Introduce a dimensionless load factor $\zeta\in[0,1]$ and replace
+the fixed external loads by their multiples $\zeta\bb_0$ and
+$\zeta\overline{\bt}_0$. The residual at that load is
+
+$$
+R_\zeta(\bu;\bv)
+=\zeta\ell_{\mathrm{hyp}}(\bv)-a_{\mathrm{hyp}}(\bu;\bv).
+$$ {#eq-c9-load-factor}
+
+Choose successive factors $0=\zeta_0<\zeta_1<\cdots<\zeta_m=1$.
+At each load, solve its equilibrium equations with Newton's method, starting
+from the previous converged displacement. The prescribed displacement is
+held fixed in this description. If it also depends on load, assign the new
+prescribed values before beginning the next Newton solve; the corrections
+within that solve are then zero on its prescribed degrees of freedom.
+
+These load increments describe a quasistatic sequence, not a time
+integration. If a step fails, retain the last converged state, reduce the
+load increment, and retry. Do not continue from an unconverged state and
+label it an equilibrium solution.
+
+### Reducing a Newton update
+
+Even at a fixed load, a full correction may produce $J\leq0$ or increase the
+residual. A **damped Newton update** uses a step factor $\omega\in(0,1]$:
+
+$$
+\bU^{k+1}=\bU^k+\omega\Delta\bU^k.
+$$ {#eq-c9-damped-newton}
+
+For the free equations, define a scalar measure of residual size along this
+direction,
+
+$$
+\Phi(\omega)=\frac12
+\norm{\bR_f(\bU^k+\omega\Delta\bU^k)}_2^2.
+$$
+
+The derivative at zero can be calculated from the Newton equation:
+
+$$
+\begin{aligned}
+\Phi'(0)
+&=\bR_f(\bU^k)\cdot
+\bigl((K_T)_{ff}(\bU^k)\Delta\bU_f^k\bigr)\\
+&=-\norm{\bR_f(\bU^k)}_2^2.
+\end{aligned}
+$$ {#eq-c9-residual-descent}
+
+Unless the residual is already zero, an exact Newton direction therefore
+decreases this measure for sufficiently small admissible positive steps.
+A simple backtracking rule starts with $\omega=1$ and repeatedly halves it
+until the trial deformation is admissible and
+
+$$
+\Phi(\omega)\leq\Phi(0)+c\omega\Phi'(0)
+=(1-2c\omega)\Phi(0),\qquad 0<c<\frac12.
+$$ {#eq-c9-backtracking}
+
+This is a sufficient-decrease test, not a search for an exact minimum along
+the direction. Limit the number of trials and report failure if no acceptable
+step is found. In a finite element implementation, $J$ is checked at the
+integration points used by the constitutive calculation. For higher-order
+deformations, positivity at those points alone does not prove positivity
+everywhere in an element.
+
+The residual-based test does not require that the total potential decrease.
+Newton's method solves stationarity equations and may approach stationary
+points that are not energy minima. Load stepping and backtracking improve
+the range of usable initial guesses but do not guarantee a unique or stable
+equilibrium for every nonlinear problem.
+
+::: {#exr-c9-backtracking}
+## An inadmissible full step
+Apply scalar Newton iteration to $r(s)=1/s-2$ on $s>0$, starting at $s^0=2$.
+
+1. Compute the full Newton correction and show that the full update leaves
+   the admissible interval.
+2. Test $\omega=1/2$ and $1/4$. Identify the first positive trial stretch
+   and compare its residual magnitude with $|r(2)|$.
+:::
+
+## FEniCSx implementation and verification {#sec-c9-fenicsx}
+
+The cube example below delegates the nonlinear iterations to PETSc. The
+[hyperelastic cantilever notebook](https://github.com/CEADpx/finite-element-methods/blob/main/notebooks/nonlinear/hyperelasticity_newton.ipynb)
+used in Lecture 3 follows the same workflow with a beam in bending: UFL
+differentiates the residual form before assembly, and DOLFINx calls PETSc
+for the Newton iterations at each load. The determinant checks apply to
+converged states, not to every trial displacement.
+
+### A three-dimensional test problem
+
+Consider the reference cube $\Om_0=(0,1)^3$ mm$^3$. Clamp its face $X_1=0$,
+prescribe reference traction $0.2\bm e_1$ MPa on $X_1=1$ mm, and impose
+zero traction on its remaining faces. There is no body force. Use the
+compressible neo-Hookean material with $\mu=1$ MPa and $\lambda=2$ MPa.
+This problem differs from @exm-c9-constrained-stretch: the cube may deform
+transversely away from the clamp. The affine constrained-stretch solution
+is not its exact solution.
+
+![The reference cube, clamped at $X_1=0$ and loaded by reference traction on $X_1=1$ mm. The four other faces have zero prescribed traction. The arrows indicate the load direction, and $\zeta$ scales its magnitude.](../figures/chapter09/cube-boundary-data.svg){#fig-c9-cube-boundary width="82%"}
+
+Use four subdivisions in each coordinate direction and split the cubes into
+tetrahedra. The displacement space is vector-valued $P_1$. The following
+blocks form one program and are intended to run sequentially in the
+repository's `finite-elements` environment, with a single MPI process.
+They were checked with DOLFINx 0.11.0. The nonlinear solver interface follows
+the DOLFINx documentation [@dolfinx-nonlinear-problem].
+
+```{python}
+#| eval: false
+import numpy as np
+import ufl
+from mpi4py import MPI
+from petsc4py import PETSc
+from dolfinx import fem, mesh
+from dolfinx.fem.petsc import NonlinearProblem
+
+domain = mesh.create_unit_cube(MPI.COMM_SELF, 4, 4, 4)
+V = fem.functionspace(domain, ("Lagrange", 1, (3,)))
+u = fem.Function(V)
+v = ufl.TestFunction(V)
+w = ufl.TrialFunction(V)
+fdim = domain.topology.dim - 1
+left = mesh.locate_entities_boundary(domain, fdim,
+    lambda x: np.isclose(x[0], 0.0))
+right = mesh.locate_entities_boundary(domain, fdim,
+    lambda x: np.isclose(x[0], 1.0))
+fixed = fem.locate_dofs_topological(V, fdim, left)
+bc = fem.dirichletbc(np.zeros(3, dtype=PETSc.ScalarType), fixed, V)
+tags = mesh.meshtags(domain, fdim, np.sort(right),
+    np.ones(len(right), dtype=np.int32))
+ds = ufl.Measure("ds", domain=domain, subdomain_data=tags)
+dx = ufl.Measure("dx", domain=domain)
+```
+
+The tag `1` identifies the loaded face. The facet search and degree-of-freedom
+location have the same roles as in Chapter 6. `u` stores the current
+displacement, `v` is the test function, and `w` is the correction direction.
+
+### Energy, residual, and automatic differentiation
+
+Write the energy directly from @eq-model-neo-hookean-energy. The scalar
+`load` is the load factor $\zeta$; it multiplies the final prescribed traction.
+
+```{python}
+#| eval: false
+F = ufl.Identity(3) + ufl.grad(u)
+J = ufl.det(F)
+mu, lam = 1.0, 2.0
+psi = mu / 2 * (ufl.tr(F.T * F) - 3) - mu * ufl.ln(J)
+psi += lam / 2 * ufl.ln(J)**2
+load = fem.Constant(domain, PETSc.ScalarType(0.0))
+traction = ufl.as_vector((0.2, 0.0, 0.0))
+Pi = psi * dx - load * ufl.dot(traction, u) * ds(1)
+residual = -ufl.derivative(Pi, u, v)
+tangent = ufl.derivative(residual, u, w)
+```
+
+The last two lines implement @eq-c9-first-variation and
+@eq-c9-energy-tangent. In particular, `residual` is **minus** the first
+variation; using the first variation itself would reverse our residual
+convention. UFL differentiates the specified expression with respect to the
+coefficient `u`. Its automatically generated tangent can be checked against
+@eq-c9-neo-hookean-tangent or by @eq-c9-finite-difference.
+
+### Nonlinear solve and load increments
+
+`NonlinearProblem` passes the residual and its Jacobian to PETSc's nonlinear
+solver, SNES. Choose Newton iteration with backtracking, and a direct LU
+solve for each linear correction:
+
+```{python}
+#| eval: false
+problem = NonlinearProblem(residual, u, J=tangent, bcs=[bc],
+    petsc_options_prefix="c9_cube_", petsc_options={
+        "snes_type": "newtonls", "snes_linesearch_type": "bt",
+        "snes_atol": 1e-10, "snes_rtol": 1e-9, "snes_max_it": 20,
+        "ksp_type": "preonly", "pc_type": "lu",
+        "snes_error_if_not_converged": True})
+
+for zeta in (0.25, 0.5, 0.75, 1.0):
+    load.value = zeta
+    problem.solve()
+    if problem.solver.getConvergedReason() <= 0:
+        raise RuntimeError("Nonlinear solve failed")
+    u.x.scatter_forward()
+    print(zeta, problem.solver.getIterationNumber())
+```
+
+The previous solution remains in `u` and supplies the initial iterate for
+the next load. The tolerances control the assembled residual; the iteration
+limit prevents an unsuccessful solve from continuing indefinitely. The LU
+choice is suitable for this small example, not a recommendation for large
+three-dimensional problems. The solver's backtracking reduces a step using
+its residual test; this example's positive-determinant checks below are
+verification of the computed states, not a guarantee that a generic solver
+enforces all deformation constraints.
+
+### Reaction balance and deformation checks
+
+The computed quantities should test the formulation as well as solver
+termination. First, the applied force on the loaded face is
+$0.2\zeta A_0\bm e_1$, with $A_0=1$ mm$^2$. Assemble the *unmodified*
+residual before boundary rows are replaced. With this vector-valued space,
+`fixed` contains nodal block indices and each block has three components.
+The support reaction is minus the sum of those residual blocks:
+
+```{python}
+#| eval: false
+raw_R = fem.assemble_vector(fem.form(residual)).array.copy()
+reaction = -raw_R.reshape(-1, 3)[fixed].sum(axis=0)
+area = fem.assemble_scalar(fem.form(1.0 * ds(1)))
+applied = np.array([0.2 * float(load.value) * area, 0.0, 0.0])
+print("Force balance:", reaction + applied)
+```
+
+Second, check the element volume ratios. Because the mesh has affine
+tetrahedra and the displacement is $P_1$, $\bF$ and $J$ are constant on each
+element. A discontinuous degree-zero (`DG0`) function therefore records the
+computed $J$ exactly, one value per element:
+
+```{python}
+#| eval: false
+Q = fem.functionspace(domain, ("DG", 0))
+J_values = fem.Function(Q)
+J_values.interpolate(fem.Expression(J, Q.element.interpolation_points))
+mean_u1 = fem.assemble_scalar(fem.form(u[0] * ds(1))) / area
+print("Minimum J:", J_values.x.array.min())
+print("Mean end displacement:", mean_u1)
+```
+
+The diagnostic blocks above check the final converged state. Recording the
+same quantities after each converged load step gives the following results.
+Small differences in the last digits can arise from solver versions and
+floating-point arithmetic.
+
+| $\zeta$ | Newton iterations | Mean end $u_1$ (mm) | Minimum $J$ | Axial reaction (N) |
+|---:|---:|---:|---:|---:|
+| 0.25 | 3 | 0.017841 | 1.004065 | $-0.05$ |
+| 0.50 | 3 | 0.036204 | 1.008179 | $-0.10$ |
+| 0.75 | 3 | 0.055103 | 1.012340 | $-0.15$ |
+| 1.00 | 3 | 0.074554 | 1.016547 | $-0.20$ |
+
+The reactions balance the prescribed loads, and every element has positive
+volume ratio at each reported state. These are useful checks, but this table
+does not establish mesh accuracy. To assess that accuracy, refine the mesh
+and compare the end displacement and other selected outputs at the same
+final load. The piecewise-constant $J$ argument above also depends on the
+affine $P_1$ setting and must not be reused unchanged for curved geometry
+or higher-degree displacement.
+
+::: {#exr-c9-cube-verification}
+## Mesh and tangent checks for the cube
+1. Repeat the cube computation with two, four, and eight subdivisions per
+   coordinate direction. At the final load, report the mean end displacement,
+   axial reaction, and minimum $J$. Compare successive end displacements.
+2. On the coarsest mesh, choose a coefficient perturbation that is zero at
+   the clamp. Use @eq-c9-finite-difference with three decreasing values of
+   $\epsilon$ to check the assembled free tangent. Report the norm of the
+   difference and its change when $\epsilon$ is divided by ten.
+:::
+
+## Chapter summary
+
+- Hyperelastic equilibrium is $R(\bu;\bv)=\ell_{\mathrm{hyp}}(\bv)
+  -a_{\mathrm{hyp}}(\bu;\bv)=0$ for every admissible test function.
+  The potential satisfies $\delta\Pi=-R$ and its second variation is
+  the negative of the residual derivative.
+- Newton's method linearizes the residual at the current displacement and
+  solves $\delta_uR[\Delta\bu]=-R$. Corrections have zero prescribed
+  displacement when the current iterate satisfies the fixed boundary data.
+- Consistent differentiation of the stress law produces the material tangent.
+  Linearizing before discretization and differentiating the assembled
+  residual give the same matrix when quadrature and boundary treatment agree.
+- The assembled Jacobian is $\bK_T=\partial\bR/\partial\bU$.
+  Solve $(K_T)_{ff}\Delta\bU_f=-\bR_f$, retain the prescribed coefficients,
+  and recover support reactions as $-\bR_p$.
+- Load stepping uses a previous equilibrium as the next initial guess.
+  Backtracking reduces a correction when a full update is unsuitable.
+- Residual convergence, tangent verification, positive deformation
+  determinants, force balance, and mesh accuracy are distinct checks.
+  UFL supplies derivatives of the stated forms; those checks remain necessary.

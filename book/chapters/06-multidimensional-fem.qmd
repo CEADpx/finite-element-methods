@@ -1469,12 +1469,13 @@ but their contribution is assembled into the load vector through facet
 integrals rather than through prescribed coefficient values.
 
 After the solve, the prescribed values are inserted into $\bU$ and the
-residual vector $\bR=\bK\bU-\bF$ is formed exactly as in
+residual vector $\bR=\bF-\bK\bU$ is formed exactly as in
 @eq-c5-residual-vector. Its free entries vanish up to rounding error, and its
-prescribed entries are the discrete reactions. For elasticity they are the
+negative prescribed entries are the discrete reactions, $\bm r_p=-\bR_p$.
+For elasticity they are the
 nodal support forces. For scalar diffusion, the entry associated with a
 prescribed nodal degree of freedom $i$ is
-$R_i=a(u_h,\phi_i)-\ell(\phi_i)$. If $u_h$ is replaced by a sufficiently smooth
+$r_i=a(u_h,\phi_i)-\ell(\phi_i)$. If $u_h$ is replaced by a sufficiently smooth
 exact solution, integration by parts shows that this quantity equals
 $\int_{\Gam_D}q\,\phi_i\,\ds$. The reactions are discrete
 counterparts of these weighted boundary fluxes; they need not equal direct
@@ -1484,7 +1485,7 @@ $a(u_h,\phi_i)=\ell(\phi_i)$ for every free nodal degree of freedom, and
 $a(u_h,1)=0$. Together these facts give
 
 $$
-\sum_{i\text{ prescribed}}R_i
+\sum_{i\text{ prescribed}}r_i
 =
 -\ell(1)
 =

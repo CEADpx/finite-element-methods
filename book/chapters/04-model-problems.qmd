@@ -1170,7 +1170,9 @@ $$
 \bx=\bm{\varphi}(\bX)=\bX+\bu(\bX)
 $$ {#eq-model-finite-deformation-map}
 
-sends it to its current position $\bx\in\Om_t$. The deformation gradient is
+sends it to its current position $\bx\in\Om_t$. For the changes of variables
+below, assume a sufficiently smooth, one-to-one, orientation-preserving
+deformation. The deformation gradient is
 
 $$
 \bF
@@ -1180,7 +1182,9 @@ $$
 F_{iJ}=\frac{\partial x_i}{\partial X_J}.
 $$ {#eq-model-deformation-gradient}
 
-It maps an infinitesimal reference line element to its current counterpart:
+Taking the total differential of $x_i=\varphi_i(\bX)$ gives
+$\dd x_i=(\partial\varphi_i/\partial X_J)\dd X_J=F_{iJ}\dd X_J$.
+Thus $\bF$ maps an infinitesimal reference line element to its current counterpart:
 
 $$
 \dd\bx=\bF\,\dd\bX.
@@ -1264,23 +1268,53 @@ stretches.
 
 ### Stress measures and reference equilibrium
 
-The Cauchy stress $\bsig$ acts on current area. For a formulation over
-$\Om_0$, use the first Piola--Kirchhoff stress
+The Cauchy stress $\bsig$ acts on current area. To express the same surface
+force over $\Om_0$, both the area and its normal must be transformed.
+Let $\bm N$ and $\bn$ denote the corresponding reference and current outward
+unit normals, and let $\dd A$ and $\dd a$ denote the area elements.
+In three dimensions, span an oriented reference patch by two small edge
+vectors $\bm A$ and $\bm B$, so that $\bm N\dd A=\bm A\times\bm B$.
+Their current counterparts are $\bF\bm A$ and $\bF\bm B$. The cross-product
+identity
+$(\bF\bm A)\times(\bF\bm B)=J\bF^{-T}(\bm A\times\bm B)$ gives
+
+$$
+\bn\dd a
+=(\bF\bm A)\times(\bF\bm B)
+=J\bF^{-T}\bm N\dd A.
+$$ {#eq-model-nanson}
+
+This is **Nanson's formula**. The vector $\bF^{-T}\bm N$ need not have unit
+length; its direction and magnitude together account for the change of normal
+and area. The same normal-and-boundary-measure relation applies in two
+dimensions. Substitution into the current surface force gives
+
+$$
+\dd\bm f=\bsig\bn\dd a
+=\bigl(J\bsig\bF^{-T}\bigr)\bm N\dd A.
+$$
+
+Define the first Piola--Kirchhoff stress by
 
 $$
 \bP=J\bsig\bF^{-T}.
 $$ {#eq-model-first-piola-transform}
 
 Both $\bsig$ and $\bP$ have units of pascals, but they refer to different
-areas. If corresponding current and reference area elements are denoted by
-$\dd a$ and $\dd A$, the stress transformation ensures that the same force is
-represented by $\bsig\bn\,\dd a=\bP\bm N\,\dd A$. Thus the traction per unit
-reference area is $\bP\bm{N}$, where $\bm{N}$ is the outward unit normal to
-$\partial\Om_0$. Although $\bsig$ is symmetric, $\bP$ is generally not
+areas. The traction per unit reference area is $\bP\bm N$.
+Although $\bsig$ is symmetric, $\bP$ is generally not
 symmetric because it relates current force components to reference area.
 
 Let $\bb_0$, measured in $\mathrm{N}/\mathrm{m}^3$, be body force per unit
-reference volume. Consider an arbitrary subdomain $\omega_0\subset\Om_0$.
+reference volume. Since $\dd V_t=J\dd V_0$, the current body-force term
+$\rho\bb\dd V_t$ becomes $\bb_0\dd V_0$, with
+
+$$
+\bb_0(\bX)=J(\bX)\rho\bigl(\bm\varphi(\bX)\bigr)
+\bb\bigl(\bm\varphi(\bX)\bigr).
+$$ {#eq-model-reference-body-force}
+
+Consider an arbitrary subdomain $\omega_0\subset\Om_0$.
 For quasistatic equilibrium, the total body and surface forces on
 $\omega_0$ must sum to zero:
 
@@ -1378,7 +1412,8 @@ quantities that are unchanged by a change of orthonormal basis, such as
 $\tr\bC$ and $J$
 [@belytschko2000; @bonet-wood2008].
 
-A common compressible neo-Hookean model is
+A common compressible neo-Hookean model, with Lamé parameters $\mu$ and
+$\lambda$ measured in pascals, is
 
 $$
 \Psi(\bF)
@@ -1512,6 +1547,16 @@ The dependence of $\bP$ on $\bF(\bu)$ makes $a_{\mathrm{hyp}}$ generally
 nonlinear in $\bu$. For a fixed $\bu$, it is linear in $\bv$. It is therefore
 a semilinear form in the sense of @def-semilinear-form.
 
+The residual measures the difference between external and internal work:
+
+$$
+R(\bu;\bv)=\ell_{\mathrm{hyp}}(\bv)-a_{\mathrm{hyp}}(\bu;\bv).
+$$ {#eq-model-hyperelastic-residual}
+
+Thus equilibrium requires $R(\bu;\bv)=0$ for every $\bv\in\Vzero$.
+This follows the external-minus-internal convention in
+@eq-variational-residual.
+
 ### Total potential energy and equilibrium
 
 The strong and variational equations are nonlinear in $\bu$, but this does
@@ -1554,6 +1599,15 @@ $$
 -\int_{\Gam_{0t}}\overline{\bt}_0\cdot\bv\,\dd A.
 \end{aligned}
 $$ {#eq-model-hyperelastic-first-variation}
+
+In terms of @eq-model-hyperelastic-semilinear-form and
+@eq-model-hyperelastic-residual, this identity is
+
+$$
+\delta\Pi_{\mathrm{hyp}}(\bu;\bv)
+=a_{\mathrm{hyp}}(\bu;\bv)-\ell_{\mathrm{hyp}}(\bv)
+=-R(\bu;\bv).
+$$ {#eq-model-hyperelastic-energy-residual}
 
 The stationarity condition
 $\delta\Pi_{\mathrm{hyp}}(\bu;\bv)=0$ for every

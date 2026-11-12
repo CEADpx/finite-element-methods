@@ -99,7 +99,7 @@ strong form.
 For a candidate field $u$, define the residual at $\bx\in\Om$ by
 
 $$
-R(u)(\bx)=\mathcal{L}(u)(\bx)-f(\bx).
+R(u)(\bx)=f(\bx)-\mathcal{L}(u)(\bx).
 $$
 
 A strong solution satisfies
@@ -268,8 +268,8 @@ Multiplication of @eq-variational-strong-pde by $v$ and integration over
 $\Om$ gives
 
 $$
--\int_{\Om}v\,\divg(k\grad u)\,\dx
--\int_{\Om}fv\,\dx=0.
+\int_{\Om}fv\,\dx
++\int_{\Om}v\,\divg(k\grad u)\,\dx=0.
 $$ {#eq-variational-weighted-residual}
 
 Equivalently,
@@ -398,6 +398,16 @@ a(w,v)=\int_{\Om}k\grad w\cdot\grad v\,\dx,
 \qquad
 \ell(v)=\int_{\Om}fv\,\dx+\int_{\Gam_N}qv\,\ds.
 $$ {#eq-variational-forms}
+
+For a trial function $w$, define the variational residual by
+
+$$
+R(w;v)=\ell(v)-a(w,v).
+$$ {#eq-variational-residual}
+
+It is external loading minus the internal form, including the prescribed
+Neumann contribution through $\ell$. A weak solution makes this residual
+zero for every admissible test function.
 
 ::: {#def-weak-diffusion-problem}
 ## Variational diffusion problem

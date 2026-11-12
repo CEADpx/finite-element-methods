@@ -88,9 +88,11 @@ Uppercase operators distinguish differentiation with respect to reference coordi
 | $a(u,v)$ | Bilinear form |
 | $a(u;v)$ | Semilinear form (nonlinear in $u$ and linear in $v$) |
 | $\ell(v)$ | Linear functional |
-| $R(u;v)$ | Residual evaluated in direction $v$ |
+| $R(u;v)=\ell(v)-a(u;v)$ | Variational residual; use $a(u,v)$ for a bilinear form |
 | $\Pi(u)$ | Energy or potential functional |
 | $\delta\Pi(u;v)$ | First variation of $\Pi$ at $u$ in direction $v$ |
+| $\delta^2\Pi(u;v,w)$ | Variation of $\delta\Pi(u;v)$ with respect to $u$ in direction $w$ |
+| $\delta_uR(u;v)[w]$ | Variation of the residual with respect to $u$, with test function $v$ held fixed |
 | $\norm{v}_V$ | Norm of $v$ in $V$ |
 | $\seminorm{v}_{H^m(\Om)}$ | Sobolev seminorm of order $m$ |
 | $\inner{u}{v}_V$ | Inner product of $u$ and $v$ in $V$ |
@@ -136,7 +138,7 @@ discussion.
 | $r_e$, $j_{\mathcal F}$ | Element and facet residuals |
 | $\eta_e$ | Local a posteriori error indicator |
 | $\eta=(\sum_e\eta_e^2)^{1/2}$ | Global residual error estimator |
-| $R(u_h;v)=\ell(v)-a(u_h,v)$ | Variational residual tested with $v$ |
+| $R_i(\bU)=R(u_h;\phi_i)$ | Assembled residual entry for a scalar finite element field |
 | $\omega_i$, $\omega_e$, $\omega_{\mathcal F}$ | Vertex, element, and facet patches in residual estimates |
 | $C_Q$, $N_{\mathrm{ov}}$ | Quasi-interpolation constant and bound on patch overlap |
 | $C_{\mathrm{rel}}$, $C_{\mathrm{eff}}$ | Reliability and local-efficiency constants |
@@ -145,7 +147,12 @@ discussion.
 | $\mathcal M$, $\theta$ | Marked element set and selected fraction of the squared estimator in bulk marking |
 | $\bK^e$, $\bF^e$, $\bU^e$ | Element stiffness matrix, load vector, and coefficient vector |
 | $\bK\bU=\bF$ | Representative assembled algebraic system |
-| $\bR=\bK\bU-\bF$ | Algebraic residual vector, including reactions at prescribed degrees of freedom |
+| $\bR=\bF-\bK\bU$ | Algebraic residual vector for a linear problem, using external minus internal force |
+| $\bm r_p=-\bR_p$ | Support reactions at prescribed degrees of freedom |
+| $\bK_T=\partial\bR/\partial\bU$ | Jacobian of the nonlinear residual; negative of the internal-force tangent for displacement-independent loads |
+| $\Delta\bU$, $\Delta\bu$ | Newton correction to the coefficient vector and displacement field |
+| $\mathbb A_{\alpha I\beta J}=\partial P_{\alpha I}/\partial F_{\beta J}$ | Material tangent for the first Piola--Kirchhoff stress |
+| $\zeta$, $\omega$ | Load factor and Newton step factor in the nonlinear solution procedure |
 
 The book uses *element* for a geometric member of a mesh. The calligraphic
 symbols $\Iref$, $\Ie$, and $\Ih$ denote interpolation operators. They are
@@ -183,7 +190,8 @@ means that heat enters the body.
 
 Some standard symbols recur in different settings. In finite-deformation
 mechanics, $\bF$ is the deformation gradient and $J=\det\bF$. In the assembled
-finite element system, $\bF$ is the load vector. These objects do not occur in
-the same derivation. Similarly, $\bm K$ is a conductivity tensor in the heat
+finite element system, $\bF$ is the load vector, whose entries have nodal and
+component indices. The surrounding definition and indices distinguish it from
+the deformation gradient. Similarly, $\bm K$ is a conductivity tensor in the heat
 equation and $\bK$ is a stiffness matrix in the algebraic system. Their
 meaning is stated when each setting is introduced.
