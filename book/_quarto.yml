@@ -46,6 +46,7 @@ book:
   appendices:
     - appendices/a-real-analysis-essentials.qmd
     - appendices/b-tensor-notation-index-calculus.qmd
+    - appendices/c-neo-hookean-tangent.qmd
   references: references.qmd
 
 bibliography: references.bib

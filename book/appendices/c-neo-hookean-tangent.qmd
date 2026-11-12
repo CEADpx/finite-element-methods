@@ -1,0 +1,76 @@
+# Derivation of the neo-Hookean material tangent {#sec-appendix-neo-hookean-tangent}
+
+```{=latex}
+\chaptershorttitle{Neo-Hookean Tangent}
+```
+
+This appendix derives the stress variation used in @sec-c9-linearization.
+Let $\bm H$ be the increment of the deformation gradient $\bF$, as in
+@eq-c9-stress-variation.
+
+## Inverse and determinant variations
+
+The neo-Hookean stress in @eq-model-neo-hookean-stress contains
+$\bF^{-T}$ and $\ln J$. To differentiate it, take $\delta\bF=\bm H$ and
+vary the identity $\bF\bF^{-1}=\bI$:
+
+$$
+\bm H\bF^{-1}+\bF\delta(\bF^{-1})=\bm0.
+$$
+
+Multiplying on the left by $\bF^{-1}$ and then transposing gives
+
+$$
+\begin{aligned}
+\delta(\bF^{-1})&=-\bF^{-1}\bm H\bF^{-1},\\
+\delta(\bF^{-T})&=-\bF^{-T}\bm H^T\bF^{-T}.
+\end{aligned}
+$$ {#eq-c9-inverse-variation}
+
+The derivative of the determinant can be expressed through the cofactor
+tensor $J\bF^{-T}$:
+
+$$
+\delta J=(J\bF^{-T}):\bm H
+=J\tr(\bF^{-1}\bm H).
+$$ {#eq-c9-determinant-variation}
+
+Here $\bF^{-T}:\bm H=\tr(\bF^{-1}\bm H)$ follows from the definition
+of the double contraction. Applying the scalar chain rule to $\ln J$ yields
+
+$$
+\delta(\ln J)=\frac{\delta J}{J}
+=\tr(\bF^{-1}\bm H).
+$$ {#eq-c9-log-variation}
+
+All these formulas refer to the same perturbation $\delta\bF=\bm H$ and
+require an invertible $\bF$; the logarithm also requires $J>0$.
+
+## The neo-Hookean material tangent
+
+Rewrite @eq-model-neo-hookean-stress as
+
+$$
+\bP(\bF)=\mu\bF+(\lambda\ln J-\mu)\bF^{-T}.
+$$
+
+The product rule first gives
+
+$$
+\delta\bP(\bF;\bm H)
+=\mu\bm H+\lambda\delta(\ln J)\bF^{-T}
++(\lambda\ln J-\mu)\delta(\bF^{-T}).
+$$
+
+Substitution of @eq-c9-inverse-variation and @eq-c9-log-variation gives
+
+$$
+\boxed{\begin{aligned}
+\delta\bP(\bF;\bm H)
+={}&\mu\bm H
++\lambda\tr(\bF^{-1}\bm H)\bF^{-T}\\
+&+(\mu-\lambda\ln J)\bF^{-T}\bm H^T\bF^{-T}.
+\end{aligned}}
+$$
+
+This gives the material tangent in @eq-c9-neo-hookean-tangent.

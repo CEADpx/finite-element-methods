@@ -13,14 +13,15 @@ $\bF(\bu)=\bI+\Grad\bu$ through its determinant and inverse. Substituting a
 finite element displacement into the variational equation therefore gives
 nonlinear equations for its coefficients.
 
-This chapter develops the solution of those equations. We retain the
-reference configuration and constitutive model introduced in Chapter 4,
-linearize its residual, and discretize the resulting Newton correction
-problem. Element assembly then follows the connectivity and support
-arguments of Chapters 5 and 6. Worked calculations and a small FEniCSx
-example provide checks on the stress derivative, reaction forces, and
-nonlinear solve. Load stepping and step reduction address cases in which a
-full Newton update is not suitable.
+This chapter develops Newton's method for those equations. We can
+linearize the variational residual and then discretize the correction
+equation, or discretize the nonlinear problem and then differentiate its
+algebraic residual. Both routes give the same Newton system under the
+conditions stated in @sec-c9-two-routes. After the full Newton iteration,
+we consider two ways to help it converge: load stepping gives a starting
+displacement for the next load, and a line search can shorten a correction
+at a fixed load. The final example applies the same formulation to a scalar
+nonlinear diffusion problem.
 
 ## Equilibrium, residual, and energy {#sec-c9-residual}
 
@@ -309,76 +310,25 @@ on the right comes from Newton's equation. They have different origins.
 Multiplying both sides by $-1$ gives an equivalent equation, but changing
 only one side reverses the correction.
 
-### Inverse and determinant variations
+### The neo-Hookean material tangent
 
-The neo-Hookean stress in @eq-model-neo-hookean-stress contains
-$\bF^{-T}$ and $\ln J$. To differentiate it, take $\delta\bF=\bm H$ and
-vary the identity $\bF\bF^{-1}=\bI$:
-
-$$
-\bm H\bF^{-1}+\bF\delta(\bF^{-1})=\bm0.
-$$
-
-Multiplying on the left by $\bF^{-1}$ and then transposing gives
+For the stress law in @eq-model-neo-hookean-stress, the stress variation is
 
 $$
 \begin{aligned}
-\delta(\bF^{-1})&=-\bF^{-1}\bm H\bF^{-1},\\
-\delta(\bF^{-T})&=-\bF^{-T}\bm H^T\bF^{-T}.
-\end{aligned}
-$$ {#eq-c9-inverse-variation}
-
-The derivative of the determinant can be expressed through the cofactor
-tensor $J\bF^{-T}$:
-
-$$
-\delta J=(J\bF^{-T}):\bm H
-=J\tr(\bF^{-1}\bm H).
-$$ {#eq-c9-determinant-variation}
-
-Here $\bF^{-T}:\bm H=\tr(\bF^{-1}\bm H)$ follows from the definition
-of the double contraction. Applying the scalar chain rule to $\ln J$ yields
-
-$$
-\delta(\ln J)=\frac{\delta J}{J}
-=\tr(\bF^{-1}\bm H).
-$$ {#eq-c9-log-variation}
-
-All these formulas refer to the same perturbation $\delta\bF=\bm H$ and
-require an invertible $\bF$; the logarithm also requires $J>0$.
-
-### The neo-Hookean material tangent
-
-Rewrite @eq-model-neo-hookean-stress as
-
-$$
-\bP(\bF)=\mu\bF+(\lambda\ln J-\mu)\bF^{-T}.
-$$
-
-The product rule first gives
-
-$$
-\delta\bP(\bF;\bm H)
-=\mu\bm H+\lambda\delta(\ln J)\bF^{-T}
-+(\lambda\ln J-\mu)\delta(\bF^{-T}).
-$$
-
-Substitution of @eq-c9-inverse-variation and @eq-c9-log-variation gives
-
-$$
-\boxed{\begin{aligned}
 \delta\bP(\bF;\bm H)
 ={}&\mu\bm H
 +\lambda\tr(\bF^{-1}\bm H)\bF^{-T}\\
 &+(\mu-\lambda\ln J)\bF^{-T}\bm H^T\bF^{-T}.
-\end{aligned}}
+\end{aligned}
 $$ {#eq-c9-neo-hookean-tangent}
 
-For Newton's problem, evaluate this expression at $\bF^k$ and set
-$\bm H=\Grad\Delta\bu^k$. This derivative is called a **consistent
-tangent** because it differentiates the stress law actually used in the
-residual. Substituting a small-strain stiffness while retaining the
-finite-deformation stress would not give this derivative.
+@sec-appendix-neo-hookean-tangent derives this result by differentiating the
+inverse and determinant of $\bF$. In the Newton equation, evaluate it at
+$\bF^k$ and use $\bm H=\Grad\Delta\bu^k$. This is a **consistent tangent**:
+it differentiates the stress law used to compute the residual. Using the
+small-strain stiffness with the finite-deformation residual would give a
+different correction equation.
 
 ::: {#exm-c9-linear-limit}
 ## Recovery of the linear elastic response
@@ -454,7 +404,7 @@ the support reactions are $\bm r_p=-\bR_p$ as in
 $F_{\alpha I}$ is a component of the deformation gradient, with $I$ indexing
 the reference-coordinate directions.
 
-### Linearize, then discretize
+### Linearize, then discretize {#sec-c9-linearize-then-discretize}
 
 Start with the linearized variational equation @eq-c9-field-newton.
 Evaluate it at the current FE displacement $\bu_h^k$ and expand the correction:
@@ -498,22 +448,58 @@ The test direction determines the row, and the correction basis direction
 determines the column. This is the sequence used in @sec-c9-fenicsx:
 differentiate the variational form, then assemble the matrix.
 
-### Comparison with the assembled residual Jacobian
+### Discretize, then linearize {#sec-c9-discretize-then-linearize}
 
-One can also differentiate @eq-c9-assembled-residual after discretization.
-Changing $U_{j\beta}$ by $\epsilon$ changes $\bu_h$ by
-$\epsilon\phi_j\bm e_\beta$. With the test direction fixed, the chain rule
-therefore gives the same entry as @eq-c9-tangent-entries:
+In this route, substitute @eq-c9-fe-displacement into the nonlinear
+variational problem and test with the free basis directions. This gives the
+nonlinear algebraic equations $\bR_f(\bU)=\bm0$ from
+@eq-c9-assembled-residual. With the prescribed coefficients held fixed,
+Newton's method now acts directly on those equations:
 
 $$
-(K_T)_{i\alpha,j\beta}(\bU)
-=\frac{\partial R_{i\alpha}(\bU)}{\partial U_{j\beta}}.
+\sum_{j,\beta\text{ free}}
+\frac{\partial R_{i\alpha}}{\partial U_{j\beta}}(\bU^k)
+\Delta U_{j\beta}^k=-R_{i\alpha}(\bU^k),
+\qquad i\alpha\text{ free}.
+$$ {#eq-c9-newton-assembled-first}
+
+To compute one derivative, change only $U_{j\beta}$ by $\epsilon$. The
+finite element displacement then changes from $\bu_h$ to
+$\bu_h+\epsilon\phi_j\bm e_\beta$. The test direction does not change.
+Substituting the perturbed displacement into the definition of $R_{i\alpha}$
+gives
+
+$$
+\begin{aligned}
+\frac{\partial R_{i\alpha}}{\partial U_{j\beta}}(\bU)
+&=\left.\frac{\dd}{\dd\epsilon}
+  R(\bu_h+\epsilon\phi_j\bm e_\beta;\phi_i\bm e_\alpha)
+  \right|_{\epsilon=0}\\
+&=\delta_u R(\bu_h;\phi_i\bm e_\alpha)[\phi_j\bm e_\beta]
+=(K_T)_{i\alpha,j\beta}(\bU).
+\end{aligned}
 $$ {#eq-c9-jacobian}
 
-The entries agree in computation when both constructions use the same basis,
-quadrature, and treatment of prescribed coefficients. Since $R=\ell-a$
-and the loads are independent of displacement, $\bK_T$ is the negative of
-the internal-force derivative.
+### When the two routes give the same matrix {#sec-c9-two-routes}
+
+In @sec-c9-linearize-then-discretize, we differentiate with respect to a
+field, then evaluate the derivative on pairs of finite element basis
+directions. In @sec-c9-discretize-then-linearize, we differentiate with
+respect to the coefficients of those directions. By @eq-c9-jacobian, both
+give the same matrix. In an implementation, use the same
+spaces, prescribed coefficients, and quadrature in both routes. With fixed
+quadrature points and weights, differentiation of the discrete residual
+amounts to differentiating the same weighted sum of integrand values. An
+independently chosen quadrature rule for the tangent need not produce the
+Jacobian of that residual. For the displacement-independent loads here,
+$R=\ell-a$ makes $\bK_T$ the negative of the internal-force derivative.
+
+The FEniCSx example in @sec-c9-fenicsx uses the first route at the level of
+forms: UFL differentiates the residual before DOLFINx assembles it. The
+second route is useful when the residual is already available as an
+algebraic function of the coefficients.
+
+### The discrete potential
 
 For a hyperelastic material, let
 $\Pi_h(\bU)=\Pi_{\mathrm{hyp}}(\bu_h)$ be the discrete potential. Then
@@ -913,9 +899,14 @@ interest are still needed. Nor does a small residual prove that the
 equilibrium is a stable energy minimum. The linear error theory of
 Chapters 7 and 8 cannot be applied unchanged to a general nonlinear problem.
 
-## Load stepping and step reduction {#sec-c9-load-stepping}
+## Load stepping and damped Newton's method {#sec-c9-load-stepping}
 
-### Increasing the load in stages
+The local convergence result in @eq-c9-quadratic-convergence assumes that
+the initial iterate is close to equilibrium. Load stepping changes the
+initial guess by first solving at a nearby load. Damping changes the
+size of a Newton update while the load is held fixed.
+
+### Load stepping
 
 A large final load may place the undeformed initial guess far from a
 solution. Introduce a dimensionless load factor $\zeta\in[0,1]$ and replace
@@ -927,19 +918,68 @@ R_\zeta(\bu;\bv)
 =\zeta\ell_{\mathrm{hyp}}(\bv)-a_{\mathrm{hyp}}(\bu;\bv).
 $$ {#eq-c9-load-factor}
 
-Choose successive factors $0=\zeta_0<\zeta_1<\cdots<\zeta_m=1$.
-At each load, solve its equilibrium equations with Newton's method, starting
-from the previous converged displacement. The prescribed displacement is
-held fixed in this description. If it also depends on load, assign the new
-prescribed values before beginning the next Newton solve; the corrections
-within that solve are then zero on its prescribed degrees of freedom.
+Suppose $\bU_m$ is in equilibrium at $\zeta_m$. Let $\bF_f$ be the free
+entries of the load vector at $\zeta=1$. At $\zeta_m+\Delta\zeta$, use
+$\bU_m$ as the initial iterate. The internal forces have not yet changed,
+so subtracting the old free residual, which is zero, gives
 
-These load increments describe a quasistatic sequence, not a time
-integration. If a step fails, retain the last converged state, reduce the
-load increment, and retry. Do not continue from an unconverged state and
-label it an equilibrium solution.
+$$
+\bR_f(\bU_m;\zeta_m+\Delta\zeta)
+=\bR_f(\bU_m;\zeta_m)+\Delta\zeta\,\bF_f
+=\Delta\zeta\,\bF_f.
+$$ {#eq-c9-load-increment-residual}
 
-### Reducing a Newton update
+The first Newton correction therefore satisfies
+$(K_T)_{ff}(\bU_m)\Delta\bU_f=-\Delta\zeta\,\bF_f$.
+If the free tangent is nonsingular and its inverse is bounded, the
+correction is small when $\Delta\zeta$ is small. More precisely, near
+such an equilibrium the implicit function theorem gives a smooth local
+solution branch. Differentiating $\bR_f(\bU(\zeta);\zeta)=\bm0$ gives
+
+$$
+(K_T)_{ff}\frac{\dd\bU_f}{\dd\zeta}=-\bF_f.
+$$ {#eq-c9-load-sensitivity}
+
+Thus, away from a singular tangent, nearby loads have nearby equilibria.
+This is why the previous solution can put the next Newton solve within
+its range of local convergence. Near a limit point, the tangent may
+become singular and the equilibrium path may turn back in load. Reducing
+the increment cannot in general trace that path using load as the
+parameter.
+
+For a scalar example, take the residual $R_\zeta(s)=10\zeta-s-s^3$.
+At $\zeta=0.2$, the equilibrium is $s=1$. At $\zeta=0.4$, starting again
+from $s=0$ gives $R=4$ and $R'=-1$, so the first Newton correction is $4$.
+Starting from $s=1$ instead gives $R=2$ and $R'=-4$, so the first
+correction is $1/2$. The previous equilibrium gives a better starting
+point for this load without changing the equation to be solved.
+
+**Algorithm for load stepping.** Choose an initial increment
+$\Delta\zeta>0$, a minimum increment, and a maximum number of retries.
+
+1. Start with an equilibrium at $\zeta=0$. For a stress-free body with zero
+   prescribed displacement, $\bU=\bm0$ supplies it. Otherwise solve the
+   initial equilibrium problem.
+2. Set the trial load to $\min(1,\zeta+\Delta\zeta)$. Keep the last converged
+   coefficients and use a copy of them as the starting iterate. Solve
+   the free equations at the trial load with Newton's method.
+3. If the solve converges, accept both the trial load and its solution.
+   If it fails, restore the last converged coefficients, halve the attempted
+   load increment, and retry from the last converged load. Stop with a
+   failure report if the retry limit is reached or the reduced increment
+   falls below the minimum.
+4. Repeat until an equilibrium at $\zeta=1$ is accepted.
+
+This algorithm assumes that the prescribed displacement is independent of
+load. If it changes, impose the new prescribed values before starting the
+inner solve and keep the prescribed correction zero during that solve.
+In that case the initial residual also reflects the change in the prescribed
+coefficients, so @eq-c9-load-increment-residual no longer applies as written.
+The load factor labels quasistatic equilibria. It is not a time step.
+For incremental equilibrium algorithms and alternatives to load control,
+see @belytschko2000 [Sections 6.3.5 and 6.3.7].
+
+### Damped Newton iteration and backtracking
 
 Even at a fixed load, a full correction may produce $J\leq0$ or increase the
 residual. A **damped Newton update** uses a step factor $\omega\in(0,1]$:
@@ -969,26 +1009,48 @@ $$ {#eq-c9-residual-descent}
 
 Unless the residual is already zero, an exact Newton direction therefore
 decreases this measure for sufficiently small admissible positive steps.
-A simple backtracking rule starts with $\omega=1$ and repeatedly halves it
-until the trial deformation is admissible and
+In a **line search**, keep $\Delta\bU^k$ fixed and choose $\omega$ by
+testing trial iterates along that direction. For example, accept an
+admissible trial if it satisfies the Armijo sufficient-decrease condition
 
 $$
 \Phi(\omega)\leq\Phi(0)+c\omega\Phi'(0)
 =(1-2c\omega)\Phi(0),\qquad 0<c<\frac12.
 $$ {#eq-c9-backtracking}
 
-This is a sufficient-decrease test, not a search for an exact minimum along
-the direction. Limit the number of trials and report failure if no acceptable
-step is found. In a finite element implementation, $J$ is checked at the
-integration points used by the constitutive calculation. For higher-order
-deformations, positivity at those points alone does not prove positivity
-everywhere in an element.
+**Algorithm for Newton iteration with backtracking at a fixed load.**
+
+1. Assemble the free residual at $\bU^k$. If it satisfies
+   @eq-c9-force-tolerance, accept equilibrium. Otherwise assemble the
+   tangent and solve @eq-c9-free-newton for the correction.
+2. Try $\omega=1$ first. Form $\bU_{\mathrm{trial}}=\bU^k+\omega\Delta\bU^k$,
+   holding the prescribed entries fixed. Check that the material law can
+   be evaluated at the trial state before evaluating its residual. For
+   this model, reject a trial with $J\leq0$ at a constitutive integration point.
+3. If the trial is admissible, assemble its free residual and apply the
+   decrease condition in @eq-c9-backtracking. If the test fails, or the trial was inadmissible,
+   halve $\omega$ and try again with the same correction. If it passes,
+   set $\bU^{k+1}=\bU_{\mathrm{trial}}$ and return to step 1.
+4. Report failure if no trial is accepted within the line-search limits
+   or if the Newton iteration limit is reached. If this solve is part of
+   load stepping, the outer algorithm can then retry with a smaller
+   load increment.
+
+Each trial needs a new residual, but not a new tangent or linear solve.
+The next accepted iterate is where Newton recomputes the tangent. Trying
+$\omega=1$ first lets the method take full steps again near equilibrium
+when the decrease condition is satisfied. For higher-order deformations,
+checking $J$ at the integration points alone does not prove positivity
+throughout each element.
 
 The residual-based test does not require that the total potential decrease.
 Newton's method solves stationarity equations and may approach stationary
 points that are not energy minima. Load stepping and backtracking improve
 the range of usable initial guesses but do not guarantee a unique or stable
-equilibrium for every nonlinear problem.
+equilibrium for every nonlinear problem. For line searches in nonlinear
+finite element analysis, see @belytschko2000 [Section 6.3.8]. For the
+backtracking algorithm used by the FEniCSx examples, see the PETSc
+documentation [@petsc-snes-linesearch-bt].
 
 ::: {#exr-c9-backtracking}
 ## An inadmissible full step
@@ -1109,14 +1171,20 @@ for zeta in (0.25, 0.5, 0.75, 1.0):
     print(zeta, problem.solver.getIterationNumber())
 ```
 
-The previous solution remains in `u` and supplies the initial iterate for
-the next load. The tolerances control the assembled residual; the iteration
-limit prevents an unsuccessful solve from continuing indefinitely. The LU
-choice is suitable for this small example, not a recommendation for large
-three-dimensional problems. The solver's backtracking reduces a step using
-its residual test; this example's positive-determinant checks below are
-verification of the computed states, not a guarantee that a generic solver
-enforces all deformation constraints.
+The outer loop changes $\zeta$. Each call to `solve()` keeps that load fixed
+and lets PETSc choose the correction factor $\omega$ within Newton's method.
+The converged solution remains in `u` for the next load. This short example
+uses prescribed increments and stops on failure. To implement the retry
+algorithm above, save the last converged coefficients before `solve()`;
+if a solve fails, restore them and reduce the load increment.
+
+The residual tolerances and iteration limit are passed to PETSc. A direct
+LU solve is adequate for this small mesh. PETSc's `bt` line search uses
+polynomial interpolation by default to choose trial step lengths for
+reducing the squared residual norm [@petsc-snes-linesearch-bt], rather
+than the simple halving rule above. This program does not supply a check
+for $J>0$ at each trial state. The determinant checks below apply to
+the computed equilibria.
 
 ### Reaction balance and deformation checks
 
@@ -1182,6 +1250,181 @@ or higher-degree displacement.
    difference and its change when $\epsilon$ is divided by ten.
 :::
 
+## Nonlinear diffusion and reaction {#sec-c9-nonlinear-diffusion}
+
+Consider a scalar field $u$ on the unit square $\Om=(0,1)^2$. The
+diffusion coefficient depends on the gradient of $u$:
+
+$$
+\begin{aligned}
+-\grad\cdot\bigl(k(u)\grad u\bigr)+c(\bx)u^3 &= f(\bx)
+&&\text{in }\Om,\\
+u&=0 &&\text{on }\partial\Om,
+\end{aligned}
+\qquad k(u)=k_0(1+|\grad u|^2).
+$$ {#eq-c9-diffusion-strong}
+
+Here $k_0>0$ is constant, $|\grad u|^2=\grad u\cdot\grad u$,
+$c\in L^\infty(\Om)$ with $c\ge0$ almost everywhere, and
+$f\in L^{4/3}(\Om)$.
+
+### Variational problem and potential
+
+For smooth fields, multiply @eq-c9-diffusion-strong by $v$ and
+integrate the diffusion term by parts. Its boundary term
+$-\int_{\partial\Om}v k(u)\grad u\cdot\bn\,\dd s$ vanishes because $v=0$
+on $\partial\Om$. Define the remaining terms by
+
+$$
+\begin{aligned}
+a(u;v)&=\int_\Om \bigl[k(u)\grad u\cdot\grad v+cu^3v\bigr]\,\dx,\\
+\ell(v)&=\int_\Om fv\,\dx.
+\end{aligned}
+$$ {#eq-c9-diffusion-forms}
+
+Use $V=W^{1,4}_0(\Om)$ for both the trial and test functions. The zero
+subscript means zero trace on the boundary. To see why we use fourth-power
+integrability, note that $|\grad u|^3$ is in $L^{4/3}$ when $\grad u$ is
+in $L^4$: raising the former to the power $4/3$ gives $|\grad u|^4$.
+Hölder's inequality (@eq-foundations-holder), with exponents $4/3$ and
+$4$, gives
+
+$$
+\begin{aligned}
+\int_\Om |\grad u|^3|\grad v|\,\dx
+&\le \norm{\grad u}_{L^4}^3\norm{\grad v}_{L^4},\\
+\int_\Om |cu^3v|\,\dx
+&\le \norm{c}_{L^\infty}\norm{u}_{L^4}^3\norm{v}_{L^4},\\
+\int_\Om |fv|\,\dx
+&\le \norm{f}_{L^{4/3}}\norm{v}_{L^4}.
+\end{aligned}
+$$
+
+The $L^4$ norms are finite by the choice of $V$. The norms of $c$ and $f$
+are finite by assumption. The linear part of the diffusion term is also
+finite because $L^4(\Om)\subset L^2(\Om)$ on the square. The cubic
+diffusion flux is the reason for using the Banach space $W^{1,4}_0$:
+membership in the Hilbert space $H^1_0$ alone does not guarantee a gradient
+in $L^4$.
+
+Find $u\in V$ such that $a(u;v)=\ell(v)$ for every $v\in V$.
+Define $R(u;v)=\ell(v)-a(u;v)$. The corresponding potential is
+
+$$
+\Pi(u)=\int_\Om
+\left[\frac{k_0}{2}|\grad u|^2+\frac{k_0}{4}|\grad u|^4
++\frac{c}{4}u^4-fu\right]\,\dx.
+$$ {#eq-c9-diffusion-potential}
+
+The load estimate above applies with $u$ in place of $v$. The other
+terms are finite since $u,\grad u\in L^4$ and $c$ is bounded. For
+$u+\epsilon v$, the squared gradient has the expansion
+
+$$
+|\grad(u+\epsilon v)|^2=|\grad u|^2
++2\epsilon\grad u\cdot\grad v+\epsilon^2|\grad v|^2.
+$$
+
+Thus differentiation of its square gives
+$4|\grad u|^2\grad u\cdot\grad v$ at $\epsilon=0$. Substitution in the
+potential and differentiation gives
+
+$$
+\begin{aligned}
+\delta\Pi(u;v)
+&=\int_\Om \bigl[k_0\grad u\cdot\grad v
++k_0|\grad u|^2\grad u\cdot\grad v+cu^3v-fv\bigr]\,\dx\\
+&=a(u;v)-\ell(v)=-R(u;v).
+\end{aligned}
+$$ {#eq-c9-diffusion-energy-residual}
+
+### Newton correction
+
+Hold $v$ fixed and replace $u$ by $u+\epsilon w$ with $w\in V$. The
+load term is fixed. The derivative of $k(u+\epsilon w)$ at zero is
+$2k_0\grad u\cdot\grad w$. The product rule for
+$k(u+\epsilon w)\grad(u+\epsilon w)$ gives two terms, and
+the reaction $c(u+\epsilon w)^3$ contributes $3cu^2w$. The result is
+
+$$
+\begin{aligned}
+\delta_uR(u;v)[w]=-\int_\Om\bigl[&
+k(u)\grad w\cdot\grad v\\
+&+2k_0(\grad u\cdot\grad w)(\grad u\cdot\grad v)
++3cu^2wv\bigr]\,\dx .
+\end{aligned}
+$$ {#eq-c9-diffusion-tangent}
+
+For example, Hölder's inequality with $1/2+1/4+1/4=1$ gives
+
+$$
+\begin{aligned}
+\int_\Om|\grad u|^2|\grad w||\grad v|\,\dx
+&\le \norm{\grad u}_{L^4}^2
+     \norm{\grad w}_{L^4}\norm{\grad v}_{L^4},\\
+\int_\Om |cu^2wv|\,\dx
+&\le \norm{c}_{L^\infty}\norm{u}_{L^4}^2
+     \norm{w}_{L^4}\norm{v}_{L^4}.
+\end{aligned}
+$$
+
+Here $|\grad u|^2$ and $u^2$ are in $L^2$ because $u\in V$. The $L^4$
+norms of $w,v,\grad w,\grad v$ are finite because $w,v\in V$.
+The remaining term in @eq-c9-diffusion-tangent splits into a constant
+coefficient term and a term bounded by the first estimate above.
+
+Let $\Vhzero\subset V$ consist of continuous piecewise-linear functions on
+triangles with zero trace. Find $\Delta u_h^k\in\Vhzero$ such that
+
+$$
+\delta_uR(u_h^k;v_h)[\Delta u_h^k]=-R(u_h^k;v_h)
+\qquad\forall v_h\in\Vhzero .
+$$ {#eq-c9-diffusion-newton}
+
+Then update $u_h^{k+1}=u_h^k+\omega\Delta u_h^k$, where $\omega=1$ for a
+full Newton step. At each fixed iterate the correction equation is linear.
+In fact, with $v_h=w_h$, the negative of @eq-c9-diffusion-tangent is
+bounded below by $k_0\norm{\grad w_h}_{L^2}^2$ because $c\ge 0$.
+This is positive for every nonzero $w_h$ with zero trace. Consequently,
+the negative of the free residual Jacobian is symmetric positive definite.
+The lower bound controls the $H^1$ seminorm, not the $W^{1,4}$ norm.
+
+### FEniCSx example
+
+Set $k_0=1$ and $c(x,y)=1+x$. Choose $u_{\mathrm{exact}}=4x(1-x)y(1-y)$,
+which vanishes on all four edges. Substitute it for $u$ on the left of
+@eq-c9-diffusion-strong to obtain $f$. In the
+[companion notebook](https://github.com/CEADpx/finite-element-methods/blob/main/notebooks/nonlinear/nonlinear_diffusion_reaction.ipynb),
+UFL evaluates these spatial derivatives of the known function. The
+residual and its derivative with respect to the unknown are supplied
+explicitly, following @eq-c9-diffusion-forms and @eq-c9-diffusion-tangent.
+Here `u` is the current finite element function, `v` is a test function,
+and `w` is the trial direction for the correction:
+
+```{python}
+#| eval: false
+g, gv, gw = ufl.grad(u), ufl.grad(v), ufl.grad(w)
+k = k0 * (1 + ufl.dot(g, g))
+ell = f * v * dx
+a = (k * ufl.dot(g, gv) + c * u**3 * v) * dx
+residual = ell - a
+tangent = -(
+    k * ufl.dot(gw, gv)
+    + 2 * k0 * ufl.dot(g, gw) * ufl.dot(g, gv)
+    + 3 * c * u**2 * w * v
+) * dx
+```
+
+Pass `residual` and `J=tangent` to `NonlinearProblem` together with the
+zero Dirichlet condition, as in @sec-c9-fenicsx. The notebook starts from
+zero and calls `solve()` once at the full load, using PETSc Newton
+iteration with backtracking. On the mesh with $288$ triangles, the solver
+took seven Newton iterations and the computed $L^2$ error was
+$2.1808\times10^{-3}$. @fig-c9-nonlinear-diffusion compares the two
+solutions on the same color scale.
+
+![Finite element and exact solutions of the nonlinear diffusion and reaction problem on the unit square.](../figures/chapter09/nonlinear-diffusion.png){#fig-c9-nonlinear-diffusion width="95%" fig-pos="H"}
+
 ## Chapter summary
 
 - Hyperelastic equilibrium is $R(\bu;\bv)=\ell_{\mathrm{hyp}}(\bv)
@@ -1197,8 +1440,12 @@ or higher-degree displacement.
 - The assembled Jacobian is $\bK_T=\partial\bR/\partial\bU$.
   Solve $(K_T)_{ff}\Delta\bU_f=-\bR_f$, retain the prescribed coefficients,
   and recover support reactions as $-\bR_p$.
-- Load stepping uses a previous equilibrium as the next initial guess.
-  Backtracking reduces a correction when a full update is unsuitable.
+- Load stepping changes the load between equilibrium solves and uses a
+  previous equilibrium as the next initial guess. Backtracking keeps the
+  load fixed and reduces a correction when the full update is unsuitable.
 - Residual convergence, tangent verification, positive deformation
   determinants, force balance, and mesh accuracy are distinct checks.
   UFL supplies derivatives of the stated forms; those checks remain necessary.
+- For nonlinear diffusion, the cubic gradient term calls for
+  $W^{1,4}_0(\Om)$ in the continuous problem. The residual and its tangent
+  can be written directly in UFL and passed to the same nonlinear solver.
