@@ -6,6 +6,13 @@ Lecture materials are grouped by topic.
 
 - Large deformation and reference formulation: [PDF](nonlinear-fem/chapter11_large_deformation_lecture01.pdf) · [LaTeX](nonlinear-fem/chapter11_large_deformation_lecture01.tex).
 - Newton iteration and the tangent system: [PDF](nonlinear-fem/chapter11_newton_lecture02.pdf) · [LaTeX](nonlinear-fem/chapter11_newton_lecture02.tex).
+- Nonlinear solution and FEniCSx implementation: [PDF](nonlinear-fem/chapter11_nonlinear_implementation_lecture03.pdf) · [LaTeX](nonlinear-fem/chapter11_nonlinear_implementation_lecture03.tex).
+- Nonlinear diffusion and reaction: [PDF](nonlinear-fem/chapter11_nonlinear_diffusion_lecture04.pdf) · [LaTeX](nonlinear-fem/chapter11_nonlinear_diffusion_lecture04.tex).
+
+The [cantilever notebook](../../notebooks/nonlinear/hyperelasticity_newton.ipynb)
+for Lecture 3 uses UFL differentiation. The follow-up
+[diffusion and reaction notebook](../../notebooks/nonlinear/nonlinear_diffusion_reaction.ipynb)
+for Lecture 4 supplies the residual and tangent explicitly.
 
 ## `finite-element-assembly/`
 
