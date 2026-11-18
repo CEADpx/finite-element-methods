@@ -5,7 +5,7 @@
 - [Assignment 3: Variational Formulations and Energy Principles](assignment-03/assignment-03.qmd)
 - [Assignment 4: Finite Element Computation in One and Two Dimensions](assignment-04/assignment-04.qmd)
 - [Assignment 5: Adaptive Refinement of a Mounting Bracket](assignment-05/notebooks/problem1.ipynb)
-- [Assignment 6: Identify a Silicone Material by Indentation](assignment-06/assignment-06.ipynb)
+- [Assignment 6: Identify a Silicone Material by Indentation](assignment-06/notebooks/problem1.ipynb)
 
 Assignment 6 is a notebook-only nonlinear finite element project. Students
 write the residual and tangent in UFL, compare four and eight load steps,
