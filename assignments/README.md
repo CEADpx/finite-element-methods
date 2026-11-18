@@ -5,6 +5,12 @@
 - [Assignment 3: Variational Formulations and Energy Principles](assignment-03/assignment-03.qmd)
 - [Assignment 4: Finite Element Computation in One and Two Dimensions](assignment-04/assignment-04.qmd)
 - [Assignment 5: Adaptive Refinement of a Mounting Bracket](assignment-05/notebooks/problem1.ipynb)
+- [Assignment 6: Identify a Silicone Material by Indentation](assignment-06/assignment-06.ipynb)
+
+Assignment 6 is a notebook-only nonlinear finite element project. Students
+write the residual and tangent in UFL, compare four and eight load steps,
+select a material model and parameters from narrow-punch data, and predict a
+wider-punch test without refitting. Submit the executed notebook with the results.
 
 Assignment 5 is provided only as a notebook. It contains the complete problem,
 tasks, marks, supplied routines and submission instructions. Students implement
@@ -38,7 +44,7 @@ entire problem section when reordering problems; the displayed numbers update
 automatically in both HTML and PDF.
 
 Assignments 1-4 have their own folders holding a `.qmd` source, rendered PDF
-and any notebooks. Assignment 5 is notebook-only and does not need Quarto
+and any notebooks. Assignments 5 and 6 are notebook-only and do not need Quarto
 rendering. Render the `.qmd` assignments from the repository root with
 
 ```bash
