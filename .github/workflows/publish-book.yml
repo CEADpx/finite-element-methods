@@ -42,8 +42,11 @@ jobs:
           python --version
           quarto --version
 
-      - name: Install TinyTeX and required math font
+      - name: Install PDF build dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends librsvg2-bin
+          rsvg-convert --version
           quarto install tinytex --no-prompt
           export PATH="$HOME/.TinyTeX/bin/x86_64-linux:$PATH"
           tlmgr update --self
