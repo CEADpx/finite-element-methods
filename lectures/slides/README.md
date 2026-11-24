@@ -2,6 +2,18 @@
 
 Lecture materials are grouped by topic.
 
+## `transient-fem/`
+
+- Lecture 1, heat conduction through spatial discretization and the theta method:
+  [PDF](transient-fem/chapter12_transient_lecture01.pdf) · [LaTeX](transient-fem/chapter12_transient_lecture01.tex).
+- Lecture 2, time-step variational forms and a localized-heater FEniCSx example:
+  [PDF](transient-fem/chapter12_transient_lecture02.pdf) · [LaTeX](transient-fem/chapter12_transient_lecture02.tex).
+
+Both decks use Chapter 4's thermal notation and boundary-flux convention.
+The [Lecture 2 notebook](../../notebooks/transient/heat_theta.ipynb) contains
+the full heat-equation implementation and saved results. Consistency and
+stability receive a brief comparison in the slides.
+
 ## `nonlinear-fem/`
 
 - Large deformation and reference formulation: [PDF](nonlinear-fem/chapter11_large_deformation_lecture01.pdf) · [LaTeX](nonlinear-fem/chapter11_large_deformation_lecture01.tex).
